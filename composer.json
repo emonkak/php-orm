@@ -1,0 +1,31 @@
+{
+    "name": "emonkak/orm",
+    "description": "",
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "Shota Nozaki",
+            "email": "emonkak@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "emonkak/collection": "dev-master",
+        "emonkak/database": "dev-master",
+        "emonkak/query-builder": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.4",
+        "satooshi/php-coveralls": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Emonkak\\Orm\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Emonkak\\Orm\\Tests\\": "tests/"
+        }
+    }
+}
