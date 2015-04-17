@@ -12,12 +12,12 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @var string
      */
-    protected $innerTable;
+    protected $referenceTable;
 
     /**
      * @var string
      */
-    protected $innerKey;
+    protected $referenceKey;
 
     /**
      * @var \Closure
@@ -36,23 +36,23 @@ abstract class AbstractRelation implements RelationInterface
 
     /**
      * @param string   $class
-     * @param string   $innerTable
-     * @param string   $innerKey
+     * @param string   $referenceTable
+     * @param string   $referenceKey
      * @param \Closure $outerKeySelector
      * @param \Closure $innerKeySelector
      * @param \Closure $resultValueSelector
      */
     public function __construct(
         $class,
-        $innerTable,
-        $innerKey,
+        $referenceTable,
+        $referenceKey,
         \Closure $outerKeySelector,
         \Closure $innerKeySelector,
         \Closure $resultValueSelector
     ) {
         $this->class = $class;
-        $this->innerTable = $innerTable;
-        $this->innerKey = $innerKey;
+        $this->referenceTable = $referenceTable;
+        $this->referenceKey = $referenceKey;
         $this->outerKeySelector = $outerKeySelector;
         $this->innerKeySelector = $innerKeySelector;
         $this->resultValueSelector = $resultValueSelector;
@@ -69,17 +69,17 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritDoc}
      */
-    public function getInnerTable()
+    public function getReferenceTable()
     {
-        return $this->innerTable;
+        return $this->referenceTable;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getInnerKey()
+    public function getReferenceKey()
     {
-        return $this->innerKey;
+        return $this->referenceKey;
     }
 
     /**

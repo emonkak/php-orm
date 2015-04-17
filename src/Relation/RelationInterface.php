@@ -12,18 +12,18 @@ interface RelationInterface
     public function getClass();
 
     /**
-     * Gets the inner table name.
+     * Gets the reference table name.
      *
      * @return string
      */
-    public function getInnerTable();
+    public function getReferenceTable();
 
     /**
-     * Gets the inner table key.
+     * Gets the reference table key.
      *
      * @return string
      */
-    public function getInnerKey();
+    public function getReferenceKey();
 
     /**
      * Gets the outer table key selector function.
