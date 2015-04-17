@@ -20,47 +20,23 @@ class RelationQuery implements QueryInterface
     private $relation;
 
     /**
-     * @var RelationQueryBuilderInterface
-     */
-    private $relationQueryBuilder;
-
-    /**
      * @var callable
      */
     private $callback;
 
     /**
-     * @param ExecutableQueryInterface $outerQuery
+     * @param ExexutableQueryInterface $outerQuery
      * @param RelationInterface        $relation
-    */
-    public static function create(ExecutableQueryInterface $outerQuery, RelationInterface $relation)
-    {
-        return new self($outerQuery, $relation, RelationQueryBuilder::getInstance());
-    }
-
-    /**
-     * @param oxexutableQueryInterface      $outerQuery
-     * @param RelationInterface             $relation
-     * @param RelationQueryBuilderInterface $relationQueryBuilder
+     * @param callable                 $callback (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
     */
     public function __construct(
         ExecutableQueryInterface $outerQuery,
         RelationInterface $relation,
-        RelationQueryBuilderInterface $relationQueryBuilder
+        callable $callback = null
     ) {
         $this->outerQuery = $outerQuery;
         $this->relation = $relation;
-        $this->relationQueryBuilder = $relationQueryBuilder;
-    }
-
-    /**
-     * @param callable $callback (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
-     * @return self
-     */
-    public function withCallback(callable $callback)
-    {
         $this->callback = $callback;
-        return $this;
     }
 
     /**
@@ -81,10 +57,10 @@ class RelationQuery implements QueryInterface
             return $outerValues;
         }
 
-        $relation = $this->relation;
         $callback = $this->callback;
+        $relation = $this->relation;
 
-        $innerQuery = $this->relationQueryBuilder->build($outerValues, $relation);
+        $innerQuery = $this->buildQuery($outerValues, $relation);
 
         if ($callback) {
             $innerQuery = $callback($innerQuery, $outerValues);
@@ -101,5 +77,24 @@ class RelationQuery implements QueryInterface
     public function __toString()
     {
         return (string) $this->outerQuery;
+    }
+
+    /**
+     * @param array             $outerValues
+     * @param RelationInterface $relation
+     * @return ExecutableQueryInterface
+     */
+    protected function buildQuery(array $outerValues, RelationInterface $relation)
+    {
+        $sql = sprintf(
+            'SELECT * FROM `%s` WHERE `%s` IN (%s)',
+            $relation->getReferenceTable(),
+            $relation->getReferenceKey(),
+            implode(', ', array_fill(0, count($outerValues), '?'))
+        );
+
+        $binds = array_map($relation->getOuterKeySelector(), $outerValues);
+
+        return (new PlainQuery($sql, $binds))->withClass($relation->getClass());
     }
 }
