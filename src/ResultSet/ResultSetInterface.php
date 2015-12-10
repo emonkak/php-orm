@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\ResultSet;
 
-interface ResultSetInterface extends \IteratorAggregate
+interface ResultSetInterface extends \IteratorAggregate, \Countable
 {
     /**
      * @return mixed|null
@@ -19,4 +19,10 @@ interface ResultSetInterface extends \IteratorAggregate
      * @return mixed[]
      */
     public function column($columnNumber = 0);
+
+    /**
+     * @param integer $columnNumber
+     * @return mixed
+     */
+    public function value($columnNumber = 0);
 }

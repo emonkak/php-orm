@@ -42,9 +42,27 @@ class IteratorResultSet implements ResultSetInterface
     /**
      * {@inheritDoc}
      */
+    public function count()
+    {
+        return iterator_count($this->iterator);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function first()
+    {
+        foreach ($this->iterator as $result) {
+            return $result;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function all()
     {
-        return $this->toList();
+        return iterator_to_array($this->iterator, false);
     }
 
     /**
@@ -60,5 +78,18 @@ class IteratorResultSet implements ResultSetInterface
         }
 
         return $results;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function value($columnNumber = 0)
+    {
+        foreach ($this->iterator as $result) {
+            $values = array_values((array) $result);
+            return isset($values[$columnNumber]) ? $values[$columnNumber] : null;
+        }
+
+        return null;
     }
 }

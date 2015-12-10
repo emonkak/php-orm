@@ -3,9 +3,10 @@
 namespace Emonkak\Orm\Query;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\QueryBuilder\QueryInterface;
+use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\QueryBuilder\QueryBuilderInterface;
 
-interface ExecutableQueryInterface extends QueryInterface
+interface QueryInterface extends QueryBuilderInterface
 {
     /**
      * @param PDOInterface $pdo
