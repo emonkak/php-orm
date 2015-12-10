@@ -9,7 +9,7 @@ class OneToOne extends AbstractRelation
     /**
      * {@inheritDoc}
      */
-    public function join($outerValues, $innerValues)
+    public function join(array $outerValues, array $innerValues)
     {
         $collection = Collection::from($outerValues)->outerJoin(
             $innerValues,

@@ -2,12 +2,19 @@
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Database\PDOInterface;
+
 class RelationBuilder
 {
     /**
+     * @var PDOInterface
+     */
+    private $pdo;
+
+    /**
      * @var string
      */
-    private $class;
+    private $innerClass;
 
     /**
      * @var string
@@ -35,12 +42,22 @@ class RelationBuilder
     private $resultValueSelector;
 
     /**
-     * @param string $class
+     * @param PDOInterface $pdo
      * @return self
      */
-    public function withClass($class)
+    public function pdo(PDOInterface $pdo)
     {
-        $this->class = $class;
+        $this->pdo = $pdo;
+        return $this;
+    }
+
+    /**
+     * @param string $innerClass
+     * @return self
+     */
+    public function innerClass($innerClass)
+    {
+        $this->innerClass = $innerClass;
         return $this;
     }
 
@@ -106,7 +123,7 @@ class RelationBuilder
     public function innerKeySelector(callable $innerKeySelector)
     {
         $this->innerKeySelector = $innerKeySelector;
-        return $thid;
+        return $this;
     }
 
     /**
@@ -140,6 +157,7 @@ class RelationBuilder
         $this->validate();
 
         return new OneToOne(
+            $this->pdo,
             $this->class,
             $this->referenceTable,
             $this->referenceKey,
@@ -157,7 +175,8 @@ class RelationBuilder
         $this->validate();
 
         return new OneToMany(
-            $this->class,
+            $this->pdo,
+            $this->innerClass,
             $this->referenceTable,
             $this->referenceKey,
             $this->outerKeySelector,
@@ -167,11 +186,12 @@ class RelationBuilder
     }
 
     /**
-     * Validates instance state.
+     * Validates this instance state.
      */
     private function validate()
     {
-        if ($this->class === null
+        if ($this->pdo === null
+            || $this->innerClass === null
             || $this->referenceTable === null
             || $this->referenceKey === null
             || $this->outerKeySelector === null

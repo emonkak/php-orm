@@ -3,8 +3,9 @@
 namespace Emonkak\Orm\Query;
 
 use Emonkak\QueryBuilder\ToStringable;
+use Emonkak\QueryBuilder\QueryBuilderInterface;
 
-class PlainQuery implements ExecutableQueryInterface
+class PlainQuery implements QueryInterface
 {
     use Executable;
     use ToStringable;
@@ -20,11 +21,12 @@ class PlainQuery implements ExecutableQueryInterface
     private $binds;
 
     /**
-     * @param string  $sql
-     * @param mixed[] $binds
+     * @param QueryBuilderInterface $query
+     * @return self
      */
-    public static function create($sql, array $binds = [])
+    public static function fromQuery(QueryBuilderInterface $query)
     {
+        list($sql, $binds) = $query->build();
         return new self($sql, $binds);
     }
 
@@ -41,7 +43,7 @@ class PlainQuery implements ExecutableQueryInterface
     /**
      * {@inheritDoc}
      */
-    public function compile()
+    public function build()
     {
         return [$this->sql, $this->binds];
     }

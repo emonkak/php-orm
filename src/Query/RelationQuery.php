@@ -5,7 +5,6 @@ namespace Emonkak\Orm\Query;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\IteratorResultSet;
-use Emonkak\QueryBuilder\QueryInterface;
 
 class RelationQuery implements QueryInterface
 {
@@ -22,29 +21,34 @@ class RelationQuery implements QueryInterface
     /**
      * @var callable
      */
-    private $callback;
+    private $constraint;
 
     /**
-     * @param ExexutableQueryInterface $outerQuery
-     * @param RelationInterface        $relation
-     * @param callable                 $callback (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
-    */
-    public function __construct(
-        ExecutableQueryInterface $outerQuery,
-        RelationInterface $relation,
-        callable $callback = null
-    ) {
+     * @param QueryInterface    $outerQuery
+     * @param RelationInterface $relation
+     * @param callable          $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
+     */
+    public function __construct(QueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
+    {
         $this->outerQuery = $outerQuery;
         $this->relation = $relation;
-        $this->callback = $callback;
+        $this->constraint = $constraint;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function compile()
+    public function __toString()
     {
-        return $this->outerQuery->compile();
+        return (string) $this->outerQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function build()
+    {
+        return $this->outerQuery->build();
     }
 
     /**
@@ -57,44 +61,14 @@ class RelationQuery implements QueryInterface
             return $outerValues;
         }
 
-        $callback = $this->callback;
+        $constraint = $this->constraint;
         $relation = $this->relation;
 
-        $innerQuery = $this->buildQuery($outerValues, $relation);
+        $innerQuery = $constraint($relation->buildQuery($outerValues));
+        $innerValues = $relation->executeQuery($innerQuery)->all();
 
-        if ($callback) {
-            $innerQuery = $callback($innerQuery, $outerValues);
-        }
-
-        $result = $relation->join($outerValues, $innerQuery->execute($pdo));
+        $result = $relation->join($outerValues, $innerValues);
 
         return new IteratorResultSet($result);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-        return (string) $this->outerQuery;
-    }
-
-    /**
-     * @param array             $outerValues
-     * @param RelationInterface $relation
-     * @return ExecutableQueryInterface
-     */
-    protected function buildQuery(array $outerValues, RelationInterface $relation)
-    {
-        $sql = sprintf(
-            'SELECT * FROM `%s` WHERE `%s` IN (%s)',
-            $relation->getReferenceTable(),
-            $relation->getReferenceKey(),
-            implode(', ', array_fill(0, count($outerValues), '?'))
-        );
-
-        $binds = array_map($relation->getOuterKeySelector(), $outerValues);
-
-        return (new PlainQuery($sql, $binds))->withClass($relation->getClass());
     }
 }
