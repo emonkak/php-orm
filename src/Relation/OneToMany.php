@@ -11,11 +11,15 @@ class OneToMany extends AbstractRelation
      */
     public function join($outerClass, array $outerValues, array $innerValues)
     {
+        $outerKeySelector = \Closure::bind($this->outerKeySelector, null, $outerClass);
+        $innerKeySelector = \Closure::bind($this->innerKeySelector, null, $this->innerClass);
+        $resultValueSelector = \Closure::bind($this->resultValueSelector, null, $outerClass);
+
         $collection = Collection::from($outerValues)->groupJoin(
             $innerValues,
-            \Closure::bind($this->outerKeySelector, null, $outerClass),
-            \Closure::bind($this->innerKeySelector, null, $this->innerClass),
-            \Closure::bind($this->resultValueSelector, null, $outerClass)
+            $outerKeySelector,
+            $innerKeySelector,
+            $resultValueSelector
         );
 
         return $collection->getIterator();

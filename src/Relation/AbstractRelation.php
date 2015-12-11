@@ -3,8 +3,8 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\Query\ExecutableQueryInterface;
 use Emonkak\Orm\Query\SelectQuery;
-use Emonkak\Orm\Query\QueryInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
@@ -21,12 +21,12 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @var string
      */
-    protected $referenceTable;
+    protected $foreignTable;
 
     /**
      * @var string
      */
-    protected $referenceKey;
+    protected $foreignKey;
 
     /**
      * @var \Closure
@@ -46,8 +46,8 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @param PDOInterface $pdo                 The connection to use in this relation.
      * @param string       $innerClass          The class to map.
-     * @param string       $referenceTable      The reference table name.
-     * @param string       $referenceKey        The reference table key.
+     * @param string       $foreignTable        The foreign table name.
+     * @param string       $foreignKey          The foreign table key.
      * @param \Closure     $outerKeySelector    The key selector for outer value.
      * @param \Closure     $innerKeySelector    The key selector for inner value.
      * @param \Closure     $resultValueSelector The result value selector.
@@ -55,16 +55,16 @@ abstract class AbstractRelation implements RelationInterface
     public function __construct(
         PDOInterface $pdo,
         $innerClass,
-        $referenceTable,
-        $referenceKey,
+        $foreignTable,
+        $foreignKey,
         \Closure $outerKeySelector,
         \Closure $innerKeySelector,
         \Closure $resultValueSelector
     ) {
         $this->pdo = $pdo;
         $this->innerClass = $innerClass;
-        $this->referenceTable = $referenceTable;
-        $this->referenceKey = $referenceKey;
+        $this->foreignTable = $foreignTable;
+        $this->foreignKey = $foreignKey;
         $this->outerKeySelector = $outerKeySelector;
         $this->innerKeySelector = $innerKeySelector;
         $this->resultValueSelector = $resultValueSelector;
@@ -75,18 +75,19 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function buildQuery($outerClass, array $outerValues)
     {
-        $outerKeys = array_map(\Closure::bind($this->outerKeySelector, null, $outerClass), $outerValues);
+        $outerKeySelector = \Closure::bind($this->outerKeySelector, null, $outerClass);
+        $outerKeys = array_map($outerKeySelector, $outerValues);
 
         return SelectQuery::create()
             ->to($this->innerClass)
-            ->from($this->referenceTable)
-            ->where($this->referenceKey, 'IN', $outerKeys);
+            ->from($this->foreignTable)
+            ->where($this->foreignTable . '.' . $this->foreignKey, 'IN', $outerKeys);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function executeQuery(QueryInterface $query)
+    public function executeQuery(ExecutableQueryInterface $query)
     {
         return $query->execute($this->pdo);
     }

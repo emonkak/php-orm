@@ -2,46 +2,26 @@
 
 namespace Emonkak\Orm\Query;
 
-use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\QueryBuilder\SelectQueryBuilder;
 
-class SelectQuery extends SelectQueryBuilder implements QueryInterface
+class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
 {
-    use Executable;
-
-    /**
-     * @var array (RelationInterface, callable)[]
-     */
-    private $relations = [];
+    use Executable, Observable {
+        Observable::execute insteadof Executable;
+    }
 
     /**
      * @param RelationInterface $relation
      * @param callable          $constraint
+     * @return self
      */
     public function with(RelationInterface $relation, callable $constraint = null)
     {
-        $chained = clone $this;
-        $chained->relations[] = [$relation, $constraint];
-        return $chained;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function execute(PDOInterface $pdo)
-    {
-        $class = $this->class;
-        $query = PlainQuery::fromQuery($this)->to($class);
-
-        foreach ($this->relations as $relation) {
-            list ($relation, $constraint) = $relation;
-
-            $query = new RelationQuery($class, $query, $relation, $constraint ?: function($query) {
+        return $this->observe(function($query) use ($relation, $constraint) {
+            return new RelationQuery($this->class, $query, $relation, $constraint ?: function($query) {
                 return $query;
             });
-        }
-
-        return $query->execute($pdo);
+        });
     }
 }
