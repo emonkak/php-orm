@@ -31,12 +31,13 @@ class SelectQuery extends SelectQueryBuilder implements QueryInterface
      */
     public function execute(PDOInterface $pdo)
     {
-        $query = PlainQuery::fromQuery($this)->to($this->class);
+        $class = $this->class;
+        $query = PlainQuery::fromQuery($this)->to($class);
 
         foreach ($this->relations as $relation) {
             list ($relation, $constraint) = $relation;
 
-            $query = new RelationQuery($query, $relation, $constraint ?: function($query) {
+            $query = new RelationQuery($class, $query, $relation, $constraint ?: function($query) {
                 return $query;
             });
         }

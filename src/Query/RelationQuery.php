@@ -9,6 +9,11 @@ use Emonkak\Orm\ResultSet\IteratorResultSet;
 class RelationQuery implements QueryInterface
 {
     /**
+     * @var string
+     */
+    private $outerClass;
+
+    /**
      * @var ExecutableQueryInterface
      */
     private $outerQuery;
@@ -24,12 +29,14 @@ class RelationQuery implements QueryInterface
     private $constraint;
 
     /**
+     * @param string            $outerClass
      * @param QueryInterface    $outerQuery
      * @param RelationInterface $relation
      * @param callable          $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
      */
-    public function __construct(QueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
+    public function __construct($outerClass, QueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
     {
+        $this->outerClass = $outerClass;
         $this->outerQuery = $outerQuery;
         $this->relation = $relation;
         $this->constraint = $constraint;
@@ -40,7 +47,7 @@ class RelationQuery implements QueryInterface
      */
     public function __toString()
     {
-        return (string) $this->outerQuery;
+        return $this->outerQuery->__toString();
     }
 
     /**
@@ -61,13 +68,14 @@ class RelationQuery implements QueryInterface
             return $outerValues;
         }
 
+        $outerClass = $this->outerClass;
         $constraint = $this->constraint;
         $relation = $this->relation;
 
-        $innerQuery = $constraint($relation->buildQuery($outerValues));
+        $innerQuery = $constraint($relation->buildQuery($outerClass, $outerValues));
         $innerValues = $relation->executeQuery($innerQuery)->all();
 
-        $result = $relation->join($outerValues, $innerValues);
+        $result = $relation->join($outerClass, $outerValues, $innerValues);
 
         return new IteratorResultSet($result);
     }
