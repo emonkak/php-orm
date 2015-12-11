@@ -44,7 +44,7 @@ trait Executable
 
     /**
      * @param PDOStatementInterface $stmt
-     * @param array                 $binds
+     * @param mixed[]               $binds
      */
     private function bindTo(PDOStatementInterface $stmt, array $binds)
     {
@@ -68,4 +68,9 @@ trait Executable
             }
         }
     }
+
+    /**
+     * @return array (sql, binds)
+     */
+    abstract public function build();
 }

@@ -10,19 +10,21 @@ interface RelationInterface
     /**
      * Joins between outer values and inner values.
      *
-     * @param array $outerValues
-     * @param array $innerValues
+     * @param string  $outerClass
+     * @param mixed[] $outerValues
+     * @param mixed[] $innerValues
      * @return \Iterator
      */
-    public function join(array $outerValues, array $innerValues);
+    public function join($outerClass, array $outerValues, array $innerValues);
 
     /**
      * Builds the query to fetch inner values.
      *
-     * @param array $outerValues
+     * @param string  $outerClass
+     * @param mixed[] $outerValues
      * @return QueryInterface
      */
-    public function buildQuery(array $outerValues);
+    public function buildQuery($outerClass, array $outerValues);
 
     /**
      * Executes the query.

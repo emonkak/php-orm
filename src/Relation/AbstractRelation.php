@@ -29,17 +29,17 @@ abstract class AbstractRelation implements RelationInterface
     protected $referenceKey;
 
     /**
-     * @var callable
+     * @var \Closure
      */
     protected $outerKeySelector;
 
     /**
-     * @var callable
+     * @var \Closure
      */
     protected $innerKeySelector;
 
     /**
-     * @var callable
+     * @var \Closure
      */
     protected $resultValueSelector;
 
@@ -48,18 +48,18 @@ abstract class AbstractRelation implements RelationInterface
      * @param string       $innerClass          The class to map.
      * @param string       $referenceTable      The reference table name.
      * @param string       $referenceKey        The reference table key.
-     * @param callable     $outerKeySelector    The key selector for outer value.
-     * @param callable     $innerKeySelector    The key selector for inner value.
-     * @param callable     $resultValueSelector The result value selector.
+     * @param \Closure     $outerKeySelector    The key selector for outer value.
+     * @param \Closure     $innerKeySelector    The key selector for inner value.
+     * @param \Closure     $resultValueSelector The result value selector.
      */
     public function __construct(
         PDOInterface $pdo,
         $innerClass,
         $referenceTable,
         $referenceKey,
-        callable $outerKeySelector,
-        callable $innerKeySelector,
-        callable $resultValueSelector
+        \Closure $outerKeySelector,
+        \Closure $innerKeySelector,
+        \Closure $resultValueSelector
     ) {
         $this->pdo = $pdo;
         $this->innerClass = $innerClass;
@@ -73,9 +73,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritDoc}
      */
-    public function buildQuery(array $outerValues)
+    public function buildQuery($outerClass, array $outerValues)
     {
-        $outerKeys = array_map($this->outerKeySelector, $outerValues);
+        $outerKeys = array_map(\Closure::bind($this->outerKeySelector, null, $outerClass), $outerValues);
 
         return SelectQuery::create()
             ->to($this->innerClass)
