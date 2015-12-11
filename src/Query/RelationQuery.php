@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\IteratorResultSet;
 
-class RelationQuery implements QueryInterface
+class RelationQuery implements ExecutableQueryInterface
 {
     /**
      * @var string
@@ -29,12 +29,12 @@ class RelationQuery implements QueryInterface
     private $constraint;
 
     /**
-     * @param string            $outerClass
-     * @param QueryInterface    $outerQuery
-     * @param RelationInterface $relation
-     * @param callable          $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
+     * @param string                   $outerClass
+     * @param ExecutableQueryInterface $outerQuery
+     * @param RelationInterface        $relation
+     * @param callable                 $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
      */
-    public function __construct($outerClass, QueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
+    public function __construct($outerClass, ExecutableQueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
     {
         $this->outerClass = $outerClass;
         $this->outerQuery = $outerQuery;

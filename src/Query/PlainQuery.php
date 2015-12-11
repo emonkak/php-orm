@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Query;
 use Emonkak\QueryBuilder\ToStringable;
 use Emonkak\QueryBuilder\QueryBuilderInterface;
 
-class PlainQuery implements QueryInterface
+class PlainQuery implements ExecutableQueryInterface
 {
     use Executable;
     use ToStringable;

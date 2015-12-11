@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Orm\Query\QueryInterface;
+use Emonkak\Orm\Query\ExecutableQueryInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 interface RelationInterface
@@ -22,15 +22,15 @@ interface RelationInterface
      *
      * @param string  $outerClass
      * @param mixed[] $outerValues
-     * @return QueryInterface
+     * @return ExecutableQueryInterface
      */
     public function buildQuery($outerClass, array $outerValues);
 
     /**
      * Executes the query.
      *
-     * @param QueryInterface $query
+     * @param ExecutableQueryInterface $query
      * @return ResultSetInterface
      */
-    public function executeQuery(QueryInterface $query);
+    public function executeQuery(ExecutableQueryInterface $query);
 }
