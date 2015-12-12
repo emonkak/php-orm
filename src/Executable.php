@@ -1,58 +1,46 @@
 <?php
 
-namespace Emonkak\Orm\Query;
+namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\PDOResultSet;
-use Emonkak\QueryBuilder\QueryBuilderInterface;
 
-class ExecutableQuery implements ExecutableQueryInterface
+trait Executable
 {
-    /**
-     * @var QueryInterface
-     */
-    private $query;
-
     /**
      * @var string
      */
-    private $class;
+    private $class = 'stdClass';
 
     /**
-     * @param QueryBuilderInterface $query
-     * @param string                $class
+     * @param string $class
+     * @return self
      */
-    public function __construct(QueryBuilderInterface $query, $class)
+    public function to($class)
     {
-        $this->query = $query;
-        $this->class = $class;
+        $chained = $this->chained();
+        $chained->class = $class;
+        return $chained;
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
-    public function __toString()
+    public function getClass()
     {
-        return $this->query->__toString();
+        return $this->class;
     }
 
     /**
-     * {@inheritDoc}
+     * @param PDOInterface $connection
+     * @return ResultSetInterface
      */
-    public function build()
+    public function execute(PDOInterface $connection)
     {
-        return $this->query->build();
-    }
+        list ($sql, $binds) = $this->build();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function execute(PDOInterface $pdo)
-    {
-        list ($sql, $binds) = $this->query->build();
-
-        $stmt = $pdo->prepare($sql);
+        $stmt = $connection->prepare($sql);
         $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
 
         $this->bindTo($stmt, $binds);
@@ -89,4 +77,14 @@ class ExecutableQuery implements ExecutableQueryInterface
             }
         }
     }
+
+    /**
+     * @return array (sql: string, binds: mixed)
+     */
+    abstract public function build();
+
+    /**
+     * @return self
+     */
+    abstract protected function chained();
 }

@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Orm\Query\ExecutableQueryInterface;
+use Emonkak\Orm\ExecutableQueryInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 interface RelationInterface
@@ -10,27 +10,52 @@ interface RelationInterface
     /**
      * Joins between outer values and inner values.
      *
-     * @param string  $outerClass
      * @param mixed[] $outerValues
      * @param mixed[] $innerValues
+     * @param string  $outerClass
      * @return \Iterator
      */
-    public function join($outerClass, array $outerValues, array $innerValues);
+    public function join(array $outerValues, array $innerValues, $outerClass);
 
     /**
      * Builds the query to fetch inner values.
      *
-     * @param string  $outerClass
      * @param mixed[] $outerValues
+     * @param string  $outerClass
      * @return ExecutableQueryInterface
      */
-    public function buildQuery($outerClass, array $outerValues);
+    public function buildQuery(array $outerValues, $outerClass);
 
     /**
-     * Executes the query.
+     * Adds the relation to this relation.
      *
-     * @param ExecutableQueryInterface $query
-     * @return ResultSetInterface
+     * @param RelationInterface $relation
+     * @return self
      */
-    public function executeQuery(ExecutableQueryInterface $query);
+    public function with(RelationInterface $relation);
+
+    /**
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @return string
+     */
+    public function getTable();
+
+    /**
+     * @return string
+     */
+    public function getRelationKey();
+
+    /**
+     * @return string
+     */
+    public function getOuterKey();
+
+    /**
+     * @return string
+     */
+    public function getInnerKey();
 }

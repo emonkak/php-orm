@@ -1,6 +1,6 @@
 <?php
 
-namespace Emonkak\Orm\Query;
+namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 
@@ -17,7 +17,7 @@ trait Observable
      */
     public function observe(callable $observer)
     {
-        $chained = clone $this;
+        $chained = $this->chained();
         $chained->observers[] = $observer;
         return $chained;
     }
@@ -25,19 +25,24 @@ trait Observable
     /**
      * {@inheritDoc}
      */
-    public function execute(PDOInterface $pdo)
+    public function execute(PDOInterface $connection)
     {
-        $query = $this->toExecutable();
+        $query = PlainQuery::fromQuery($this)->to($this->getClass());
 
         foreach ($this->observers as $observer) {
-            $query = $observer($query);
+            $query = $observer($query, $connection);
         }
 
-        return $query->execute($pdo);
+        return $query->execute($connection);
     }
 
     /**
-     * @return QueryInterface
+     * @return string
      */
-    abstract public function toExecutable();
+    abstract public function getClass();
+
+    /**
+     * @return self
+     */
+    abstract protected function chained();
 }

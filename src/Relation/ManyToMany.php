@@ -2,55 +2,198 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
-use Emonkak\QueryBuilder\Expression\ExpressionInterface;
+use Emonkak\Collection\Collection;
 
-class ManyToMany extends OneToMany
+class ManyToMany implements RelationInterface
 {
+    const PIVOT_KEY_PREFIX = '__pivot_';
+
     /**
      * @var string
      */
-    private $intersectionTable;
+    private $relationKey;
 
     /**
-     * @var ExpressionInterface
+     * @var RelationInterface
      */
-    private $intersectionCondition;
+    private $hasRelation;
 
     /**
-     * @param PDOInterface        $pdo                   The connection to use in this relation.
-     * @param string              $innerClass            The class to map.
-     * @param string              $referenceTable        The reference table name.
-     * @param string              $referenceColumn       The reference table column.
-     * @param string              $intersectionTable     The intersection table name.
-     * @param ExpressionInterface $intersectionCondition The intersection table join condition.
-     * @param \Closure            $outerKeySelector      The key selector for outer value.
-     * @param \Closure            $innerKeySelector      The key selector for inner value.
-     * @param \Closure            $resultValueSelector   The result value selector.
+     * @var RelationInterface
+     */
+    private $belongsToRelation;
+
+    /**
+     * @param string            $relationKey
+     * @param RelationInterface $hasRelation
+     * @param RelationInterface $belongsToRelation
      */
     public function __construct(
-        PDOInterface $pdo,
-        $innerClass,
-        $referenceTable,
-        $referenceColumn,
-        $intersectionTable,
-        ExpressionInterface $intersectionCondition,
-        \Closure $outerKeySelector,
-        \Closure $innerKeySelector,
-        \Closure $resultValueSelector
+        $relationKey,
+        RelationInterface $hasRelation,
+        RelationInterface $belongsToRelation
     ) {
-        parent::__construct($pdo, $innerClass, $referenceTable, $referenceColumn, $outerKeySelector, $innerKeySelector, $resultValueSelector);
+        $this->relationKey = $relationKey;
+        $this->hasRelation = $hasRelation;
+        $this->belongsToRelation = $belongsToRelation;
+    }
 
-        $this->intersectionTable = $intersectionTable;
-        $this->intersectionCondition = $intersectionCondition;
+    /**
+     * @param RelationInterface $relation
+     * @return self
+     */
+    public function with(RelationInterface $relation)
+    {
+        return new static(
+            $this->relationKey,
+            $this->hasRelation->with($relation),
+            $this->belongsToRelation
+        );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function buildQuery($outerClass, array $outerValues)
+    public function buildQuery(array $outerValues, $outerClass)
     {
-        return parent::buildQuery($outerClass, $outerValues)
-            ->leftJoin($this->intersectionTable, $this->intersectionCondition);
+        $hasRelation = $this->hasRelation;
+        $belongsToRelation = $this->belongsToRelation;
+
+        $query = $hasRelation->buildQuery($outerValues, $outerClass)
+            ->to($belongsToRelation->getClass())
+            ->leftJoin(
+                $belongsToRelation->getTable(),
+                sprintf(
+                    '`%s`.`%s` = `%s`.`%s`',
+                    $hasRelation->getTable(),
+                    $belongsToRelation->getOuterKey(),
+                    $belongsToRelation->getTable(),
+                    $belongsToRelation->getInnerKey()
+                )
+            );
+
+        if (count($query->getSelect()) === 0) {
+            $query = $query->select(sprintf('`%s`.*', $belongsToRelation->getTable()));
+        }
+
+        return $query
+            ->select(
+                sprintf('`%s`.`%s`', $hasRelation->getTable(), $hasRelation->getInnerKey()),
+                sprintf('`%s`', $this->getPivotKey())
+            );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function join(array $outerValues, array $innerValues, $outerClass)
+    {
+        $outerKeySelector = $this->getOuterKeySelector()->bindTo(null, $outerClass);
+        $pivotKeySelector = $this->getPivotKeySelector()->bindTo(null, $this->belongsToRelation->getClass());
+        $resultValueSelector = $this->getResultValueSelector()->bindTo(null, $outerClass);
+
+        $collection = Collection::from($outerValues)->groupJoin(
+            $innerValues,
+            $outerKeySelector,
+            $pivotKeySelector,
+            $resultValueSelector
+        );
+
+        return $collection->getIterator();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTable()
+    {
+        return $this->belongsToRelation->getTable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRelationKey()
+    {
+        return $this->relationKey;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOuterKey()
+    {
+        return $hasRelation->getOuterKey();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInnerKey()
+    {
+        return $hasRelation->getInnerKey();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPivotKey()
+    {
+        return self::PIVOT_KEY_PREFIX . $this->hasRelation->getInnerKey();
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getOuterKeySelector()
+    {
+        $outerKey = $this->hasRelation->getOuterKey();
+        return static function($outer) use ($outerKey) {
+            return $outer->$outerKey;
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getInnerKeySelector()
+    {
+        $innerKey = $this->hasRelation->getInnerKey();
+        return static function($inner) use ($innerKey) {
+            return $inner->$innerKey;
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getPivotKeySelector()
+    {
+        $pivotKey = $this->getPivotKey();
+        return static function($inner) use ($pivotKey) {
+            $pivotValue = $inner->$pivotKey;
+            unset($inner->$pivotKey);
+            return $pivotValue;
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getResultValueSelector()
+    {
+        $relationKey = $this->relationKey;
+        return static function($outer, $inner) use ($relationKey) {
+            $outer->$relationKey = $inner;
+            return $outer;
+        };
     }
 }

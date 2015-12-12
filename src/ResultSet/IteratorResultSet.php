@@ -5,6 +5,9 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Collection\Enumerable;
 use Emonkak\Collection\EnumerableAliases;
 
+/**
+ * @internal
+ */
 class IteratorResultSet implements ResultSetInterface
 {
     use Enumerable;
@@ -48,7 +51,7 @@ class IteratorResultSet implements ResultSetInterface
     }
 
     /**
-     * @return mixed|null
+     * {@inheritDoc}
      */
     public function first()
     {

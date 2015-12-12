@@ -6,6 +6,9 @@ use Emonkak\Collection\Enumerable;
 use Emonkak\Collection\EnumerableAliases;
 use Emonkak\Database\PDOStatementInterface;
 
+/**
+ * @internal
+ */
 class PDOResultSet implements ResultSetInterface
 {
     use Enumerable;
