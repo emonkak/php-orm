@@ -42,4 +42,15 @@ class SelectQuery implements ExecutableQueryInterface
     {
         return (int) $this->aggregate($connection, 'COUNT', $expr);
     }
+
+    /**
+     * @param PDOInterface $connection
+     * @param integer $perPage
+     * @return Paginator
+     */
+    public function paginate(PDOInterface $connection, $perPage)
+    {
+        $totalItems = $this->count($connection);
+        return new Paginator($this, $connection, $perPage, $totalItems);
+    }
 }
