@@ -3,92 +3,179 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\Query\ExecutableQueryInterface;
-use Emonkak\Orm\Query\SelectQuery;
+use Emonkak\Orm\ExecutableQueryInterface;
+use Emonkak\QueryBuilder\QueryBuilderInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
     /**
-     * @var PDOInterface
+     * @var ExecutableQueryInterface
      */
-    protected $pdo;
+    private $query;
 
     /**
      * @var string
      */
-    protected $innerClass;
+    private $table;
 
     /**
      * @var string
      */
-    protected $foreignTable;
+    private $relationKey;
 
     /**
      * @var string
      */
-    protected $foreignKey;
+    private $outerKey;
 
     /**
-     * @var \Closure
+     * @var string
      */
-    protected $outerKeySelector;
+    private $innerKey;
 
     /**
-     * @var \Closure
+     * @param array $attrs
+     * @return self
      */
-    protected $innerKeySelector;
+    public static function of(array $attrs)
+    {
+        $requiredKeys = ['query', 'table', 'relationKey', 'outerKey', 'innerKey'];
+        $actualKeys = array_keys($attrs);
+        $diffKeys = array_diff($requiredKeys, $actualKeys);
+
+        if (!empty($diffKeys)) {
+            throw new \InvalidArgumentException('Missing some keys: ' . implode(',', $diffKeys));
+        }
+
+        return new static(
+            $attrs['query'],
+            $attrs['table'],
+            $attrs['relationKey'],
+            $attrs['outerKey'],
+            $attrs['innerKey']
+        );
+    }
 
     /**
-     * @var \Closure
-     */
-    protected $resultValueSelector;
-
-    /**
-     * @param PDOInterface $pdo                 The connection to use in this relation.
-     * @param string       $innerClass          The class to map.
-     * @param string       $foreignTable        The foreign table name.
-     * @param string       $foreignKey          The foreign table key.
-     * @param \Closure     $outerKeySelector    The key selector for outer value.
-     * @param \Closure     $innerKeySelector    The key selector for inner value.
-     * @param \Closure     $resultValueSelector The result value selector.
+     * @param ExecutableQueryInterface $query
+     * @param string                   $table
+     * @param string                   $relationKey
+     * @param string                   $outerKey
+     * @param string                   $innerKey
      */
     public function __construct(
-        PDOInterface $pdo,
-        $innerClass,
-        $foreignTable,
-        $foreignKey,
-        \Closure $outerKeySelector,
-        \Closure $innerKeySelector,
-        \Closure $resultValueSelector
+        ExecutableQueryInterface $query,
+        $table,
+        $relationKey,
+        $outerKey,
+        $innerKey
     ) {
-        $this->pdo = $pdo;
-        $this->innerClass = $innerClass;
-        $this->foreignTable = $foreignTable;
-        $this->foreignKey = $foreignKey;
-        $this->outerKeySelector = $outerKeySelector;
-        $this->innerKeySelector = $innerKeySelector;
-        $this->resultValueSelector = $resultValueSelector;
+        $this->query = $query;
+        $this->table = $table;
+        $this->relationKey = $relationKey;
+        $this->outerKey = $outerKey;
+        $this->innerKey = $innerKey;
+    }
+
+    /**
+     * @param RelationInterface $relation
+     * @return self
+     */
+    public function with(RelationInterface $relation)
+    {
+        return new static(
+            $this->query->with($relation),
+            $this->table,
+            $this->relationKey,
+            $this->outerKey,
+            $this->innerKey
+        );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function buildQuery($outerClass, array $outerValues)
+    public function buildQuery(array $outerValues, $outerClass)
     {
-        $outerKeySelector = \Closure::bind($this->outerKeySelector, null, $outerClass);
+        $outerKeySelector = $this->getOuterKeySelector()->bindTo(null, $outerClass);
         $outerKeys = array_map($outerKeySelector, $outerValues);
 
-        return SelectQuery::create()
-            ->to($this->innerClass)
-            ->from($this->foreignTable)
-            ->where($this->foreignTable . '.' . $this->foreignKey, 'IN', $outerKeys);
+        return $this->query
+            ->from($this->table)
+            ->where(sprintf('`%s`.`%s`', $this->table, $this->innerKey), 'IN', $outerKeys);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function executeQuery(ExecutableQueryInterface $query)
+    public function getClass()
     {
-        return $query->execute($this->pdo);
+        return $this->query->getClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRelationKey()
+    {
+        return $this->relationKey;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOuterKey()
+    {
+        return $this->outerKey;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInnerKey()
+    {
+        return $this->innerKey;
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getOuterKeySelector()
+    {
+        $outerKey = $this->outerKey;
+        return static function($outer) use ($outerKey) {
+            return $outer->$outerKey;
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getInnerKeySelector()
+    {
+        $innerKey = $this->innerKey;
+        return static function($inner) use ($innerKey) {
+            return $inner->$innerKey;
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function getResultValueSelector()
+    {
+        $relationKey = $this->relationKey;
+        return static function($outer, $inner) use ($relationKey) {
+            $outer->$relationKey = $inner;
+            return $outer;
+        };
     }
 }

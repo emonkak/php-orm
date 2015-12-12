@@ -1,6 +1,6 @@
 <?php
 
-namespace Emonkak\Orm\Query;
+namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\QueryBuilder\QueryBuilderInterface;
@@ -8,8 +8,13 @@ use Emonkak\QueryBuilder\QueryBuilderInterface;
 interface ExecutableQueryInterface extends QueryBuilderInterface
 {
     /**
-     * @param PDOInterface $pdo
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @param PDOInterface $connection
      * @return ResultSetInterface
      */
-    public function execute(PDOInterface $pdo);
+    public function execute(PDOInterface $connection);
 }

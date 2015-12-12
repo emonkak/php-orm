@@ -1,6 +1,6 @@
 <?php
 
-namespace Emonkak\Orm\Query;
+namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\RelationInterface;
@@ -9,14 +9,14 @@ use Emonkak\Orm\ResultSet\IteratorResultSet;
 class RelationQuery implements ExecutableQueryInterface
 {
     /**
-     * @var string
-     */
-    private $outerClass;
-
-    /**
      * @var ExecutableQueryInterface
      */
     private $outerQuery;
+
+    /**
+     * @var PDOInterface
+     */
+    private $connection;
 
     /**
      * @var RelationInterface
@@ -29,15 +29,19 @@ class RelationQuery implements ExecutableQueryInterface
     private $constraint;
 
     /**
-     * @param string                   $outerClass
      * @param ExecutableQueryInterface $outerQuery
+     * @param PDOInterface             $connection
      * @param RelationInterface        $relation
      * @param callable                 $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
      */
-    public function __construct($outerClass, ExecutableQueryInterface $outerQuery, RelationInterface $relation, callable $constraint)
-    {
-        $this->outerClass = $outerClass;
+    public function __construct(
+        ExecutableQueryInterface $outerQuery,
+        PDOInterface $connection,
+        RelationInterface $relation,
+        callable $constraint
+    ) {
         $this->outerQuery = $outerQuery;
+        $this->connection = $connection;
         $this->relation = $relation;
         $this->constraint = $constraint;
     }
@@ -61,21 +65,29 @@ class RelationQuery implements ExecutableQueryInterface
     /**
      * {@inheritDoc}
      */
-    public function execute(PDOInterface $pdo)
+    public function getClass()
     {
-        $outerValues = $this->outerQuery->execute($pdo)->all();
+        return $this->outerQuery->getClass();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function execute(PDOInterface $connection)
+    {
+        $outerValues = $this->outerQuery->execute($connection)->all();
         if (empty($outerValues)) {
             return $outerValues;
         }
 
-        $outerClass = $this->outerClass;
+        $outerClass = $this->outerQuery->getClass();
         $constraint = $this->constraint;
         $relation = $this->relation;
 
-        $innerQuery = $constraint($relation->buildQuery($outerClass, $outerValues));
-        $innerValues = $relation->executeQuery($innerQuery)->all();
+        $innerQuery = $constraint($relation->buildQuery($outerValues, $outerClass));
+        $innerValues = $innerQuery->execute($this->connection)->all();
 
-        $result = $relation->join($outerClass, $outerValues, $innerValues);
+        $result = $relation->join($outerValues, $innerValues, $outerClass);
 
         return new IteratorResultSet($result);
     }

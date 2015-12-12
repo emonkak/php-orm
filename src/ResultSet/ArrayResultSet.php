@@ -5,6 +5,9 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Collection\Enumerable;
 use Emonkak\Collection\EnumerableAliases;
 
+/**
+ * @internal
+ */
 class ArrayResultSet extends \ArrayObject implements ResultSetInterface
 {
     use Enumerable;
