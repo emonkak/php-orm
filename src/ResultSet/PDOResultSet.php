@@ -70,7 +70,7 @@ class PDOResultSet implements ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function column($columnNumber = 0)
+    public function columns($columnNumber = 0)
     {
         return $this->stmt->fetchAll(\PDO::FETCH_COLUMN, $columnNumber);
     }

@@ -18,7 +18,7 @@ interface ResultSetInterface extends \IteratorAggregate, \Countable
      * @param integer $columnNumber
      * @return mixed[]
      */
-    public function column($columnNumber = 0);
+    public function columns($columnNumber = 0);
 
     /**
      * @param integer $columnNumber

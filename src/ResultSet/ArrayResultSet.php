@@ -42,7 +42,7 @@ class ArrayResultSet extends \ArrayObject implements ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function column($columnNumber = 0)
+    public function columns($columnNumber = 0)
     {
         $results = [];
 
