@@ -138,9 +138,9 @@ class PaginatedResultSet implements ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function column($columnNumber = 0)
+    public function columns($columnNumber = 0)
     {
-        return $this->results->column($columnNumber);
+        return $this->results->columns($columnNumber);
     }
 
     /**
