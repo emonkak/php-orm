@@ -5,6 +5,7 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\IteratorResultSet;
+use Emonkak\Orm\ResultSet\EmptyResultSet;
 
 class RelationQuery implements ExecutableQueryInterface
 {
@@ -77,7 +78,7 @@ class RelationQuery implements ExecutableQueryInterface
     {
         $outerValues = $this->outerQuery->execute($connection)->all();
         if (empty($outerValues)) {
-            return $outerValues;
+            return new EmptyResultSet();
         }
 
         $outerClass = $this->outerQuery->getClass();
