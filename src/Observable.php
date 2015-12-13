@@ -12,7 +12,7 @@ trait Observable
     private $observers = [];
 
     /**
-     * @param callable (query: QueryInterface) -> QueryInterface
+     * @param callable (query: QueryInterface, connection: PDOInterface) -> QueryInterface
      * @return self
      */
     public function observe(callable $observer)

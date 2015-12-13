@@ -32,7 +32,7 @@ class RelationQuery implements ExecutableQueryInterface
      * @param ExecutableQueryInterface $outerQuery
      * @param PDOInterface             $connection
      * @param RelationInterface        $relation
-     * @param callable                 $constraint (query: ExecutableQueryInterface, outerValues: mixed[]) -> ExecutableQueryInterface
+     * @param callable                 $constraint (query: ExecutableQueryInterface, outerValues: mixed[], outerClass: string) -> ExecutableQueryInterface
      */
     public function __construct(
         ExecutableQueryInterface $outerQuery,
@@ -84,7 +84,8 @@ class RelationQuery implements ExecutableQueryInterface
         $constraint = $this->constraint;
         $relation = $this->relation;
 
-        $innerQuery = $constraint($relation->buildQuery($outerValues, $outerClass));
+        $innerQuery = $relation->buildQuery($outerValues, $outerClass);
+        $innerQuery = $constraint($innerQuery, $outerValues, $outerClass);
         $innerValues = $innerQuery->execute($this->connection)->all();
 
         $result = $relation->join($outerValues, $innerValues, $outerClass);
