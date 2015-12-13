@@ -18,7 +18,7 @@ class ArrayResultSet extends \ArrayObject implements ResultSetInterface
      */
     public function getSource()
     {
-        return $this->getArrayCopy();
+        return $this;
     }
 
     /**
@@ -26,7 +26,7 @@ class ArrayResultSet extends \ArrayObject implements ResultSetInterface
      */
     public function first()
     {
-        foreach ($this->getArrayCopy() as $result) {
+        foreach ($this as $result) {
             return $result;
         }
     }
@@ -46,7 +46,7 @@ class ArrayResultSet extends \ArrayObject implements ResultSetInterface
     {
         $results = [];
 
-        foreach ($this->getArrayCopy() as $result) {
+        foreach ($this as $result) {
             $values = array_values((array) $result);
             $results[] = isset($values[$columnNumber]) ? $values[$columnNumber] : null;
         }
@@ -59,7 +59,7 @@ class ArrayResultSet extends \ArrayObject implements ResultSetInterface
      */
     public function value($columnNumber = 0)
     {
-        foreach ($this->getArrayCopy() as $result) {
+        foreach ($this as $result) {
             $values = array_values((array) $result);
             return isset($values[$columnNumber]) ? $values[$columnNumber] : null;
         }
