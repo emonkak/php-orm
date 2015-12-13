@@ -3,8 +3,8 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class Paginator
 {
@@ -44,7 +44,7 @@ class Paginator
 
     /**
      * @param integer $pageNum
-     * @return ResultSetInterface
+     * @return PaginatedResultSet
      */
     public function page($pageNum)
     {
@@ -53,18 +53,22 @@ class Paginator
 
     /**
      * @param integer $index
-     * @return ResultSetInterface
+     * @return PaginatedResultSet
      */
     public function index($index)
     {
         if ($index < 0) {
-            throw new \OutOfBoundsException();
+            throw new \OutOfRangeException();
         }
 
-        $results = $this->query
-            ->offset($this->perPage * $index)
-            ->limit($this->perPage)
-            ->execute($this->connection);
+        if ($this->getTotalPages() > $index) {
+            $results = $this->query
+                ->offset($this->perPage * $index)
+                ->limit($this->perPage)
+                ->execute($this->connection);
+        } else {
+            $results = new EmptyResultSet();
+        }
 
         return new PaginatedResultSet($results, $this, $index);
     }

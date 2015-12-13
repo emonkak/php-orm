@@ -58,6 +58,22 @@ class PaginatedResultSet implements ResultSetInterface
     }
 
     /**
+     * @return integer
+     */
+    public function getTotalItems()
+    {
+        return $this->paginator->getTotalItems();
+    }
+
+    /**
+     * @return integer
+     */
+    public function getTotalPages()
+    {
+        return $this->paginator->getTotalPages();
+    }
+
+    /**
      * @return self
      */
     public function getNextPage()
@@ -93,6 +109,22 @@ class PaginatedResultSet implements ResultSetInterface
     public function hasNextPage()
     {
         return ($this->index + 1) < $this->paginator->getTotalPages();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFirstPage()
+    {
+        return $this->index == 0;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isLastPage()
+    {
+        return $this->index == ($this->paginator->getTotalPages() - 1);
     }
 
     /**
