@@ -28,7 +28,7 @@ class SelectQuery implements ExecutableQueryInterface
     public function aggregate(PDOInterface $connection, $func, $expr)
     {
         return $this
-            ->withSelect([Creteria::of($expr)->apply($func)])
+            ->withSelect([Creteria::of($func)->call([$expr])])
             ->executeWithoutObservers($connection)
             ->value();
     }
