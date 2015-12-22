@@ -6,6 +6,9 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 
+/**
+ * @internal
+ */
 class Paginator
 {
     /**
@@ -26,27 +29,27 @@ class Paginator
     /**
      * @var integer
      */
-    private $totalItems;
+    private $numItems;
 
     /**
      * @param SelectQuery  $query
      * @param PDOInterface $connection
      * @param integer      $perPage
-     * @param integer      $totalItems
+     * @param integer      $numItems
      */
-    public function __construct(SelectQuery $query, PDOInterface $connection, $perPage, $totalItems)
+    public function __construct(SelectQuery $query, PDOInterface $connection, $perPage, $numItems)
     {
         $this->query = $query;
         $this->connection = $connection;
         $this->perPage = $perPage;
-        $this->totalItems = $totalItems;
+        $this->numItems = $numItems;
     }
 
     /**
      * @param integer $pageNum
      * @return PaginatedResultSet
      */
-    public function page($pageNum)
+    public function at($pageNum)
     {
         return $this->index($pageNum - 1);
     }
@@ -55,13 +58,13 @@ class Paginator
      * @param integer $index
      * @return PaginatedResultSet
      */
-    public function index($index)
+    public function atIndex($index)
     {
         if ($index < 0) {
-            throw new \OutOfRangeException();
+            throw new \OutOfRangeException('Invalid page index given: ' . $index);
         }
 
-        if ($this->getTotalPages() > $index) {
+        if ($this->getNumPages() > $index) {
             $results = $this->query
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
@@ -76,16 +79,16 @@ class Paginator
     /**
      * @return integer
      */
-    public function getTotalItems()
+    public function getNumItems()
     {
-        return $this->totalItems;
+        return $this->numItems;
     }
 
     /**
      * @return integer
      */
-    public function getTotalPages()
+    public function getNumPages()
     {
-        return (int) ceil($this->totalItems / $this->perPage);
+        return (int) ceil($this->numItems / $this->perPage);
     }
 }

@@ -60,17 +60,17 @@ class PaginatedResultSet implements ResultSetInterface
     /**
      * @return integer
      */
-    public function getTotalItems()
+    public function getNumItems()
     {
-        return $this->paginator->getTotalItems();
+        return $this->paginator->getNumItems();
     }
 
     /**
      * @return integer
      */
-    public function getTotalPages()
+    public function getNumPages()
     {
-        return $this->paginator->getTotalPages();
+        return $this->paginator->getNumPages();
     }
 
     /**
@@ -81,7 +81,7 @@ class PaginatedResultSet implements ResultSetInterface
         if (!$this->hasNextPage()) {
             throw new \OutOfRangeException('The next page does not exist');
         }
-        return $this->paginator->index($this->index + 1);
+        return $this->paginator->atIndex($this->index + 1);
     }
 
     /**
@@ -92,7 +92,7 @@ class PaginatedResultSet implements ResultSetInterface
         if (!$this->hasPrevPage()) {
             throw new \OutOfRangeException('The previous page does not exist');
         }
-        return $this->paginator->index($this->index - 1);
+        return $this->paginator->atIndex($this->index - 1);
     }
 
     /**
@@ -108,7 +108,7 @@ class PaginatedResultSet implements ResultSetInterface
      */
     public function hasNextPage()
     {
-        return ($this->index + 1) < $this->paginator->getTotalPages();
+        return ($this->index + 1) < $this->paginator->getNumPages();
     }
 
     /**
@@ -124,7 +124,7 @@ class PaginatedResultSet implements ResultSetInterface
      */
     public function isLastPage()
     {
-        return $this->index == ($this->paginator->getTotalPages() - 1);
+        return $this->index == ($this->paginator->getNumPages() - 1);
     }
 
     /**
