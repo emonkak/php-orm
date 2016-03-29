@@ -3,6 +3,7 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Collection\Collection;
+use Emonkak\Database\PDOInterface;
 
 class ManyToMany implements RelationInterface
 {
@@ -14,24 +15,24 @@ class ManyToMany implements RelationInterface
     private $relationKey;
 
     /**
-     * @var RelationInterface
+     * @var OneToMany
      */
     private $hasRelation;
 
     /**
-     * @var RelationInterface
+     * @var OneToOne
      */
     private $belongsToRelation;
 
     /**
-     * @param string            $relationKey
-     * @param RelationInterface $hasRelation
-     * @param RelationInterface $belongsToRelation
+     * @param string    $relationKey
+     * @param OneToMany $hasRelation
+     * @param OneToOne  $belongsToRelation
      */
     public function __construct(
         $relationKey,
-        RelationInterface $hasRelation,
-        RelationInterface $belongsToRelation
+        OneToMany $hasRelation,
+        OneToOne $belongsToRelation
     ) {
         $this->relationKey = $relationKey;
         $this->hasRelation = $hasRelation;
@@ -39,10 +40,9 @@ class ManyToMany implements RelationInterface
     }
 
     /**
-     * @param RelationInterface $relation
-     * @return self
+     * {@inheritDoc}
      */
-    public function with(RelationInterface $relation)
+    public function with(RelationInterface $relation, PDOInterface $relationConnection = null, callable $constraint = null)
     {
         return new static(
             $this->relationKey,
@@ -60,7 +60,6 @@ class ManyToMany implements RelationInterface
         $belongsToRelation = $this->belongsToRelation;
 
         $query = $hasRelation->buildQuery($outerValues, $outerClass)
-            ->to($belongsToRelation->getClass())
             ->leftJoin(
                 $belongsToRelation->getTable(),
                 sprintf(
@@ -107,7 +106,7 @@ class ManyToMany implements RelationInterface
      */
     public function getClass()
     {
-        return $this->class;
+        return $this->belongsToRelation->getClass();
     }
 
     /**
@@ -131,7 +130,7 @@ class ManyToMany implements RelationInterface
      */
     public function getOuterKey()
     {
-        return $hasRelation->getOuterKey();
+        return $this->hasRelation->getOuterKey();
     }
 
     /**
@@ -139,7 +138,7 @@ class ManyToMany implements RelationInterface
      */
     public function getInnerKey()
     {
-        return $hasRelation->getInnerKey();
+        return $this->hasRelation->getInnerKey();
     }
 
     /**

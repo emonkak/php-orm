@@ -3,15 +3,20 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\ExecutableQueryInterface;
+use Emonkak\Orm\SelectQuery;
 use Emonkak\QueryBuilder\QueryBuilderInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
     /**
-     * @var ExecutableQueryInterface
+     * @var SelectQuery
      */
     private $query;
+
+    /**
+     * @var string
+     */
+    private $class;
 
     /**
      * @var string
@@ -39,7 +44,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public static function of(array $attrs)
     {
-        $requiredKeys = ['query', 'table', 'relationKey', 'outerKey', 'innerKey'];
+        $requiredKeys = ['query', 'class', 'table', 'relationKey', 'outerKey', 'innerKey'];
         $actualKeys = array_keys($attrs);
         $diffKeys = array_diff($requiredKeys, $actualKeys);
 
@@ -49,6 +54,7 @@ abstract class AbstractRelation implements RelationInterface
 
         return new static(
             $attrs['query'],
+            $attrs['class'],
             $attrs['table'],
             $attrs['relationKey'],
             $attrs['outerKey'],
@@ -57,20 +63,23 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * @param ExecutableQueryInterface $query
-     * @param string                   $table
-     * @param string                   $relationKey
-     * @param string                   $outerKey
-     * @param string                   $innerKey
+     * @param SelectQuery $query
+     * @param string      $class
+     * @param string      $table
+     * @param string      $relationKey
+     * @param string      $outerKey
+     * @param string      $innerKey
      */
     public function __construct(
-        ExecutableQueryInterface $query,
+        SelectQuery $query,
+        $class,
         $table,
         $relationKey,
         $outerKey,
         $innerKey
     ) {
         $this->query = $query;
+        $this->class = $class;
         $this->table = $table;
         $this->relationKey = $relationKey;
         $this->outerKey = $outerKey;
@@ -78,13 +87,13 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * @param RelationInterface $relation
-     * @return self
+     * {@inheritDoc}
      */
-    public function with(RelationInterface $relation)
+    public function with(RelationInterface $relation, PDOInterface $relationConnection = null, callable $constraint = null)
     {
         return new static(
-            $this->query->with($relation),
+            $this->query->with($relation, $relationConnection, $constraint),
+            $this->class,
             $this->table,
             $this->relationKey,
             $this->outerKey,
@@ -110,11 +119,11 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function getClass()
     {
-        return $this->query->getClass();
+        return $this->class;
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     public function getTable()
     {
@@ -122,7 +131,7 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     public function getRelationKey()
     {
@@ -130,7 +139,7 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     public function getOuterKey()
     {
@@ -138,7 +147,7 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     public function getInnerKey()
     {

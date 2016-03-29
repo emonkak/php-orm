@@ -64,22 +64,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function first()
     {
-        return $this->stmt->fetch();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function columns($columnNumber = 0)
-    {
-        return $this->stmt->fetchAll(\PDO::FETCH_COLUMN, $columnNumber);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function value($columnNumber = 0)
-    {
-        return $this->stmt->fetchColumn($columnNumber);
+        $value = $this->stmt->fetch();
+        return $value !== false ? $value : null;
     }
 }

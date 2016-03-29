@@ -58,6 +58,7 @@ class IteratorResultSet implements ResultSetInterface
         foreach ($this->iterator as $result) {
             return $result;
         }
+        return null;
     }
 
     /**
@@ -66,33 +67,5 @@ class IteratorResultSet implements ResultSetInterface
     public function all()
     {
         return iterator_to_array($this->iterator, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function columns($columnNumber = 0)
-    {
-        $results = [];
-
-        foreach ($this->iterator as $result) {
-            $values = array_values((array) $result);
-            $results[] = isset($values[$columnNumber]) ? $values[$columnNumber] : null;
-        }
-
-        return $results;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function value($columnNumber = 0)
-    {
-        foreach ($this->iterator as $result) {
-            $values = array_values((array) $result);
-            return isset($values[$columnNumber]) ? $values[$columnNumber] : null;
-        }
-
-        return null;
     }
 }

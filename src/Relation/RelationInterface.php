@@ -2,8 +2,8 @@
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\ExecutableQueryInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 interface RelationInterface
 {
@@ -30,32 +30,16 @@ interface RelationInterface
      * Adds the relation to this relation.
      *
      * @param RelationInterface $relation
+     * @param PDOInterface      $relationConnection
+     * @param callable|null     $constraint
      * @return self
      */
-    public function with(RelationInterface $relation);
+    public function with(RelationInterface $relation, PDOInterface $relationConnection = null, callable $constraint = null);
 
     /**
+     * Gets the class to map inner values.
+     *
      * @return string
      */
     public function getClass();
-
-    /**
-     * @return string
-     */
-    public function getTable();
-
-    /**
-     * @return string
-     */
-    public function getRelationKey();
-
-    /**
-     * @return string
-     */
-    public function getOuterKey();
-
-    /**
-     * @return string
-     */
-    public function getInnerKey();
 }

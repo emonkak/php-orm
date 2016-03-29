@@ -66,30 +66,28 @@ class RelationQuery implements ExecutableQueryInterface
     /**
      * {@inheritDoc}
      */
-    public function getClass()
+    public function execute(PDOInterface $connection)
     {
-        return $this->outerQuery->getClass();
+        return $this->outerQuery->execute($connection);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function execute(PDOInterface $connection)
+    public function getResult(PDOInterface $connection, $class)
     {
-        $outerValues = $this->outerQuery->execute($connection)->all();
+        $outerValues = $this->outerQuery->getResult($connection, $class)->all();
         if (empty($outerValues)) {
             return new EmptyResultSet();
         }
 
-        $outerClass = $this->outerQuery->getClass();
         $constraint = $this->constraint;
-        $relation = $this->relation;
+        $innerQuery = $this->relation->buildQuery($outerValues, $class);
+        $innerQuery = $constraint($innerQuery, $outerValues, $class);
+        $innerClass = $this->relation->getClass();
 
-        $innerQuery = $relation->buildQuery($outerValues, $outerClass);
-        $innerQuery = $constraint($innerQuery, $outerValues, $outerClass);
-        $innerValues = $innerQuery->execute($this->connection)->all();
-
-        $result = $relation->join($outerValues, $innerValues, $outerClass);
+        $innerValues = $innerQuery->getResult($this->connection, $innerClass)->all();
+        $result = $this->relation->join($outerValues, $innerValues, $class);
 
         return new IteratorResultSet($result);
     }
