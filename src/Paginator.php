@@ -32,17 +32,24 @@ class Paginator
     private $numItems;
 
     /**
+     * @var string
+     */
+    private $class;
+
+    /**
      * @param SelectQuery  $query
      * @param PDOInterface $connection
      * @param integer      $perPage
      * @param integer      $numItems
+     * @param string       $class
      */
-    public function __construct(SelectQuery $query, PDOInterface $connection, $perPage, $numItems)
+    public function __construct(SelectQuery $query, PDOInterface $connection, $perPage, $numItems, $class)
     {
         $this->query = $query;
         $this->connection = $connection;
         $this->perPage = $perPage;
         $this->numItems = $numItems;
+        $this->class = $class;
     }
 
     /**
@@ -65,15 +72,15 @@ class Paginator
         }
 
         if ($this->getNumPages() > $index) {
-            $results = $this->query
+            $result = $this->query
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
-                ->execute($this->connection);
+                ->getResult($this->connection, $this->class);
         } else {
-            $results = new EmptyResultSet();
+            $result = new EmptyResultSet();
         }
 
-        return new PaginatedResultSet($results, $this, $index);
+        return new PaginatedResultSet($result, $this, $index);
     }
 
     /**

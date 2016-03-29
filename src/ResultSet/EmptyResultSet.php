@@ -53,20 +53,4 @@ class EmptyResultSet implements ResultSetInterface
     {
         return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function columns($columnNumber = 0)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function value($columnNumber = 0)
-    {
-        return null;
-    }
 }

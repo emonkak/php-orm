@@ -9,44 +9,31 @@ use Emonkak\Orm\ResultSet\PDOResultSet;
 trait Executable
 {
     /**
-     * @var string
-     */
-    private $class = 'stdClass';
-
-    /**
-     * @param string $class
-     * @return self
-     */
-    public function to($class)
-    {
-        $chained = $this->chained();
-        $chained->class = $class;
-        return $chained;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
      * @param PDOInterface $connection
-     * @return ResultSetInterface
+     * @return PDOStatementInterface
      */
     public function execute(PDOInterface $connection)
     {
         list ($sql, $binds) = $this->build();
 
         $stmt = $connection->prepare($sql);
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
 
         $this->bindTo($stmt, $binds);
 
         $stmt->execute();
 
+        return $stmt;
+    }
+
+    /**
+     * @param PDOInterface $connection
+     * @param string       $class
+     * @return ResultSetInterface
+     */
+    public function getResult(PDOInterface $connection, $class)
+    {
+        $stmt = $this->execute($connection);
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
         return new PDOResultSet($stmt);
     }
 

@@ -27,7 +27,7 @@ class OneToOne extends AbstractRelation
                 $outerValues,
                 $innerKeySelector,
                 $outerKeySelector,
-                function($outer, $inner) use ($resultValueSelector) {
+                static function($outer, $inner) use ($resultValueSelector) {
                     return $resultValueSelector($inner, $outer);
                 }
             );

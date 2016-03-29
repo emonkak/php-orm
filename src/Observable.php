@@ -27,7 +27,7 @@ trait Observable
      */
     public function execute(PDOInterface $connection)
     {
-        $query = PlainQuery::fromQuery($this)->to($this->getClass());
+        $query = PlainQuery::fromQuery($this);
 
         foreach ($this->observers as $observer) {
             $query = $observer($query, $connection);
@@ -37,9 +37,18 @@ trait Observable
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
-    abstract public function getClass();
+    public function getResult(PDOInterface $connection, $class)
+    {
+        $query = PlainQuery::fromQuery($this);
+
+        foreach ($this->observers as $observer) {
+            $query = $observer($query, $connection);
+        }
+
+        return $query->getResult($connection, $class);
+    }
 
     /**
      * @return self
