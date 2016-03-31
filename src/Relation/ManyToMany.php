@@ -110,38 +110,6 @@ class ManyToMany implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getTable()
-    {
-        return $this->belongsToRelation->getTable();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRelationKey()
-    {
-        return $this->relationKey;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getOuterKey()
-    {
-        return $this->hasRelation->getOuterKey();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getInnerKey()
-    {
-        return $this->hasRelation->getInnerKey();
-    }
-
-    /**
      * @return string
      */
     protected function getPivotKey()
@@ -157,17 +125,6 @@ class ManyToMany implements RelationInterface
         $outerKey = $this->hasRelation->getOuterKey();
         return static function($outer) use ($outerKey) {
             return $outer->$outerKey;
-        };
-    }
-
-    /**
-     * @return \Closure
-     */
-    protected function getInnerKeySelector()
-    {
-        $innerKey = $this->hasRelation->getInnerKey();
-        return static function($inner) use ($innerKey) {
-            return $inner->$innerKey;
         };
     }
 
