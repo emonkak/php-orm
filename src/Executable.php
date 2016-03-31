@@ -69,9 +69,4 @@ trait Executable
      * @return array (sql: string, binds: mixed)
      */
     abstract public function build();
-
-    /**
-     * @return self
-     */
-    abstract protected function chained();
 }
