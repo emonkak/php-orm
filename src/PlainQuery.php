@@ -2,11 +2,9 @@
 
 namespace Emonkak\Orm;
 
-use Emonkak\QueryBuilder\PlainQueryBuilder;
-use Emonkak\QueryBuilder\Chainable;
+use Emonkak\Orm\QueryBuilder\PlainQueryBuilder;
 
 class PlainQuery extends PlainQueryBuilder implements ExecutableQueryInterface
 {
-    use Chainable;
     use Executable;
 }

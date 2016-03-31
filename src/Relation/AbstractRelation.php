@@ -4,7 +4,6 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\SelectQuery;
-use Emonkak\QueryBuilder\QueryBuilderInterface;
 
 abstract class AbstractRelation implements RelationInterface
 {
@@ -42,7 +41,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param array $attrs
      * @return self
      */
-    public static function of(array $attrs)
+    public static function create(array $attrs)
     {
         $requiredKeys = ['query', 'class', 'table', 'relationKey', 'outerKey', 'innerKey'];
         $actualKeys = array_keys($attrs);

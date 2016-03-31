@@ -3,17 +3,12 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\QueryBuilder\Creteria;
+use Emonkak\Orm\QueryBuilder\SelectQueryBuilder;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\QueryBuilder\Chainable;
-use Emonkak\QueryBuilder\Creteria;
-use Emonkak\QueryBuilder\SelectQueryBuilderTrait;
-use Emonkak\QueryBuilder\ToStringable;
 
-class SelectQuery implements ExecutableQueryInterface
+class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
 {
-    use Chainable;
-    use SelectQueryBuilderTrait;
-    use ToStringable;
     use Executable, Observable {
         Observable::execute insteadof Executable;
         Observable::getResult insteadof Executable;
@@ -100,7 +95,7 @@ class SelectQuery implements ExecutableQueryInterface
     public function aggregate(PDOInterface $connection, $expr, $func)
     {
         return $this
-            ->withSelect([Creteria::of($func)->call([$expr])])
+            ->withSelect([Creteria::call($func, [$expr])])
             ->execute($connection)
             ->fetchColumn();
     }

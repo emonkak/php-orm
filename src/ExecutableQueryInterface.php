@@ -4,8 +4,8 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\QueryBuilder\QueryBuilderInterface;
 
 interface ExecutableQueryInterface extends QueryBuilderInterface
 {

@@ -17,9 +17,9 @@ trait Observable
      */
     public function observe(callable $observer)
     {
-        $chained = $this->chained();
-        $chained->observers[] = $observer;
-        return $chained;
+        $cloned = clone $this;
+        $cloned->observers[] = $observer;
+        return $cloned;
     }
 
     /**
@@ -49,9 +49,4 @@ trait Observable
 
         return $query->getResult($connection, $class);
     }
-
-    /**
-     * @return self
-     */
-    abstract protected function chained();
 }
