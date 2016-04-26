@@ -32,6 +32,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function getSource()
     {
+        $this->stmt->execute();
         return $this->stmt;
     }
 
@@ -40,6 +41,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function count()
     {
+        $this->stmt->execute();
         return $this->stmt->rowCount();
     }
 
@@ -48,6 +50,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function getIterator()
     {
+        $this->stmt->execute();
         return $this->stmt;
     }
 
@@ -56,6 +59,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function all()
     {
+        $this->stmt->execute();
         return $this->stmt->fetchAll();
     }
 
@@ -64,6 +68,7 @@ class PDOResultSet implements ResultSetInterface
      */
     public function first()
     {
+        $this->stmt->execute();
         $value = $this->stmt->fetch();
         return $value !== false ? $value : null;
     }
