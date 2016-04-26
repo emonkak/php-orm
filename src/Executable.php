@@ -32,8 +32,14 @@ trait Executable
      */
     public function getResult(PDOInterface $connection, $class)
     {
-        $stmt = $this->execute($connection);
+        list ($sql, $binds) = $this->build();
+
+        $stmt = $connection->prepare($sql);
+
+        $this->bindTo($stmt, $binds);
+
         $stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+
         return new PDOResultSet($stmt);
     }
 

@@ -15,36 +15,20 @@ class RelationQuery implements ExecutableQueryInterface
     private $outerQuery;
 
     /**
-     * @var PDOInterface
-     */
-    private $connection;
-
-    /**
      * @var RelationInterface
      */
     private $relation;
 
     /**
-     * @var callable
-     */
-    private $constraint;
-
-    /**
      * @param ExecutableQueryInterface $outerQuery
-     * @param PDOInterface             $connection
      * @param RelationInterface        $relation
-     * @param callable                 $constraint (query: ExecutableQueryInterface, outerValues: mixed[], outerClass: string) -> ExecutableQueryInterface
      */
     public function __construct(
         ExecutableQueryInterface $outerQuery,
-        PDOInterface $connection,
-        RelationInterface $relation,
-        callable $constraint
+        RelationInterface $relation
     ) {
         $this->outerQuery = $outerQuery;
-        $this->connection = $connection;
         $this->relation = $relation;
-        $this->constraint = $constraint;
     }
 
     /**
@@ -76,19 +60,8 @@ class RelationQuery implements ExecutableQueryInterface
      */
     public function getResult(PDOInterface $connection, $class)
     {
-        $outerValues = $this->outerQuery->getResult($connection, $class)->all();
-        if (empty($outerValues)) {
-            return new EmptyResultSet();
-        }
+        $outer = $this->outerQuery->getResult($connection, $class);
 
-        $constraint = $this->constraint;
-        $innerQuery = $this->relation->buildQuery($outerValues, $class);
-        $innerQuery = $constraint($innerQuery, $outerValues, $class);
-        $innerClass = $this->relation->getClass();
-
-        $innerValues = $innerQuery->getResult($this->connection, $innerClass)->all();
-        $result = $this->relation->join($outerValues, $innerValues, $class);
-
-        return new IteratorResultSet($result);
+        return $this->relation->join($outer, $class);
     }
 }

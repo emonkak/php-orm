@@ -4,42 +4,25 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\ExecutableQueryInterface;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 interface RelationInterface
 {
     /**
      * Joins between outer values and inner values.
      *
-     * @param mixed[] $outerValues
-     * @param mixed[] $innerValues
-     * @param string  $outerClass
-     * @return \Iterator
+     * @param ResultSetInterface $outer
+     * @param string             $outerClass
+     * @return ResultSetInterface
      */
-    public function join(array $outerValues, array $innerValues, $outerClass);
-
-    /**
-     * Builds the query to fetch inner values.
-     *
-     * @param mixed[] $outerValues
-     * @param string  $outerClass
-     * @return ExecutableQueryInterface
-     */
-    public function buildQuery(array $outerValues, $outerClass);
+    public function join(ResultSetInterface $outer, $outerClass);
 
     /**
      * Adds the relation to this relation.
      *
      * @param RelationInterface $relation
-     * @param PDOInterface      $relationConnection
-     * @param callable|null     $constraint
+     * @param PDOInterface|null $connection
      * @return self
      */
-    public function with(RelationInterface $relation, PDOInterface $relationConnection = null, callable $constraint = null);
-
-    /**
-     * Gets the class to map inner values.
-     *
-     * @return string
-     */
-    public function getClass();
+    public function with(RelationInterface $relation);
 }

@@ -18,21 +18,12 @@ class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
 
     /**
      * @param RelationInterface $relation
-     * @param PDOInterface      $relationConnection
-     * @param callable|null     $constraint
      * @return SelectQuery
      */
-    public function with(RelationInterface $relation, PDOInterface $relationConnection = null, callable $constraint = null)
+    public function with(RelationInterface $relation)
     {
-        return $this->observe(static function(ExecutableQueryInterface $query, PDOInterface $connection) use ($relation, $relationConnection, $constraint) {
-            return new RelationQuery(
-                $query,
-                $relationConnection ?: $connection,
-                $relation,
-                $constraint ?: function($query) {
-                    return $query;
-                }
-            );
+        return $this->observe(function(ExecutableQueryInterface $query) use ($relation) {
+            return new RelationQuery($query, $relation);
         });
     }
 
