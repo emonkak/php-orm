@@ -5,7 +5,6 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\QueryBuilder\Creteria;
 use Emonkak\Orm\QueryBuilder\SelectQueryBuilder;
-use Emonkak\Orm\Relation\RelationInterface;
 
 class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
 {
@@ -15,17 +14,7 @@ class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
         Executable::execute as executeWithoutObservers;
         Executable::getResult as getResultWithoutObservers;
     }
-
-    /**
-     * @param RelationInterface $relation
-     * @return SelectQuery
-     */
-    public function with(RelationInterface $relation)
-    {
-        return $this->observe(function(ExecutableQueryInterface $query) use ($relation) {
-            return new RelationQuery($query, $relation);
-        });
-    }
+    use Relatable;
 
     /**
      * @param PDOInterface $connection
