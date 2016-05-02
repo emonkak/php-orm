@@ -2,27 +2,23 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\ExecutableQueryInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 interface RelationInterface
 {
     /**
-     * Joins between outer values and inner values.
+     * Joins between the outer result and the relation result.
      *
-     * @param ResultSetInterface $outer
-     * @param string             $outerClass
-     * @return ResultSetInterface
+     * @param ResultSetInterface  $result
+     * @return \Traversable
      */
-    public function join(ResultSetInterface $outer, $outerClass);
+    public function join(ResultSetInterface $result);
 
     /**
      * Adds the relation to this relation.
      *
      * @param RelationInterface $relation
-     * @param PDOInterface|null $connection
-     * @return self
+     * @return RelationInterface
      */
     public function with(RelationInterface $relation);
 }

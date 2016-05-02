@@ -2,17 +2,15 @@
 
 namespace Emonkak\Orm\ResultSet;
 
-use Emonkak\Collection\Enumerable;
-use Emonkak\Collection\EnumerableAliases;
 use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @internal
  */
-class PDOResultSet implements ResultSetInterface
+class PDOResultSet implements \IteratorAggregate, ResultSetInterface
 {
-    use Enumerable;
-    use EnumerableAliases;
+    use EnumerableExtensions;
 
     /**
      * @var PDOStatementInterface
@@ -20,29 +18,26 @@ class PDOResultSet implements ResultSetInterface
     private $stmt;
 
     /**
-     * @param PDOStatementInterface $stmt
+     * @var string
      */
-    public function __construct(PDOStatementInterface $stmt)
+    private $class;
+
+    /**
+     * @param PDOStatementInterface $stmt
+     * @param string                $class
+     */
+    public function __construct(PDOStatementInterface $stmt, $class)
     {
         $this->stmt = $stmt;
+        $this->class = $class;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSource()
+    public function getClass()
     {
-        $this->stmt->execute();
-        return $this->stmt;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function count()
-    {
-        $this->stmt->execute();
-        return $this->stmt->rowCount();
+        return $this->class;
     }
 
     /**
@@ -51,25 +46,40 @@ class PDOResultSet implements ResultSetInterface
     public function getIterator()
     {
         $this->stmt->execute();
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
         return $this->stmt;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function all()
+    public function toArray()
     {
         $this->stmt->execute();
-        return $this->stmt->fetchAll();
+        return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function first()
+    public function first(callable $predicate = null)
     {
         $this->stmt->execute();
-        $value = $this->stmt->fetch();
-        return $value !== false ? $value : null;
+
+        if ($predicate) {
+            $stmt->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
+            foreach ($this->stmt as $element) {
+                if ($predicate($element)) {
+                    return $element;
+                }
+            }
+        } else {
+            $element = $this->stmt->fetch(\PDO::FETCH_CLASS, $this->class);
+            if ($element !== false) {
+                return $element;
+            }
+        }
+
+        throw new \RuntimeException('Sequence contains no elements.');
     }
 }

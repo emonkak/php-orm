@@ -5,6 +5,7 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\PDOResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 trait Executable
 {
@@ -14,14 +15,8 @@ trait Executable
      */
     public function execute(PDOInterface $connection)
     {
-        list ($sql, $binds) = $this->build();
-
-        $stmt = $connection->prepare($sql);
-
-        $this->bindTo($stmt, $binds);
-
+        $stmt = $this->prepare($connection);
         $stmt->execute();
-
         return $stmt;
     }
 
@@ -32,23 +27,20 @@ trait Executable
      */
     public function getResult(PDOInterface $connection, $class)
     {
+        $stmt = $this->prepare($connection);
+        return new PDOResultSet($stmt, $class);
+    }
+
+    /**
+     * @param PDOInterface $connection
+     * @return PDOStatementInterface
+     */
+    private function prepare(PDOInterface $connection)
+    {
         list ($sql, $binds) = $this->build();
 
         $stmt = $connection->prepare($sql);
 
-        $this->bindTo($stmt, $binds);
-
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
-
-        return new PDOResultSet($stmt);
-    }
-
-    /**
-     * @param PDOStatementInterface $stmt
-     * @param mixed[]               $binds
-     */
-    private function bindTo(PDOStatementInterface $stmt, array $binds)
-    {
         foreach ($binds as $index => $bind) {
             $type = gettype($bind);
             switch ($type) {
@@ -69,6 +61,8 @@ trait Executable
                 throw new \LogicException(sprintf('Invalid value, got "%s".', $type));
             }
         }
+
+        return $stmt;
     }
 
     /**

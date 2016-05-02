@@ -3,7 +3,6 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 
 /**
@@ -22,6 +21,11 @@ class Paginator
     private $connection;
 
     /**
+     * @var string
+     */
+    private $class;
+
+    /**
      * @var integer
      */
     private $perPage;
@@ -32,24 +36,19 @@ class Paginator
     private $numItems;
 
     /**
-     * @var string
-     */
-    private $class;
-
-    /**
      * @param SelectQuery  $query
      * @param PDOInterface $connection
+     * @param string       $class
      * @param integer      $perPage
      * @param integer      $numItems
-     * @param string       $class
      */
-    public function __construct(SelectQuery $query, PDOInterface $connection, $perPage, $numItems, $class)
+    public function __construct(SelectQuery $query, PDOInterface $connection, $class, $perPage, $numItems)
     {
         $this->query = $query;
         $this->connection = $connection;
+        $this->class = $class;
         $this->perPage = $perPage;
         $this->numItems = $numItems;
-        $this->class = $class;
     }
 
     /**
@@ -58,7 +57,7 @@ class Paginator
      */
     public function at($pageNum)
     {
-        return $this->index($pageNum - 1);
+        return $this->atIndex($pageNum - 1);
     }
 
     /**
@@ -77,7 +76,7 @@ class Paginator
                 ->limit($this->perPage)
                 ->getResult($this->connection, $this->class);
         } else {
-            $result = new EmptyResultSet();
+            $result = new \EmptyIterator();
         }
 
         return new PaginatedResultSet($result, $this, $index);

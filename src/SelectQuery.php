@@ -93,13 +93,13 @@ class SelectQuery extends SelectQueryBuilder implements ExecutableQueryInterface
 
     /**
      * @param PDOInterface $connection
-     * @param integer      $perPage
      * @param string       $class
+     * @param integer      $perPage
      * @return Paginator
      */
-    public function paginate(PDOInterface $connection, $perPage, $class)
+    public function paginate(PDOInterface $connection, $class, $perPage)
     {
         $numItems = $this->count($connection);
-        return new Paginator($this, $connection, $perPage, $numItems, $class);
+        return new Paginator($this, $connection, $class, $perPage, $numItems);
     }
 }

@@ -3,16 +3,15 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\ResultSet\JoinedResultSet;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\ResultSet\IteratorResultSet;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 
 class RelationQuery implements ExecutableQueryInterface
 {
     /**
      * @var ExecutableQueryInterface
      */
-    private $outerQuery;
+    private $query;
 
     /**
      * @var RelationInterface
@@ -20,14 +19,14 @@ class RelationQuery implements ExecutableQueryInterface
     private $relation;
 
     /**
-     * @param ExecutableQueryInterface $outerQuery
+     * @param ExecutableQueryInterface $query
      * @param RelationInterface        $relation
      */
     public function __construct(
-        ExecutableQueryInterface $outerQuery,
+        ExecutableQueryInterface $query,
         RelationInterface $relation
     ) {
-        $this->outerQuery = $outerQuery;
+        $this->query = $query;
         $this->relation = $relation;
     }
 
@@ -36,7 +35,7 @@ class RelationQuery implements ExecutableQueryInterface
      */
     public function __toString()
     {
-        return $this->outerQuery->__toString();
+        return $this->query->__toString();
     }
 
     /**
@@ -44,7 +43,7 @@ class RelationQuery implements ExecutableQueryInterface
      */
     public function build()
     {
-        return $this->outerQuery->build();
+        return $this->query->build();
     }
 
     /**
@@ -52,7 +51,7 @@ class RelationQuery implements ExecutableQueryInterface
      */
     public function execute(PDOInterface $connection)
     {
-        return $this->outerQuery->execute($connection);
+        return $this->query->execute($connection);
     }
 
     /**
@@ -60,8 +59,7 @@ class RelationQuery implements ExecutableQueryInterface
      */
     public function getResult(PDOInterface $connection, $class)
     {
-        $outer = $this->outerQuery->getResult($connection, $class);
-
-        return $this->relation->join($outer, $class);
+        $result = $this->query->getResult($connection, $class);
+        return new JoinedResultSet($result, $this->relation);
     }
 }

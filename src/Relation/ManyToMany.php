@@ -2,49 +2,78 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Collection\Collection;
-use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectQuery;
 
-class ManyToMany extends AbstractRelation
+/**
+ * @internal
+ */
+class ManyToMany implements RelationInterface
 {
-    /**
-     * @var SelectQuery
-     */
-    private $query;
-
     /**
      * @var string
      */
     private $relationKey;
 
     /**
-     * @var OneToMany
+     * @var Relation
      */
-    private $hasRelation;
+    private $oneToMany;
 
     /**
-     * @var OneToOne
+     * @var Relation
      */
-    private $belongsToRelation;
+    private $manyToOne;
 
     /**
-     * @param SelectQuery $query
+     * @var SelectQuery
+     */
+    private $query;
+
+    /**
      * @param string      $relationKey
-     * @param OneToMany   $hasRelation
-     * @param OneToOne    $belongsToRelation
+     * @param Relation    $oneToMany
+     * @param Relation    $manyToOne
+     * @param SelectQuery $query
      */
     public function __construct(
-        SelectQuery $query,
         $relationKey,
-        OneToMany $hasRelation,
-        OneToOne $belongsToRelation
+        Relation $oneToMany,
+        Relation $manyToOne,
+        SelectQuery $query
     ) {
-        $this->query = $query;
         $this->relationKey = $relationKey;
-        $this->hasRelation = $hasRelation;
-        $this->belongsToRelation = $belongsToRelation;
+        $this->oneToMany = $oneToMany;
+        $this->manyToOne = $manyToOne;
+        $this->query = $query;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function join(ResultSetInterface $result)
+    {
+        $outerElements = $result->toArray();
+        if (empty($outerElements)) {
+            return new \EmptyIterator();
+        }
+
+        $outerClass = $result->getClass();
+        $outerKeySelector = AccessorCreators::toKeySelector($this->oneToMany->getOuterKey(), $outerClass);
+        $pivotKeySelector = AccessorCreators::toPivotKeySelector($this->getPivotKey(), $this->manyToOne->getClass());
+        $resultSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
+        $joinStrategy = $this->oneToMany->getJoinStrategy();
+
+        $outerKeys = array_map($outerKeySelector, $outerElements);
+        $innerResult = $this->getResult($outerKeys);
+
+        return $joinStrategy(
+            $outerElements,
+            $innerResult,
+            $outerKeySelector,
+            $pivotKeySelector,
+            $resultSelector
+        );
     }
 
     /**
@@ -52,76 +81,54 @@ class ManyToMany extends AbstractRelation
      */
     public function with(RelationInterface $relation)
     {
-        return new static(
-            $this->query->with($relation),
+        return new ManyToMany(
             $this->relationKey,
-            $this->hasRelation,
-            $this->belongsToRelation
+            $this->oneToMany,
+            $this->manyToOne,
+            $this->query->with($relation)
         );
     }
 
     /**
-     * {@inheritDoc}
+     * @param mixed[] $outerKeys
+     * @return ResultSetInterface
      */
-    protected function getResult(array $outerValues, $outerClass)
+    private function getResult($outerKeys)
     {
-        $hasRelation = $this->hasRelation;
-        $belongsToRelation = $this->belongsToRelation;
-
-        $outerKeySelector = AccessorCreators::toKeySelector($hasRelation->getOuterKey(), $outerClass);
-        $outerKeys = array_map($outerKeySelector, $outerValues);
+        $oneToMany = $this->oneToMany;
+        $manyToOne = $this->manyToOne;
 
         $query = $this->query
-            ->from(sprintf('`%s`', $hasRelation->getTable()))
+            ->from(sprintf('`%s`', $oneToMany->getTable()))
             ->leftJoin(
-                sprintf('`%s`', $belongsToRelation->getTable()),
+                sprintf('`%s`', $manyToOne->getTable()),
                 sprintf(
                     '`%s`.`%s` = `%s`.`%s`',
-                    $hasRelation->getTable(),
-                    $belongsToRelation->getOuterKey(),
-                    $belongsToRelation->getTable(),
-                    $belongsToRelation->getInnerKey()
+                    $oneToMany->getTable(),
+                    $manyToOne->getOuterKey(),
+                    $manyToOne->getTable(),
+                    $manyToOne->getInnerKey()
                 )
             )
-            ->where(sprintf('`%s`.`%s`', $hasRelation->getTable(), $hasRelation->getInnerKey()), 'IN', $outerKeys);
+            ->where(sprintf('`%s`.`%s`', $oneToMany->getTable(), $oneToMany->getInnerKey()), 'IN', $outerKeys);
 
         if (count($query->getSelect()) === 0) {
-            $query = $query->select(sprintf('`%s`.*', $belongsToRelation->getTable()));
+            $query = $query->select(sprintf('`%s`.*', $manyToOne->getTable()));
         }
 
         return $query
             ->select(
-                sprintf('`%s`.`%s`', $hasRelation->getTable(), $hasRelation->getInnerKey()),
+                sprintf('`%s`.`%s`', $oneToMany->getTable(), $oneToMany->getInnerKey()),
                 sprintf('`%s`', $this->getPivotKey())
             )
-            ->getResult($this->belongsToRelation->getConnection(), $this->belongsToRelation->getClass());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function doJoin(array $outerValues, $outerClass, ResultSetInterface $inner)
-    {
-        $innerValues = $inner->all();
-        $outerKeySelector = AccessorCreators::toKeySelector($this->hasRelation->getOuterKey(), $outerClass);
-        $pivotKeySelector = AccessorCreators::toKeySelector($this->getPivotKey(), $this->belongsToRelation->getClass());
-        $resultValueSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
-
-        $collection = Collection::from($outerValues)->groupJoin(
-            $innerValues,
-            $outerKeySelector,
-            $pivotKeySelector,
-            $resultValueSelector
-        );
-
-        return $collection->getIterator();
+            ->getResult($manyToOne->getConnection(), $manyToOne->getClass());
     }
 
     /**
      * @return string
      */
-    protected function getPivotKey()
+    private function getPivotKey()
     {
-        return '__pivot_' . $this->hasRelation->getInnerKey();
+        return '__pivot_' . $this->oneToMany->getInnerKey();
     }
 }
