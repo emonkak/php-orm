@@ -19,7 +19,7 @@ trait Observable
     private $executing = false;
 
     /**
-     * @param callable $observer (query: ExecutableQueryInterface, connection: PDOInterface) -> ExecutableQueryInterface
+     * @param callable $observer (query: QueryInterface, connection: PDOInterface) -> QueryInterface
      * @return self
      */
     public function observe(callable $observer)
