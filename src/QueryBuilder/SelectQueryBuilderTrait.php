@@ -306,7 +306,7 @@ trait SelectQueryBuilderTrait
     public function where()
     {
         $args = func_get_args();
-        $expr = Creteria::condition($args);
+        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
         $where = $this->where ? $this->where->_and($expr) : $expr;
         return $this->withWhere($where);
     }
@@ -318,7 +318,7 @@ trait SelectQueryBuilderTrait
     public function orWhere()
     {
         $args = func_get_args();
-        $expr = Creteria::condition($args);
+        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
         $where = $this->where ? $this->where->_or($expr) : $expr;
         return $this->withWhere($where);
     }
@@ -380,7 +380,7 @@ trait SelectQueryBuilderTrait
     public function having()
     {
         $args = func_get_args();
-        $expr = Creteria::condition($args);
+        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
         $having = $this->having ? $this->having->_and($expr) : $expr;
         return $this->withHaving($having);
     }
@@ -392,7 +392,7 @@ trait SelectQueryBuilderTrait
     public function orHaving()
     {
         $args = func_get_args();
-        $expr = Creteria::condition($args);
+        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
         $having = $this->having ? $this->having->_or($expr) : $expr;
         return $this->withHaving($having);
     }
