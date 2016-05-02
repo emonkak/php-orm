@@ -3,21 +3,19 @@
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Orm\Paginator;
-use Emonkak\Collection\Enumerable;
-use Emonkak\Collection\EnumerableAliases;
+use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @internal
  */
-class PaginatedResultSet implements ResultSetInterface
+class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
 {
-    use Enumerable;
-    use EnumerableAliases;
+    use EnumerableExtensions;
 
     /**
      * @var ResultSetInterface
      */
-    private $results;
+    private $result;
 
     /**
      * @var Paginator
@@ -30,15 +28,23 @@ class PaginatedResultSet implements ResultSetInterface
     private $index;
 
     /**
-     * @param ResultSetInterface $results
+     * @param ResultSetInterface $result
      * @param Paginator          $paginator
      * @param integer            $index
      */
-    public function __construct(ResultSetInterface $results, Paginator $paginator, $index)
+    public function __construct(ResultSetInterface $result, Paginator $paginator, $index)
     {
-        $this->results = $results;
+        $this->result = $result;
         $this->paginator = $paginator;
         $this->index = $index;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getClass()
+    {
+        return $this->result->getClass();
     }
 
     /**
@@ -74,23 +80,23 @@ class PaginatedResultSet implements ResultSetInterface
     }
 
     /**
-     * @return self
+     * @return PaginatedResultSet
      */
     public function getNextPage()
     {
         if (!$this->hasNextPage()) {
-            throw new \OutOfRangeException('The next page does not exist');
+            throw new \OutOfRangeException('The next page does not exist.');
         }
         return $this->paginator->atIndex($this->index + 1);
     }
 
     /**
-     * @return self
+     * @return PaginatedResultSet
      */
     public function getPrevPage()
     {
         if (!$this->hasPrevPage()) {
-            throw new \OutOfRangeException('The previous page does not exist');
+            throw new \OutOfRangeException('The previous page does not exist.');
         }
         return $this->paginator->atIndex($this->index - 1);
     }
@@ -130,40 +136,8 @@ class PaginatedResultSet implements ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function count()
-    {
-        return $this->results->count();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getIterator()
     {
-        return $this->results->getIterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSource()
-    {
-        return $this->results;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function first()
-    {
-        return $this->results->first();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function all()
-    {
-        return $this->results->all();
+        return $this->result;
     }
 }

@@ -2,15 +2,12 @@
 
 namespace Emonkak\Orm\ResultSet;
 
-interface ResultSetInterface extends \IteratorAggregate, \Countable
+use Emonkak\Enumerable\EnumerableInterface;
+
+interface ResultSetInterface extends EnumerableInterface
 {
     /**
-     * @return mixed
+     * @return string
      */
-    public function first();
-
-    /**
-     * @return mixed[]
-     */
-    public function all();
+    public function getClass();
 }

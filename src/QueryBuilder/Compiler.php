@@ -22,22 +22,22 @@ class Compiler
     {
         $binds = [];
         $sql = $prefix
-             . self::processProjections($select, $binds)
-             . self::processFrom($from, $binds)
-             . self::processJoin($join, $binds)
-             . self::processWhere($where, $binds)
-             . self::processGroupBy($groupBy, $binds)
-             . self::processHaving($having, $binds)
-             . self::processOrderBy($orderBy, $binds)
-             . self::processLimit($limit, $binds)
-             . self::processOffset($offset, $binds)
+             . self::buildProjections($select, $binds)
+             . self::buildFrom($from, $binds)
+             . self::buildJoin($join, $binds)
+             . self::buildWhere($where, $binds)
+             . self::buildGroupBy($groupBy, $binds)
+             . self::buildHaving($having, $binds)
+             . self::buildOrderBy($orderBy, $binds)
+             . self::buildLimit($limit, $binds)
+             . self::buildOffset($offset, $binds)
              . ($suffix !== null ? ' ' . $suffix : '');
 
         if (!empty($union)) {
             $sql = '(' . $sql . ')';
         }
 
-        $sql .= self::processUnion($union, $binds);
+        $sql .= self::buildUnion($union, $binds);
 
         return [$sql, $binds];
     }
@@ -47,7 +47,7 @@ class Compiler
      * @param mixed[]                  &$binds
      * @return string
      */
-    private static function processProjections(array $select, array &$binds)
+    private static function buildProjections(array $select, array &$binds)
     {
         if (empty($select)) {
             return ' *';
@@ -68,7 +68,7 @@ class Compiler
      * @param mixed[]                  &$binds
      * @return string
      */
-    private static function processFrom(array $from, array &$binds)
+    private static function buildFrom(array $from, array &$binds)
     {
         if (empty($from)) {
             return '';
@@ -89,7 +89,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processJoin(array $join, array &$binds)
+    private static function buildJoin(array $join, array &$binds)
     {
         if (empty($join)) {
             return '';
@@ -110,7 +110,7 @@ class Compiler
      * @param mixed[]                &$binds
      * @return string
      */
-    private static function processWhere(QueryFragmentInterface $where = null, array &$binds)
+    private static function buildWhere(QueryFragmentInterface $where = null, array &$binds)
     {
         if (!isset($where)) {
             return '';
@@ -127,7 +127,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processGroupBy(array $groupBy, array &$binds)
+    private static function buildGroupBy(array $groupBy, array &$binds)
     {
         if (empty($groupBy)) {
             return '';
@@ -148,7 +148,7 @@ class Compiler
      * @param mixed[]                &$binds
      * @return string
      */
-    private static function processHaving(QueryFragmentInterface $having = null, array &$binds)
+    private static function buildHaving(QueryFragmentInterface $having = null, array &$binds)
     {
         if (!isset($having)) {
             return '';
@@ -165,7 +165,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processOrderBy(array $orderBy, array &$binds)
+    private static function buildOrderBy(array $orderBy, array &$binds)
     {
         if (empty($orderBy)) {
             return '';
@@ -186,7 +186,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processLimit($limit, array &$binds)
+    private static function buildLimit($limit, array &$binds)
     {
         if ($limit === null) {
             return '';
@@ -201,7 +201,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processOffset($offset, array &$binds)
+    private static function buildOffset($offset, array &$binds)
     {
         if ($offset === null) {
             return '';
@@ -216,7 +216,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function processUnion(array $union, array &$binds)
+    private static function buildUnion(array $union, array &$binds)
     {
         if (empty($union)) {
             return '';
