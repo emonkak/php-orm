@@ -23,18 +23,19 @@ class Creteria
     }
 
     /**
-     * @param mixed[] $condition
+     * @param mixed[] ...$args
      * @return QueryFragmentInterface
      */
-    public static function condition(array $condition)
+    public static function condition()
     {
-        switch (count($condition)) {
+        $args = func_get_args();
+        switch (count($args)) {
         case 1:
-            return self::str($condition[0]);
+            return self::str($args[0]);
         case 2:
-            return self::unaryOperator($condition[0], $condition[1]);
+            return self::unaryOperator($args[0], $args[1]);
         case 3:
-            return self::operator($condition[0], $condition[1], $condition[2]);
+            return self::operator($args[0], $args[1], $args[2]);
         }
         throw new \InvalidArgumentException('The number of arguments is incorrect');
     }
@@ -50,12 +51,12 @@ class Creteria
     }
 
     /**
-     * @param mixed $first
+     * @param mixed $str
      * @return QueryFragmentInterface
      */
-    public static function str($first)
+    public static function str($str)
     {
-        return is_string($first) ? new Str($first) : self::value($first);
+        return is_string($str) ? new Str($str) : self::value($str);
     }
 
     /**
@@ -80,7 +81,7 @@ class Creteria
             return $value;
         }
         $type = gettype($value);
-        throw new \InvalidArgumentException("Invalid creteria, got '$type'.");
+        throw new \InvalidArgumentException("Invalid value, got '$type'.");
     }
 
     /**
