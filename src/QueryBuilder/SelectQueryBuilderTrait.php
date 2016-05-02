@@ -9,12 +9,9 @@ use Emonkak\Orm\QueryBuilder\Clause\Sort;
 use Emonkak\Orm\QueryBuilder\Clause\Union;
 use Emonkak\Orm\QueryBuilder\Compiler\CompilerInterface;
 use Emonkak\Orm\QueryBuilder\Compiler\DefaultCompiler;
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
 
-class SelectQueryBuilder implements QueryBuilderInterface
+trait SelectQueryBuilderTrait
 {
-    use ToStringable;
-
     /**
      * @var string
      */

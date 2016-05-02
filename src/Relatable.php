@@ -12,7 +12,7 @@ trait Relatable
      */
     public function with(RelationInterface $relation)
     {
-        return $this->observe(function(ExecutableQueryInterface $query) use ($relation) {
+        return $this->observe(function(QueryInterface $query) use ($relation) {
             return new RelationQuery($query, $relation);
         });
     }

@@ -7,7 +7,7 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
-interface ExecutableQueryInterface extends QueryBuilderInterface
+interface QueryInterface extends QueryBuilderInterface
 {
     /**
      * @param PDOInterface $connection

@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\ResultSet\JoinedResultSet;
 use Emonkak\Orm\Relation\RelationInterface;
 
-class RelationQuery implements ExecutableQueryInterface
+class RelationQuery implements QueryInterface
 {
     /**
      * @var ExecutableQueryInterface
@@ -19,11 +19,11 @@ class RelationQuery implements ExecutableQueryInterface
     private $relation;
 
     /**
-     * @param ExecutableQueryInterface $query
-     * @param RelationInterface        $relation
+     * @param QueryInterface    $query
+     * @param RelationInterface $relation
      */
     public function __construct(
-        ExecutableQueryInterface $query,
+        QueryInterface $query,
         RelationInterface $relation
     ) {
         $this->query = $query;
