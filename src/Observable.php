@@ -12,7 +12,14 @@ trait Observable
     private $observers = [];
 
     /**
-     * @param callable (query: QueryInterface, connection: PDOInterface) -> QueryInterface
+     * Whether this query is executing.
+     *
+     * @var boolean
+     */
+    private $executing = false;
+
+    /**
+     * @param callable $observer (query: ExecutableQueryInterface, connection: PDOInterface) -> ExecutableQueryInterface
      * @return self
      */
     public function observe(callable $observer)
@@ -27,26 +34,59 @@ trait Observable
      */
     public function execute(PDOInterface $connection)
     {
-        $query = PlainQuery::fromQuery($this);
+        if ($this->executing) {
+            return $this->executeWithoutObservers($connection);
+        } else {
+            $this->executing = true;
 
-        foreach ($this->observers as $observer) {
-            $query = $observer($query, $connection);
+            $query = $this;
+
+            foreach ($this->observers as $observer) {
+                $query = $observer($query, $connection);
+            }
+
+            $result = $query->execute($connection);
+
+            $this->executing = false;
+
+            return $result;
         }
-
-        return $query->execute($connection);
     }
+
+    /**
+     * @param PDOInterface $connection
+     * @return PDOStatementInterface
+     */
+    abstract public function executeWithoutObservers(PDOInterface $connection);
 
     /**
      * {@inheritDoc}
      */
     public function getResult(PDOInterface $connection, $class)
     {
-        $query = PlainQuery::fromQuery($this);
+        if ($this->executing) {
+            return $this->getResultWithoutObservers($connection, $class);
+        } else {
+            $this->executing = true;
 
-        foreach ($this->observers as $observer) {
-            $query = $observer($query, $connection);
+            $query = $this;
+
+            foreach ($this->observers as $observer) {
+                $query = $observer($query, $connection);
+            }
+
+            $result = $query->getResult($connection, $class);
+
+            $this->executing = false;
+
+            return $result;
         }
-
-        return $query->getResult($connection, $class);
     }
+
+    /**
+     * @param PDOInterface $connection
+     * @param string       $class
+     * @return ResultSetInterface
+     */
+    abstract public function getResultWithoutObservers(PDOInterface $connection, $class);
 }
