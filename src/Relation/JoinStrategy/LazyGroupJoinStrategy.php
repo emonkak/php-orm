@@ -19,8 +19,9 @@ class LazyGroupJoinStrategy
         $innerElements = new MemoizeIterator($inner);
 
         return new SelectIterator($outer, static function($outerElement) use ($innerElements, $outerKeySelector, $innerKeySelector, $resultSelector) {
-            $innerElements = new WhereIterator($innerElements, static function($innerElement) use ($outerElement, $outerKeySelector, $innerKeySelector) {
-                return $outerKeySelector($outerElement) === $innerKeySelector($innerElement);
+            $outerKey = $outerKeySelector($outerElement);
+            $innerElements = new WhereIterator($innerElements, static function($innerElement) use ($outerElement, $outerKey, $innerKeySelector) {
+                return $innerKeySelector($innerElement) === $outerKey;
             });
             $innerElements = new MemoizeIterator($innerElements);
             return $resultSelector($outerElement, $innerElements);
