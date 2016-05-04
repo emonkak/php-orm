@@ -67,7 +67,7 @@ class Paginator
     public function atIndex($index)
     {
         if ($index < 0) {
-            throw new \OutOfRangeException('Invalid page index given: ' . $index);
+            throw new \OutOfRangeException("Invalid page index given: '$index'");
         }
 
         if ($this->getNumPages() > $index) {

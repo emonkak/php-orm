@@ -6,6 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoinStrategy;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoinStrategy;
+use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoinStrategy;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoinStrategy;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectQuery;
@@ -79,6 +80,36 @@ class Relation implements RelationInterface
             $connection,
             $query ?: new SelectQuery(),
             new OuterJoinStrategy()
+        );
+    }
+
+    /**
+     * @param string           $class
+     * @param string           $table
+     * @param string           $relationKey
+     * @param string           $outerKey
+     * @param string           $innerKey
+     * @param PDOInterface     $connection
+     * @param SelectQuery|null $query
+     */
+    public static function lazyOneToOne(
+        $class,
+        $table,
+        $relationKey,
+        $outerKey,
+        $innerKey,
+        PDOInterface $connection,
+        SelectQuery $query = null
+    ) {
+        return new Relation(
+            $class,
+            $table,
+            $relationKey,
+            $outerKey,
+            $innerKey,
+            $connection,
+            $query ?: new SelectQuery(),
+            new LazyOuterJoinStrategy()
         );
     }
 

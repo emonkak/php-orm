@@ -16,10 +16,10 @@ class LazyGroupJoinStrategy
      */
     public function __invoke($outer, $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
     {
-        $inner = new MemoizeIterator($inner);
+        $innerElements = new MemoizeIterator($inner);
 
-        return new SelectIterator($outer, static function($outerElement) use ($inner, $outerKeySelector, $innerKeySelector, $resultSelector) {
-            $innerElements = new WhereIterator($inner, static function($innerElement) use ($outerElement, $outerKeySelector, $innerKeySelector) {
+        return new SelectIterator($outer, static function($outerElement) use ($innerElements, $outerKeySelector, $innerKeySelector, $resultSelector) {
+            $innerElements = new WhereIterator($innerElements, static function($innerElement) use ($outerElement, $outerKeySelector, $innerKeySelector) {
                 return $outerKeySelector($outerElement) === $innerKeySelector($innerElement);
             });
             $innerElements = new MemoizeIterator($innerElements);
