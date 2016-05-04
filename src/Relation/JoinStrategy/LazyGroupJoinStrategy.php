@@ -4,7 +4,8 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\Iterator\MemoizeIterator;
 use Emonkak\Enumerable\Iterator\SelectIterator;
-use Emonkak\Enumerable\Iterator\WhereIterator;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\Proxy\LazyLoadingInterface;
 
 /**
  * @internal
@@ -16,15 +17,26 @@ class LazyGroupJoinStrategy
      */
     public function __invoke($outer, $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
     {
+        $factory = new LazyLoadingValueHolderFactory();
         $innerElements = new MemoizeIterator($inner);
 
-        return new SelectIterator($outer, static function($outerElement) use ($innerElements, $outerKeySelector, $innerKeySelector, $resultSelector) {
+        return new SelectIterator($outer, static function($outerElement) use ($factory, $innerElements, $outerKeySelector, $innerKeySelector, $resultSelector) {
             $outerKey = $outerKeySelector($outerElement);
-            $innerElements = new WhereIterator($innerElements, static function($innerElement) use ($outerElement, $outerKey, $innerKeySelector) {
-                return $innerKeySelector($innerElement) === $outerKey;
-            });
-            $innerElements = new MemoizeIterator($innerElements);
-            return $resultSelector($outerElement, $innerElements);
+            $initializer = function (&$wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, &$initializer) use ($outerElement, $innerElements, $outerKey, $innerKeySelector) {
+                $initializer = null;
+                $joinedElements = [];
+
+                foreach ($innerElements as $innerElement) {
+                    if ($innerKeySelector($innerElement) === $outerKey) {
+                        $joinedElements[] = $innerElement;
+                    }
+                }
+
+                $wrappedObject = new \ArrayObject($joinedElements);
+                return true;
+            };
+            $proxy = $factory->createProxy(\ArrayObject::class, $initializer);
+            return $resultSelector($outerElement, $proxy);
         });
     }
 }
