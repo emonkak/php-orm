@@ -48,6 +48,14 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getIterator()
+    {
+        return $this->result;
+    }
+
+    /**
      * @return integer
      */
     public function getIndex()
@@ -82,7 +90,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * @return PaginatedResultSet
      */
-    public function getNextPage()
+    public function nextPage()
     {
         if (!$this->hasNextPage()) {
             throw new \OutOfRangeException('The next page does not exist.');
@@ -93,7 +101,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * @return PaginatedResultSet
      */
-    public function getPrevPage()
+    public function prevPage()
     {
         if (!$this->hasPrevPage()) {
             throw new \OutOfRangeException('The previous page does not exist.');
@@ -131,13 +139,5 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     public function isLastPage()
     {
         return $this->index == ($this->paginator->getNumPages() - 1);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
-    {
-        return $this->result;
     }
 }
