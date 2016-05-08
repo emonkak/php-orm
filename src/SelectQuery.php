@@ -4,10 +4,9 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\QueryBuilder\Creteria;
-use Emonkak\Orm\QueryBuilder\ToStringable;
-use Emonkak\Orm\QueryBuilder\SelectQueryBuilderTrait;
+use Emonkak\Orm\QueryBuilder\SelectQueryBuilder;
 
-class SelectQuery implements QueryInterface
+class SelectQuery extends SelectQueryBuilder implements QueryInterface
 {
     use Executable, Observable {
         Observable::execute insteadof Executable;
@@ -16,8 +15,6 @@ class SelectQuery implements QueryInterface
         Executable::getResult as getResultWithoutObservers;
     }
     use Relatable;
-    use SelectQueryBuilderTrait;
-    use ToStringable;
 
     /**
      * @param PDOInterface $connection

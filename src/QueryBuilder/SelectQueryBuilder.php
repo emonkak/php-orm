@@ -10,8 +10,10 @@ use Emonkak\Orm\QueryBuilder\Clause\Union;
 use Emonkak\Orm\QueryBuilder\Compiler\CompilerInterface;
 use Emonkak\Orm\QueryBuilder\Compiler\DefaultCompiler;
 
-trait SelectQueryBuilderTrait
+class SelectQueryBuilder implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
      * @var string
      */
