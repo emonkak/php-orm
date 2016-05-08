@@ -105,7 +105,7 @@ class ManyToMany implements RelationInterface
                 sprintf(
                     '`%s`.`%s` = `%s`.`%s`',
                     $oneToMany->getTable(),
-                    $manyToOne->getOuterKey(),
+                    $oneToMany->getInnerKey(),
                     $manyToOne->getTable(),
                     $manyToOne->getInnerKey()
                 )
