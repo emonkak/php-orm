@@ -2,15 +2,18 @@
 
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Alias implements QueryFragmentInterface
+class Alias implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
-     * @var QueryFragmentInterface $value
+     * @var QueryBuilderInterface $value
      */
     private $value;
 
@@ -20,10 +23,10 @@ class Alias implements QueryFragmentInterface
     private $alias;
 
     /**
-     * @param QueryFragmentInterface $value
-     * @param string                 $alias
+     * @param QueryBuilderInterface $value
+     * @param string                $alias
      */
-    public function __construct(QueryFragmentInterface $value, $alias)
+    public function __construct(QueryBuilderInterface $value, $alias)
     {
         $this->value = $value;
         $this->alias = $alias;

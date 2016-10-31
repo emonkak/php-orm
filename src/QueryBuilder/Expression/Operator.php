@@ -2,14 +2,16 @@
 
 namespace Emonkak\Orm\QueryBuilder\Expression;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Operator implements QueryFragmentInterface
+class Operator implements QueryBuilderInterface
 {
     use ExpressionHelper;
+    use ToStringable;
 
     /**
      * @var string
@@ -17,21 +19,21 @@ class Operator implements QueryFragmentInterface
     private $operator;
 
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $lhs;
 
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $rhs;
 
     /**
      * @param string                 $operator
-     * @param QueryFragmentInterface $lhs
-     * @param QueryFragmentInterface $rhs
+     * @param QueryBuilderInterface $lhs
+     * @param QueryBuilderInterface $rhs
      */
-    public function __construct($operator, QueryFragmentInterface $lhs, QueryFragmentInterface $rhs)
+    public function __construct($operator, QueryBuilderInterface $lhs, QueryBuilderInterface $rhs)
     {
         $this->operator = $operator;
         $this->lhs = $lhs;

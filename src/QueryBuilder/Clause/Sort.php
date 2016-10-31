@@ -2,15 +2,18 @@
 
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Sort implements QueryFragmentInterface
+class Sort implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
-     * @var QueryFragmentInterface $expr
+     * @var QueryBuilderInterface $expr
      */
     private $expr;
 
@@ -20,10 +23,10 @@ class Sort implements QueryFragmentInterface
     private $ordering;
 
     /**
-     * @param QueryFragmentInterface $expr
-     * @param string                 $ordering
+     * @param QueryBuilderInterface $expr
+     * @param string                $ordering
      */
-    public function __construct(QueryFragmentInterface $expr, $ordering)
+    public function __construct(QueryBuilderInterface $expr, $ordering)
     {
         $this->expr = $expr;
         $this->ordering = $ordering;

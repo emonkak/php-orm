@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
 use Emonkak\Orm\QueryBuilder\ToStringable;
 
 class PlainQuery implements QueryInterface
@@ -27,10 +27,10 @@ class PlainQuery implements QueryInterface
     private $binds;
 
     /**
-     * @param QueryFragmentInterface $query
+     * @param QueryBuilderInterface $query
      * @return PlainQuery
      */
-    public static function fromQuery(QueryFragmentInterface $query)
+    public static function fromQuery(QueryBuilderInterface $query)
     {
         list ($sql, $binds) = $query->build();
         return new PlainQuery($sql, $binds);

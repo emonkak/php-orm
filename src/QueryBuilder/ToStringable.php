@@ -23,7 +23,7 @@ trait ToStringable
             default:
                 if (mb_check_encoding($bind, 'utf-8')) {
                     return "'" . addslashes($bind) . "'";
-                } else {  // binary given
+                } else {  // binary string
                     return sprintf("x'%s'", bin2hex($bind));
                 }
                 break;

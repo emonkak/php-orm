@@ -2,15 +2,18 @@
 
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Join implements QueryFragmentInterface
+class Join implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
-     * @var QueryFragmentInterface $table
+     * @var QueryBuilderInterface $table
      */
     private $table;
 
@@ -20,10 +23,10 @@ class Join implements QueryFragmentInterface
     private $type;
 
     /**
-     * @param QueryFragmentInterface $table
-     * @param string                 $type
+     * @param QueryBuilderInterface $table
+     * @param string                $type
      */
-    public function __construct(QueryFragmentInterface $table, $type)
+    public function __construct(QueryBuilderInterface $table, $type)
     {
         $this->table = $table;
         $this->type = $type;

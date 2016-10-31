@@ -2,20 +2,23 @@
 
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class ConditionalJoin implements QueryFragmentInterface
+class ConditionalJoin implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $table;
 
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $condition;
 
@@ -25,11 +28,11 @@ class ConditionalJoin implements QueryFragmentInterface
     private $type;
 
     /**
-     * @param QueryFragmentInterface $table
-     * @param QueryFragmentInterface $condition
-     * @param string                 $type
+     * @param QueryBuilderInterface $table
+     * @param QueryBuilderInterface $condition
+     * @param string                $type
      */
-    public function __construct(QueryFragmentInterface $table, QueryFragmentInterface $condition, $type)
+    public function __construct(QueryBuilderInterface $table, QueryBuilderInterface $condition, $type)
     {
         $this->table = $table;
         $this->condition = $condition;
