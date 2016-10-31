@@ -3,195 +3,45 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\Relation\JoinStrategy\GroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\OuterJoinStrategy;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectQuery;
 
-class Relation implements RelationInterface
+abstract class Relation implements RelationInterface
 {
     /**
      * @var string
      */
-    private $class;
+    protected $class;
 
     /**
      * @var string
      */
-    private $table;
+    protected $table;
 
     /**
      * @var string
      */
-    private $relationKey;
+    protected $relationKey;
 
     /**
      * @var string
      */
-    private $outerKey;
+    protected $outerKey;
 
     /**
      * @var string
      */
-    private $innerKey;
+    protected $innerKey;
 
     /**
      * @var PDOInterface
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var SelectQuery
      */
-    private $query;
-
-    /**
-     * @var JoinStrategyInterface
-     */
-    private $joinStrategy;
-
-    /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
-     */
-    public static function oneToOne(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            $connection,
-            $query ?: new SelectQuery(),
-            new OuterJoinStrategy()
-        );
-    }
-
-    /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
-     */
-    public static function lazyOneToOne(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            $connection,
-            $query ?: new SelectQuery(),
-            new LazyOuterJoinStrategy()
-        );
-    }
-
-    /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
-     */
-    public static function oneToMany(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            $connection,
-            $query ?: new SelectQuery(),
-            new GroupJoinStrategy()
-        );
-    }
-
-    /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
-     */
-    public static function lazyOneToMany(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            $connection,
-            $query ?: new SelectQuery(),
-            new LazyGroupJoinStrategy()
-        );
-    }
-
-    /**
-     * @param string           $relationKey
-     * @param Relation         $oneToMany
-     * @param Relation         $manyToOne
-     * @param SelectQuery|null $query
-     */
-    public static function manyToMany(
-        $relationKey,
-        Relation $oneToMany,
-        Relation $manyToOne,
-        SelectQuery $query = null
-    ) {
-        return new ManyToMany(
-            $relationKey,
-            $oneToMany,
-            $manyToOne,
-            $query ?: new SelectQuery()
-        );
-    }
+    protected $query;
 
     /**
      * @param string       $class
@@ -201,7 +51,6 @@ class Relation implements RelationInterface
      * @param string       $innerKey
      * @param PDOInterface $connection
      * @param SelectQuery  $query
-     * @param callable     $joinStrategy
      */
     public function __construct(
         $class,
@@ -210,8 +59,7 @@ class Relation implements RelationInterface
         $outerKey,
         $innerKey,
         PDOInterface $connection,
-        SelectQuery $query,
-        callable $joinStrategy
+        SelectQuery $query = null
     ) {
         $this->class = $class;
         $this->table = $table;
@@ -219,8 +67,7 @@ class Relation implements RelationInterface
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
         $this->connection = $connection;
-        $this->query = $query;
-        $this->joinStrategy = $joinStrategy;
+        $this->query = $query ?: new SelectQuery();
     }
 
     /**
@@ -282,10 +129,7 @@ class Relation implements RelationInterface
     /**
      * @return JoinStrategyInterface
      */
-    public function getJoinStrategy()
-    {
-        return $this->joinStrategy;
-    }
+    abstract public function getJoinStrategy();
 
     /**
      * {@inheritDoc}
@@ -301,7 +145,7 @@ class Relation implements RelationInterface
         $outerKeySelector = AccessorCreators::toKeySelector($this->outerKey, $outerClass);
         $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->class);
         $resultSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
-        $joinStrategy = $this->joinStrategy;
+        $joinStrategy = $this->getJoinStrategy();
 
         $outerKeys = array_map($outerKeySelector, $outerElements);
         $innerResult = $this->getResult($outerKeys);
@@ -320,15 +164,14 @@ class Relation implements RelationInterface
      */
     public function with(RelationInterface $relation)
     {
-        return new Relation(
+        return new static(
             $this->class,
             $this->table,
             $this->relationKey,
             $this->outerKey,
             $this->innerKey,
             $this->connection,
-            $this->query->with($relation),
-            $this->joinStrategy
+            $this->query->with($relation)
         );
     }
 
@@ -336,7 +179,7 @@ class Relation implements RelationInterface
      * @param mixed[] $outerKeys
      * @return ResultSetInterface
      */
-    private function getResult($outerKeys)
+    protected function getResult($outerKeys)
     {
         return $this->query
             ->from(sprintf('`%s`', $this->table))
