@@ -3,7 +3,6 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\SelectQuery;
 
 /**
  * @internal
@@ -26,26 +25,18 @@ class ManyToMany implements RelationInterface
     private $manyToOne;
 
     /**
-     * @var SelectQuery
-     */
-    private $query;
-
-    /**
-     * @param string      $relationKey
-     * @param Relation    $oneToMany
-     * @param Relation    $manyToOne
-     * @param SelectQuery $query
+     * @param string   $relationKey
+     * @param Relation $oneToMany
+     * @param Relation $manyToOne
      */
     public function __construct(
         $relationKey,
         Relation $oneToMany,
-        Relation $manyToOne,
-        SelectQuery $query
+        Relation $manyToOne
     ) {
         $this->relationKey = $relationKey;
         $this->oneToMany = $oneToMany;
         $this->manyToOne = $manyToOne;
-        $this->query = $query;
     }
 
     /**
@@ -83,9 +74,8 @@ class ManyToMany implements RelationInterface
     {
         return new ManyToMany(
             $this->relationKey,
-            $this->oneToMany,
-            $this->manyToOne,
-            $this->query->with($relation)
+            $this->oneToMany->with($relation),
+            $this->manyToOne
         );
     }
 
@@ -93,12 +83,12 @@ class ManyToMany implements RelationInterface
      * @param mixed[] $outerKeys
      * @return ResultSetInterface
      */
-    private function getResult($outerKeys)
+    protected function getResult($outerKeys)
     {
         $oneToMany = $this->oneToMany;
         $manyToOne = $this->manyToOne;
 
-        $query = $this->query
+        $query = $this->oneToMany->getQuery()
             ->from(sprintf('`%s`', $oneToMany->getTable()))
             ->leftJoin(
                 sprintf('`%s`', $manyToOne->getTable()),
@@ -127,7 +117,7 @@ class ManyToMany implements RelationInterface
     /**
      * @return string
      */
-    private function getPivotKey()
+    protected function getPivotKey()
     {
         return '__pivot_' . $this->oneToMany->getInnerKey();
     }
