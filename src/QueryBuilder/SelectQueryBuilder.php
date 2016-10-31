@@ -20,37 +20,37 @@ class SelectQueryBuilder implements QueryBuilderInterface
     private $prefix = 'SELECT';
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $select = [];
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $from = [];
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $join = [];
 
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $where = null;
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $groupBy = [];
 
     /**
-     * @var QueryFragmentInterface
+     * @var QueryBuilderInterface
      */
     private $having = null;
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $orderBy = [];
 
@@ -70,7 +70,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     private $suffix = null;
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $union = [];
 
@@ -83,7 +83,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getSelect()
     {
@@ -91,7 +91,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getFrom()
     {
@@ -99,7 +99,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getJoin()
     {
@@ -107,7 +107,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     public function getWhere()
     {
@@ -115,7 +115,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getGroupBy()
     {
@@ -123,7 +123,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     public function getHaving()
     {
@@ -131,7 +131,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getOrderBy()
     {
@@ -163,7 +163,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryFragmentInterface[]
+     * @return QueryBuilderInterface[]
      */
     public function getUnion()
     {
@@ -171,7 +171,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $select
+     * @param QueryBuilderInterface[] $select
      * @return self
      */
     public function withSelect(array $select)
@@ -182,7 +182,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $from
+     * @param QueryBuilderInterface[] $from
      * @return self
      */
     public function withFrom(array $from)
@@ -193,7 +193,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $join
+     * @param QueryBuilderInterface[] $join
      * @return self
      */
     public function withJoin(array $join)
@@ -204,10 +204,10 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface $where
+     * @param QueryBuilderInterface $where
      * @return self
      */
-    public function withWhere(QueryFragmentInterface $where = null)
+    public function withWhere(QueryBuilderInterface $where = null)
     {
         $cloned = clone $this;
         $cloned->where = $where;
@@ -215,7 +215,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $groupBy
+     * @param QueryBuilderInterface[] $groupBy
      * @return self
      */
     public function withGroupBy(array $groupBy)
@@ -226,10 +226,10 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface $having
+     * @param QueryBuilderInterface $having
      * @return self
      */
-    public function withHaving(QueryFragmentInterface $having = null)
+    public function withHaving(QueryBuilderInterface $having = null)
     {
         $cloned = clone $this;
         $cloned->having = $having;
@@ -237,7 +237,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $orderBy
+     * @param QueryBuilderInterface[] $orderBy
      * @return self
      */
     public function withOrderBy(array $orderBy)
@@ -248,7 +248,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryFragmentInterface[] $union
+     * @param QueryBuilderInterface[] $union
      * @return self
      */
     public function withUnion(array $union)

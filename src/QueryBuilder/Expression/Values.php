@@ -2,22 +2,24 @@
 
 namespace Emonkak\Orm\QueryBuilder\Expression;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Values implements QueryFragmentInterface
+class Values implements QueryBuilderInterface
 {
     use ExpressionHelper;
+    use ToStringable;
 
     /**
-     * @var QueryFragmentInterface[]
+     * @var QueryBuilderInterface[]
      */
     private $values;
 
     /**
-     * @var QueryFragmentInterface[] $values
+     * @var QueryBuilderInterface[] $values
      */
     public function __construct(array $values)
     {

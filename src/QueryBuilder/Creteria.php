@@ -24,7 +24,7 @@ class Creteria
 
     /**
      * @param mixed[] ...$args
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     public static function condition()
     {
@@ -52,7 +52,7 @@ class Creteria
 
     /**
      * @param mixed $str
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     public static function str($str)
     {
@@ -61,7 +61,7 @@ class Creteria
 
     /**
      * @param mixed $value
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     public static function value($value)
     {
@@ -77,7 +77,7 @@ class Creteria
         if ($value instanceof QueryBuilderInterface) {
             return new SubQuery($value);
         }
-        if ($value instanceof QueryFragmentInterface) {
+        if ($value instanceof QueryBuilderInterface) {
             return $value;
         }
         $type = gettype($value);
@@ -97,7 +97,7 @@ class Creteria
     /**
      * @param string $operator
      * @param mixed  $vlaue
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     private static function unaryOperator($operator, $value)
     {
@@ -119,7 +119,7 @@ class Creteria
      * @param string $lhr
      * @param string $operator
      * @param mixed  $rhs
-     * @return QueryFragmentInterface
+     * @return QueryBuilderInterface
      */
     private static function operator($lhs, $operator, $rhs)
     {

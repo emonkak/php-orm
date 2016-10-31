@@ -2,14 +2,16 @@
 
 namespace Emonkak\Orm\QueryBuilder\Expression;
 
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Value implements QueryFragmentInterface
+class Value implements QueryBuilderInterface
 {
     use ExpressionHelper;
+    use ToStringable;
 
     /**
      * @var mixed $value

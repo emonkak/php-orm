@@ -5,20 +5,20 @@ namespace Emonkak\Orm\QueryBuilder;
 class Compiler
 {
     /**
-     * @param string                   $prefix
-     * @param QueryFragmentInterface[] $select
-     * @param QueryFragmentInterface[] $from
-     * @param QueryFragmentInterface[] $join
-     * @param QueryFragmentInterface   $where
-     * @param QueryFragmentInterface[] $groupBy
-     * @param QueryFragmentInterface   $having
-     * @param QueryFragmentInterface[] $orderBy
-     * @param integer                  $limit
-     * @param integer                  $offset
-     * @param QueryBuilderInterface[]  $union
+     * @param string                  $prefix
+     * @param QueryBuilderInterface[] $select
+     * @param QueryBuilderInterface[] $from
+     * @param QueryBuilderInterface[] $join
+     * @param QueryBuilderInterface   $where
+     * @param QueryBuilderInterface[] $groupBy
+     * @param QueryBuilderInterface   $having
+     * @param QueryBuilderInterface[] $orderBy
+     * @param integer                 $limit
+     * @param integer                 $offset
+     * @param QueryBuilderInterface[] $union
      * @return array (sql: string, binds: mixed[])
      */
-    public static function compileSelect($prefix, array $select, array $from = null, array $join, QueryFragmentInterface $where = null, array $groupBy, QueryFragmentInterface $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    public static function compileSelect($prefix, array $select, array $from = null, array $join, QueryBuilderInterface $where = null, array $groupBy, QueryBuilderInterface $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
     {
         $binds = [];
         $sql = $prefix
@@ -43,8 +43,8 @@ class Compiler
     }
 
     /**
-     * @param QueryFragmentInterface[] $select
-     * @param mixed[]                  &$binds
+     * @param QueryBuilderInterface[] $select
+     * @param mixed[]                 &$binds
      * @return string
      */
     private static function buildProjections(array $select, array &$binds)
@@ -64,8 +64,8 @@ class Compiler
     }
 
     /**
-     * @param QueryFragmentInterface[] $from
-     * @param mixed[]                  &$binds
+     * @param QueryBuilderInterface[] $from
+     * @param mixed[]                 &$binds
      * @return string
      */
     private static function buildFrom(array $from, array &$binds)
@@ -106,11 +106,11 @@ class Compiler
     }
 
     /**
-     * @param QueryFragmentInterface $where
-     * @param mixed[]                &$binds
+     * @param QueryBuilderInterface $where
+     * @param mixed[]               &$binds
      * @return string
      */
-    private static function buildWhere(QueryFragmentInterface $where = null, array &$binds)
+    private static function buildWhere(QueryBuilderInterface $where = null, array &$binds)
     {
         if (!isset($where)) {
             return '';
@@ -144,11 +144,11 @@ class Compiler
     }
 
     /**
-     * @param QueryFragmentInterface $having
-     * @param mixed[]                &$binds
+     * @param QueryBuilderInterface $having
+     * @param mixed[]               &$binds
      * @return string
      */
-    private static function buildHaving(QueryFragmentInterface $having = null, array &$binds)
+    private static function buildHaving(QueryBuilderInterface $having = null, array &$binds)
     {
         if (!isset($having)) {
             return '';

@@ -2,8 +2,13 @@
 
 namespace Emonkak\Orm\QueryBuilder;
 
-interface QueryBuilderInterface extends QueryFragmentInterface
+interface QueryBuilderInterface
 {
+    /**
+     * @return array (string, mixed[])
+     */
+    public function build();
+
     /**
      * @return string
      */

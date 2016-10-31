@@ -3,13 +3,15 @@
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\QueryFragmentInterface;
+use Emonkak\Orm\QueryBuilder\ToStringable;
 
 /**
  * @internal
  */
-class Union implements QueryFragmentInterface
+class Union implements QueryBuilderInterface
 {
+    use ToStringable;
+
     /**
      * @var QueryBuilderInterface $query
      */
