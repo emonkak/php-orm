@@ -88,7 +88,7 @@ class ManyToMany implements RelationInterface
         $oneToMany = $this->oneToMany;
         $manyToOne = $this->manyToOne;
 
-        $query = $this->oneToMany->getQuery()
+        $query = $oneToMany->getQuery()
             ->from(sprintf('`%s`', $oneToMany->getTable()))
             ->leftJoin(
                 sprintf('`%s`', $manyToOne->getTable()),

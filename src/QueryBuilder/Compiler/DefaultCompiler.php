@@ -1,9 +1,25 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder;
+namespace Emonkak\Orm\QueryBuilder\Compiler;
 
-class Compiler
+use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
+
+class DefaultCompiler implements CompilerInterface
 {
+    /**
+     * @return DefaultCompiler
+     */
+    public static function getInstance()
+    {
+        static $instance;
+
+        if (!isset($instance)) {
+            $instance = new DefaultCompiler();
+        }
+
+        return $instance;
+    }
+
     /**
      * @param string                  $prefix
      * @param QueryBuilderInterface[] $select
@@ -18,26 +34,26 @@ class Compiler
      * @param QueryBuilderInterface[] $union
      * @return array (sql: string, binds: mixed[])
      */
-    public static function compileSelect($prefix, array $select, array $from = null, array $join, QueryBuilderInterface $where = null, array $groupBy, QueryBuilderInterface $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    public function compileSelect($prefix, array $select, array $from, array $join, QueryBuilderInterface $where = null, array $groupBy, QueryBuilderInterface $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
     {
         $binds = [];
         $sql = $prefix
-             . self::buildProjections($select, $binds)
-             . self::buildFrom($from, $binds)
-             . self::buildJoin($join, $binds)
-             . self::buildWhere($where, $binds)
-             . self::buildGroupBy($groupBy, $binds)
-             . self::buildHaving($having, $binds)
-             . self::buildOrderBy($orderBy, $binds)
-             . self::buildLimit($limit, $binds)
-             . self::buildOffset($offset, $binds)
+             . $this->buildProjections($select, $binds)
+             . $this->buildFrom($from, $binds)
+             . $this->buildJoin($join, $binds)
+             . $this->buildWhere($where, $binds)
+             . $this->buildGroupBy($groupBy, $binds)
+             . $this->buildHaving($having, $binds)
+             . $this->buildOrderBy($orderBy, $binds)
+             . $this->buildLimit($limit, $binds)
+             . $this->buildOffset($offset, $binds)
              . ($suffix !== null ? ' ' . $suffix : '');
 
         if (!empty($union)) {
             $sql = '(' . $sql . ')';
         }
 
-        $sql .= self::buildUnion($union, $binds);
+        $sql .= $this->buildUnion($union, $binds);
 
         return [$sql, $binds];
     }
@@ -47,7 +63,7 @@ class Compiler
      * @param mixed[]                 &$binds
      * @return string
      */
-    private static function buildProjections(array $select, array &$binds)
+    private function buildProjections(array $select, array &$binds)
     {
         if (empty($select)) {
             return ' *';
@@ -68,7 +84,7 @@ class Compiler
      * @param mixed[]                 &$binds
      * @return string
      */
-    private static function buildFrom(array $from, array &$binds)
+    private function buildFrom(array $from, array &$binds)
     {
         if (empty($from)) {
             return '';
@@ -89,7 +105,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildJoin(array $join, array &$binds)
+    private function buildJoin(array $join, array &$binds)
     {
         if (empty($join)) {
             return '';
@@ -110,7 +126,7 @@ class Compiler
      * @param mixed[]               &$binds
      * @return string
      */
-    private static function buildWhere(QueryBuilderInterface $where = null, array &$binds)
+    private function buildWhere(QueryBuilderInterface $where = null, array &$binds)
     {
         if (!isset($where)) {
             return '';
@@ -127,7 +143,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildGroupBy(array $groupBy, array &$binds)
+    private function buildGroupBy(array $groupBy, array &$binds)
     {
         if (empty($groupBy)) {
             return '';
@@ -148,7 +164,7 @@ class Compiler
      * @param mixed[]               &$binds
      * @return string
      */
-    private static function buildHaving(QueryBuilderInterface $having = null, array &$binds)
+    private function buildHaving(QueryBuilderInterface $having = null, array &$binds)
     {
         if (!isset($having)) {
             return '';
@@ -165,7 +181,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildOrderBy(array $orderBy, array &$binds)
+    private function buildOrderBy(array $orderBy, array &$binds)
     {
         if (empty($orderBy)) {
             return '';
@@ -186,7 +202,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildLimit($limit, array &$binds)
+    private function buildLimit($limit, array &$binds)
     {
         if ($limit === null) {
             return '';
@@ -201,7 +217,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildOffset($offset, array &$binds)
+    private function buildOffset($offset, array &$binds)
     {
         if ($offset === null) {
             return '';
@@ -216,7 +232,7 @@ class Compiler
      * @param mixed[] &$binds
      * @return string
      */
-    private static function buildUnion(array $union, array &$binds)
+    private function buildUnion(array $union, array &$binds)
     {
         if (empty($union)) {
             return '';
