@@ -15,6 +15,11 @@ class SelectQueryBuilder implements QueryBuilderInterface
     use ToStringable;
 
     /**
+     * @var CompilerInterface
+     */
+    private $compiler;
+
+    /**
      * @var string
      */
     private $prefix = 'SELECT';
@@ -73,6 +78,14 @@ class SelectQueryBuilder implements QueryBuilderInterface
      * @var QueryBuilderInterface[]
      */
     private $union = [];
+
+    /**
+     * @param CompilerInterface $compiler
+     */
+    public function __construct(CompilerInterface $compiler = null)
+    {
+        $this->compiler = $compiler ?: DefaultCompiler::getInstance();
+    }
 
     /**
      * @return string
@@ -482,7 +495,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        return Compiler::compileSelect(
+        return $this->compiler->compileSelect(
             $this->prefix,
             $this->select,
             $this->from,

@@ -38,7 +38,7 @@ class JoinedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function getClass()
     {
-        $this->result->getClass();
+        return $this->result->getClass();
     }
 
     /**
