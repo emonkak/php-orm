@@ -8,12 +8,7 @@ use Emonkak\Orm\QueryBuilder\SelectQueryBuilder;
 
 class SelectQuery extends SelectQueryBuilder implements QueryInterface
 {
-    use Executable, Observable {
-        Observable::execute insteadof Executable;
-        Observable::getResult insteadof Executable;
-        Executable::execute as executeWithoutObservers;
-        Executable::getResult as getResultWithoutObservers;
-    }
+    use Executable;
     use Relatable;
 
     /**

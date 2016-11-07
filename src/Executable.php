@@ -10,25 +10,79 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 trait Executable
 {
     /**
+     * @var callable[]
+     */
+    private $observers = [];
+
+    /**
+     * Whether this query is executing.
+     *
+     * @var boolean
+     */
+    private $executing = false;
+
+    /**
+     * @param callable $observer (query: QueryInterface, connection: PDOInterface) -> QueryInterface
+     * @return self
+     */
+    public function observe(callable $observer)
+    {
+        $cloned = clone $this;
+        $cloned->observers[] = $observer;
+        return $cloned;
+    }
+
+    /**
      * @param PDOInterface $connection
      * @return PDOStatementInterface
      */
     public function execute(PDOInterface $connection)
     {
-        $stmt = $this->prepare($connection);
-        $stmt->execute();
-        return $stmt;
+        if ($this->executing) {
+            $stmt = $this->prepare($connection);
+            $stmt->execute();
+            return $stmt;
+        } else {
+            $this->executing = true;
+            try {
+                return $this->applyObservers($connection)->execute($connection);
+            } finally {
+                $this->executing = false;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(PDOInterface $connection, $class)
+    {
+        if ($this->executing) {
+            $stmt = $this->prepare($connection);
+            return new PDOResultSet($stmt, $class);
+        } else {
+            $this->executing = true;
+            try {
+                return $this->applyObservers($connection)->getResult($connection, $class);
+            } finally {
+                $this->executing = false;
+            }
+        }
     }
 
     /**
      * @param PDOInterface $connection
-     * @param string       $class
-     * @return ResultSetInterface
+     * @return QueryInterface
      */
-    public function getResult(PDOInterface $connection, $class)
+    private function applyObservers(PDOInterface $connection)
     {
-        $stmt = $this->prepare($connection);
-        return new PDOResultSet($stmt, $class);
+        $query = $this;
+
+        foreach ($this->observers as $observer) {
+            $query = $observer($query, $connection);
+        }
+
+        return $query;
     }
 
     /**

@@ -7,12 +7,7 @@ use Emonkak\Orm\QueryBuilder\ToStringable;
 
 class PlainQuery implements QueryInterface
 {
-    use Executable, Observable {
-        Observable::execute insteadof Executable;
-        Observable::getResult insteadof Executable;
-        Executable::execute as executeWithoutObservers;
-        Executable::getResult as getResultWithoutObservers;
-    }
+    use Executable;
     use Relatable;
     use ToStringable;
 
