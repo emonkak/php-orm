@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\QueryBuilder\Expression;
 
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\ToStringable;
+use Emonkak\Orm\QueryBuilder\Stringable;
 
 /**
  * @internal
@@ -11,7 +11,7 @@ use Emonkak\Orm\QueryBuilder\ToStringable;
 class Values implements QueryBuilderInterface
 {
     use ExpressionHelper;
-    use ToStringable;
+    use Stringable;
 
     /**
      * @var QueryBuilderInterface[]

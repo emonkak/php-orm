@@ -7,7 +7,7 @@ use Emonkak\Enumerable\Iterator\GroupJoinIterator;
 /**
  * @internal
  */
-class GroupJoinStrategy
+class GroupJoinStrategy implements JoinStrategyInterface
 {
     /**
      * {@inheritDoc}
