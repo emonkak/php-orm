@@ -3,14 +3,14 @@
 namespace Emonkak\Orm\QueryBuilder\Clause;
 
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\ToStringable;
+use Emonkak\Orm\QueryBuilder\Stringable;
 
 /**
  * @internal
  */
 class Alias implements QueryBuilderInterface
 {
-    use ToStringable;
+    use Stringable;
 
     /**
      * @var QueryBuilderInterface $value

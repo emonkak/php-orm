@@ -3,13 +3,13 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\ToStringable;
+use Emonkak\Orm\QueryBuilder\Stringable;
 
 class PlainQuery implements QueryInterface
 {
     use Executable;
     use Relatable;
-    use ToStringable;
+    use Stringable;
 
     /**
      * @var string

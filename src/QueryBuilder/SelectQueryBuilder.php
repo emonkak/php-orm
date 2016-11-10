@@ -12,7 +12,7 @@ use Emonkak\Orm\QueryBuilder\Compiler\DefaultCompiler;
 
 class SelectQueryBuilder implements QueryBuilderInterface
 {
-    use ToStringable;
+    use Stringable;
 
     /**
      * @var CompilerInterface

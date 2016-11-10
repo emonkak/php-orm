@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\QueryBuilder;
 
-trait ToStringable
+trait Stringable
 {
     /**
      * @return string
