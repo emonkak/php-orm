@@ -2,22 +2,17 @@
 
 namespace Emonkak\Orm\QueryBuilder;
 
-use Emonkak\Orm\QueryBuilder\Clause\Alias;
-use Emonkak\Orm\QueryBuilder\Clause\ConditionalJoin;
-use Emonkak\Orm\QueryBuilder\Clause\Join;
-use Emonkak\Orm\QueryBuilder\Clause\Sort;
-use Emonkak\Orm\QueryBuilder\Clause\Union;
-use Emonkak\Orm\QueryBuilder\Compiler\CompilerInterface;
-use Emonkak\Orm\QueryBuilder\Compiler\DefaultCompiler;
+use Emonkak\Orm\QueryBuilder\Grammar\GrammarInterface;
+use Emonkak\Orm\QueryBuilder\Grammar\DefaultGrammar;
+use Emonkak\Orm\QueryBuilder\Node\ConditionalJoin;
+use Emonkak\Orm\QueryBuilder\Node\Join;
 
-class SelectQueryBuilder implements QueryBuilderInterface
+class SelectBuilder implements QueryBuilderInterface
 {
-    use Stringable;
-
     /**
-     * @var CompilerInterface
+     * @var GrammarInterface
      */
-    private $compiler;
+    private $grammar;
 
     /**
      * @var string
@@ -25,37 +20,37 @@ class SelectQueryBuilder implements QueryBuilderInterface
     private $prefix = 'SELECT';
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $select = [];
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $from = [];
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $join = [];
 
     /**
-     * @var QueryBuilderInterface
+     * @var Sql
      */
     private $where = null;
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $groupBy = [];
 
     /**
-     * @var QueryBuilderInterface
+     * @var Sql
      */
     private $having = null;
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $orderBy = [];
 
@@ -75,16 +70,16 @@ class SelectQueryBuilder implements QueryBuilderInterface
     private $suffix = null;
 
     /**
-     * @var QueryBuilderInterface[]
+     * @var Sql[]
      */
     private $union = [];
 
     /**
-     * @param CompilerInterface $compiler
+     * @param GrammarInterface $grammar
      */
-    public function __construct(CompilerInterface $compiler = null)
+    public function __construct(GrammarInterface $grammar = null)
     {
-        $this->compiler = $compiler ?: DefaultCompiler::getInstance();
+        $this->grammar = $grammar ?: DefaultGrammar::getInstance();
     }
 
     /**
@@ -96,7 +91,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getSelect()
     {
@@ -104,7 +99,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getFrom()
     {
@@ -112,7 +107,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getJoin()
     {
@@ -120,7 +115,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface
+     * @return Sql
      */
     public function getWhere()
     {
@@ -128,7 +123,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getGroupBy()
     {
@@ -136,7 +131,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface
+     * @return Sql
      */
     public function getHaving()
     {
@@ -144,7 +139,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getOrderBy()
     {
@@ -176,7 +171,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return QueryBuilderInterface[]
+     * @return Sql[]
      */
     public function getUnion()
     {
@@ -184,8 +179,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $select
-     * @return self
+     * @param Sql[] $select
+     * @return $this
      */
     public function withSelect(array $select)
     {
@@ -195,8 +190,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $from
-     * @return self
+     * @param Sql[] $from
+     * @return $this
      */
     public function withFrom(array $from)
     {
@@ -206,8 +201,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $join
-     * @return self
+     * @param Sql[] $join
+     * @return $this
      */
     public function withJoin(array $join)
     {
@@ -217,10 +212,10 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface $where
-     * @return self
+     * @param Sql|null $where
+     * @return $this
      */
-    public function withWhere(QueryBuilderInterface $where = null)
+    public function withWhere(Sql $where = null)
     {
         $cloned = clone $this;
         $cloned->where = $where;
@@ -228,8 +223,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $groupBy
-     * @return self
+     * @param Sql[] $groupBy
+     * @return $this
      */
     public function withGroupBy(array $groupBy)
     {
@@ -239,10 +234,10 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface $having
-     * @return self
+     * @param Sql $having
+     * @return $this
      */
-    public function withHaving(QueryBuilderInterface $having = null)
+    public function withHaving(Sql $having = null)
     {
         $cloned = clone $this;
         $cloned->having = $having;
@@ -250,8 +245,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $orderBy
-     * @return self
+     * @param Sql[] $orderBy
+     * @return $this
      */
     public function withOrderBy(array $orderBy)
     {
@@ -261,8 +256,8 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface[] $union
-     * @return self
+     * @param Sql[] $union
+     * @return $this
      */
     public function withUnion(array $union)
     {
@@ -273,7 +268,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
 
     /**
      * @param string $prefix
-     * @return self
+     * @return $this
      */
     public function prefix($prefix)
     {
@@ -285,13 +280,13 @@ class SelectQueryBuilder implements QueryBuilderInterface
     /**
      * @param mixed  $expr
      * @param string $alias
-     * @return self
+     * @return $this
      */
     public function select($expr, $alias = null)
     {
-        $expr = Creteria::str($expr);
+        $expr = $this->grammar->lift($expr);
         if ($alias !== null) {
-            $expr = new Alias($expr, $alias);
+            $expr = $this->grammar->alias($expr, $alias);
         }
         $select = $this->select;
         $select[] = $expr;
@@ -299,42 +294,58 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed  $expr
+     * @param mixed  $table
      * @param string $alias
-     * @return self
+     * @return $this
      */
-    public function from($expr, $alias = null)
+    public function from($table, $alias = null)
     {
-        $expr = Creteria::str($expr);
+        $table = $this->grammar->lift($table);
         if ($alias !== null) {
-            $expr = new Alias($expr, $alias);
+            $table = $this->grammar->alias($table, $alias);
         }
         $from = $this->from;
-        $from[] = $expr;
+        $from[] = $table;
         return $this->withFrom($from);
     }
 
     /**
-     * @param mixed[] ...$args
-     * @return self
+     * @param mixed       $lhs
+     * @param string|null $operator
+     * @param mixed|null  $rhs
+     * @return $this
      */
-    public function where()
+    public function where($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $args = func_get_args();
-        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
-        $where = $this->where ? $this->where->_and($expr) : $expr;
+        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
         return $this->withWhere($where);
     }
 
     /**
-     * @param mixed[] ...$args
-     * @return self
+     * @param mixed       $lhs
+     * @param string|null $operator
+     * @param mixed|null  $rhs
+     * @return $this
      */
-    public function orWhere()
+    public function orWhere($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $args = func_get_args();
-        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
-        $where = $this->where ? $this->where->_or($expr) : $expr;
+        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
+        return $this->withWhere($where);
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function groupWhere(callable $callback)
+    {
+        $builder = $callback(new SelectBuilder($this->grammar));
+        if ($builder->where === null) {
+            return $this;
+        }
+        $where = $this->where ? $this->grammar->operator('AND', $this->where, $builder->where) : $builder->where;
         return $this->withWhere($where);
     }
 
@@ -343,21 +354,20 @@ class SelectQueryBuilder implements QueryBuilderInterface
      * @param mixed  $condition
      * @param string $alias
      * @param string $type
-     * @return self
+     * @return $this
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
     {
-        $table = Creteria::str($table);
+        $table = $this->grammar->lift($table);
         if ($alias !== null) {
-            $table = new Alias($table, $alias);
+            $table = $this->grammar->alias($table, $alias);
         }
+        $cloned = clone $this;
         $join = $this->join;
         if ($condition !== null) {
-            $condition = Creteria::str($condition);
-            $join[] = new ConditionalJoin($table, $condition, $type);
-        } else {
-            $join[] = new Join($table, $type);
+            $condition = $this->grammar->lift($condition);
         }
+        $join[] = $this->grammar->join($table, $condition, $type);
         return $this->withJoin($join);
     }
 
@@ -365,7 +375,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
      * @param mixed  $table
      * @param mixed  $condition
      * @param string $alias
-     * @return self
+     * @return $this
      */
     public function leftJoin($table, $condition = null, $alias = null)
     {
@@ -375,13 +385,13 @@ class SelectQueryBuilder implements QueryBuilderInterface
     /**
      * @param mixed  $expr
      * @param string $ordering
-     * @return self
+     * @return $this
      */
     public function groupBy($expr, $ordering = null)
     {
-        $expr = Creteria::str($expr);
+        $expr = $this->grammar->lift($expr);
         if ($ordering !== null) {
-            $expr = new Sort($expr, $ordering);
+            $expr = $this->grammar->order($expr, $ordering);
         }
         $groupBy = $this->groupBy;
         $groupBy[] = $expr;
@@ -389,39 +399,55 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed[] ...$args
-     * @return self
+     * @param mixed       $lhs
+     * @param string|null $operator
+     * @param mixed|null  $rhs
+     * @return $this
      */
-    public function having()
+    public function having($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $args = func_get_args();
-        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
-        $having = $this->having ? $this->having->_and($expr) : $expr;
+        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $having = $this->having ? $this->grammar->operator('AND', $this->having, $condition) : $condition;
         return $this->withHaving($having);
     }
 
     /**
-     * @param mixed[] ...$args
-     * @return self
+     * @param mixed       $lhs
+     * @param string|null $operator
+     * @param mixed|null  $rhs
+     * @return $this
      */
-    public function orHaving()
+    public function orHaving($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $args = func_get_args();
-        $expr = call_user_func_array([Creteria::class, 'condition'], $args);
-        $having = $this->having ? $this->having->_or($expr) : $expr;
+        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $having = $this->having ? $this->grammar->operator('OR', $this->having, $condition) : $condition;
         return $this->withHaving($having);
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function groupHaving(callable $callback)
+    {
+        $builder = $callback(new SelectBuilder($this->grammar));
+        if ($builder->having === null) {
+            return $this;
+        }
+        $having = $this->having ? $this->grammar->operator('AND', $this->having, $builder->having) : $builder->having;
+        return $this->withHaving($where);
     }
 
     /**
      * @param mixed  $expr
      * @param stirng $ordering
-     * @return self
+     * @return $this
      */
     public function orderBy($expr, $ordering = null)
     {
-        $expr = Creteria::str($expr);
+        $expr = $this->grammar->lift($expr);
         if ($ordering !== null) {
-            $expr = new Sort($expr, $ordering);
+            $expr = $this->grammar->order($expr, $ordering);
         }
         $orderBy = $this->orderBy;
         $orderBy[] = $expr;
@@ -430,7 +456,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
 
     /**
      * @param integer $integer
-     * @return self
+     * @return $this
      */
     public function limit($limit)
     {
@@ -441,7 +467,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
 
     /**
      * @param integer $integer
-     * @return self
+     * @return $this
      */
     public function offset($offset)
     {
@@ -452,7 +478,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
 
     /**
      * @param string $suffix
-     * @return self
+     * @return $this
      */
     public function suffix($suffix)
     {
@@ -462,7 +488,7 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return self
+     * @return $this
      */
     public function forUpdate()
     {
@@ -470,32 +496,33 @@ class SelectQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface $query
-     * @param string                $type
-     * @return self
+     * @param mixed  $query
+     * @param string $type
+     * @return $this
      */
-    public function union(QueryBuilderInterface $query, $type = 'UNION')
+    public function union($query, $type = 'UNION')
     {
-        $union = $this->union;
-        $union[] = new Union($query, $type);
-        return $this->withUnion($union);
+        $query = $this->grammar->lift($query);
+        $cloned = clone $this;
+        $cloned->union[] = $this->grammar->union($query, $type);
+        return $cloned;
     }
 
     /**
-     * @param QueryBuilderInterface $query
-     * @return self
+     * @param mixed $query
+     * @return $this
      */
-    public function unionAll(QueryBuilderInterface $query)
+    public function unionAll($query)
     {
         return $this->union($query, 'UNION ALL');
     }
 
     /**
-     * @return array (string, mixed[])
+     * {@inheritDoc}
      */
     public function build()
     {
-        return $this->compiler->compileSelect(
+        return $this->grammar->compileSelect(
             $this->prefix,
             $this->select,
             $this->from,
@@ -509,5 +536,31 @@ class SelectQueryBuilder implements QueryBuilderInterface
             $this->suffix,
             $this->union
         );
+    }
+
+    /**
+     * @param mixed  $lhs
+     * @param string $operator
+     * @param mixed  $rhs1
+     * @param mixed  $rhs2
+     * @return Sql
+     */
+    private function condition($lhs, $operator, $rhs1, $rhs2)
+    {
+        if ($operator === null) {
+            return $this->grammar->lift($lhs);
+        } elseif ($rhs1 === null) {
+            $lhs = $this->grammar->lift($lhs);
+            return $this->grammar->unaryOperator($operator, $lhs);
+        } elseif ($rhs2 === null) {
+            $lhs = $this->grammar->lift($lhs);
+            $rhs = $this->grammar->liftValue($rhs1);
+            return $this->grammar->operator($operator, $lhs, $rhs);
+        } else {
+            $lhs = $this->grammar->lift($lhs);
+            $start = $this->grammar->liftValue($rhs1);
+            $end = $this->grammar->liftValue($rhs2);
+            return $this->grammar->between($operator, $lhs, $start, $end);
+        }
     }
 }

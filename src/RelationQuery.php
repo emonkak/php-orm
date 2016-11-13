@@ -33,14 +33,6 @@ class RelationQuery implements QueryInterface
     /**
      * {@inheritDoc}
      */
-    public function __toString()
-    {
-        return $this->query->__toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function build()
     {
         return $this->query->build();

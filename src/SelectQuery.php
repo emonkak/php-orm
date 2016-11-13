@@ -3,10 +3,9 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\QueryBuilder\Creteria;
-use Emonkak\Orm\QueryBuilder\SelectQueryBuilder;
+use Emonkak\Orm\QueryBuilder\SelectBuilder;
 
-class SelectQuery extends SelectQueryBuilder implements QueryInterface
+class SelectQuery extends SelectBuilder implements QueryInterface
 {
     use Executable;
     use Relatable;
@@ -70,7 +69,7 @@ class SelectQuery extends SelectQueryBuilder implements QueryInterface
     public function aggregate(PDOInterface $connection, $expr, $func)
     {
         return $this
-            ->withSelect([Creteria::call($func, [$expr])])
+            ->withSelect(["$func($expr)"])
             ->execute($connection)
             ->fetchColumn();
     }
