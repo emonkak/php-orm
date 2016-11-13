@@ -8,7 +8,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
 /**
  * @internal
  */
-class PDOResultSet implements \IteratorAggregate, ResultSetInterface
+class ModelResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -46,8 +46,10 @@ class PDOResultSet implements \IteratorAggregate, ResultSetInterface
     public function getIterator()
     {
         $this->stmt->execute();
-        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
-        return $this->stmt;
+        $instantiator = $this->getInstantiator();
+        foreach ($this->stmt as $row) {
+            yield $instantiator($row);
+        }
     }
 
     /**
@@ -56,7 +58,9 @@ class PDOResultSet implements \IteratorAggregate, ResultSetInterface
     public function toArray()
     {
         $this->stmt->execute();
-        return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class);
+        $instantiator = $this->getInstantiator();
+        $rows = $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return array_map($instantiator, $rows);
     }
 
     /**
@@ -66,20 +70,38 @@ class PDOResultSet implements \IteratorAggregate, ResultSetInterface
     {
         $this->stmt->execute();
 
+        $instantiator = $this->getInstantiator();
+
         if ($predicate) {
-            $stmt->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
-            foreach ($this->stmt as $element) {
-                if ($predicate($element)) {
-                    return $element;
+            $stmt->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            foreach ($this->stmt as $row) {
+                $instance = $instantiator($row);
+                if ($predicate($instance)) {
+                    return $instance;
                 }
             }
         } else {
-            $element = $this->stmt->fetch(\PDO::FETCH_CLASS, $this->class);
-            if ($element !== false) {
-                return $element;
+            $row = $this->stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($row !== false) {
+                return $instantiator($row);
             }
         }
 
         throw new \RuntimeException('Sequence contains no elements.');
+    }
+
+    /**
+     * @return callable
+     */
+    private function getInstantiator()
+    {
+        $class = $this->class;
+        return \Closure::bind(
+            static function($props) use ($class) {
+                return new $class($props);
+            },
+            null,
+            $class
+        );
     }
 }

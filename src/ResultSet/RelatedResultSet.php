@@ -9,7 +9,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 /**
  * @internal
  */
-class JoinedResultSet implements \IteratorAggregate, ResultSetInterface
+class RelatedResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 

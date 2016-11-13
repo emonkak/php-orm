@@ -51,7 +51,7 @@ class ManyToMany implements RelationInterface
 
         $outerClass = $result->getClass();
         $outerKeySelector = AccessorCreators::toKeySelector($this->oneToMany->getOuterKey(), $outerClass);
-        $pivotKeySelector = AccessorCreators::toPivotKeySelector($this->getPivotKey(), $this->manyToOne->getClass());
+        $pivotKeySelector = AccessorCreators::toPivotKeySelector($this->getPivotKey(), $this->manyToOne->getFetcher()->getClass());
         $resultSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
         $joinStrategy = $this->oneToMany->getJoinStrategy();
 
@@ -111,7 +111,7 @@ class ManyToMany implements RelationInterface
                 sprintf('`%s`.`%s`', $oneToMany->getTable(), $oneToMany->getInnerKey()),
                 sprintf('`%s`', $this->getPivotKey())
             )
-            ->getResult($manyToOne->getConnection(), $manyToOne->getClass());
+            ->getResult($manyToOne->getConnection(), $manyToOne->getFetcher());
     }
 
     /**
