@@ -3,21 +3,22 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\Relation\JoinStrategy\GroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\LazyInnerJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\OuterJoinStrategy;
+use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\SelectQuery;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 class Relation implements RelationInterface
 {
     /**
-     * @var string
+     * @var PDOInterface
      */
-    private $class;
+    private $connection;
+
+    /**
+     * @var FetcherInterface
+     */
+    private $fetcher;
 
     /**
      * @var string
@@ -40,180 +41,59 @@ class Relation implements RelationInterface
     private $innerKey;
 
     /**
-     * @var JoinStrategyInterface
-     */
-    private $joinStrategy;
-
-    /**
-     * @var PDOInterface
-     */
-    private $connection;
-
-    /**
      * @var SelectQuery
      */
     private $query;
 
     /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
+     * @var JoinStrategyInterface
      */
-    public static function oneToOne(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            new OuterJoinStrategy(),
-            $connection,
-            $query ?: new SelectQuery()
-        );
-    }
+    private $joinStrategy;
 
     /**
-     * @param string           $class
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param SelectQuery|null $query
-     */
-    public static function oneToMany(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            new GroupJoinStrategy(),
-            $connection,
-            $query ?: new SelectQuery()
-        );
-    }
-
-    /**
-     * @param string                        $class
-     * @param string                        $table
-     * @param string                        $relationKey
-     * @param string                        $outerKey
-     * @param string                        $innerKey
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @param PDOInterface                  $connection
-     * @param SelectQuery|null              $query
-     */
-    public static function lazyOneToOne(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        LazyLoadingValueHolderFactory $proxyFactory,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            new LazyInnerJoinStrategy($proxyFactory),
-            $connection,
-            $query ?: new SelectQuery()
-        );
-    }
-
-    /**
-     * @param string                        $class
-     * @param string                        $table
-     * @param string                        $relationKey
-     * @param string                        $outerKey
-     * @param string                        $innerKey
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @param PDOInterface                  $connection
-     * @param SelectQuery|null              $query
-     */
-    public static function lazyOneToMany(
-        $class,
-        $table,
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        LazyLoadingValueHolderFactory $proxyFactory,
-        PDOInterface $connection,
-        SelectQuery $query = null
-    ) {
-        return new Relation(
-            $class,
-            $table,
-            $relationKey,
-            $outerKey,
-            $innerKey,
-            new LazyGroupJoinStrategy($proxyFactory),
-            $connection,
-            $query ?: new SelectQuery()
-        );
-    }
-
-    /**
-     * @param string                $class
+     * @param PDOInterface          $connection
+     * @param FetcherInterface      $fetcher
      * @param string                $table
      * @param string                $relationKey
      * @param string                $outerKey
      * @param string                $innerKey
-     * @param JoinStrategyInterface $joinStrategy
-     * @param PDOInterface          $connection
      * @param SelectQuery           $query
+     * @param JoinStrategyInterface $joinStrategy
      */
     public function __construct(
-        $class,
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
         $table,
         $relationKey,
         $outerKey,
         $innerKey,
-        JoinStrategyInterface $joinStrategy,
-        PDOInterface $connection,
-        SelectQuery $query
+        SelectQuery $query,
+        JoinStrategyInterface $joinStrategy
     ) {
-        $this->class = $class;
+        $this->connection = $connection;
+        $this->fetcher = $fetcher;
         $this->table = $table;
         $this->relationKey = $relationKey;
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
-        $this->joinStrategy = $joinStrategy;
-        $this->connection = $connection;
         $this->query = $query;
+        $this->joinStrategy = $joinStrategy;
     }
 
     /**
-     * @return string
+     * @return PDOInterface
      */
-    public function getClass()
+    public function getConnection()
     {
-        return $this->class;
+        return $this->connection;
+    }
+
+    /**
+     * @return Fetcher
+     */
+    public function getFetcher()
+    {
+        return $this->fetcher;
     }
 
     /**
@@ -249,14 +129,6 @@ class Relation implements RelationInterface
     }
 
     /**
-     * @return PDOInterface
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
      * @return SelectQuery
      */
     public function getQuery()
@@ -284,7 +156,7 @@ class Relation implements RelationInterface
 
         $outerClass = $result->getClass();
         $outerKeySelector = AccessorCreators::toKeySelector($this->outerKey, $outerClass);
-        $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->class);
+        $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->fetcher->getClass());
         $resultSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
         $joinStrategy = $this->joinStrategy;
 
@@ -306,14 +178,14 @@ class Relation implements RelationInterface
     public function with(RelationInterface $relation)
     {
         return new Relation(
-            $this->class,
+            $this->connection,
+            $this->fetcher,
             $this->table,
             $this->relationKey,
             $this->outerKey,
             $this->innerKey,
-            $this->joinStrategy,
-            $this->connection,
-            $this->query->with($relation)
+            $this->query->with($relation),
+            $this->joinStrategy
         );
     }
 
@@ -326,6 +198,6 @@ class Relation implements RelationInterface
         return $this->query
             ->from(sprintf('`%s`', $this->table))
             ->where(sprintf('`%s`.`%s`', $this->table, $this->innerKey), 'IN', $outerKeys)
-            ->getResult($this->connection, $this->class);
+            ->getResult($this->connection, $this->fetcher);
     }
 }

@@ -5,10 +5,10 @@ namespace Emonkak\Orm;
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
 use Emonkak\Orm\QueryBuilder\Sql;
 
-class PlainQuery implements QueryInterface
+class PlainQuery
 {
-    use Executable;
-    use Relatable;
+    use Preparable;
+    use Fetchable;
 
     /**
      * @var string

@@ -4,11 +4,12 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\QueryBuilder\SelectBuilder;
+use Emonkak\Orm\Fetcher\FetcherInterface;
 
-class SelectQuery extends SelectBuilder implements QueryInterface
+class SelectQuery extends SelectBuilder
 {
-    use Executable;
-    use Relatable;
+    use Preparable;
+    use Fetchable;
 
     /**
      * @param PDOInterface $connection
@@ -68,21 +69,20 @@ class SelectQuery extends SelectBuilder implements QueryInterface
      */
     public function aggregate(PDOInterface $connection, $expr, $func)
     {
-        return $this
-            ->withSelect(["$func($expr)"])
-            ->execute($connection)
-            ->fetchColumn();
+        $stmt = $this->withSelect(["$func($expr)"])->prepare($connection);
+        $stmt->execute();
+        return $stmt->fetchColumn();
     }
 
     /**
-     * @param PDOInterface $connection
-     * @param string       $class
-     * @param integer      $perPage
+     * @param PDOInterface     $connection
+     * @param FetcherInterface $fetcher
+     * @param integer          $perPage
      * @return Paginator
      */
-    public function paginate(PDOInterface $connection, $class, $perPage)
+    public function paginate(PDOInterface $connection, FetcherInterface $fetcher, $perPage)
     {
         $numItems = $this->count($connection);
-        return new Paginator($this, $connection, $class, $perPage, $numItems);
+        return new Paginator($this, $connection, $fetcher, $perPage, $numItems);
     }
 }
