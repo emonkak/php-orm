@@ -10,7 +10,7 @@ use ProxyManager\Proxy\LazyLoadingInterface;
 /**
  * @internal
  */
-class LazyGroupJoinStrategy implements JoinStrategyInterface
+class LazyGroupJoin implements JoinStrategyInterface
 {
     /**
      * @var LazyLoadingValueHolderFactory

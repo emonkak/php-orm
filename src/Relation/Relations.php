@@ -4,10 +4,10 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Relation\JoinStrategy\GroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\LazyInnerJoinStrategy;
-use Emonkak\Orm\Relation\JoinStrategy\OuterJoinStrategy;
+use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyInnerJoin;
+use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\SelectQuery;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
@@ -39,7 +39,7 @@ final class Relations
             $outerKey,
             $innerKey,
             $query ?: new SelectQuery(),
-            new OuterJoinStrategy()
+            new OuterJoin()
         );
     }
 
@@ -69,7 +69,7 @@ final class Relations
             $outerKey,
             $innerKey,
             $query ?: new SelectQuery(),
-            new GroupJoinStrategy()
+            new GroupJoin()
         );
     }
 
@@ -101,7 +101,7 @@ final class Relations
             $outerKey,
             $innerKey,
             $query ?: new SelectQuery(),
-            new LazyInnerJoinStrategy($proxyFactory ?: new LazyLoadingValueHolderFactory())
+            new LazyInnerJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
 
@@ -133,7 +133,7 @@ final class Relations
             $outerKey,
             $innerKey,
             $query ?: new SelectQuery(),
-            new LazyGroupJoinStrategy($proxyFactory ?: new LazyLoadingValueHolderFactory())
+            new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
 

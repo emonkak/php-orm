@@ -5,12 +5,11 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Emonkak\Enumerable\Iterator\SelectIterator;
-use Emonkak\Enumerable\Iterator\WhereIterator;
 
 /**
  * @internal
  */
-class LazyInnerJoinStrategy implements JoinStrategyInterface
+class LazyInnerJoin implements JoinStrategyInterface
 {
     /**
      * @var LazyLoadingValueHolderFactory
