@@ -5,12 +5,7 @@ namespace Emonkak\Orm\QueryBuilder;
 interface QueryBuilderInterface
 {
     /**
-     * @return array (string, mixed[])
+     * @return Sql
      */
     public function build();
-
-    /**
-     * @return string
-     */
-    public function __toString();
 }

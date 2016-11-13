@@ -23,7 +23,7 @@ trait Executable
 
     /**
      * @param callable $observer (query: QueryInterface, connection: PDOInterface) -> QueryInterface
-     * @return self
+     * @return $this
      */
     public function observe(callable $observer)
     {
@@ -91,28 +91,28 @@ trait Executable
      */
     private function prepare(PDOInterface $connection)
     {
-        list ($sql, $binds) = $this->build();
+        $query = $this->build();
 
-        $stmt = $connection->prepare($sql);
+        $stmt = $connection->prepare($query->getSql());
 
-        foreach ($binds as $index => $bind) {
-            $type = gettype($bind);
+        foreach ($query->getBindings() as $index => $binding) {
+            $type = gettype($binding);
             switch ($type) {
             case 'boolean':
-                $stmt->bindValue($index + 1, $bind, \PDO::PARAM_BOOL);
+                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_BOOL);
                 break;
             case 'integer':
-                $stmt->bindValue($index + 1, $bind, \PDO::PARAM_INT);
+                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_INT);
                 break;
             case 'double':
             case 'string':
-                $stmt->bindValue($index + 1, $bind, \PDO::PARAM_STR);
+                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_STR);
                 break;
             case 'NULL':
-                $stmt->bindValue($index + 1, $bind, \PDO::PARAM_NULL);
+                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
                 break;
             default:
-                throw new \LogicException(sprintf('Invalid value, got "%s".', $type));
+                throw new \UnexpectedValueException("Unexpected value, got '$type'.");
             }
         }
 
@@ -120,7 +120,7 @@ trait Executable
     }
 
     /**
-     * @return array (sql: string, binds: mixed)
+     * @return Sql
      */
     abstract public function build();
 }

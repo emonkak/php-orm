@@ -19,7 +19,7 @@ trait Relatable
 
     /**
      * @param callable $observer
-     * @return self
+     * @return $this
      */
     abstract public function observe(callable $observer);
 }

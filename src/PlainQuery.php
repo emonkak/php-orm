@@ -3,13 +3,12 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\Stringable;
+use Emonkak\Orm\QueryBuilder\Sql;
 
 class PlainQuery implements QueryInterface
 {
     use Executable;
     use Relatable;
-    use Stringable;
 
     /**
      * @var string
@@ -19,26 +18,26 @@ class PlainQuery implements QueryInterface
     /**
      * @var mixed[]
      */
-    private $binds;
+    private $bindings;
 
     /**
      * @param QueryBuilderInterface $query
      * @return PlainQuery
      */
-    public static function fromQuery(QueryBuilderInterface $query)
+    public static function fromBuilder(QueryBuilderInterface $builder)
     {
-        list ($sql, $binds) = $query->build();
-        return new PlainQuery($sql, $binds);
+        $query = $builder->build();
+        return new PlainQuery($query->getSql(), $query->getBindings());
     }
 
     /**
      * @param string  $sql
-     * @param mixed[] $binds
+     * @param mixed[] $bindings
      */
-    public function __construct($sql, $binds)
+    public function __construct($sql, $bindings)
     {
         $this->sql = $sql;
-        $this->binds = $binds;
+        $this->bindings = $bindings;
     }
 
     /**
@@ -46,6 +45,6 @@ class PlainQuery implements QueryInterface
      */
     public function build()
     {
-        return [$this->sql, $this->binds];
+        return new Sql($this->sql, $this->bindings);
     }
 }
