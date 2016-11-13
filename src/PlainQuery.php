@@ -7,8 +7,8 @@ use Emonkak\Orm\QueryBuilder\Sql;
 
 class PlainQuery
 {
-    use Preparable;
     use Fetchable;
+    use Preparable;
 
     /**
      * @var string

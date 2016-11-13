@@ -8,8 +8,8 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 
 class SelectQuery extends SelectBuilder
 {
-    use Preparable;
     use Fetchable;
+    use Preparable;
 
     /**
      * @param PDOInterface $connection
@@ -18,7 +18,7 @@ class SelectQuery extends SelectBuilder
      */
     public function avg(PDOInterface $connection, $expr)
     {
-        return (int) $this->aggregate($connection, $expr, 'AVG');
+        return (int) $this->aggregate($connection, 'AVG', $expr);
     }
 
     /**
@@ -28,7 +28,7 @@ class SelectQuery extends SelectBuilder
      */
     public function count(PDOInterface $connection, $expr = '*')
     {
-        return (int) $this->aggregate($connection, $expr, 'COUNT');
+        return (int) $this->aggregate($connection, 'COUNT', $expr);
     }
 
     /**
@@ -38,7 +38,7 @@ class SelectQuery extends SelectBuilder
      */
     public function max(PDOInterface $connection, $expr)
     {
-        return (int) $this->aggregate($connection, $expr, 'MAX');
+        return (int) $this->aggregate($connection, 'MAX', $expr);
     }
 
     /**
@@ -48,7 +48,7 @@ class SelectQuery extends SelectBuilder
      */
     public function min(PDOInterface $connection, $expr)
     {
-        return (int) $this->aggregate($connection, $expr, 'MIN');
+        return (int) $this->aggregate($connection, 'MIN', $expr);
     }
 
     /**
@@ -58,16 +58,16 @@ class SelectQuery extends SelectBuilder
      */
     public function sum(PDOInterface $connection, $expr)
     {
-        return (int) $this->aggregate($connection, $expr, 'SUM');
+        return (int) $this->aggregate($connection, 'SUM', $expr);
     }
 
     /**
      * @param PDOInterface $connection
-     * @param mixed        $expr
      * @param string       $func
+     * @param mixed        $expr
      * @return mixed
      */
-    public function aggregate(PDOInterface $connection, $expr, $func)
+    public function aggregate(PDOInterface $connection, $func, $expr)
     {
         $stmt = $this->withSelect(["$func($expr)"])->prepare($connection);
         $stmt->execute();
