@@ -4,8 +4,6 @@ namespace Emonkak\Orm\QueryBuilder;
 
 use Emonkak\Orm\QueryBuilder\Grammar\GrammarInterface;
 use Emonkak\Orm\QueryBuilder\Grammar\DefaultGrammar;
-use Emonkak\Orm\QueryBuilder\Node\ConditionalJoin;
-use Emonkak\Orm\QueryBuilder\Node\Join;
 
 class SelectBuilder implements QueryBuilderInterface
 {
@@ -312,12 +310,13 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param mixed       $lhs
      * @param string|null $operator
-     * @param mixed|null  $rhs
+     * @param mixed|null  $rhs1
+     * @param mixed|null  $rhs2
      * @return $this
      */
     public function where($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
         $where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
         return $this->withWhere($where);
     }
@@ -325,12 +324,13 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param mixed       $lhs
      * @param string|null $operator
-     * @param mixed|null  $rhs
+     * @param mixed|null  $rhs1
+     * @param mixed|null  $rhs2
      * @return $this
      */
     public function orWhere($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
         $where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
         return $this->withWhere($where);
     }
@@ -401,12 +401,13 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param mixed       $lhs
      * @param string|null $operator
-     * @param mixed|null  $rhs
+     * @param mixed|null  $rhs1
+     * @param mixed|null  $rhs2
      * @return $this
      */
     public function having($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
         $having = $this->having ? $this->grammar->operator('AND', $this->having, $condition) : $condition;
         return $this->withHaving($having);
     }
@@ -414,12 +415,13 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param mixed       $lhs
      * @param string|null $operator
-     * @param mixed|null  $rhs
+     * @param mixed|null  $rhs1
+     * @param mixed|null  $rhs2
      * @return $this
      */
     public function orHaving($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
-        $condition = $this->condition($lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
         $having = $this->having ? $this->grammar->operator('OR', $this->having, $condition) : $condition;
         return $this->withHaving($having);
     }
@@ -536,31 +538,5 @@ class SelectBuilder implements QueryBuilderInterface
             $this->suffix,
             $this->union
         );
-    }
-
-    /**
-     * @param mixed  $lhs
-     * @param string $operator
-     * @param mixed  $rhs1
-     * @param mixed  $rhs2
-     * @return Sql
-     */
-    private function condition($lhs, $operator, $rhs1, $rhs2)
-    {
-        if ($operator === null) {
-            return $this->grammar->lift($lhs);
-        } elseif ($rhs1 === null) {
-            $lhs = $this->grammar->lift($lhs);
-            return $this->grammar->unaryOperator($operator, $lhs);
-        } elseif ($rhs2 === null) {
-            $lhs = $this->grammar->lift($lhs);
-            $rhs = $this->grammar->liftValue($rhs1);
-            return $this->grammar->operator($operator, $lhs, $rhs);
-        } else {
-            $lhs = $this->grammar->lift($lhs);
-            $start = $this->grammar->liftValue($rhs1);
-            $end = $this->grammar->liftValue($rhs2);
-            return $this->grammar->between($operator, $lhs, $start, $end);
-        }
     }
 }
