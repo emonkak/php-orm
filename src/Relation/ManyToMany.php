@@ -15,24 +15,24 @@ class ManyToMany implements RelationInterface
     private $relationKey;
 
     /**
-     * @var Relation
+     * @var AbstractRelation
      */
     private $oneToMany;
 
     /**
-     * @var Relation
+     * @var AbstractRelation
      */
     private $manyToOne;
 
     /**
-     * @param string   $relationKey
-     * @param Relation $oneToMany
-     * @param Relation $manyToOne
+     * @param string           $relationKey
+     * @param AbstractRelation $oneToMany
+     * @param AbstractRelation $manyToOne
      */
     public function __construct(
         $relationKey,
-        Relation $oneToMany,
-        Relation $manyToOne
+        AbstractRelation $oneToMany,
+        AbstractRelation $manyToOne
     ) {
         $this->relationKey = $relationKey;
         $this->oneToMany = $oneToMany;
