@@ -3,8 +3,9 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\QueryBuilder\SelectBuilder;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\QueryBuilder\SelectBuilder;
+use Emonkak\Orm\QueryBuilder\Sql;
 
 class SelectQuery extends SelectBuilder
 {
@@ -69,7 +70,7 @@ class SelectQuery extends SelectBuilder
      */
     public function aggregate(PDOInterface $connection, $func, $expr)
     {
-        $stmt = $this->withSelect(["$func($expr)"])->prepare($connection);
+        $stmt = $this->withSelect([new Sql("$func($expr)")])->prepare($connection);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
