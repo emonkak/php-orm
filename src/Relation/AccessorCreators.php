@@ -21,13 +21,19 @@ class AccessorCreators
      */
     public static function toKeySelector($prop, $class)
     {
-        return \Closure::bind(
-            static function($obj) use ($prop) {
-                return $obj->$prop;
-            },
-            null,
-            $class
-        );
+        if ($class !== null) {
+            return \Closure::bind(
+                static function($obj) use ($prop) {
+                    return $obj->$prop;
+                },
+                null,
+                $class
+            );
+        } else {
+            return function($props) use ($prop) {
+                return $props[$prop];
+            };
+        }
     }
 
     /**
@@ -37,15 +43,23 @@ class AccessorCreators
      */
     public static function toPivotKeySelector($prop, $class)
     {
-        return \Closure::bind(
-            static function($obj) use ($prop) {
-                $pivot = $obj->$prop;
-                unset($obj->$prop);
+        if ($class !== null) {
+            return \Closure::bind(
+                static function($obj) use ($prop) {
+                    $pivot = $obj->$prop;
+                    unset($obj->$prop);
+                    return $pivot;
+                },
+                null,
+                $class
+            );
+        } else {
+            return function($props) use ($prop) {
+                $pivot = $props[$prop];
+                unset($props[$prop]);
                 return $pivot;
-            },
-            null,
-            $class
-        );
+            };
+        }
     }
 
     /**
@@ -55,13 +69,20 @@ class AccessorCreators
      */
     public static function toKeyAssignee($prop, $class)
     {
-        return \Closure::bind(
-            static function($lhs, $rhs) use ($prop) {
-                $lhs->$prop = $rhs;
+        if ($class !== null) {
+            return \Closure::bind(
+                static function($lhs, $rhs) use ($prop) {
+                    $lhs->$prop = $rhs;
+                    return $lhs;
+                },
+                null,
+                $class
+            );
+        } else {
+            return function($lhs, $rhs) use ($prop) {
+                $lhs[$prop] = $rhs;
                 return $lhs;
-            },
-            null,
-            $class
-        );
+            };
+        }
     }
 }
