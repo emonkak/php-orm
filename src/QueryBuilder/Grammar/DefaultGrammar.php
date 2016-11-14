@@ -69,6 +69,28 @@ class DefaultGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
+    public function liftCondition($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    {
+        if ($operator === null) {
+            return $this->lift($lhs);
+        } elseif ($rhs1 === null) {
+            $lhs = $this->lift($lhs);
+            return $this->unaryOperator($operator, $lhs);
+        } elseif ($rhs2 === null) {
+            $lhs = $this->lift($lhs);
+            $rhs = $this->liftValue($rhs1);
+            return $this->operator($operator, $lhs, $rhs);
+        } else {
+            $lhs = $this->lift($lhs);
+            $start = $this->liftValue($rhs1);
+            $end = $this->liftValue($rhs2);
+            return $this->between($operator, $lhs, $start, $end);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function alias(Sql $value, $alias)
     {
         $sql = $value->getSql() . ' AS ' . $alias;

@@ -8,6 +8,22 @@ use Emonkak\Orm\QueryBuilder\Sql;
 interface GrammarInterface
 {
     /**
+     * @param string  $prefix
+     * @param Sql[]   $select
+     * @param Sql[]   $from
+     * @param Sql[]   $join
+     * @param Sql     $where
+     * @param Sql[]   $groupBy
+     * @param Sql     $having
+     * @param Sql[]   $orderBy
+     * @param integer $limit
+     * @param integer $offset
+     * @param Sql[]   $union
+     * @return Sql
+     */
+    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
+
+    /**
      * @param mixed $value
      * @return Sql
      */
@@ -63,20 +79,4 @@ interface GrammarInterface
      * @return Sql
      */
     public function unaryOperator($operator, Sql $lhs);
-
-    /**
-     * @param string  $prefix
-     * @param Sql[]   $select
-     * @param Sql[]   $from
-     * @param Sql[]   $join
-     * @param Sql     $where
-     * @param Sql[]   $groupBy
-     * @param Sql     $having
-     * @param Sql[]   $orderBy
-     * @param integer $limit
-     * @param integer $offset
-     * @param Sql[]   $union
-     * @return Sql
-     */
-    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
 }
