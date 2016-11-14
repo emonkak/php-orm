@@ -22,6 +22,55 @@ class DefaultGrammar implements GrammarInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     */
+    private function __construct()
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    {
+        $bindings = [];
+        $sql = $prefix
+             . $this->processSelect($select, $bindings)
+             . $this->processFrom($from, $bindings)
+             . $this->processJoin($join, $bindings)
+             . $this->processWhere($where, $bindings)
+             . $this->processGroupBy($groupBy, $bindings)
+             . $this->processHaving($having, $bindings)
+             . $this->processOrderBy($orderBy, $bindings)
+             . $this->processLimit($limit, $bindings)
+             . $this->processOffset($offset, $bindings)
+             . ($suffix !== null ? ' ' . $suffix : '');
+
+        if (!empty($union)) {
+            $sql = '(' . $sql . ')';
+        }
+
+        $sql .= $this->processUnion($union, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null, array $update)
+    {
+        $bindings = [];
+        $sql = $prefix
+             . $this->processInto($table, $columns)
+             . $this->processValues($values, $bindings)
+             . $this->processInsertSelect($select, $bindings)
+             . $this->processOnDuplicateKeyUpdate($update, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function lift($value)
@@ -59,8 +108,8 @@ class DefaultGrammar implements GrammarInterface
             return new Sql('?', [$value]);
         }
         if (is_array($value)) {
-            $placeholders = '(' . implode(', ', array_fill(0, count($value), '?')) . ')';
-            return new Sql($placeholders, $value);
+            $placeholders = array_fill(0, count($value), '?');
+            return new Sql('(' . implode(', ', $placeholders) . ')', array_values($value));
         }
         $type = gettype($value);
         throw new \UnexpectedValueException("Unexpected value, got '$type'.");
@@ -202,40 +251,6 @@ class DefaultGrammar implements GrammarInterface
                 return new Sql($sql, $bindings);
         }
         throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
-    {
-        $bindings = [];
-        $sql = $prefix
-             . $this->processSelect($select, $bindings)
-             . $this->processFrom($from, $bindings)
-             . $this->processJoin($join, $bindings)
-             . $this->processWhere($where, $bindings)
-             . $this->processGroupBy($groupBy, $bindings)
-             . $this->processHaving($having, $bindings)
-             . $this->processOrderBy($orderBy, $bindings)
-             . $this->processLimit($limit, $bindings)
-             . $this->processOffset($offset, $bindings)
-             . ($suffix !== null ? ' ' . $suffix : '');
-
-        if (!empty($union)) {
-            $sql = '(' . $sql . ')';
-        }
-
-        $sql .= $this->processUnion($union, $bindings);
-
-        return new Sql($sql, $bindings);
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    private function __construct()
-    {
     }
 
     /**
@@ -436,5 +451,70 @@ class DefaultGrammar implements GrammarInterface
         }
 
         return ' ' . implode(' ', $sqls);
+    }
+
+    /**
+     * @param string   $table
+     * @param string[] $columns
+     * @return string
+     */
+    private function processInto($table, array $columns)
+    {
+        $sql = ' INTO ' . $table;
+        if (!empty($columns)) {
+            $sql .= ' (' . implode(', ', $columns) . ')';
+        }
+        return $sql;
+    }
+
+    /**
+     * @param Sql[][] $values
+     * @param mixed[] &$bindings
+     * @return string
+     */
+    private function processValues(array $values, array &$bindings)
+    {
+        if (empty($values)) {
+            return '';
+        }
+        $sqls = [];
+        $bindings = [];
+        foreach ($values as $row) {
+            $sqls[] = $row->getSql();
+            $bindings = array_merge($bindings, $row->getBindings());
+        }
+        return ' VALUES ' . implode(', ', $sqls);
+    }
+
+    /**
+     * @param Sql|null $select
+     * @param mixed[]  &$bindings
+     * @return string
+     */
+    private function processInsertSelect(Sql $select = null, array &$bindings)
+    {
+        if ($select === null) {
+            return '';
+        }
+        $bindings = array_merge($bindings, $select->getBindings());
+        return ' ' . $select->getSql();
+    }
+
+    /**
+     * @param Sql[]   $update
+     * @param mixed[] &$bindings
+     * @return string
+     */
+    private function processOnDuplicateKeyUpdate(array $update, array &$bindings)
+    {
+        if (empty($update)) {
+            return '';
+        }
+        $sqls = [];
+        foreach ($update as $key => $value) {
+            $sqls[] = $key . ' = ' . $value->getSql();
+            $bindings = array_merge($bindings, $value->getBindings());
+        }
+        return ' ON DUPLICATE KEY UPDATE ' . implode(', ', $sqls);
     }
 }

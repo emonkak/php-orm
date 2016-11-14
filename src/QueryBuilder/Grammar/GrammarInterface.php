@@ -24,6 +24,17 @@ interface GrammarInterface
     public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
 
     /**
+     * @param string   $prefix
+     * @param string   $table
+     * @param string[] $columns
+     * @param Sql[][]  $values
+     * @param Sql|null $select
+     * @param Sql[]    $union
+     * @return Sql
+     */
+    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null, array $update);
+
+    /**
      * @param mixed $value
      * @return Sql
      */

@@ -362,7 +362,6 @@ class SelectBuilder implements QueryBuilderInterface
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
-        $cloned = clone $this;
         $join = $this->join;
         if ($condition !== null) {
             $condition = $this->grammar->lift($condition);
