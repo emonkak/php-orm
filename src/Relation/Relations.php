@@ -10,130 +10,209 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyInnerJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\SelectQuery;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use Psr\Cache\CacheItemPoolInterface;
 
 final class Relations
 {
     /**
-     * @param PDOInterface     $connection
-     * @param FetcherInterface $fetcher
      * @param string           $table
      * @param string           $relationKey
      * @param string           $outerKey
      * @param string           $innerKey
+     * @param PDOInterface     $connection
+     * @param FetcherInterface $fetcher
      * @param SelectQuery|null $query
+     * @return Relation
      */
     public static function oneToOne(
-        PDOInterface $connection,
-        FetcherInterface $fetcher,
         $table,
         $relationKey,
         $outerKey,
         $innerKey,
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
         SelectQuery $query = null
     ) {
         return new Relation(
-            $connection,
-            $fetcher,
             $table,
             $relationKey,
             $outerKey,
             $innerKey,
+            $connection,
+            $fetcher,
             $query ?: new SelectQuery(),
             new OuterJoin()
         );
     }
 
     /**
-     * @param PDOInterface     $connection
-     * @param FetcherInterface $fetcher
      * @param string           $table
      * @param string           $relationKey
      * @param string           $outerKey
      * @param string           $innerKey
+     * @param PDOInterface     $connection
+     * @param FetcherInterface $fetcher
      * @param SelectQuery|null $query
+     * @return Relation
      */
     public static function oneToMany(
-        PDOInterface $connection,
-        FetcherInterface $fetcher,
         $table,
         $relationKey,
         $outerKey,
         $innerKey,
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
         SelectQuery $query = null
     ) {
         return new Relation(
-            $connection,
-            $fetcher,
             $table,
             $relationKey,
             $outerKey,
             $innerKey,
+            $connection,
+            $fetcher,
             $query ?: new SelectQuery(),
             new GroupJoin()
         );
     }
 
     /**
-     * @param PDOInterface                       $connection
-     * @param FetcherInterface                   $fetcher
      * @param string                             $table
      * @param string                             $relationKey
      * @param string                             $outerKey
      * @param string                             $innerKey
-     * @param SelectQuery|null                   $query
+     * @param PDOInterface                       $connection
+     * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
+     * @param SelectQuery|null                   $query
+     * @return Relation
      */
     public static function lazyOneToOne(
-        PDOInterface $connection,
-        FetcherInterface $fetcher,
         $table,
         $relationKey,
         $outerKey,
         $innerKey,
-        SelectQuery $query = null,
-        LazyLoadingValueHolderFactory $proxyFactory = null
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
+        LazyLoadingValueHolderFactory $proxyFactory = null,
+        SelectQuery $query = null
     ) {
         return new Relation(
-            $connection,
-            $fetcher,
             $table,
             $relationKey,
             $outerKey,
             $innerKey,
+            $connection,
+            $fetcher,
             $query ?: new SelectQuery(),
             new LazyInnerJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
 
     /**
-     * @param PDOInterface                       $connection
-     * @param FetcherInterface                   $fetcher
      * @param string                             $table
      * @param string                             $relationKey
      * @param string                             $outerKey
      * @param string                             $innerKey
-     * @param SelectQuery|null                   $query
+     * @param PDOInterface                       $connection
+     * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
+     * @param SelectQuery|null                   $query
+     * @return Relation
      */
     public static function lazyOneToMany(
-        PDOInterface $connection,
-        FetcherInterface $fetcher,
         $table,
         $relationKey,
         $outerKey,
         $innerKey,
-        SelectQuery $query = null,
-        LazyLoadingValueHolderFactory $proxyFactory = null
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
+        LazyLoadingValueHolderFactory $proxyFactory = null,
+        SelectQuery $query = null
     ) {
         return new Relation(
-            $connection,
-            $fetcher,
             $table,
             $relationKey,
             $outerKey,
             $innerKey,
+            $connection,
+            $fetcher,
             $query ?: new SelectQuery(),
             new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
+        );
+    }
+
+    /**
+     * @param string                 $table
+     * @param string                 $relationKey
+     * @param string                 $outerKey
+     * @param string                 $innerKey
+     * @param PDOInterface           $connection
+     * @param FetcherInterface       $fetcher
+     * @param CacheItemPoolInterface $cachePool
+     * @param integer|null           $lifetime
+     * @param SelectQuery|null       $query
+     * @return CachedRelation
+     */
+    public static function cachedOneToOne(
+        $table,
+        $relationKey,
+        $outerKey,
+        $innerKey,
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
+        CacheItemPoolInterface $cachePool,
+        $lifetime = null,
+        SelectQuery $query = null
+    ) {
+        return new CachedRelation(
+            $table,
+            $relationKey,
+            $outerKey,
+            $innerKey,
+            $connection,
+            $fetcher,
+            $cachePool,
+            $lifetime,
+            $query ?: new SelectQuery(),
+            new OuterJoin()
+        );
+    }
+
+    /**
+     * @param string                 $table
+     * @param string                 $relationKey
+     * @param string                 $outerKey
+     * @param string                 $innerKey
+     * @param PDOInterface           $connection
+     * @param FetcherInterface       $fetcher
+     * @param CacheItemPoolInterface $cachePool
+     * @param integer|null           $lifetime
+     * @param SelectQuery|null       $query
+     * @return CachedRelation
+     */
+    public static function cachedOneToMany(
+        $table,
+        $relationKey,
+        $outerKey,
+        $innerKey,
+        PDOInterface $connection,
+        FetcherInterface $fetcher,
+        CacheItemPoolInterface $cachePool,
+        $lifetime = null,
+        SelectQuery $query = null
+    ) {
+        return new CachedRelation(
+            $table,
+            $relationKey,
+            $outerKey,
+            $innerKey,
+            $connection,
+            $fetcher,
+            $cachePool,
+            $lifetime,
+            $query ?: new SelectQuery(),
+            new GroupJoin()
         );
     }
 
@@ -141,6 +220,7 @@ final class Relations
      * @param string   $relationKey
      * @param Relation $oneToMany
      * @param Relation $manyToOne
+     * @return ManyToMany
      */
     public static function manyToMany($relationKey, Relation $oneToMany, Relation $manyToOne)
     {
