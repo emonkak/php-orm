@@ -1,9 +1,9 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder\Grammar;
+namespace Emonkak\Orm\Grammar;
 
-use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\Sql;
+use Emonkak\Orm\QueryBuilderInterface;
+use Emonkak\Orm\Sql;
 
 interface GrammarInterface
 {
@@ -29,10 +29,31 @@ interface GrammarInterface
      * @param string[] $columns
      * @param Sql[][]  $values
      * @param Sql|null $select
-     * @param Sql[]    $union
      * @return Sql
      */
-    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null, array $update);
+    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null);
+
+    /**
+     * @param string   $prefix
+     * @param Sql      $table
+     * @param Sql[]    $update
+     * @param Sql|null $where
+     * @param Sql[]    $orderBy
+     * @param integer  $limit
+     * @return Sql
+     */
+    public function compileUpdate($prefix, Sql $table, array $update, Sql $where = null, array $orderBy, $limit);
+
+    /**
+     * @param string   $prefix
+     * @param Sql      $table
+     * @param Sql[]    $update
+     * @param Sql|null $where
+     * @param Sql[]    $orderBy
+     * @param integer  $limit
+     * @return Sql
+     */
+    public function compileDelete($prefix, array $from, Sql $where = null, array $orderBy, $limit);
 
     /**
      * @param mixed $value
@@ -90,4 +111,10 @@ interface GrammarInterface
      * @return Sql
      */
     public function unaryOperator($operator, Sql $lhs);
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function identifier($string);
 }

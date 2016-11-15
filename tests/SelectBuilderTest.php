@@ -1,9 +1,9 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder\Tests;
+namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\QueryBuilder\Sql;
-use Emonkak\Orm\QueryBuilder\SelectBuilder;
+use Emonkak\Orm\Sql;
+use Emonkak\Orm\SelectBuilder;
 
 class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 {

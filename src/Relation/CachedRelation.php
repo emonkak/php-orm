@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\SelectQuery;
+use Emonkak\Orm\SelectBuilder;
 use Psr\Cache\CacheItemPoolInterface;
 
 class CachedRelation extends AbstractRelation
@@ -30,7 +30,7 @@ class CachedRelation extends AbstractRelation
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
      * @param integer|null           $lifetime
-     * @param SelectQuery            $query
+     * @param SelectBuilder            $builder
      * @param JoinStrategyInterface  $joinStrategy
      */
     public function __construct(
@@ -42,7 +42,7 @@ class CachedRelation extends AbstractRelation
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
         $lifetime,
-        SelectQuery $query,
+        SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
     ) {
         parent::__construct(
@@ -52,7 +52,7 @@ class CachedRelation extends AbstractRelation
             $innerKey,
             $connection,
             $fetcher,
-            $query,
+            $builder,
             $joinStrategy
         );
 
@@ -74,7 +74,7 @@ class CachedRelation extends AbstractRelation
             $this->fetcher,
             $this->cachePool,
             $this->lifetime,
-            $this->query->with($relation),
+            $this->builder->with($relation),
             $this->joinStrategy
         );
     }
@@ -106,9 +106,11 @@ class CachedRelation extends AbstractRelation
         }
 
         if (!empty($uncachedItems)) {
-            $result = $this->query
-                ->from(sprintf('`%s`', $this->table))
-                ->where(sprintf('`%s`.`%s`', $this->table, $this->innerKey), 'IN', array_keys($uncachedItems))
+            $grammar = $this->builder->getGrammar();
+
+            $result = $this->builder
+                ->from($grammar->identifier($this->table))
+                ->where($grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey), 'IN', array_keys($uncachedItems))
                 ->getResult($this->connection, $this->fetcher);
 
             $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->fetcher->getClass());

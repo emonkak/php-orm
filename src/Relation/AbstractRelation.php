@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\SelectQuery;
+use Emonkak\Orm\SelectBuilder;
 
 abstract class AbstractRelation implements RelationInterface
 {
@@ -41,9 +41,9 @@ abstract class AbstractRelation implements RelationInterface
     protected $fetcher;
 
     /**
-     * @var SelectQuery
+     * @var SelectBuilder
      */
-    protected $query;
+    protected $builder;
 
     /**
      * @var JoinStrategyInterface
@@ -55,7 +55,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param string                $relationKey
      * @param string                $outerKey
      * @param string                $innerKey
-     * @param SelectQuery           $query
+     * @param SelectBuilder           $builder
      * @param PDOInterface          $connection
      * @param FetcherInterface      $fetcher
      * @param JoinStrategyInterface $joinStrategy
@@ -67,7 +67,7 @@ abstract class AbstractRelation implements RelationInterface
         $innerKey,
         PDOInterface $connection,
         FetcherInterface $fetcher,
-        SelectQuery $query,
+        SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
     ) {
         $this->table = $table;
@@ -76,7 +76,7 @@ abstract class AbstractRelation implements RelationInterface
         $this->innerKey = $innerKey;
         $this->connection = $connection;
         $this->fetcher = $fetcher;
-        $this->query = $query;
+        $this->builder = $builder;
         $this->joinStrategy = $joinStrategy;
     }
 
@@ -129,11 +129,11 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * @return SelectQuery
+     * @return SelectBuilder
      */
-    public function getQuery()
+    public function getBuilder()
     {
-        return $this->query;
+        return $this->builder;
     }
 
     /**

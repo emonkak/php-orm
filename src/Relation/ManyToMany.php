@@ -88,29 +88,29 @@ class ManyToMany implements RelationInterface
         $oneToMany = $this->oneToMany;
         $manyToOne = $this->manyToOne;
 
-        $query = $oneToMany->getQuery()
-            ->from(sprintf('`%s`', $oneToMany->getTable()))
+        $builder = $oneToMany->getBuilder();
+        $grammar = $builder->getGrammar();
+
+        $builder = $oneToMany->getBuilder()
+            ->select($grammar->identifier($manyToOne->getTable()) . '.*')
+            ->select(
+                $grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()),
+                $grammar->identifier($this->getPivotKey())
+            )
+            ->from($grammar->identifier($oneToMany->getTable()))
             ->leftJoin(
-                sprintf('`%s`', $manyToOne->getTable()),
+                $grammar->identifier($manyToOne->getTable()),
                 sprintf(
-                    '`%s`.`%s` = `%s`.`%s`',
-                    $oneToMany->getTable(),
-                    $oneToMany->getInnerKey(),
-                    $manyToOne->getTable(),
-                    $manyToOne->getInnerKey()
+                    '%s.%s = %s.%s',
+                    $grammar->identifier($oneToMany->getTable()),
+                    $grammar->identifier($oneToMany->getInnerKey()),
+                    $grammar->identifier($manyToOne->getTable()),
+                    $grammar->identifier($manyToOne->getInnerKey())
                 )
             )
-            ->where(sprintf('`%s`.`%s`', $oneToMany->getTable(), $oneToMany->getInnerKey()), 'IN', $outerKeys);
+            ->where($grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()), 'IN', $outerKeys);
 
-        if (count($query->getSelect()) === 0) {
-            $query = $query->select(sprintf('`%s`.*', $manyToOne->getTable()));
-        }
-
-        return $query
-            ->select(
-                sprintf('`%s`.`%s`', $oneToMany->getTable(), $oneToMany->getInnerKey()),
-                sprintf('`%s`', $this->getPivotKey())
-            )
+        return $builder
             ->getResult($manyToOne->getConnection(), $manyToOne->getFetcher());
     }
 

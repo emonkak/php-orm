@@ -12,9 +12,9 @@ use Emonkak\Orm\ResultSet\PaginatedResultSet;
 class Paginator
 {
     /**
-     * @var SelectQuery
+     * @var SelectBuilder
      */
-    private $query;
+    private $builder;
 
     /**
      * @var PDOInterface
@@ -37,15 +37,15 @@ class Paginator
     private $numItems;
 
     /**
-     * @param SelectQuery      $query
+     * @param SelectBuilder    $builder
      * @param PDOInterface     $connection
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
      * @param integer          $numItems
      */
-    public function __construct(SelectQuery $query, PDOInterface $connection, FetcherInterface $fetcher, $perPage, $numItems)
+    public function __construct(SelectBuilder $builder, PDOInterface $connection, FetcherInterface $fetcher, $perPage, $numItems)
     {
-        $this->query = $query;
+        $this->builder = $builder;
         $this->connection = $connection;
         $this->fetcher = $fetcher;
         $this->perPage = $perPage;
@@ -72,7 +72,7 @@ class Paginator
         }
 
         if ($this->getNumPages() > $index) {
-            $result = $this->query
+            $result = $this->builder
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
                 ->getResult($this->connection, $this->fetcher);
@@ -81,6 +81,22 @@ class Paginator
         }
 
         return new PaginatedResultSet($result, $this, $index);
+    }
+
+    /**
+     * @return PaginatedResultSet
+     */
+    public function firstPage()
+    {
+        return $this->atIndex(0);
+    }
+
+    /**
+     * @return PaginatedResultSet
+     */
+    public function lastPage()
+    {
+        return $this->atIndex($this->getNumPages() - 1);
     }
 
     /**

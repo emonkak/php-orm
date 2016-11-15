@@ -1,12 +1,18 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder;
+namespace Emonkak\Orm;
 
-use Emonkak\Orm\QueryBuilder\Grammar\DefaultGrammar;
-use Emonkak\Orm\QueryBuilder\Grammar\GrammarInterface;
+use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarInterface;
 
+/**
+ * Provides the query building of INSERT statement.
+ */
 class InsertBuilder implements QueryBuilderInterface
 {
+    use Explainable;
+    use Preparable;
+
     /**
      * @var GrammarInterface
      */
@@ -20,7 +26,7 @@ class InsertBuilder implements QueryBuilderInterface
     /**
      * @var string
      */
-    private $table;
+    private $into;
 
     /**
      * @var string[]
@@ -38,16 +44,19 @@ class InsertBuilder implements QueryBuilderInterface
     private $select;
 
     /**
-     * @var Sql[]
-     */
-    private $update = [];
-
-    /**
      * @param GrammarInterface $grammar
      */
     public function __construct(GrammarInterface $grammar = null)
     {
         $this->grammar = $grammar ?: DefaultGrammar::getInstance();
+    }
+
+    /**
+     * @return GrammarInterface
+     */
+    public function getGrammar()
+    {
+        return $this->grammar;
     }
 
     /**
@@ -62,14 +71,14 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed $table
-     * @param array $columns
+     * @param string   $table
+     * @param string[] $columns
      * @return $this
      */
     public function into($table, array $columns = [])
     {
         $cloned = clone $this;
-        $cloned->table = $table;
+        $cloned->into = $table;
         $cloned->columns = $columns;
         return $cloned;
     }
@@ -78,10 +87,10 @@ class InsertBuilder implements QueryBuilderInterface
      * @param mixed[] $values
      * @return $this
      */
-    public function values(...$values)
+    public function values()
     {
         $cloned = clone $this;
-        foreach ($values as $row) {
+        foreach (func_get_args() as $row) {
             $cloned->values[] = $this->grammar->liftValue($row);
         }
         return $cloned;
@@ -99,28 +108,16 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed[] $update
-     * @return $this
-     */
-    public function onDuplicateKeyUpdate(array $update)
-    {
-        $cloned = clone $this;
-        $cloned->update = array_map([$this->grammar, 'liftValue'], $update);
-        return $cloned;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function build()
     {
         return $this->grammar->compileInsert(
             $this->prefix,
-            $this->table,
+            $this->into,
             $this->columns,
             $this->values,
-            $this->select,
-            $this->update
+            $this->select
         );
     }
 }

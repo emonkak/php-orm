@@ -1,8 +1,8 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder\Tests;
+namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\QueryBuilder\Sql;
+use Emonkak\Orm\Sql;
 
 class SqlTest extends \PHPUnit_Framework_TestCase
 {

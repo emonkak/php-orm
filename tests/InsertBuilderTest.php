@@ -1,10 +1,10 @@
 <?php
 
-namespace Emonkak\Orm\Tests\QueryBuilder;
+namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\QueryBuilder\InsertBuilder;
-use Emonkak\Orm\QueryBuilder\SelectBuilder;
-use Emonkak\Orm\QueryBuilder\Sql;
+use Emonkak\Orm\InsertBuilder;
+use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Sql;
 
 class InsertBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,16 +53,5 @@ class InsertBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->build();
         $this->assertSame('INSERT INTO t1 (c1, c2, c3) VALUES (?, ?, ?), (?, ?, ?)', $query->getSql());
         $this->assertSame(['foo', 'bar', 'baz', 'hoge', 'huga', 'piyo'], $query->getBindings());
-    }
-
-    public function testOnDuplicateKeyUpdate()
-    {
-        $query = (new InsertBuilder())
-            ->into('t1', ['c1', 'c2', 'c3'])
-            ->values(['foo', 'bar', 'baz'])
-            ->onDuplicateKeyUpdate(['c2' => new Sql('c2 + ?', [1])])
-            ->build();
-        $this->assertSame('INSERT INTO t1 (c1, c2, c3) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE c2 = c2 + ?', $query->getSql());
-        $this->assertSame(['foo', 'bar', 'baz', 1], $query->getBindings());
     }
 }
