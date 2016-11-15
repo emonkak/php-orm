@@ -8,7 +8,7 @@ use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyInnerJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
-use Emonkak\Orm\SelectQuery;
+use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -21,7 +21,7 @@ final class Relations
      * @param string           $innerKey
      * @param PDOInterface     $connection
      * @param FetcherInterface $fetcher
-     * @param SelectQuery|null $query
+     * @param SelectBuilder|null $builder
      * @return Relation
      */
     public static function oneToOne(
@@ -31,7 +31,7 @@ final class Relations
         $innerKey,
         PDOInterface $connection,
         FetcherInterface $fetcher,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new Relation(
             $table,
@@ -40,7 +40,7 @@ final class Relations
             $innerKey,
             $connection,
             $fetcher,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new OuterJoin()
         );
     }
@@ -52,7 +52,7 @@ final class Relations
      * @param string           $innerKey
      * @param PDOInterface     $connection
      * @param FetcherInterface $fetcher
-     * @param SelectQuery|null $query
+     * @param SelectBuilder|null $builder
      * @return Relation
      */
     public static function oneToMany(
@@ -62,7 +62,7 @@ final class Relations
         $innerKey,
         PDOInterface $connection,
         FetcherInterface $fetcher,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new Relation(
             $table,
@@ -71,7 +71,7 @@ final class Relations
             $innerKey,
             $connection,
             $fetcher,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new GroupJoin()
         );
     }
@@ -84,7 +84,7 @@ final class Relations
      * @param PDOInterface                       $connection
      * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @param SelectQuery|null                   $query
+     * @param SelectBuilder|null                   $builder
      * @return Relation
      */
     public static function lazyOneToOne(
@@ -95,7 +95,7 @@ final class Relations
         PDOInterface $connection,
         FetcherInterface $fetcher,
         LazyLoadingValueHolderFactory $proxyFactory = null,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new Relation(
             $table,
@@ -104,7 +104,7 @@ final class Relations
             $innerKey,
             $connection,
             $fetcher,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new LazyInnerJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
@@ -117,7 +117,7 @@ final class Relations
      * @param PDOInterface                       $connection
      * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @param SelectQuery|null                   $query
+     * @param SelectBuilder|null                   $builder
      * @return Relation
      */
     public static function lazyOneToMany(
@@ -128,7 +128,7 @@ final class Relations
         PDOInterface $connection,
         FetcherInterface $fetcher,
         LazyLoadingValueHolderFactory $proxyFactory = null,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new Relation(
             $table,
@@ -137,7 +137,7 @@ final class Relations
             $innerKey,
             $connection,
             $fetcher,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
@@ -151,7 +151,7 @@ final class Relations
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
      * @param integer|null           $lifetime
-     * @param SelectQuery|null       $query
+     * @param SelectBuilder|null       $builder
      * @return CachedRelation
      */
     public static function cachedOneToOne(
@@ -163,7 +163,7 @@ final class Relations
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
         $lifetime = null,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new CachedRelation(
             $table,
@@ -174,7 +174,7 @@ final class Relations
             $fetcher,
             $cachePool,
             $lifetime,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new OuterJoin()
         );
     }
@@ -188,7 +188,7 @@ final class Relations
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
      * @param integer|null           $lifetime
-     * @param SelectQuery|null       $query
+     * @param SelectBuilder|null       $builder
      * @return CachedRelation
      */
     public static function cachedOneToMany(
@@ -200,7 +200,7 @@ final class Relations
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
         $lifetime = null,
-        SelectQuery $query = null
+        SelectBuilder $builder = null
     ) {
         return new CachedRelation(
             $table,
@@ -211,7 +211,7 @@ final class Relations
             $fetcher,
             $cachePool,
             $lifetime,
-            $query ?: new SelectQuery(),
+            $builder ?: new SelectBuilder(),
             new GroupJoin()
         );
     }

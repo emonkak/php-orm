@@ -3,6 +3,7 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\Relation\RelationInterface;

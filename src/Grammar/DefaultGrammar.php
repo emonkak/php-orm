@@ -1,9 +1,9 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder\Grammar;
+namespace Emonkak\Orm\Grammar;
 
-use Emonkak\Orm\QueryBuilder\QueryBuilderInterface;
-use Emonkak\Orm\QueryBuilder\Sql;
+use Emonkak\Orm\QueryBuilderInterface;
+use Emonkak\Orm\Sql;
 
 class DefaultGrammar implements GrammarInterface
 {
@@ -34,6 +34,7 @@ class DefaultGrammar implements GrammarInterface
     public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
     {
         $bindings = [];
+
         $sql = $prefix
              . $this->processSelect($select, $bindings)
              . $this->processFrom($from, $bindings)
@@ -58,14 +59,46 @@ class DefaultGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null, array $update)
+    public function compileInsert($prefix, $into, array $columns, array $values, Sql $select = null)
     {
         $bindings = [];
+
         $sql = $prefix
-             . $this->processInto($table, $columns)
+             . $this->processInto($into, $columns)
              . $this->processValues($values, $bindings)
-             . $this->processInsertSelect($select, $bindings)
-             . $this->processOnDuplicateKeyUpdate($update, $bindings);
+             . $this->processInsertSelect($select, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileUpdate($prefix, Sql $table, array $update, Sql $where = null, array $orderBy, $limit)
+    {
+        $bindings = $table->getBindings();
+
+        $sql = $prefix . ' ' . $table->getSql()
+             . $this->processSet($update, $bindings)
+             . $this->processWhere($where, $bindings)
+             . $this->processOrderBy($orderBy, $bindings)
+             . $this->processLimit($limit, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileDelete($prefix, array $from, Sql $where = null, array $orderBy, $limit)
+    {
+        $bindings = [];
+
+        $sql = $prefix
+             . $this->processFrom($from, $bindings)
+             . $this->processWhere($where, $bindings)
+             . $this->processOrderBy($orderBy, $bindings)
+             . $this->processLimit($limit, $bindings);
 
         return new Sql($sql, $bindings);
     }
@@ -222,7 +255,7 @@ class DefaultGrammar implements GrammarInterface
                 $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
                 return new Sql($sql, $bindings);
         }
-        throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
+        throw new \UnexpectedValueException("Unexpected between operator, got '$operator'.");
     }
 
     /**
@@ -254,6 +287,14 @@ class DefaultGrammar implements GrammarInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function identifier($string)
+    {
+        return '`' . str_replace('`', '``', $string) . '`';
+    }
+
+    /**
      * @param Sql[]   $select
      * @param mixed[] &$bindings
      * @return string
@@ -266,10 +307,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($select as $definition) {
-            $selectSql = $definition->getSql();
-            $selectBindings = $definition->getBindings();
-            $sqls[] = $selectSql;
-            $bindings = array_merge($bindings, $selectBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' ' . implode(', ', $sqls);
@@ -288,10 +327,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($from as $definition) {
-            $tableSql = $definition->getSql();
-            $tableBindings = $definition->getBindings();
-            $sqls[] = $tableSql;
-            $bindings = array_merge($bindings, $tableBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' FROM ' . implode(', ', $sqls);
@@ -310,10 +347,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($join as $definition) {
-            $joinSql = $definition->getSql();
-            $joinBindings = $definition->getBindings();
-            $sqls[] = $joinSql;
-            $bindings = array_merge($bindings, $joinBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' ' . implode(' ', $sqls);
@@ -330,12 +365,9 @@ class DefaultGrammar implements GrammarInterface
             return '';
         }
 
-        $whereSql = $where->getSql();
-        $whereBindings = $where->getBindings();
+        $bindings = array_merge($bindings, $where->getBindings());
 
-        $bindings = array_merge($bindings, $whereBindings);
-
-        return ' WHERE ' . $whereSql;
+        return ' WHERE ' . $where->getSql();
     }
 
     /**
@@ -351,10 +383,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($groupBy as $definition) {
-            $groupBySql = $definition->getSql();
-            $groupByBindings = $definition->getBindings();
-            $sqls[] = $groupBySql;
-            $bindings = array_merge($bindings, $groupByBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' GROUP BY ' . implode(', ', $sqls);
@@ -371,12 +401,9 @@ class DefaultGrammar implements GrammarInterface
             return '';
         }
 
-        $havingSql = $having->getSql();
-        $havingBindings = $having->getBindings();
+        $bindings = array_merge($bindings, $having->getBindings());
 
-        $bindings = array_merge($bindings, $havingBindings);
-
-        return ' HAVING ' . $havingSql;
+        return ' HAVING ' . $having->getSql();
     }
 
     /**
@@ -392,10 +419,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($orderBy as $definition) {
-            $orderBySql = $definition->getSql();
-            $orderByBindings = $definition->getBindings();
-            $sqls[] = $orderBySql;
-            $bindings = array_merge($bindings, $orderByBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' ORDER BY ' . implode(', ', $sqls);
@@ -444,10 +469,8 @@ class DefaultGrammar implements GrammarInterface
 
         $sqls = [];
         foreach ($union as $definition) {
-            $unionSql = $definition->getSql();
-            $unionBindings = $definition->getBindings();
-            $sqls[] = $unionSql;
-            $bindings = array_merge($bindings, $unionBindings);
+            $sqls[] = $definition->getSql();
+            $bindings = array_merge($bindings, $definition->getBindings());
         }
 
         return ' ' . implode(' ', $sqls);
@@ -505,7 +528,7 @@ class DefaultGrammar implements GrammarInterface
      * @param mixed[] &$bindings
      * @return string
      */
-    private function processOnDuplicateKeyUpdate(array $update, array &$bindings)
+    private function processSet(array $update, array &$bindings)
     {
         if (empty($update)) {
             return '';
@@ -515,6 +538,6 @@ class DefaultGrammar implements GrammarInterface
             $sqls[] = $key . ' = ' . $value->getSql();
             $bindings = array_merge($bindings, $value->getBindings());
         }
-        return ' ON DUPLICATE KEY UPDATE ' . implode(', ', $sqls);
+        return ' SET ' . implode(', ', $sqls);
     }
 }

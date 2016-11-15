@@ -16,7 +16,7 @@ class Relation extends AbstractRelation
             $this->innerKey,
             $this->connection,
             $this->fetcher,
-            $this->query->with($relation),
+            $this->builder->with($relation),
             $this->joinStrategy
         );
     }
@@ -26,9 +26,10 @@ class Relation extends AbstractRelation
      */
     protected function getResult($outerKeys)
     {
-        return $this->query
-            ->from(sprintf('`%s`', $this->table))
-            ->where(sprintf('`%s`.`%s`', $this->table, $this->innerKey), 'IN', $outerKeys)
+        $grammar = $this->builder->getGrammar();
+        return $this->builder
+            ->from($grammar->identifier($this->table))
+            ->where($grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey), 'IN', $outerKeys)
             ->getResult($this->connection, $this->fetcher);
     }
 }

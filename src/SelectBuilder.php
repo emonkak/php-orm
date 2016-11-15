@@ -1,12 +1,21 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder;
+namespace Emonkak\Orm;
 
-use Emonkak\Orm\QueryBuilder\Grammar\GrammarInterface;
-use Emonkak\Orm\QueryBuilder\Grammar\DefaultGrammar;
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarInterface;
 
+/**
+ * Provides the query building of SELECT statement.
+ */
 class SelectBuilder implements QueryBuilderInterface
 {
+    use Aggregatable;
+    use Explainable;
+    use Fetchable;
+    use Preparable;
+
     /**
      * @var GrammarInterface
      */
@@ -81,187 +90,11 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return string
+     * @return GrammarInterface
      */
-    public function getPrefix()
+    public function getGrammar()
     {
-        return $this->prefix;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getSelect()
-    {
-        return $this->select;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getFrom()
-    {
-        return $this->from;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getJoin()
-    {
-        return $this->join;
-    }
-
-    /**
-     * @return Sql
-     */
-    public function getWhere()
-    {
-        return $this->where;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getGroupBy()
-    {
-        return $this->groupBy;
-    }
-
-    /**
-     * @return Sql
-     */
-    public function getHaving()
-    {
-        return $this->having;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getOrderBy()
-    {
-        return $this->orderBy;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getOffset()
-    {
-        return $this->offset;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSuffix()
-    {
-        return $this->suffix;
-    }
-
-    /**
-     * @return Sql[]
-     */
-    public function getUnion()
-    {
-        return $this->union;
-    }
-
-    /**
-     * @param Sql[] $select
-     * @return $this
-     */
-    public function withSelect(array $select)
-    {
-        $cloned = clone $this;
-        $cloned->select = $select;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql[] $from
-     * @return $this
-     */
-    public function withFrom(array $from)
-    {
-        $cloned = clone $this;
-        $cloned->from = $from;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql[] $join
-     * @return $this
-     */
-    public function withJoin(array $join)
-    {
-        $cloned = clone $this;
-        $cloned->join = $join;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql|null $where
-     * @return $this
-     */
-    public function withWhere(Sql $where = null)
-    {
-        $cloned = clone $this;
-        $cloned->where = $where;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql[] $groupBy
-     * @return $this
-     */
-    public function withGroupBy(array $groupBy)
-    {
-        $cloned = clone $this;
-        $cloned->groupBy = $groupBy;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql $having
-     * @return $this
-     */
-    public function withHaving(Sql $having = null)
-    {
-        $cloned = clone $this;
-        $cloned->having = $having;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql[] $orderBy
-     * @return $this
-     */
-    public function withOrderBy(array $orderBy)
-    {
-        $cloned = clone $this;
-        $cloned->orderBy = $orderBy;
-        return $cloned;
-    }
-
-    /**
-     * @param Sql[] $union
-     * @return $this
-     */
-    public function withUnion(array $union)
-    {
-        $cloned = clone $this;
-        $cloned->union = $union;
-        return $cloned;
+        return $this->grammar;
     }
 
     /**
@@ -286,9 +119,29 @@ class SelectBuilder implements QueryBuilderInterface
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
-        $select = $this->select;
-        $select[] = $expr;
-        return $this->withSelect($select);
+        $cloned = clone $this;
+        $cloned->select[] = $expr;
+        return $cloned;
+    }
+
+    /**
+     * @param mixed  $expr
+     * @param string $alias
+     * @return $this
+     */
+    public function selectAll(array $exprs)
+    {
+        $select = [];
+        foreach ($exprs as $key => $expr) {
+            $expr = $this->grammar->lift($expr);
+            if (is_string($key)) {
+                $expr = $this->grammar->alias($expr, $key);
+            }
+            $select[] = $expr;
+        }
+        $cloned = clone $this;
+        $cloned->select = $select;
+        return $cloned;
     }
 
     /**
@@ -302,9 +155,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
-        $from = $this->from;
-        $from[] = $table;
-        return $this->withFrom($from);
+        $cloned = clone $this;
+        $cloned->from[] = $table;
+        return $cloned;
     }
 
     /**
@@ -317,8 +170,9 @@ class SelectBuilder implements QueryBuilderInterface
     public function where($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
         $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
-        return $this->withWhere($where);
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -331,8 +185,9 @@ class SelectBuilder implements QueryBuilderInterface
     public function orWhere($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
         $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
-        return $this->withWhere($where);
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -345,8 +200,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($builder->where === null) {
             return $this;
         }
-        $where = $this->where ? $this->grammar->operator('AND', $this->where, $builder->where) : $builder->where;
-        return $this->withWhere($where);
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $builder->where) : $builder->where;
+        return $cloned;
     }
 
     /**
@@ -366,8 +222,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($condition !== null) {
             $condition = $this->grammar->lift($condition);
         }
-        $join[] = $this->grammar->join($table, $condition, $type);
-        return $this->withJoin($join);
+        $cloned = clone $this;
+        $cloned->join[] = $this->grammar->join($table, $condition, $type);
+        return $cloned;
     }
 
     /**
@@ -392,9 +249,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($ordering !== null) {
             $expr = $this->grammar->order($expr, $ordering);
         }
-        $groupBy = $this->groupBy;
-        $groupBy[] = $expr;
-        return $this->withGroupBy($groupBy);
+        $cloned = clone $this;
+        $cloned->groupBy[] = $expr;
+        return $cloned;
     }
 
     /**
@@ -407,8 +264,9 @@ class SelectBuilder implements QueryBuilderInterface
     public function having($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
         $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $having = $this->having ? $this->grammar->operator('AND', $this->having, $condition) : $condition;
-        return $this->withHaving($having);
+        $cloned = clone $this;
+        $cloned->having = $this->having ? $this->grammar->operator('AND', $this->having, $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -421,8 +279,9 @@ class SelectBuilder implements QueryBuilderInterface
     public function orHaving($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
     {
         $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $having = $this->having ? $this->grammar->operator('OR', $this->having, $condition) : $condition;
-        return $this->withHaving($having);
+        $cloned = clone $this;
+        $cloned->having = $this->having ? $this->grammar->operator('OR', $this->having, $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -435,8 +294,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($builder->having === null) {
             return $this;
         }
-        $having = $this->having ? $this->grammar->operator('AND', $this->having, $builder->having) : $builder->having;
-        return $this->withHaving($where);
+        $cloned = clone $this;
+        $cloned->having = $this->having ? $this->grammar->operator('AND', $this->having, $builder->having) : $builder->having;
+        return $cloned;
     }
 
     /**
@@ -450,9 +310,9 @@ class SelectBuilder implements QueryBuilderInterface
         if ($ordering !== null) {
             $expr = $this->grammar->order($expr, $ordering);
         }
-        $orderBy = $this->orderBy;
-        $orderBy[] = $expr;
-        return $this->withOrderBy($orderBy);
+        $cloned = clone $this;
+        $cloned->orderBy[] = $expr;
+        return $cloned;
     }
 
     /**
@@ -538,4 +398,27 @@ class SelectBuilder implements QueryBuilderInterface
             $this->union
         );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function aggregate(PDOInterface $connection, $func, $expr)
+    {
+        $stmt = $this->selectAll(["$func($expr)"])->prepare($connection);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * @param PDOInterface     $connection
+     * @param FetcherInterface $fetcher
+     * @param integer          $perPage
+     * @return Paginator
+     */
+    public function paginate(PDOInterface $connection, FetcherInterface $fetcher, $perPage)
+    {
+        $numItems = $this->count($connection);
+        return new Paginator($this, $connection, $fetcher, $perPage, $numItems);
+    }
+
 }

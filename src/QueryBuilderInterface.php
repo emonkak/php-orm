@@ -1,6 +1,6 @@
 <?php
 
-namespace Emonkak\Orm\QueryBuilder;
+namespace Emonkak\Orm;
 
 interface QueryBuilderInterface
 {

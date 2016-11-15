@@ -4,7 +4,7 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\QueryBuilder\Sql;
+use Emonkak\Orm\Sql;
 
 /**
  * @internal
@@ -38,10 +38,21 @@ trait Preparable
                 $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
                 break;
             default:
-                throw new \UnexpectedValueException("Unexpected value, got '$type'.");
+                throw new \UnexpectedValueException("The value does not be bindable, got '$type'.");
             }
         }
 
+        return $stmt;
+    }
+
+    /**
+     * @param PDOInterface $connection
+     * @return PDOStatementInterface
+     */
+    public function execute(PDOInterface $connection)
+    {
+        $stmt = $this->prepare($connection);
+        $stmt->execute();
         return $stmt;
     }
 
