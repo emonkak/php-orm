@@ -99,10 +99,10 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = (new SelectBuilder())
             ->from('t1')
-            ->leftJoin('t2', 't1.id = t2.id')
+            ->outerJoin('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id', null, 'INNER JOIN')
             ->build();
-        $this->assertSame('SELECT * FROM t1 LEFT JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id', $query->getSql(), 'LEFT JOIN, INNER JOIN');
+        $this->assertSame('SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id', $query->getSql(), 'LEFT JOIN, INNER JOIN');
         $this->assertSame([], $query->getBindings());
 
         $builder = (new SelectBuilder())->from('t2');

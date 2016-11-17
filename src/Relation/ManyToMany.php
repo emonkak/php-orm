@@ -98,7 +98,7 @@ class ManyToMany implements RelationInterface
                 $grammar->identifier($this->getPivotKey())
             )
             ->from($grammar->identifier($oneToMany->getTable()))
-            ->leftJoin(
+            ->outerJoin(
                 $grammar->identifier($manyToOne->getTable()),
                 sprintf(
                     '%s.%s = %s.%s',
