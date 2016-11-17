@@ -91,7 +91,7 @@ class InsertBuilder implements QueryBuilderInterface
     {
         $cloned = clone $this;
         foreach (func_get_args() as $row) {
-            $cloned->values[] = $this->grammar->liftValue($row);
+            $cloned->values[] = $this->grammar->liftValue(array_values($row));
         }
         return $cloned;
     }

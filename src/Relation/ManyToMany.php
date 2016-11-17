@@ -91,7 +91,7 @@ class ManyToMany implements RelationInterface
         $builder = $oneToMany->getBuilder();
         $grammar = $builder->getGrammar();
 
-        $builder = $oneToMany->getBuilder()
+        $builder = $builder
             ->select($grammar->identifier($manyToOne->getTable()) . '.*')
             ->select(
                 $grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()),
@@ -111,7 +111,7 @@ class ManyToMany implements RelationInterface
             ->where($grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()), 'IN', $outerKeys);
 
         return $builder
-            ->getResult($manyToOne->getConnection(), $manyToOne->getFetcher());
+            ->getResult($manyToOne->getPdo(), $manyToOne->getFetcher());
     }
 
     /**

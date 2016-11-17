@@ -31,13 +31,13 @@ trait Fetchable
     }
 
     /**
-     * @param PDOInterface     $connection
+     * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @return ResultSetInterface
      */
-    public function getResult(PDOInterface $connection, FetcherInterface $fetcher)
+    public function getResult(PDOInterface $pdo, FetcherInterface $fetcher)
     {
-        $stmt = $this->prepare($connection);
+        $stmt = $this->prepare($pdo);
 
         foreach ($this->relations as $relation) {
             $fetcher = new RelationFetcher($fetcher, $relation);
@@ -47,8 +47,8 @@ trait Fetchable
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @return PDOStatementInterface
      */
-    abstract public function prepare(PDOInterface $connection);
+    abstract public function prepare(PDOInterface $pdo);
 }

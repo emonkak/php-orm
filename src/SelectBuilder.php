@@ -402,23 +402,22 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function aggregate(PDOInterface $connection, $func, $expr)
+    public function aggregate(PDOInterface $pdo, $func, $expr)
     {
-        $stmt = $this->selectAll(["$func($expr)"])->prepare($connection);
+        $stmt = $this->selectAll(["$func($expr)"])->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     /**
-     * @param PDOInterface     $connection
+     * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
      * @return Paginator
      */
-    public function paginate(PDOInterface $connection, FetcherInterface $fetcher, $perPage)
+    public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage)
     {
-        $numItems = $this->count($connection);
-        return new Paginator($this, $connection, $fetcher, $perPage, $numItems);
+        $numItems = $this->count($pdo);
+        return new Paginator($this, $pdo, $fetcher, $perPage, $numItems);
     }
-
 }

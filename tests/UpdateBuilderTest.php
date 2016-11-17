@@ -47,7 +47,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->set('c1', $builder)
             ->set('c2', 100)
             ->build();
-        $this->assertSame('UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?', $query->getSql(), 'サブクエリ');
+        $this->assertSame('UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?', $query->getSql());
         $this->assertSame([1, 100], $query->getBindings());
     }
 
@@ -65,7 +65,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->table('t1')
             ->setAll(['c1' => $builder, 'c2' => 100])
             ->build();
-        $this->assertSame('UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?', $query->getSql(), 'サブクエリ');
+        $this->assertSame('UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?', $query->getSql());
         $this->assertSame([1, 100], $query->getBindings());
     }
 
@@ -76,7 +76,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->set('c1', 100)
             ->where('c1', '>', 100)
             ->build();
-        $this->assertSame('UPDATE t1 SET c1 = ? WHERE (c1 > ?)', $query->getSql(), '大なり');
+        $this->assertSame('UPDATE t1 SET c1 = ? WHERE (c1 > ?)', $query->getSql());
         $this->assertSame([100, 100], $query->getBindings());
 
         $query = (new UpdateBuilder())
@@ -84,7 +84,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->set('c1', 100)
             ->where('c2', 'IN', [1, 2, 3])
             ->build();
-        $this->assertSame('UPDATE t1 SET c1 = ? WHERE (c2 IN (?, ?, ?))', $query->getSql(), 'IN句');
+        $this->assertSame('UPDATE t1 SET c1 = ? WHERE (c2 IN (?, ?, ?))', $query->getSql());
         $this->assertSame([100, 1, 2, 3], $query->getBindings());
     }
 

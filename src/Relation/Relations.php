@@ -15,12 +15,12 @@ use Psr\Cache\CacheItemPoolInterface;
 final class Relations
 {
     /**
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param FetcherInterface $fetcher
+     * @param string             $table
+     * @param string             $relationKey
+     * @param string             $outerKey
+     * @param string             $innerKey
+     * @param PDOInterface       $pdo
+     * @param FetcherInterface   $fetcher
      * @param SelectBuilder|null $builder
      * @return Relation
      */
@@ -29,7 +29,7 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder = null
     ) {
@@ -38,7 +38,7 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $builder ?: new SelectBuilder(),
             new OuterJoin()
@@ -46,12 +46,12 @@ final class Relations
     }
 
     /**
-     * @param string           $table
-     * @param string           $relationKey
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $connection
-     * @param FetcherInterface $fetcher
+     * @param string             $table
+     * @param string             $relationKey
+     * @param string             $outerKey
+     * @param string             $innerKey
+     * @param PDOInterface       $pdo
+     * @param FetcherInterface   $fetcher
      * @param SelectBuilder|null $builder
      * @return Relation
      */
@@ -60,7 +60,7 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder = null
     ) {
@@ -69,7 +69,7 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $builder ?: new SelectBuilder(),
             new GroupJoin()
@@ -81,10 +81,10 @@ final class Relations
      * @param string                             $relationKey
      * @param string                             $outerKey
      * @param string                             $innerKey
-     * @param PDOInterface                       $connection
+     * @param PDOInterface                       $pdo
      * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @param SelectBuilder|null                   $builder
+     * @param SelectBuilder|null                 $builder
      * @return Relation
      */
     public static function lazyOneToOne(
@@ -92,7 +92,7 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         LazyLoadingValueHolderFactory $proxyFactory = null,
         SelectBuilder $builder = null
@@ -102,7 +102,7 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $builder ?: new SelectBuilder(),
             new LazyInnerJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
@@ -114,10 +114,10 @@ final class Relations
      * @param string                             $relationKey
      * @param string                             $outerKey
      * @param string                             $innerKey
-     * @param PDOInterface                       $connection
+     * @param PDOInterface                       $pdo
      * @param FetcherInterface                   $fetcher
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @param SelectBuilder|null                   $builder
+     * @param SelectBuilder|null                 $builder
      * @return Relation
      */
     public static function lazyOneToMany(
@@ -125,7 +125,7 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         LazyLoadingValueHolderFactory $proxyFactory = null,
         SelectBuilder $builder = null
@@ -135,7 +135,7 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $builder ?: new SelectBuilder(),
             new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
@@ -147,11 +147,12 @@ final class Relations
      * @param string                 $relationKey
      * @param string                 $outerKey
      * @param string                 $innerKey
-     * @param PDOInterface           $connection
+     * @param PDOInterface           $pdo
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
+     * @param string                 $cachePrefix
      * @param integer|null           $lifetime
-     * @param SelectBuilder|null       $builder
+     * @param SelectBuilder|null     $builder
      * @return CachedRelation
      */
     public static function cachedOneToOne(
@@ -159,9 +160,10 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
+        $cachePrefix,
         $lifetime = null,
         SelectBuilder $builder = null
     ) {
@@ -170,9 +172,10 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $cachePool,
+            $cachePrefix,
             $lifetime,
             $builder ?: new SelectBuilder(),
             new OuterJoin()
@@ -184,11 +187,12 @@ final class Relations
      * @param string                 $relationKey
      * @param string                 $outerKey
      * @param string                 $innerKey
-     * @param PDOInterface           $connection
+     * @param PDOInterface           $pdo
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
+     * @param string                 $cachePrefix
      * @param integer|null           $lifetime
-     * @param SelectBuilder|null       $builder
+     * @param SelectBuilder|null     $builder
      * @return CachedRelation
      */
     public static function cachedOneToMany(
@@ -196,9 +200,10 @@ final class Relations
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
+        $cachePrefix,
         $lifetime = null,
         SelectBuilder $builder = null
     ) {
@@ -207,9 +212,10 @@ final class Relations
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $cachePool,
+            $cachePrefix,
             $lifetime,
             $builder ?: new SelectBuilder(),
             new GroupJoin()

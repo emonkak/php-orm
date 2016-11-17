@@ -11,60 +11,60 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 trait Aggregatable
 {
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param mixed        $expr
      * @return integer
      */
-    public function avg(PDOInterface $connection, $expr)
+    public function avg(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($connection, 'AVG', $expr);
+        return (int) $this->aggregate($pdo, 'AVG', $expr);
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param mixed        $expr
      * @return integer
      */
-    public function count(PDOInterface $connection, $expr = '*')
+    public function count(PDOInterface $pdo, $expr = '*')
     {
-        return (int) $this->aggregate($connection, 'COUNT', $expr);
+        return (int) $this->aggregate($pdo, 'COUNT', $expr);
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param mixed        $expr
      * @return integer
      */
-    public function max(PDOInterface $connection, $expr)
+    public function max(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($connection, 'MAX', $expr);
+        return (int) $this->aggregate($pdo, 'MAX', $expr);
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param mixed        $expr
      * @return integer
      */
-    public function min(PDOInterface $connection, $expr)
+    public function min(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($connection, 'MIN', $expr);
+        return (int) $this->aggregate($pdo, 'MIN', $expr);
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param mixed        $expr
      * @return integer
      */
-    public function sum(PDOInterface $connection, $expr)
+    public function sum(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($connection, 'SUM', $expr);
+        return (int) $this->aggregate($pdo, 'SUM', $expr);
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @param string       $func
      * @param mixed        $expr
      * @return mixed
      */
-    abstract function aggregate(PDOInterface $connection, $func, $expr);
+    abstract function aggregate(PDOInterface $pdo, $func, $expr);
 }
