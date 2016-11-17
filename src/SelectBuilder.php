@@ -233,9 +233,9 @@ class SelectBuilder implements QueryBuilderInterface
      * @param string $alias
      * @return $this
      */
-    public function leftJoin($table, $condition = null, $alias = null)
+    public function outerJoin($table, $condition = null, $alias = null)
     {
-        return $this->join($table, $condition, $alias, 'LEFT JOIN');
+        return $this->join($table, $condition, $alias, 'OUTER LEFT JOIN');
     }
 
     /**
