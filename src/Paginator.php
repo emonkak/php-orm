@@ -19,7 +19,7 @@ class Paginator
     /**
      * @var PDOInterface
      */
-    private $connection;
+    private $pdo;
 
     /**
      * @var FetcherInterface
@@ -38,15 +38,15 @@ class Paginator
 
     /**
      * @param SelectBuilder    $builder
-     * @param PDOInterface     $connection
+     * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
      * @param integer          $numItems
      */
-    public function __construct(SelectBuilder $builder, PDOInterface $connection, FetcherInterface $fetcher, $perPage, $numItems)
+    public function __construct(SelectBuilder $builder, PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $numItems)
     {
         $this->builder = $builder;
-        $this->connection = $connection;
+        $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->perPage = $perPage;
         $this->numItems = $numItems;
@@ -75,7 +75,7 @@ class Paginator
             $result = $this->builder
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
-                ->getResult($this->connection, $this->fetcher);
+                ->getResult($this->pdo, $this->fetcher);
         } else {
             $result = new \EmptyIterator();
         }

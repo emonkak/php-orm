@@ -12,14 +12,14 @@ use Emonkak\Orm\Sql;
 trait Preparable
 {
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @return PDOStatementInterface
      */
-    public function prepare(PDOInterface $connection)
+    public function prepare(PDOInterface $pdo)
     {
         $query = $this->build();
 
-        $stmt = $connection->prepare($query->getSql());
+        $stmt = $pdo->prepare($query->getSql());
 
         foreach ($query->getBindings() as $index => $binding) {
             $type = gettype($binding);
@@ -46,12 +46,12 @@ trait Preparable
     }
 
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @return PDOStatementInterface
      */
-    public function execute(PDOInterface $connection)
+    public function execute(PDOInterface $pdo)
     {
-        $stmt = $this->prepare($connection);
+        $stmt = $this->prepare($pdo);
         $stmt->execute();
         return $stmt;
     }

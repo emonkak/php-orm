@@ -112,8 +112,7 @@ class DefaultGrammar implements GrammarInterface
             return $value;
         }
         if ($value instanceof QueryBuilderInterface) {
-            $query = $value->build();
-            return new Sql('(' . $query->getSql() . ')', $query->getBindings());
+            return $value->build()->enclosed();
         }
         if (is_string($value)) {
             return new Sql($value);
@@ -131,8 +130,7 @@ class DefaultGrammar implements GrammarInterface
             return $value;
         }
         if ($value instanceof QueryBuilderInterface) {
-            $query = $value->build();
-            return new Sql('(' . $query->getSql() . ')', $query->getBindings());
+            return $value->build()->enclosed();
         }
         if ($value === null) {
             return new Sql('NULL');
@@ -141,8 +139,7 @@ class DefaultGrammar implements GrammarInterface
             return new Sql('?', [$value]);
         }
         if (is_array($value)) {
-            $placeholders = array_fill(0, count($value), '?');
-            return new Sql('(' . implode(', ', $placeholders) . ')', array_values($value));
+            return Sql::values($value);
         }
         $type = gettype($value);
         throw new \UnexpectedValueException("Unexpected value, got '$type'.");
@@ -436,7 +433,6 @@ class DefaultGrammar implements GrammarInterface
         if ($limit === null) {
             return '';
         }
-
         $bindings[] = $limit;
         return ' LIMIT ?';
     }
@@ -451,7 +447,6 @@ class DefaultGrammar implements GrammarInterface
         if ($offset === null) {
             return '';
         }
-
         $bindings[] = $offset;
         return ' OFFSET ?';
     }

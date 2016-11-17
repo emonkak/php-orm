@@ -33,7 +33,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @var PDOInterface
      */
-    protected $connection;
+    protected $pdo;
 
     /**
      * @var FetcherInterface
@@ -55,8 +55,8 @@ abstract class AbstractRelation implements RelationInterface
      * @param string                $relationKey
      * @param string                $outerKey
      * @param string                $innerKey
-     * @param SelectBuilder           $builder
-     * @param PDOInterface          $connection
+     * @param SelectBuilder         $builder
+     * @param PDOInterface          $pdo
      * @param FetcherInterface      $fetcher
      * @param JoinStrategyInterface $joinStrategy
      */
@@ -65,7 +65,7 @@ abstract class AbstractRelation implements RelationInterface
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
@@ -74,7 +74,7 @@ abstract class AbstractRelation implements RelationInterface
         $this->relationKey = $relationKey;
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
-        $this->connection = $connection;
+        $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->builder = $builder;
         $this->joinStrategy = $joinStrategy;
@@ -83,9 +83,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * @return PDOInterface
      */
-    public function getConnection()
+    public function getPdo()
     {
-        return $this->connection;
+        return $this->pdo;
     }
 
     /**

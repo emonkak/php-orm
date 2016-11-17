@@ -93,7 +93,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * @return callable
      */
-    private function getInstantiator()
+    protected function getInstantiator()
     {
         $class = $this->class;
         return \Closure::bind(

@@ -19,6 +19,17 @@ class Sql implements QueryBuilderInterface
     private $bindings;
 
     /**
+     * @param mixed[] $values
+     * @return Sql
+     */
+    public static function values(array $values)
+    {
+        $placeholders = array_fill(0, count($values), '?');
+        $sql = '(' . implode(', ', $placeholders) . ')';
+        return new Sql($sql, $values);
+    }
+
+    /**
      * @param string  $sql
      * @param mixed[] $bindings
      */
@@ -80,7 +91,7 @@ class Sql implements QueryBuilderInterface
     {
         return new Sql(
             $this->sql . ' ' . $sql,
-            array_merge($this->bindings, $binding)
+            array_merge($this->bindings, $bindings)
         );
     }
 
@@ -101,17 +112,6 @@ class Sql implements QueryBuilderInterface
     {
         $query = $builder->build();
         return $this->append('(' . $query->getSql() . ')', $query->getBindings());
-    }
-
-    /**
-     * @param mixed[] $values
-     * @return Sql
-     */
-    public function appendValues(array $values)
-    {
-        $placeholders = array_fill(0, count($values), '?');
-        $sql = '(' . implode(', ', $placeholders) . ')';
-        return $this->append($sql, $values);
     }
 
     /**
@@ -143,17 +143,6 @@ class Sql implements QueryBuilderInterface
     {
         $query = $builder->build();
         return $this->prepend('(' . $query->getSql() . ')', $query->getBindings());
-    }
-
-    /**
-     * @param mixed[] $values
-     * @return Sql
-     */
-    public function prependValues(array $values)
-    {
-        $placeholders = array_fill(0, count($values), '?');
-        $sql = '(' . implode(', ', $placeholders) . ')';
-        return $this->prepend($sql, $values);
     }
 
     /**

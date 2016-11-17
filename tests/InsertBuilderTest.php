@@ -15,7 +15,7 @@ class InsertBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->into('t1', ['c1', 'c2'])
             ->values(['foo', 'bar'])
             ->build();
-        $this->assertSame('INSERT IGNORE INTO t1 (c1, c2) VALUES (?, ?)', $query->getSql(), 'INSERT IGNORE');
+        $this->assertSame('INSERT IGNORE INTO t1 (c1, c2) VALUES (?, ?)', $query->getSql());
         $this->assertSame(['foo', 'bar'], $query->getBindings());
     }
 
@@ -31,7 +31,7 @@ class InsertBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->into('t1', ['c1', 'c2', 'c3'])
             ->select($builder->build())
             ->build();
-        $this->assertSame('INSERT INTO t1 (c1, c2, c3) SELECT c1, c2, c3 FROM t1 WHERE (c1 = ?)', $query->getSql(), 'INSERT SELECT');
+        $this->assertSame('INSERT INTO t1 (c1, c2, c3) SELECT c1, c2, c3 FROM t1 WHERE (c1 = ?)', $query->getSql());
     }
 
     public function testValues()

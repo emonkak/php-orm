@@ -102,7 +102,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->outerJoin('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id', null, 'INNER JOIN')
             ->build();
-        $this->assertSame('SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id', $query->getSql(), 'LEFT JOIN, INNER JOIN');
+        $this->assertSame('SELECT * FROM t1 OUTER LEFT JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id', $query->getSql());
         $this->assertSame([], $query->getBindings());
 
         $builder = (new SelectBuilder())->from('t2');
@@ -325,7 +325,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->build();
         $this->assertSame('SELECT * FROM t1 GROUP BY (SELECT c1 FROM t2 LIMIT ?) DESC', $query->getSql());
         $this->assertSame([1], $query->getBindings());
-	}
+    }
 
     public function testHaving()
     {
@@ -346,7 +346,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->having('c3', '<>', 'bar')
             ->having('c4', 'IS NOT NULL')
             ->build();
-        $this->assertSame('SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))', $query->getSql(), '値の不一致');
+        $this->assertSame('SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))', $query->getSql());
         $this->assertSame(['foo', 'bar'], $query->getBindings());
     }
 
@@ -388,7 +388,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->from('t1')
             ->limit(10)
             ->build();
-        $this->assertSame('SELECT * FROM t1 LIMIT ?', $query->getSql(), 'LIMIT');
+        $this->assertSame('SELECT * FROM t1 LIMIT ?', $query->getSql());
         $this->assertSame([10], $query->getBindings());
     }
 

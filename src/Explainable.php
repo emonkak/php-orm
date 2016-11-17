@@ -11,12 +11,12 @@ use Emonkak\Database\PDOStatementInterface;
 trait Explainable
 {
     /**
-     * @param PDOInterface $connection
+     * @param PDOInterface $pdo
      * @return array
      */
-    public function explain(PDOInterface $connection)
+    public function explain(PDOInterface $pdo)
     {
-        $stmt = $this->build()->prepend('EXPLAIN')->prepare($connection);
+        $stmt = $this->build()->prepend('EXPLAIN')->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

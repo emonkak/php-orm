@@ -17,6 +17,11 @@ class CachedRelation extends AbstractRelation
     private $cachePool;
 
     /**
+     * @var string
+     */
+    private $cachePrefix;
+
+    /**
      * @var integer|null
      */
     private $lifetime;
@@ -26,11 +31,12 @@ class CachedRelation extends AbstractRelation
      * @param string                 $relationKey
      * @param string                 $outerKey
      * @param string                 $innerKey
-     * @param PDOInterface           $connection
+     * @param PDOInterface           $pdo
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
+     * @param string                 $cachePrefix
      * @param integer|null           $lifetime
-     * @param SelectBuilder            $builder
+     * @param SelectBuilder          $builder
      * @param JoinStrategyInterface  $joinStrategy
      */
     public function __construct(
@@ -38,9 +44,10 @@ class CachedRelation extends AbstractRelation
         $relationKey,
         $outerKey,
         $innerKey,
-        PDOInterface $connection,
+        PDOInterface $pdo,
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
+        $cachePrefix,
         $lifetime,
         SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
@@ -50,13 +57,14 @@ class CachedRelation extends AbstractRelation
             $relationKey,
             $outerKey,
             $innerKey,
-            $connection,
+            $pdo,
             $fetcher,
             $builder,
             $joinStrategy
         );
 
         $this->cachePool = $cachePool;
+        $this->cachePrefix = $cachePrefix;
         $this->lifetime = $lifetime;
     }
 
@@ -70,9 +78,10 @@ class CachedRelation extends AbstractRelation
             $this->relationKey,
             $this->outerKey,
             $this->innerKey,
-            $this->connection,
+            $this->pdo,
             $this->fetcher,
             $this->cachePool,
+            $this->cachePrefix,
             $this->lifetime,
             $this->builder->with($relation),
             $this->joinStrategy
@@ -84,12 +93,11 @@ class CachedRelation extends AbstractRelation
      */
     protected function getResult($outerKeys)
     {
-        $prefix = $this->getCachePrefix();
-        $prefixLength = strlen($prefix);
+        $prefixLength = strlen($this->cachePrefix);
         $cacheKeys = [];
 
         foreach ($outerKeys as $outerKey) {
-            $cacheKeys[] = $prefix . $outerKey;
+            $cacheKeys[] = $this->cachePrefix . $outerKey;
         }
 
         $items = $this->cachePool->getItems($cacheKeys);
@@ -111,7 +119,7 @@ class CachedRelation extends AbstractRelation
             $result = $this->builder
                 ->from($grammar->identifier($this->table))
                 ->where($grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey), 'IN', array_keys($uncachedItems))
-                ->getResult($this->connection, $this->fetcher);
+                ->getResult($this->pdo, $this->fetcher);
 
             $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->fetcher->getClass());
 
@@ -130,13 +138,5 @@ class CachedRelation extends AbstractRelation
         }
 
         return $cachedElements;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getCachePrefix()
-    {
-        return $this->table . '.' . $this->innerKey . '.';
     }
 }
