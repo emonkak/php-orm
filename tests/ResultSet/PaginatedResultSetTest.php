@@ -1,0 +1,181 @@
+<?php
+
+namespace Emonkak\Orm\Tests\ResultSet;
+
+use Emonkak\Orm\Pagination\PaginatorInterface;
+use Emonkak\Orm\ResultSet\PaginatedResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
+
+/**
+ * @covers Emonkak\Orm\ResultSet\PaginatedResultSet
+ */
+class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGetClass()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult
+            ->expects($this->once())
+            ->method('getClass')
+            ->willReturn(\stdClass::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertSame(\stdClass::class, $result->getClass());
+    }
+
+    public function testGetIterator()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertSame($innerResult, $result->getIterator());
+    }
+
+    public function testGetIndex()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertSame(123, $result->getIndex());
+    }
+
+    public function testGetPageNum()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertSame(124, $result->getPageNum());
+    }
+
+    public function testNextPage()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+        $paginator
+            ->expects($this->once())
+            ->method('at')
+            ->with(124)
+            ->willReturn($expected = new PaginatedResultSet($innerResult, $paginator, 124));
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertTrue($result->hasNextPage());
+        $this->assertSame($expected, $result->nextPage());
+    }
+
+    /**
+     * @expectedException OutOfRangeException
+     */
+    public function testNextPageThrowsOutOfRangeException()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 1000);
+
+        $this->assertFalse($result->hasNextPage());
+        $result->nextPage();
+    }
+
+    public function testPrevPage()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+        $paginator
+            ->expects($this->once())
+            ->method('at')
+            ->with(122)
+            ->willReturn($expected = new PaginatedResultSet($innerResult, $paginator, 122));
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+
+        $this->assertTrue($result->hasPrevPage());
+        $this->assertSame($expected, $result->prevPage());
+    }
+
+    /**
+     * @expectedException OutOfRangeException
+     */
+    public function testPrevPageThrowsOutOfRangeException()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 0);
+
+        $this->assertFalse($result->hasPrevPage());
+        $result->prevPage();
+    }
+
+    public function testIsFirstPage()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 0);
+        $this->assertTrue($result->isFirstPage());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+        $this->assertFalse($result->isFirstPage());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 999);
+        $this->assertFalse($result->isFirstPage());
+    }
+
+    public function testIsLastPage()
+    {
+        $innerResult = $this->getMock(ResultSetInterface::class);
+
+        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getNumPages')
+            ->willReturn(1000);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 0);
+        $this->assertFalse($result->isLastPage());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 123);
+        $this->assertFalse($result->isLastPage());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 999);
+        $this->assertTrue($result->isLastPage());
+    }
+}

@@ -9,9 +9,6 @@ use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
-/**
- * @internal
- */
 trait Fetchable
 {
     /**
@@ -28,6 +25,14 @@ trait Fetchable
         $cloned = clone $this;
         $cloned->relations[] = $relation;
         return $cloned;
+    }
+
+    /**
+     * @return RelationInterface[]
+     */
+    public function getRelations()
+    {
+        return $this->relations;
     }
 
     /**

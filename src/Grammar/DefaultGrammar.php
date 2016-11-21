@@ -2,12 +2,15 @@
 
 namespace Emonkak\Orm\Grammar;
 
-use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Sql;
 
 class DefaultGrammar implements GrammarInterface
 {
+    use Liftable;
+
     /**
+     * @codeCoverageIgnore
+     *
      * @return DefaultGrammar
      */
     public static function getInstance()
@@ -26,145 +29,6 @@ class DefaultGrammar implements GrammarInterface
      */
     private function __construct()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
-    {
-        $bindings = [];
-
-        $sql = $prefix
-             . $this->processSelect($select, $bindings)
-             . $this->processFrom($from, $bindings)
-             . $this->processJoin($join, $bindings)
-             . $this->processWhere($where, $bindings)
-             . $this->processGroupBy($groupBy, $bindings)
-             . $this->processHaving($having, $bindings)
-             . $this->processOrderBy($orderBy, $bindings)
-             . $this->processLimit($limit, $bindings)
-             . $this->processOffset($offset, $bindings)
-             . ($suffix !== null ? ' ' . $suffix : '');
-
-        if (!empty($union)) {
-            $sql = '(' . $sql . ')';
-        }
-
-        $sql .= $this->processUnion($union, $bindings);
-
-        return new Sql($sql, $bindings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function compileInsert($prefix, $into, array $columns, array $values, Sql $select = null)
-    {
-        $bindings = [];
-
-        $sql = $prefix
-             . $this->processInto($into, $columns)
-             . $this->processValues($values, $bindings)
-             . $this->processInsertSelect($select, $bindings);
-
-        return new Sql($sql, $bindings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function compileUpdate($prefix, Sql $table, array $update, Sql $where = null, array $orderBy, $limit)
-    {
-        $bindings = $table->getBindings();
-
-        $sql = $prefix . ' ' . $table->getSql()
-             . $this->processSet($update, $bindings)
-             . $this->processWhere($where, $bindings)
-             . $this->processOrderBy($orderBy, $bindings)
-             . $this->processLimit($limit, $bindings);
-
-        return new Sql($sql, $bindings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function compileDelete($prefix, array $from, Sql $where = null, array $orderBy, $limit)
-    {
-        $bindings = [];
-
-        $sql = $prefix
-             . $this->processFrom($from, $bindings)
-             . $this->processWhere($where, $bindings)
-             . $this->processOrderBy($orderBy, $bindings)
-             . $this->processLimit($limit, $bindings);
-
-        return new Sql($sql, $bindings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function lift($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if (is_string($value)) {
-            return new Sql($value);
-        }
-        $type = gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function liftValue($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if ($value === null) {
-            return new Sql('NULL');
-        }
-        if (is_scalar($value)) {
-            return new Sql('?', [$value]);
-        }
-        if (is_array($value)) {
-            return Sql::values($value);
-        }
-        $type = gettype($value);
-        throw new \UnexpectedValueException("Unexpected value, got '$type'.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function liftCondition($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
-    {
-        if ($operator === null) {
-            return $this->lift($lhs);
-        } elseif ($rhs1 === null) {
-            $lhs = $this->lift($lhs);
-            return $this->unaryOperator($operator, $lhs);
-        } elseif ($rhs2 === null) {
-            $lhs = $this->lift($lhs);
-            $rhs = $this->liftValue($rhs1);
-            return $this->operator($operator, $lhs, $rhs);
-        } else {
-            $lhs = $this->lift($lhs);
-            $start = $this->liftValue($rhs1);
-            $end = $this->liftValue($rhs2);
-            return $this->between($operator, $lhs, $start, $end);
-        }
     }
 
     /**
@@ -229,8 +93,6 @@ class DefaultGrammar implements GrammarInterface
             case 'NOT IN':
             case 'LIKE':
             case 'NOT LIKE':
-            case 'REGEXP':
-            case 'NOT REGEXP':
             case 'AND':
             case 'OR':
                 $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
@@ -243,7 +105,7 @@ class DefaultGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function between($operator, Sql $lhs, Sql $start, Sql $end)
+    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end)
     {
         switch (strtoupper($operator)) {
             case 'BETWEEN':
@@ -292,6 +154,76 @@ class DefaultGrammar implements GrammarInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    {
+        $bindings = [];
+
+        $sql = $prefix
+             . $this->processSelect($select, $bindings)
+             . $this->processFrom($from, $bindings)
+             . $this->processJoin($join, $bindings)
+             . $this->processWhere($where, $bindings)
+             . $this->processGroupBy($groupBy, $bindings)
+             . $this->processHaving($having, $bindings)
+             . $this->processOrderBy($orderBy, $bindings)
+             . $this->processLimit($limit, $bindings)
+             . $this->processOffset($offset, $bindings)
+             . ($suffix !== null ? ' ' . $suffix : '');
+
+        if (!empty($union)) {
+            $sql = '(' . $sql . ')';
+        }
+
+        $sql .= $this->processUnion($union, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileInsert($prefix, $into, array $columns, array $values, Sql $select = null)
+    {
+        $bindings = [];
+
+        $sql = $prefix
+             . $this->processInto($into, $columns)
+             . $this->processValues($values, $bindings)
+             . $this->processInsertSelect($select, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileUpdate($prefix, $table, array $update, Sql $where = null)
+    {
+        $bindings = [];
+
+        $sql = $prefix . ' ' . $table
+             . $this->processSet($update, $bindings)
+             . $this->processWhere($where, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function compileDelete($prefix, $from, Sql $where = null)
+    {
+        $bindings = [];
+
+        $sql = $prefix . ' FROM ' . $from
+             . $this->processWhere($where, $bindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
      * @param Sql[]   $select
      * @param mixed[] &$bindings
      * @return string
@@ -301,14 +233,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($select)) {
             return ' *';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($select as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' ' . implode(', ', $tmpSqls);
     }
 
     /**
@@ -321,14 +253,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($from)) {
             return '';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($from as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' FROM ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' FROM ' . implode(', ', $tmpSqls);
     }
 
     /**
@@ -341,14 +273,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($join)) {
             return '';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($join as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' ' . implode(' ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' ' . implode(' ', $tmpSqls);
     }
 
     /**
@@ -361,9 +293,7 @@ class DefaultGrammar implements GrammarInterface
         if ($where === null) {
             return '';
         }
-
         $bindings = array_merge($bindings, $where->getBindings());
-
         return ' WHERE ' . $where->getSql();
     }
 
@@ -377,14 +307,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($groupBy)) {
             return '';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($groupBy as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' GROUP BY ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' GROUP BY ' . implode(', ', $tmpSqls);
     }
 
     /**
@@ -397,9 +327,7 @@ class DefaultGrammar implements GrammarInterface
         if ($having === null) {
             return '';
         }
-
         $bindings = array_merge($bindings, $having->getBindings());
-
         return ' HAVING ' . $having->getSql();
     }
 
@@ -413,14 +341,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($orderBy)) {
             return '';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($orderBy as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' ORDER BY ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' ORDER BY ' . implode(', ', $tmpSqls);
     }
 
     /**
@@ -461,14 +389,14 @@ class DefaultGrammar implements GrammarInterface
         if (empty($union)) {
             return '';
         }
-
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($union as $definition) {
-            $sqls[] = $definition->getSql();
-            $bindings = array_merge($bindings, $definition->getBindings());
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
         }
-
-        return ' ' . implode(' ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' ' . implode(' ', $tmpSqls);
     }
 
     /**
@@ -495,13 +423,18 @@ class DefaultGrammar implements GrammarInterface
         if (empty($values)) {
             return '';
         }
-        $sqls = [];
-        $bindings = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($values as $row) {
-            $sqls[] = $row->getSql();
-            $bindings = array_merge($bindings, $row->getBindings());
+            $innerSqls = [];
+            foreach ($row as $value) {
+                $innerSqls[] = $value->getSql();
+                $tmpBindings[] = $value->getBindings();
+            }
+            $tmpSqls[] = '(' . implode(', ', $innerSqls) . ')';
         }
-        return ' VALUES ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' VALUES ' . implode(', ', $tmpSqls);
     }
 
     /**
@@ -528,11 +461,13 @@ class DefaultGrammar implements GrammarInterface
         if (empty($update)) {
             return '';
         }
-        $sqls = [];
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
         foreach ($update as $key => $value) {
-            $sqls[] = $key . ' = ' . $value->getSql();
-            $bindings = array_merge($bindings, $value->getBindings());
+            $tmpSqls[] = $key . ' = ' . $value->getSql();
+            $tmpBindings[] = $value->getBindings();
         }
-        return ' SET ' . implode(', ', $sqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return ' SET ' . implode(', ', $tmpSqls);
     }
 }

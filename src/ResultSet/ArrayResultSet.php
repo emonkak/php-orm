@@ -5,10 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
-/**
- * @internal
- */
-class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
+class ArrayResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -60,7 +57,7 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         $this->stmt->execute();
 
         if ($predicate) {
-            $stmt->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
                     return $element;

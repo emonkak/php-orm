@@ -4,12 +4,10 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\Iterator\MemoizeIterator;
 use Emonkak\Enumerable\Iterator\SelectIterator;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
-/**
- * @internal
- */
 class LazyGroupJoin implements JoinStrategyInterface
 {
     /**
@@ -28,24 +26,30 @@ class LazyGroupJoin implements JoinStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function __invoke($outer, $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
+    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
     {
         $proxyFactory = $this->proxyFactory;
-        $innerElements = new MemoizeIterator($inner);
+        $cachedElements = null;
 
-        return new SelectIterator($outer, static function($outerElement) use ($proxyFactory, $innerElements, $outerKeySelector, $innerKeySelector, $resultSelector) {
-            $outerKey = $outerKeySelector($outerElement);
-            $initializer = function (&$wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, &$initializer) use ($outerElement, $innerElements, $outerKey, $innerKeySelector) {
+        return new SelectIterator($outer, static function($outerElement) use ($proxyFactory, &$cachedElements, $inner, $outerKeySelector, $innerKeySelector, $resultSelector) {
+            $initializer = static function (&$wrappedObject, LazyLoadingInterface $proxy, $method, array $parameters, &$initializer) use (&$cachedElements, $outerElement, $inner, $outerKeySelector, $innerKeySelector) {
                 $initializer = null;
-                $joinedElements = [];
 
-                foreach ($innerElements as $innerElement) {
-                    if ($innerKeySelector($innerElement) === $outerKey) {
-                        $joinedElements[] = $innerElement;
+                if ($cachedElements === null) {
+                    $cachedElements = [];
+                    foreach ($inner as $innerElement) {
+                        $innerKey = $innerKeySelector($innerElement);
+                        if (!isset($cachedElements[$innerKey])) {
+                            $cachedElements[$innerKey] = [];
+                        }
+                        $cachedElements[$innerKey][] = $innerElement;
                     }
                 }
 
+                $outerKey = $outerKeySelector($outerElement);
+                $joinedElements = isset($cachedElements[$outerKey]) ? $cachedElements[$outerKey] : [];
                 $wrappedObject = new \ArrayObject($joinedElements);
+
                 return true;
             };
             $proxy = $proxyFactory->createProxy(\ArrayObject::class, $initializer);

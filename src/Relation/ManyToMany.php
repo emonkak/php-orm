@@ -2,69 +2,195 @@
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
+use Emonkak\Orm\ResultSet\FrozenResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Orm\SelectBuilder;
 
-/**
- * @internal
- */
-class ManyToMany implements RelationInterface
+class ManyToMany extends AbstractRelation
 {
     /**
      * @var string
      */
-    private $relationKey;
+    protected $relationKey;
 
     /**
-     * @var AbstractRelation
+     * @var string
      */
-    private $oneToMany;
+    protected $oneToManyTable;
 
     /**
-     * @var AbstractRelation
+     * @var string
      */
-    private $manyToOne;
+    protected $oneToManyOuterKey;
 
     /**
-     * @param string           $relationKey
-     * @param AbstractRelation $oneToMany
-     * @param AbstractRelation $manyToOne
+     * @var string
+     */
+    protected $oneToManyInnerKey;
+
+    /**
+     * @var string
+     */
+    protected $manyToOneTable;
+
+    /**
+     * @var string
+     */
+    protected $manyToOneOuterKey;
+
+    /**
+     * @var string
+     */
+    protected $manyToOneInnerKey;
+
+    /**
+     * @var PDOInterface
+     */
+    protected $pdo;
+
+    /**
+     * @var FetcherInterface
+     */
+    protected $fetcher;
+
+    /**
+     * @var SelectBuilder
+     */
+    protected $builder;
+
+    /**
+     * @var JoinStrategyInterface
+     */
+    protected $joinStrategy;
+
+    /**
+     * @param string                $relationKey
+     * @param string                $oneToManyTable
+     * @param string                $oneToManyOuterKey
+     * @param string                $oneToManyInnerKey
+     * @param string                $manyToOneTable
+     * @param string                $manyToOneOuterKey
+     * @param string                $manyToOneInnerKey
+     * @param PDOInterface          $pdo
+     * @param FetcherInterface      $fetcher
+     * @param SelectBuilder         $builder
+     * @param JoinStrategyInterface $joinStrategy
      */
     public function __construct(
         $relationKey,
-        AbstractRelation $oneToMany,
-        AbstractRelation $manyToOne
+        $oneToManyTable,
+        $oneToManyOuterKey,
+        $oneToManyInnerKey,
+        $manyToOneTable,
+        $manyToOneOuterKey,
+        $manyToOneInnerKey,
+        PDOInterface $pdo,
+        FetcherInterface $fetcher,
+        SelectBuilder $builder,
+        JoinStrategyInterface $joinStrategy
     ) {
         $this->relationKey = $relationKey;
-        $this->oneToMany = $oneToMany;
-        $this->manyToOne = $manyToOne;
+        $this->oneToManyTable = $oneToManyTable;
+        $this->oneToManyOuterKey = $oneToManyOuterKey;
+        $this->oneToManyInnerKey = $oneToManyInnerKey;
+        $this->manyToOneTable = $manyToOneTable;
+        $this->manyToOneOuterKey = $manyToOneOuterKey;
+        $this->manyToOneInnerKey = $manyToOneInnerKey;
+        $this->pdo = $pdo;
+        $this->fetcher = $fetcher;
+        $this->builder = $builder;
+        $this->joinStrategy = $joinStrategy;
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
-    public function join(ResultSetInterface $result)
+    public function getRelationKey()
     {
-        $outerElements = $result->toArray();
-        if (empty($outerElements)) {
-            return new \EmptyIterator();
-        }
+        return $this->relationKey;
+    }
 
-        $outerClass = $result->getClass();
-        $outerKeySelector = AccessorCreators::toKeySelector($this->oneToMany->getOuterKey(), $outerClass);
-        $pivotKeySelector = AccessorCreators::toPivotKeySelector($this->getPivotKey(), $this->manyToOne->getFetcher()->getClass());
-        $resultSelector = AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
-        $joinStrategy = $this->oneToMany->getJoinStrategy();
+    /**
+     * @return string
+     */
+    public function getOneToManyTable()
+    {
+        return $this->oneToManyTable;
+    }
 
-        $outerKeys = array_map($outerKeySelector, $outerElements);
-        $innerResult = $this->getResult($outerKeys);
+    /**
+     * @return string
+     */
+    public function getOneToManyOuterKey()
+    {
+        return $this->oneToManyOuterKey;
+    }
 
-        return $joinStrategy(
-            $outerElements,
-            $innerResult,
-            $outerKeySelector,
-            $pivotKeySelector,
-            $resultSelector
-        );
+    /**
+     * @return string
+     */
+    public function getOneToManyInnerKey()
+    {
+        return $this->oneToManyInnerKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManyToOneTable()
+    {
+        return $this->manyToOneTable;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManyToOneOuterKey()
+    {
+        return $this->manyToOneOuterKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManyToOneInnerKey()
+    {
+        return $this->manyToOneInnerKey;
+    }
+
+    /**
+     * @return PDOInterface
+     */
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
+
+    /**
+     * @return FetcherInterface
+     */
+    public function getFetcher()
+    {
+        return $this->fetcher;
+    }
+
+    /**
+     * @return SelectBuilder
+     */
+    public function getBuilder()
+    {
+        return $this->builder;
+    }
+
+    /**
+     * @return JoinStrategyInterface
+     */
+    public function getJoinStrategy()
+    {
+        return $this->joinStrategy;
     }
 
     /**
@@ -74,44 +200,86 @@ class ManyToMany implements RelationInterface
     {
         return new ManyToMany(
             $this->relationKey,
-            $this->oneToMany->with($relation),
-            $this->manyToOne
+            $this->oneToManyTable,
+            $this->oneToManyOuterKey,
+            $this->oneToManyInnerKey,
+            $this->manyToOneTable,
+            $this->manyToOneOuterKey,
+            $this->manyToOneInnerKey,
+            $this->pdo,
+            $this->fetcher,
+            $this->builder->with($relation),
+            $this->joinStrategy
         );
     }
 
     /**
-     * @param mixed[] $outerKeys
-     * @return ResultSetInterface
+     * {@inheritDoc}
      */
     protected function getResult($outerKeys)
     {
-        $oneToMany = $this->oneToMany;
-        $manyToOne = $this->manyToOne;
-
-        $builder = $oneToMany->getBuilder();
-        $grammar = $builder->getGrammar();
-
-        $builder = $builder
-            ->select($grammar->identifier($manyToOne->getTable()) . '.*')
+        $grammar = $this->builder->getGrammar();
+        return $this->builder
+            ->select($grammar->identifier($this->manyToOneTable) . '.*')
             ->select(
-                $grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()),
+                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
                 $grammar->identifier($this->getPivotKey())
             )
-            ->from($grammar->identifier($oneToMany->getTable()))
+            ->from($grammar->identifier($this->oneToManyTable))
             ->outerJoin(
-                $grammar->identifier($manyToOne->getTable()),
+                $grammar->identifier($this->manyToOneTable),
                 sprintf(
                     '%s.%s = %s.%s',
-                    $grammar->identifier($oneToMany->getTable()),
-                    $grammar->identifier($oneToMany->getInnerKey()),
-                    $grammar->identifier($manyToOne->getTable()),
-                    $grammar->identifier($manyToOne->getInnerKey())
+                    $grammar->identifier($this->oneToManyTable),
+                    $grammar->identifier($this->manyToOneOuterKey),
+                    $grammar->identifier($this->manyToOneTable),
+                    $grammar->identifier($this->manyToOneInnerKey)
                 )
             )
-            ->where($grammar->identifier($oneToMany->getTable()) . '.' . $grammar->identifier($oneToMany->getInnerKey()), 'IN', $outerKeys);
+            ->where(
+                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
+                'IN',
+                $outerKeys
+            )
+            ->getResult($this->pdo, $this->fetcher);
+    }
 
-        return $builder
-            ->getResult($manyToOne->getPdo(), $manyToOne->getFetcher());
+    /**
+     * {@inheritDoc}
+     */
+    protected function doJoin(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
+    {
+        return $this->joinStrategy->join(
+            $outer,
+            $inner,
+            $outerKeySelector,
+            $innerKeySelector,
+            $resultSelector
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resolveOuterKeySelector($outerClass)
+    {
+        return AccessorCreators::toKeySelector($this->oneToManyOuterKey, $outerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resolveInnerKeySelector($innerClass)
+    {
+        return AccessorCreators::toPivotKeySelector($this->getPivotKey(), $innerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resolveResultSelector($outerClass, $innerClass)
+    {
+        return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
 
     /**
@@ -119,6 +287,6 @@ class ManyToMany implements RelationInterface
      */
     protected function getPivotKey()
     {
-        return '__pivot_' . $this->oneToMany->getInnerKey();
+        return '__pivot_' . $this->oneToManyInnerKey;
     }
 }

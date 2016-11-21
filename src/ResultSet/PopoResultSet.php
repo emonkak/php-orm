@@ -5,10 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
-/**
- * @internal
- */
-class PopoResultSet implements \IteratorAggregate, ResultSetInterface
+class PopoResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -67,14 +64,15 @@ class PopoResultSet implements \IteratorAggregate, ResultSetInterface
         $this->stmt->execute();
 
         if ($predicate) {
-            $stmt->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
+            $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
                     return $element;
                 }
             }
         } else {
-            $element = $this->stmt->fetch(\PDO::FETCH_CLASS, $this->class);
+            $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
+            $element = $this->stmt->fetch();
             if ($element !== false) {
                 return $element;
             }

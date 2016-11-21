@@ -11,14 +11,14 @@ cache:
     - vendor
     - $HOME/.composer/cache
 
-before_script:
+install:
   - composer install
 
 script:
   - mkdir -p build/logs
-  - phpunit --coverage-clover build/logs/clover.xml
+  - php ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
-  - php vendor/bin/coveralls
+  - travis_retry php ./vendor/bin/coveralls
 
 sudo: false

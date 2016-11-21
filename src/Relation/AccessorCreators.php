@@ -15,72 +15,72 @@ class AccessorCreators
     }
 
     /**
-     * @param string $prop
+     * @param string $key
      * @param string $class
      * @return \Closure
      */
-    public static function toKeySelector($prop, $class)
+    public static function toKeySelector($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(
-                static function($obj) use ($prop) {
-                    return $obj->$prop;
+                static function($obj) use ($key) {
+                    return $obj->$key;
                 },
                 null,
                 $class
             );
         } else {
-            return function($props) use ($prop) {
-                return $props[$prop];
+            return static function($array) use ($key) {
+                return $array[$key];
             };
         }
     }
 
     /**
-     * @param string $prop
+     * @param string $key
      * @param string $class
      * @return \Closure
      */
-    public static function toPivotKeySelector($prop, $class)
+    public static function toPivotKeySelector($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(
-                static function($obj) use ($prop) {
-                    $pivot = $obj->$prop;
-                    unset($obj->$prop);
+                static function($obj) use ($key) {
+                    $pivot = $obj->$key;
+                    unset($obj->$key);
                     return $pivot;
                 },
                 null,
                 $class
             );
         } else {
-            return function($props) use ($prop) {
-                $pivot = $props[$prop];
-                unset($props[$prop]);
+            return static function(&$array) use ($key) {
+                $pivot = $array[$key];
+                unset($array[$key]);
                 return $pivot;
             };
         }
     }
 
     /**
-     * @param string $prop
+     * @param string $key
      * @param string $class
      * @return \Closure
      */
-    public static function toKeyAssignee($prop, $class)
+    public static function toKeyAssignee($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(
-                static function($lhs, $rhs) use ($prop) {
-                    $lhs->$prop = $rhs;
+                static function($lhs, $rhs) use ($key) {
+                    $lhs->$key = $rhs;
                     return $lhs;
                 },
                 null,
                 $class
             );
         } else {
-            return function($lhs, $rhs) use ($prop) {
-                $lhs[$prop] = $rhs;
+            return static function($lhs, $rhs) use ($key) {
+                $lhs[$key] = $rhs;
                 return $lhs;
             };
         }

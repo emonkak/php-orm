@@ -5,9 +5,6 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 
-/**
- * @internal
- */
 trait Aggregatable
 {
     /**
@@ -17,7 +14,7 @@ trait Aggregatable
      */
     public function avg(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($pdo, 'AVG', $expr);
+        return (int) $this->aggregate($pdo, "AVG($expr)");
     }
 
     /**
@@ -27,7 +24,7 @@ trait Aggregatable
      */
     public function count(PDOInterface $pdo, $expr = '*')
     {
-        return (int) $this->aggregate($pdo, 'COUNT', $expr);
+        return (int) $this->aggregate($pdo, "COUNT($expr)");
     }
 
     /**
@@ -37,7 +34,7 @@ trait Aggregatable
      */
     public function max(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($pdo, 'MAX', $expr);
+        return (int) $this->aggregate($pdo, "MAX($expr)");
     }
 
     /**
@@ -47,7 +44,7 @@ trait Aggregatable
      */
     public function min(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($pdo, 'MIN', $expr);
+        return (int) $this->aggregate($pdo, "MIN($expr)");
     }
 
     /**
@@ -57,14 +54,13 @@ trait Aggregatable
      */
     public function sum(PDOInterface $pdo, $expr)
     {
-        return (int) $this->aggregate($pdo, 'SUM', $expr);
+        return (int) $this->aggregate($pdo, "SUM($expr)");
     }
 
     /**
      * @param PDOInterface $pdo
-     * @param string       $func
      * @param mixed        $expr
      * @return mixed
      */
-    abstract function aggregate(PDOInterface $pdo, $func, $expr);
+    abstract function aggregate(PDOInterface $pdo, $expr);
 }

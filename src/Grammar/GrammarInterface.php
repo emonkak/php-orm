@@ -8,54 +8,6 @@ use Emonkak\Orm\Sql;
 interface GrammarInterface
 {
     /**
-     * @param string  $prefix
-     * @param Sql[]   $select
-     * @param Sql[]   $from
-     * @param Sql[]   $join
-     * @param Sql     $where
-     * @param Sql[]   $groupBy
-     * @param Sql     $having
-     * @param Sql[]   $orderBy
-     * @param integer $limit
-     * @param integer $offset
-     * @param Sql[]   $union
-     * @return Sql
-     */
-    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
-
-    /**
-     * @param string   $prefix
-     * @param string   $table
-     * @param string[] $columns
-     * @param Sql[][]  $values
-     * @param Sql|null $select
-     * @return Sql
-     */
-    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null);
-
-    /**
-     * @param string   $prefix
-     * @param Sql      $table
-     * @param Sql[]    $update
-     * @param Sql|null $where
-     * @param Sql[]    $orderBy
-     * @param integer  $limit
-     * @return Sql
-     */
-    public function compileUpdate($prefix, Sql $table, array $update, Sql $where = null, array $orderBy, $limit);
-
-    /**
-     * @param string   $prefix
-     * @param Sql      $table
-     * @param Sql[]    $update
-     * @param Sql|null $where
-     * @param Sql[]    $orderBy
-     * @param integer  $limit
-     * @return Sql
-     */
-    public function compileDelete($prefix, array $from, Sql $where = null, array $orderBy, $limit);
-
-    /**
      * @param mixed $value
      * @return Sql
      */
@@ -66,6 +18,15 @@ interface GrammarInterface
      * @return Sql
      */
     public function liftValue($value);
+
+    /**
+     * @param mixed       $lhs
+     * @param string|null $operator
+     * @param mixed       $rhs1
+     * @param mixed       $rhs2
+     * @return Sql
+     */
+    public function liftCondition($lhs, $operator = null, $rhs1 = null, $rhs2 = null);
 
     /**
      * @param Sql    $value
@@ -103,7 +64,7 @@ interface GrammarInterface
      * @param Sql    $end
      * @return Sql
      */
-    public function between($operator, Sql $lhs, Sql $start, Sql $end);
+    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end);
 
     /**
      * @param string $operator
@@ -117,4 +78,48 @@ interface GrammarInterface
      * @return string
      */
     public function identifier($string);
+
+    /**
+     * @param string  $prefix
+     * @param Sql[]   $select
+     * @param Sql[]   $from
+     * @param Sql[]   $join
+     * @param Sql     $where
+     * @param Sql[]   $groupBy
+     * @param Sql     $having
+     * @param Sql[]   $orderBy
+     * @param integer $limit
+     * @param integer $offset
+     * @param string  $suffix
+     * @param Sql[]   $union
+     * @return Sql
+     */
+    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
+
+    /**
+     * @param string   $prefix
+     * @param string   $table
+     * @param string[] $columns
+     * @param Sql[][]  $values
+     * @param Sql|null $select
+     * @return Sql
+     */
+    public function compileInsert($prefix, $table, array $columns, array $values, Sql $select = null);
+
+    /**
+     * @param string   $prefix
+     * @param string   $table
+     * @param Sql[]    $update
+     * @param Sql|null $where
+     * @return Sql
+     */
+    public function compileUpdate($prefix, $table, array $update, Sql $where = null);
+
+    /**
+     * @param string   $prefix
+     * @param string   $from
+     * @param Sql|null $where
+     * @return Sql
+     */
+    public function compileDelete($prefix, $from, Sql $where = null);
 }
