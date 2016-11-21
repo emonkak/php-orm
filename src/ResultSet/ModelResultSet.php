@@ -5,10 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
-/**
- * @internal
- */
-class ModelResultSet implements \IteratorAggregate, ResultSetInterface
+class ModelResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -46,6 +43,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     public function getIterator()
     {
         $this->stmt->execute();
+        $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $instantiator = $this->getInstantiator();
         foreach ($this->stmt as $row) {
             yield $instantiator($row);
@@ -73,7 +71,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
         $instantiator = $this->getInstantiator();
 
         if ($predicate) {
-            $stmt->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $row) {
                 $instance = $instantiator($row);
                 if ($predicate($instance)) {

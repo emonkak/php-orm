@@ -1,15 +1,14 @@
 <?php
 
-namespace Emonkak\Orm;
+namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
+use Emonkak\Orm\SelectBuilder;
 
-/**
- * @internal
- */
-class Paginator
+class Paginator implements PaginatorInterface
 {
     /**
      * @var SelectBuilder
@@ -53,19 +52,9 @@ class Paginator
     }
 
     /**
-     * @param integer $pageNum
-     * @return PaginatedResultSet
+     * {@inheritDoc}
      */
-    public function at($pageNum)
-    {
-        return $this->atIndex($pageNum - 1);
-    }
-
-    /**
-     * @param integer $index
-     * @return PaginatedResultSet
-     */
-    public function atIndex($index)
+    public function at($index)
     {
         if ($index < 0) {
             throw new \OutOfRangeException("Invalid page index, got '$index'");
@@ -77,7 +66,7 @@ class Paginator
                 ->limit($this->perPage)
                 ->getResult($this->pdo, $this->fetcher);
         } else {
-            $result = new \EmptyIterator();
+            $result = new EmptyResultSet($this->fetcher->getClass());
         }
 
         return new PaginatedResultSet($result, $this, $index);
@@ -88,7 +77,7 @@ class Paginator
      */
     public function firstPage()
     {
-        return $this->atIndex(0);
+        return $this->at(0);
     }
 
     /**
@@ -96,7 +85,15 @@ class Paginator
      */
     public function lastPage()
     {
-        return $this->atIndex($this->getNumPages() - 1);
+        return $this->at($this->getNumPages() - 1);
+    }
+
+    /**
+     * @return integer
+     */
+    public function getPerPage()
+    {
+        return $this->perPage;
     }
 
     /**
@@ -108,7 +105,7 @@ class Paginator
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getNumPages()
     {

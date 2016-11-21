@@ -3,16 +3,14 @@
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\Iterator\GroupJoinIterator;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
-/**
- * @internal
- */
 class GroupJoin implements JoinStrategyInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function __invoke($outer, $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
+    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
     {
         return new GroupJoinIterator(
             $outer,

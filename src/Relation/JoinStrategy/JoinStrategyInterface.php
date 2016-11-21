@@ -2,15 +2,17 @@
 
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
+use Emonkak\Orm\ResultSet\ResultSetInterface;
+
 interface JoinStrategyInterface
 {
     /**
-     * @param array|\Traversable $outer
-     * @param array|\Traversable $inner
+     * @param ResultSetInterface $outer
+     * @param ResultSetInterface $inner
      * @param callable           $outerKeySelector
      * @param callable           $innerKeySelector
      * @param callable           $resultSelector
      * @return Traversable
      */
-    public function __invoke($outer, $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector);
+    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector);
 }

@@ -5,11 +5,12 @@ namespace Emonkak\Orm\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
+use Emonkak\Orm\ResultSet\FrozenResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 use Psr\Cache\CacheItemPoolInterface;
 
-class CachedRelation extends AbstractRelation
+class CachedRelation extends Relation
 {
     /**
      * @var CacheItemPoolInterface
@@ -22,39 +23,39 @@ class CachedRelation extends AbstractRelation
     private $cachePrefix;
 
     /**
-     * @var integer|null
+     * @var integer
      */
-    private $lifetime;
+    private $cacheLifetime;
 
     /**
-     * @param string                 $table
      * @param string                 $relationKey
+     * @param string                 $table
      * @param string                 $outerKey
      * @param string                 $innerKey
      * @param PDOInterface           $pdo
      * @param FetcherInterface       $fetcher
      * @param CacheItemPoolInterface $cachePool
      * @param string                 $cachePrefix
-     * @param integer|null           $lifetime
+     * @param integer                $cacheLifetime
      * @param SelectBuilder          $builder
      * @param JoinStrategyInterface  $joinStrategy
      */
     public function __construct(
-        $table,
         $relationKey,
+        $table,
         $outerKey,
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         CacheItemPoolInterface $cachePool,
         $cachePrefix,
-        $lifetime,
+        $cacheLifetime,
         SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
     ) {
         parent::__construct(
-            $table,
             $relationKey,
+            $table,
             $outerKey,
             $innerKey,
             $pdo,
@@ -65,7 +66,31 @@ class CachedRelation extends AbstractRelation
 
         $this->cachePool = $cachePool;
         $this->cachePrefix = $cachePrefix;
-        $this->lifetime = $lifetime;
+        $this->cacheLifetime = $cacheLifetime;
+    }
+
+    /**
+     * @return CacheItemPoolInterface
+     */
+    public function getCachePool()
+    {
+        return $this->cachePool;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCachePrefix()
+    {
+        return $this->cachePrefix;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getCacheLifetime()
+    {
+        return $this->cacheLifetime;
     }
 
     /**
@@ -74,15 +99,15 @@ class CachedRelation extends AbstractRelation
     public function with(RelationInterface $relation)
     {
         return new CachedRelation(
-            $this->table,
             $this->relationKey,
+            $this->table,
             $this->outerKey,
             $this->innerKey,
             $this->pdo,
             $this->fetcher,
             $this->cachePool,
             $this->cachePrefix,
-            $this->lifetime,
+            $this->cacheLifetime,
             $this->builder->with($relation),
             $this->joinStrategy
         );
@@ -100,35 +125,34 @@ class CachedRelation extends AbstractRelation
             $cacheKeys[] = $this->cachePrefix . $outerKey;
         }
 
-        $items = $this->cachePool->getItems($cacheKeys);
-        $cachedElements = [];
+        $cacheItems = $this->cachePool->getItems($cacheKeys);
         $uncachedItems = [];
+        $cachedElements = [];
 
-        foreach ($items as $item) {
-            if ($item->isHit()) {
-                $cachedElements[] = $item->get();
+        foreach ($cacheItems as $cacheItem) {
+            if ($cacheItem->isHit()) {
+                $cachedElements[] = $cacheItem->get();
             } else {
-                $key = substr($item->getKey(), $prefixLength);
-                $uncachedItems[$key] = $item;
+                $key = substr($cacheItem->getKey(), $prefixLength);
+                $uncachedItems[$key] = $cacheItem;
             }
         }
 
+        $innerClass = $this->fetcher->getClass();
+
         if (!empty($uncachedItems)) {
-            $grammar = $this->builder->getGrammar();
-
-            $result = $this->builder
-                ->from($grammar->identifier($this->table))
-                ->where($grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey), 'IN', array_keys($uncachedItems))
-                ->getResult($this->pdo, $this->fetcher);
-
-            $innerKeySelector = AccessorCreators::toKeySelector($this->innerKey, $this->fetcher->getClass());
+            $result = parent::getResult(array_keys($uncachedItems));
+            $innerKeySelector = $this->resolveInnerKeySelector($innerClass);
 
             foreach ($result as $element) {
                 $key = $innerKeySelector($element);
 
                 if (isset($uncachedItems[$key])) {
-                    $item = $uncachedItems[$key]->set($element)->expiresAfter($this->lifetime);
-                    $this->cachePool->saveDeferred($item);
+                    $cacheItem = $uncachedItems[$key]->set($element);
+                    if ($this->cacheLifetime !== null) {
+                        $cacheItem->expiresAfter($this->cacheLifetime);
+                    }
+                    $this->cachePool->saveDeferred($cacheItem);
                 }
 
                 $cachedElements[] = $element;
@@ -137,6 +161,6 @@ class CachedRelation extends AbstractRelation
             $this->cachePool->commit();
         }
 
-        return $cachedElements;
+        return new FrozenResultSet($cachedElements, $innerClass);
     }
 }

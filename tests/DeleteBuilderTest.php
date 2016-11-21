@@ -3,10 +3,20 @@
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
+use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\SelectBuilder;
 
+/**
+ * @covers Emonkak\Orm\DeleteBuilder
+ */
 class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGrammar()
+    {
+        $builder = (new DeleteBuilder());
+        $this->assertEquals(DefaultGrammar::getInstance(), $builder->getGrammar());
+    }
+
     public function testPrefix()
     {
         $query = (new DeleteBuilder())
@@ -15,8 +25,8 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
             ->where('c1', '=', 'foo')
             ->where('c2', '=', 'bar')
             ->build();
-        $this->assertSame('DELETE IGNORE FROM t1 WHERE ((c1 = ?) AND (c2 = ?))', $query->getSql());
-        $this->assertSame(['foo', 'bar'], $query->getBindings());
+        $this->assertEquals('DELETE IGNORE FROM t1 WHERE ((c1 = ?) AND (c2 = ?))', $query->getSql());
+        $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
     public function testWhere()
@@ -26,39 +36,68 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
             ->where('c1', '=', 'foo')
             ->where('c2', 'IN', ['piyo', 'poyo'])
             ->build();
-        $this->assertSame('DELETE FROM t1 WHERE ((c1 = ?) AND (c2 IN (?, ?)))', $query->getSql());
-        $this->assertSame(['foo', 'piyo', 'poyo'], $query->getBindings());
+        $this->assertEquals('DELETE FROM t1 WHERE ((c1 = ?) AND (c2 IN (?, ?)))', $query->getSql());
+        $this->assertEquals(['foo', 'piyo', 'poyo'], $query->getBindings());
     }
 
-    public function testOrderBy()
+    public function testOrWhere()
     {
         $query = (new DeleteBuilder())
             ->from('t1')
             ->where('c1', '=', 'foo')
-            ->orderBy('c1', 'DESC')
+            ->orWhere('c2', 'IN', ['piyo', 'poyo'])
             ->build();
-        $this->assertSame('DELETE FROM t1 WHERE (c1 = ?) ORDER BY c1 DESC', $query->getSql());
-        $this->assertSame(['foo'], $query->getBindings());
-
-        $query = (new DeleteBuilder())
-            ->from('t1')
-            ->where('c1', '=', 'foo')
-            ->orderBy('c1')
-            ->orderBy('c2')
-            ->build();
-        $this->assertSame('DELETE FROM t1 WHERE (c1 = ?) ORDER BY c1, c2', $query->getSql(), '');
-        $this->assertSame(['foo'], $query->getBindings());
+        $this->assertEquals('DELETE FROM t1 WHERE ((c1 = ?) OR (c2 IN (?, ?)))', $query->getSql());
+        $this->assertEquals(['foo', 'piyo', 'poyo'], $query->getBindings());
     }
 
-    public function testLimit()
+    public function testGroupWhere()
     {
         $query = (new DeleteBuilder())
             ->from('t1')
             ->where('c1', '=', 'foo')
-            ->orderBy('c1')
-            ->limit(10)
+            ->groupWhere(function($builder) {
+                return $builder
+                    ->where('c2', '=', 'bar')
+                    ->orWhere('c3', '=', 'baz');
+            })
             ->build();
-        $this->assertSame('DELETE FROM t1 WHERE (c1 = ?) ORDER BY c1 LIMIT ?', $query->getSql());
-        $this->assertSame(['foo', 10], $query->getBindings());
+        $this->assertEquals('DELETE FROM t1 WHERE ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))', $query->getSql());
+        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+
+        $query = (new DeleteBuilder())
+            ->from('t1')
+            ->where('c1', '=', 'foo')
+            ->groupWhere(function($builder) {
+                return $builder;
+            })
+            ->build();
+        $this->assertEquals('DELETE FROM t1 WHERE (c1 = ?)', $query->getSql());
+        $this->assertEquals(['foo'], $query->getBindings());
+    }
+
+    public function testOrGroupWhere()
+    {
+        $query = (new DeleteBuilder())
+            ->from('t1')
+            ->where('c1', '=', 'foo')
+            ->orGroupWhere(function($builder) {
+                return $builder
+                    ->where('c2', '=', 'bar')
+                    ->where('c3', '=', 'baz');
+            })
+            ->build();
+        $this->assertEquals('DELETE FROM t1 WHERE ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))', $query->getSql());
+        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+
+        $query = (new DeleteBuilder())
+            ->from('t1')
+            ->where('c1', '=', 'foo')
+            ->orGroupWhere(function($builder) {
+                return $builder;
+            })
+            ->build();
+        $this->assertEquals('DELETE FROM t1 WHERE (c1 = ?)', $query->getSql());
+        $this->assertEquals(['foo'], $query->getBindings());
     }
 }

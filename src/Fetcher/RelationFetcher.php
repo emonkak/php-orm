@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\ResultSet\RelatedResultSet;
+use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\Relation\RelationInterface;
 
 class RelationFetcher implements FetcherInterface
@@ -42,6 +42,6 @@ class RelationFetcher implements FetcherInterface
     public function fetch(PDOStatementInterface $stmt)
     {
         $result = $this->fetcher->fetch($stmt);
-        return new RelatedResultSet($result, $this->relation);
+        return new RelationResultSet($result, $this->relation);
     }
 }

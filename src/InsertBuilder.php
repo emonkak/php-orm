@@ -75,7 +75,7 @@ class InsertBuilder implements QueryBuilderInterface
      * @param string[] $columns
      * @return $this
      */
-    public function into($table, array $columns = [])
+    public function into($table, array $columns)
     {
         $cloned = clone $this;
         $cloned->into = $table;
@@ -91,7 +91,11 @@ class InsertBuilder implements QueryBuilderInterface
     {
         $cloned = clone $this;
         foreach (func_get_args() as $row) {
-            $cloned->values[] = $this->grammar->liftValue(array_values($row));
+            $innerValues = [];
+            foreach ($row as $value) {
+                $innerValues[] = $this->grammar->liftValue($value);
+            }
+            $cloned->values[] = $innerValues;
         }
         return $cloned;
     }

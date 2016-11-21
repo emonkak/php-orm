@@ -2,13 +2,10 @@
 
 namespace Emonkak\Orm\ResultSet;
 
-use Emonkak\Orm\Paginator;
 use Emonkak\Enumerable\EnumerableExtensions;
+use Emonkak\Orm\Pagination\PaginatorInterface;
 
-/**
- * @internal
- */
-class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
+class PaginatedResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -18,7 +15,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     private $result;
 
     /**
-     * @var Paginator
+     * @var PaginatorInterface
      */
     private $paginator;
 
@@ -29,10 +26,10 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
 
     /**
      * @param ResultSetInterface $result
-     * @param Paginator          $paginator
+     * @param PaginatorInterface $paginator
      * @param integer            $index
      */
-    public function __construct(ResultSetInterface $result, Paginator $paginator, $index)
+    public function __construct(ResultSetInterface $result, PaginatorInterface $paginator, $index)
     {
         $this->result = $result;
         $this->paginator = $paginator;
@@ -72,22 +69,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
-     */
-    public function getNumItems()
-    {
-        return $this->paginator->getNumItems();
-    }
-
-    /**
-     * @return integer
-     */
-    public function getNumPages()
-    {
-        return $this->paginator->getNumPages();
-    }
-
-    /**
      * @return PaginatedResultSet
      */
     public function nextPage()
@@ -95,7 +76,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
         if (!$this->hasNextPage()) {
             throw new \OutOfRangeException('The next page does not exist.');
         }
-        return $this->paginator->atIndex($this->index + 1);
+        return $this->paginator->at($this->index + 1);
     }
 
     /**
@@ -106,7 +87,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
         if (!$this->hasPrevPage()) {
             throw new \OutOfRangeException('The previous page does not exist.');
         }
-        return $this->paginator->atIndex($this->index - 1);
+        return $this->paginator->at($this->index - 1);
     }
 
     /**

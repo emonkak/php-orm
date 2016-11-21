@@ -5,9 +5,6 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 
-/**
- * @internal
- */
 trait Explainable
 {
     /**

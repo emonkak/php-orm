@@ -19,6 +19,43 @@ class Sql implements QueryBuilderInterface
     private $bindings;
 
     /**
+     * @param string $format
+     * @param Sql[]  ...$args
+     * @return Sql
+     */
+    public static function format($format /** , ...$args */)
+    {
+        $args = array_slice(func_get_args(), 1);
+        $tmpSqls = [];
+        $tmpBindings = [];
+        foreach ($args as $arg) {
+            $tmpSqls[] = $arg->getSql();
+            $tmpBindings[] = $arg->getBindings();
+        }
+        $sql = vsprintf($format, $tmpSqls);
+        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * @param string $string
+     * @return Sql
+     */
+    public static function literal($string)
+    {
+        return new Sql($string, []);
+    }
+
+    /**
+     * @param mixed $value
+     * @return Sql
+     */
+    public static function value($value)
+    {
+        return new Sql('?', [$value]);
+    }
+
+    /**
      * @param mixed[] $values
      * @return Sql
      */
@@ -33,7 +70,7 @@ class Sql implements QueryBuilderInterface
      * @param string  $sql
      * @param mixed[] $bindings
      */
-    public function __construct($sql, array $bindings = [])
+    public function __construct($sql, array $bindings)
     {
         $this->sql = $sql;
         $this->bindings = $bindings;
@@ -85,64 +122,70 @@ class Sql implements QueryBuilderInterface
     /**
      * @param string  $sql
      * @param mixed[] $bindings
+     * @param string  $separator
      * @return Sql
      */
-    public function append($sql, array $bindings = [])
+    public function append($sql, array $bindings = [], $separator = ' ')
     {
         return new Sql(
-            $this->sql . ' ' . $sql,
+            $this->sql . $separator . $sql,
             array_merge($this->bindings, $bindings)
         );
     }
 
     /**
-     * @param Sql $sql
+     * @param Sql    $sql
+     * @param string $separator
      * @return Sql
      */
-    public function appendSql(Sql $query)
+    public function appendSql(Sql $query, $separator = ' ')
     {
-        return $this->append($query->getSql(), $query->getBindings());
+        return $this->append($query->getSql(), $query->getBindings(), $separator);
     }
 
     /**
      * @param QueryBuilderInterface $builder
+     * @param string                $separator
      * @return Sql
      */
-    public function appendBuilder(QueryBuilderInterface $builder)
+    public function appendBuilder(QueryBuilderInterface $builder, $separator = ' ')
     {
         $query = $builder->build();
-        return $this->append('(' . $query->getSql() . ')', $query->getBindings());
+        return $this->append('(' . $query->getSql() . ')', $query->getBindings(), $separator);
     }
 
     /**
      * @param string  $sql
      * @param mixed[] $bindings
+     * @param string  $separator
      */
-    public function prepend($sql, array $bindings = [])
+    public function prepend($sql, array $bindings = [], $separator = ' ')
     {
         return new Sql(
-            $sql . ' ' . $this->sql,
+            $sql . $separator . $this->sql,
             array_merge($bindings, $this->bindings)
         );
     }
 
     /**
-     * @param Sql $sql
+     * @param Sql    $sql
+     * @param string $separator
      * @return Sql
      */
-    public function prependSql(Sql $query)
+    public function prependSql(Sql $query, $separator = ' ')
     {
-        return $this->prepend($query->getSql(), $query->getBindings());
+        return $this->prepend($query->getSql(), $query->getBindings(), $separator);
     }
 
     /**
      * @param QueryBuilderInterface $builder
+     * @param string                $separator
      * @return Sql
      */
-    public function prependBuilder(QueryBuilderInterface $builder)
+    public function prependBuilder(QueryBuilderInterface $builder, $separator = ' ')
     {
         $query = $builder->build();
-        return $this->prepend('(' . $query->getSql() . ')', $query->getBindings());
+        return $this->prepend('(' . $query->getSql() . ')', $query->getBindings(), $separator);
     }
 
     /**

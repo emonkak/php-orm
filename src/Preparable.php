@@ -4,11 +4,7 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\Sql;
 
-/**
- * @internal
- */
 trait Preparable
 {
     /**

@@ -6,10 +6,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
-/**
- * @internal
- */
-class RelatedResultSet implements \IteratorAggregate, ResultSetInterface
+class RelationResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
