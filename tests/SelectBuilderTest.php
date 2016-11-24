@@ -589,7 +589,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAggregate()
     {
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->once())
             ->method('execute')
@@ -599,7 +599,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('fetchColumn')
             ->willReturn(123);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
@@ -611,7 +611,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPaginate()
     {
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->once())
             ->method('execute')
@@ -621,13 +621,13 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('fetchColumn')
             ->willReturn(1000);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
             ->willReturn($stmt);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
 
         $paginator = (new SelectBuilder())->paginate($pdo, $fetcher, 100);
         $this->assertInstanceOf(Paginator::class, $paginator);

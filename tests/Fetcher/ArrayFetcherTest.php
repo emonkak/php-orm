@@ -15,7 +15,7 @@ class ArrayFetcherTest extends \PHPUnit_Framework_TestCase
     {
         $fetcher = new ArrayFetcher();
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
         $result = $fetcher->fetch($stmt);
         $this->assertInstanceOf(ArrayResultSet::class, $result);

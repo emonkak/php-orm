@@ -23,11 +23,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
-        $joinStrategy = $this->getMock(JoinStrategyInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $relation = new CachedRelation(
             'relation_key',
@@ -58,14 +58,14 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
 
     public function testWith()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
-        $joinStrategy = $this->getMock(JoinStrategyInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-        $childRelation1 = $this->getMock(RelationInterface::class);
-        $childRelation2 = $this->getMock(RelationInterface::class);
+        $childRelation1 = $this->createMock(RelationInterface::class);
+        $childRelation2 = $this->createMock(RelationInterface::class);
 
         $relation = (new CachedRelation(
                 'relation_key',
@@ -122,7 +122,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
@@ -132,14 +132,14 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
             ->with('SELECT * FROM `posts` WHERE (`posts`.`user_id` IN (?, ?))')
             ->willReturn($stmt);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('fetch')
@@ -147,9 +147,9 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->willReturn(new FrozenResultSet([$innerElements[0], $innerElements[2]], null));
 
         $cacheItems = [
-            $this->getMock(CacheItemInterface::class),
-            $this->getMock(CacheItemInterface::class),
-            $this->getMock(CacheItemInterface::class),
+            $this->createMock(CacheItemInterface::class),
+            $this->createMock(CacheItemInterface::class),
+            $this->createMock(CacheItemInterface::class),
         ];
 
         $cacheItems[0]
@@ -203,7 +203,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->with(3600)
             ->will($this->returnSelf());
 
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cachePool
             ->expects($this->once())
             ->method('getItems')
@@ -245,9 +245,9 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
 
     public function testJoinEmpty()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $builder = new SelectBuilder();
         $joinStrategy = new GroupJoin();
 

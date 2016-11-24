@@ -19,8 +19,8 @@ class RelationResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->innerResult = $this->getMock(ResultSetInterface::class);
-        $this->relation = $this->getMock(RelationInterface::class);
+        $this->innerResult = $this->createMock(ResultSetInterface::class);
+        $this->relation = $this->createMock(RelationInterface::class);
         $this->result = new RelationResultSet($this->innerResult, $this->relation);
     }
 

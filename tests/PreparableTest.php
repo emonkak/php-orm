@@ -25,7 +25,7 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             ->method('build')
             ->willReturn($query);
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
@@ -37,7 +37,7 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
@@ -63,9 +63,9 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             ->method('build')
             ->willReturn($query);
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
@@ -88,7 +88,7 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             ->method('build')
             ->willReturn($query);
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
@@ -104,7 +104,7 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')

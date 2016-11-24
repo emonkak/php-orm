@@ -22,7 +22,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
         $builder = (new SelectBuilder())->from('t1');
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(6))
             ->method('bindValue')
@@ -36,16 +36,16 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->atLeastOnce())
             ->method('prepare')
             ->with('SELECT * FROM t1 LIMIT ? OFFSET ?')
             ->willReturn($stmt);
 
-        $result = $this->getMock(ResultSetInterface::class);
+        $result = $this->createMock(ResultSetInterface::class);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->atLeastOnce())
             ->method('fetch')
@@ -88,9 +88,9 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
 
         $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
         $paginator->at(-1);
@@ -102,7 +102,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
@@ -112,16 +112,16 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->atLeastOnce())
             ->method('prepare')
             ->with('SELECT * FROM t1 LIMIT ? OFFSET ?')
             ->willReturn($stmt);
 
-        $result = $this->getMock(ResultSetInterface::class);
+        $result = $this->createMock(ResultSetInterface::class);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->atLeastOnce())
             ->method('fetch')
@@ -147,7 +147,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
         $builder = (new SelectBuilder())->from('t1');
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
@@ -157,16 +157,16 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->atLeastOnce())
             ->method('prepare')
             ->with('SELECT * FROM t1 LIMIT ? OFFSET ?')
             ->willReturn($stmt);
 
-        $result = $this->getMock(ResultSetInterface::class);
+        $result = $this->createMock(ResultSetInterface::class);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->atLeastOnce())
             ->method('fetch')

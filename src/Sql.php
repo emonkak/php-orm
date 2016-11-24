@@ -23,9 +23,8 @@ class Sql implements QueryBuilderInterface
      * @param Sql[]  ...$args
      * @return Sql
      */
-    public static function format($format /** , ...$args */)
+    public static function format($format, ...$args)
     {
-        $args = array_slice(func_get_args(), 1);
         $tmpSqls = [];
         $tmpBindings = [];
         foreach ($args as $arg) {
