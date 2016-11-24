@@ -15,7 +15,7 @@ class ModelFetcherTest extends \PHPUnit_Framework_TestCase
     {
         $fetcher = new ModelFetcher('stdClass');
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
         $result = $fetcher->fetch($stmt);
 

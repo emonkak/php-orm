@@ -15,7 +15,7 @@ class PopoFetcherTest extends \PHPUnit_Framework_TestCase
     {
         $fetcher = new PopoFetcher('stdClass');
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
         $result = $fetcher->fetch($stmt);
 

@@ -20,10 +20,10 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $joinStrategy = $this->getMock(JoinStrategyInterface::class);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $relation = new ManyToMany(
             'relation_key',
@@ -54,13 +54,13 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
 
     public function testWith()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $joinStrategy = $this->getMock(JoinStrategyInterface::class);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-        $childRelation1 = $this->getMock(RelationInterface::class);
-        $childRelation2 = $this->getMock(RelationInterface::class);
+        $childRelation1 = $this->createMock(RelationInterface::class);
+        $childRelation2 = $this->createMock(RelationInterface::class);
 
         $relation = (new ManyToMany(
                 'relation_key',
@@ -120,7 +120,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
@@ -131,14 +131,14 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn(true);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')
             ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `friendships` LEFT OUTER JOIN `users` ON `friendships`.`friend_id` = `users`.`user_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('fetch')

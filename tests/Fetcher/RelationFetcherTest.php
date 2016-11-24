@@ -16,23 +16,23 @@ class RelationFetcherTest extends \PHPUnit_Framework_TestCase
 {
     public function testFetch()
     {
-        $mockedResultSet = $this->getMock(ResultSetInterface::class);
+        $mockedResultSet = $this->createMock(ResultSetInterface::class);
         $mockedResultSet
             ->expects($this->once())
             ->method('getClass')
             ->willReturn('stdClass');
 
-        $mockedFetcher = $this->getMock(FetcherInterface::class);
+        $mockedFetcher = $this->createMock(FetcherInterface::class);
         $mockedFetcher
             ->expects($this->once())
             ->method('fetch')
             ->willReturn($mockedResultSet);
 
-        $relation = $this->getMock(RelationInterface::class);
+        $relation = $this->createMock(RelationInterface::class);
 
         $fetcher = new RelationFetcher($mockedFetcher, $relation);
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
         $result = $fetcher->fetch($stmt);
 
@@ -42,13 +42,13 @@ class RelationFetcherTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClass()
     {
-        $mockedFetcher = $this->getMock(FetcherInterface::class);
+        $mockedFetcher = $this->createMock(FetcherInterface::class);
         $mockedFetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn('stdClass');
 
-        $relation = $this->getMock(RelationInterface::class);
+        $relation = $this->createMock(RelationInterface::class);
 
         $fetcher = new RelationFetcher($mockedFetcher, $relation);
 

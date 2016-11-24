@@ -16,7 +16,7 @@ class PopoResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stmt = $this->getMock(MockedPDOStatementInterface::class);
+        $this->stmt = $this->createMock(MockedPDOStatementInterface::class);
         $this->result = new PopoResultSet($this->stmt, \stdClass::class);
     }
 

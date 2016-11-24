@@ -13,13 +13,13 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetClass()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
         $innerResult
             ->expects($this->once())
             ->method('getClass')
             ->willReturn(\stdClass::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 123);
 
@@ -28,9 +28,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIterator()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 123);
 
@@ -39,9 +39,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIndex()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 123);
 
@@ -50,9 +50,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPageNum()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 123);
 
@@ -61,9 +61,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testNextPage()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')
@@ -85,9 +85,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
      */
     public function testNextPageThrowsOutOfRangeException()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')
@@ -101,9 +101,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testPrevPage()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')
@@ -125,9 +125,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
      */
     public function testPrevPageThrowsOutOfRangeException()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')
@@ -141,9 +141,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFirstPage()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')
@@ -161,9 +161,9 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function testIsLastPage()
     {
-        $innerResult = $this->getMock(ResultSetInterface::class);
+        $innerResult = $this->createMock(ResultSetInterface::class);
 
-        $paginator = $this->getMock(PaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getNumPages')

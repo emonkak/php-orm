@@ -24,8 +24,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 {
     public function testOneToOne()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::oneToOne(
@@ -51,8 +51,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testOneToMany()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::oneToMany(
@@ -78,8 +78,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testThroughOneToMany()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::throughOneToMany(
@@ -106,8 +106,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testLazyOneToOne()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
         $builder = new SelectBuilder();
 
@@ -135,8 +135,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testLazyOneToMany()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
         $builder = new SelectBuilder();
 
@@ -164,9 +164,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testCachedOneToOne()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::cachedOneToOne(
@@ -198,9 +198,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testCachedOneToMany()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
-        $cachePool = $this->getMock(CacheItemPoolInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::cachedOneToMany(
@@ -232,8 +232,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
     public function testManyToMany()
     {
-        $pdo = $this->getMock(PDOInterface::class);
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::manyToMany(

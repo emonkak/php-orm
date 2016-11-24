@@ -22,7 +22,7 @@ class ExplainableTest extends \PHPUnit_Framework_TestCase
 
         $explainResult = ['foo', 'bar'];
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->once())
             ->method('execute')
@@ -32,7 +32,7 @@ class ExplainableTest extends \PHPUnit_Framework_TestCase
             ->method('fetchAll')
             ->willReturn($explainResult);
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($this->once())
             ->method('prepare')

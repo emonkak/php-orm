@@ -84,13 +84,13 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed[] $values
+     * @param mixed[][] ...$values
      * @return $this
      */
-    public function values()
+    public function values(...$values)
     {
         $cloned = clone $this;
-        foreach (func_get_args() as $row) {
+        foreach ($values as $row) {
             $innerValues = [];
             foreach ($row as $value) {
                 $innerValues[] = $this->grammar->liftValue($value);

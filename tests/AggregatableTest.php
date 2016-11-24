@@ -12,7 +12,7 @@ class AggregatableTest extends \PHPUnit_Framework_TestCase
 {
     public function testAvg()
     {
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
         $aggregatable = $this->getMockForTrait(Aggregatable::class);
         $aggregatable
@@ -26,7 +26,7 @@ class AggregatableTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
         $aggregatable = $this->getMockForTrait(Aggregatable::class);
         $aggregatable
@@ -40,7 +40,7 @@ class AggregatableTest extends \PHPUnit_Framework_TestCase
 
     public function testMax()
     {
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
         $aggregatable = $this->getMockForTrait(Aggregatable::class);
         $aggregatable
@@ -54,7 +54,7 @@ class AggregatableTest extends \PHPUnit_Framework_TestCase
 
     public function testMin()
     {
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
         $aggregatable = $this->getMockForTrait(Aggregatable::class);
         $aggregatable
@@ -68,7 +68,7 @@ class AggregatableTest extends \PHPUnit_Framework_TestCase
 
     public function testSum()
     {
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
         $aggregatable = $this->getMockForTrait(Aggregatable::class);
         $aggregatable

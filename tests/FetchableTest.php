@@ -17,7 +17,7 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetResult()
     {
-        $result = $this->getMock(ResultSetInterface::class);
+        $result = $this->createMock(ResultSetInterface::class);
         $result
             ->expects($this->once())
             ->method('getIterator')
@@ -39,9 +39,9 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
             ['foo' => 2, 'bar' => 4, 'baz' => 6],
         ];
 
-        $pdo = $this->getMock(PDOInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
 
-        $stmt = $this->getMock(PDOStatementInterface::class);
+        $stmt = $this->createMock(PDOStatementInterface::class);
 
         $fetchable = $this->getMockForTrait(Fetchable::class);
         $fetchable
@@ -50,14 +50,14 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($pdo))
             ->willReturn($stmt);
 
-        $fetcher = $this->getMock(FetcherInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
             ->willReturn($result);
 
-        $relation1 = $this->getMock(RelationInterface::class);
+        $relation1 = $this->createMock(RelationInterface::class);
         $relation1
             ->expects($this->once())
             ->method('join')
@@ -67,7 +67,7 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
                 }
             }));
 
-        $relation2 = $this->getMock(RelationInterface::class);
+        $relation2 = $this->createMock(RelationInterface::class);
         $relation2
             ->expects($this->once())
             ->method('join')
