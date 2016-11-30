@@ -84,10 +84,10 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         $relation = Relations::throughOneToMany(
             'relation_key',
-            'through_key',
             'table',
             'outer_key',
             'inner_key',
+            'through_key',
             $pdo,
             $fetcher,
             $builder
