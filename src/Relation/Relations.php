@@ -79,10 +79,10 @@ final class Relations
 
     /**
      * @param string             $relationKey
-     * @param string             $throughKey
      * @param string             $table
      * @param string             $outerKey
      * @param string             $innerKey
+     * @param string             $throughKey
      * @param PDOInterface       $pdo
      * @param FetcherInterface   $fetcher
      * @param SelectBuilder|null $builder
@@ -90,10 +90,10 @@ final class Relations
      */
     public static function throughOneToMany(
         $relationKey,
-        $throughKey,
         $table,
         $outerKey,
         $innerKey,
+        $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder = null
