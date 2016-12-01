@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin
@@ -57,8 +57,8 @@ class ThroughGroupJoinTest extends \PHPUnit_Framework_TestCase
 
         $result = (new ThroughGroupJoin('body'))
             ->join(
-                new FrozenResultSet($users, null),
-                new FrozenResultSet($tweets, null),
+                new PreloadResultSet($users, null),
+                new PreloadResultSet($tweets, null),
                 function($user) { return $user['user_id']; },
                 function($user) { return $user['user_id']; },
                 function($user, $tweets) {

@@ -10,7 +10,7 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyToMany;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\SelectBuilder;
 
 /**
@@ -143,7 +143,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new FrozenResultSet($innerElements, null));
+            ->willReturn(new PreloadResultSet($innerElements, null));
 
         $builder = new SelectBuilder();
         $joinStrategy = new GroupJoin();
@@ -162,7 +162,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             $joinStrategy
         );
 
-        $result = $relation->associate(new FrozenResultSet($outerElements, null));
+        $result = $relation->associate(new PreloadResultSet($outerElements, null));
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 }

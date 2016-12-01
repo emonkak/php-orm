@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\GroupJoin
@@ -57,8 +57,8 @@ class GroupJoinTest extends \PHPUnit_Framework_TestCase
 
         $result = (new GroupJoin())
             ->join(
-                new FrozenResultSet($users, null),
-                new FrozenResultSet($tweets, null),
+                new PreloadResultSet($users, null),
+                new PreloadResultSet($tweets, null),
                 function($user) { return $user['user_id']; },
                 function($user) { return $user['user_id']; },
                 function($user, $tweets) {

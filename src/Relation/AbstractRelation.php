@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
@@ -30,7 +30,7 @@ abstract class AbstractRelation implements RelationInterface
             return new \EmptyIterator();
         }
 
-        $outerResult = new FrozenResultSet($outerElements, $outerClass);
+        $outerResult = new PreloadResultSet($outerElements, $outerClass);
         $innerResult = $this->getResult($outerKeys);
         $innerClass = $innerResult->getClass();
         $innerKeySelector = $this->resolveInnerKeySelector($innerClass);

@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 use Psr\Cache\CacheItemPoolInterface;
@@ -164,6 +164,6 @@ class CachedRelation extends Relation
             $this->cachePool->commit();
         }
 
-        return new FrozenResultSet($cachedElements, $innerClass);
+        return new PreloadResultSet($cachedElements, $innerClass);
     }
 }
