@@ -82,7 +82,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$childRelation1, $childRelation2], $relation->getBuilder()->getRelations());
     }
 
-    public function testJoin()
+    public function testAssociate()
     {
         $outerElements = [
             ['user_id' => 1, 'name' => 'foo'],
@@ -162,7 +162,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             $joinStrategy
         );
 
-        $result = $relation->join(new FrozenResultSet($outerElements, null));
+        $result = $relation->associate(new FrozenResultSet($outerElements, null));
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 }

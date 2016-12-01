@@ -7,10 +7,10 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 interface RelationInterface
 {
     /**
-     * Joins between the outer result and the relation result.
+     * Associates between the outer result and the relation result.
      *
      * @param ResultSetInterface  $result
      * @return \Traversable
      */
-    public function join(ResultSetInterface $result);
+    public function associate(ResultSetInterface $result);
 }

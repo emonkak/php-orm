@@ -87,7 +87,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$childRelation1, $childRelation2], $relation->getBuilder()->getRelations());
     }
 
-    public function testJoin()
+    public function testAssociate()
     {
         $outerElements = [
             ['user_id' => 1, 'name' => 'foo'],
@@ -239,11 +239,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             $joinStrategy
         );
 
-        $result = $relation->join(new FrozenResultSet($outerElements, null));
+        $result = $relation->associate(new FrozenResultSet($outerElements, null));
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 
-    public function testJoinEmpty()
+    public function testAssociateEmpty()
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -265,7 +265,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             $joinStrategy
         );
 
-        $result = $relation->join(new EmptyResultSet(null));
+        $result = $relation->associate(new EmptyResultSet(null));
         $this->assertEmpty(iterator_to_array($result));
     }
 }

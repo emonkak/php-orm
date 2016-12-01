@@ -43,7 +43,7 @@ class RelationResultSetTest extends \PHPUnit_Framework_TestCase
 
         $this->relation
             ->expects($this->once())
-            ->method('join')
+            ->method('associate')
             ->with($this->identicalTo($this->innerResult))
             ->willReturn($expected);
 
