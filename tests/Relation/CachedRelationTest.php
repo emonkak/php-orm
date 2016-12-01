@@ -10,7 +10,7 @@ use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\SelectBuilder;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -144,7 +144,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new FrozenResultSet([$innerElements[0], $innerElements[2]], null));
+            ->willReturn(new PreloadResultSet([$innerElements[0], $innerElements[2]], null));
 
         $cacheItems = [
             $this->createMock(CacheItemInterface::class),
@@ -239,7 +239,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             $joinStrategy
         );
 
-        $result = $relation->associate(new FrozenResultSet($outerElements, null));
+        $result = $relation->associate(new PreloadResultSet($outerElements, null));
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 

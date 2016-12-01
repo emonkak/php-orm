@@ -4,7 +4,7 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class FrozenResultSet implements ResultSetInterface
+class PreloadResultSet implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -20,7 +20,7 @@ class FrozenResultSet implements ResultSetInterface
 
     /**
      * @param mixed[] $elements
-     * @param string $class
+     * @param string  $class
      */
     public function __construct(array $elements, $class)
     {

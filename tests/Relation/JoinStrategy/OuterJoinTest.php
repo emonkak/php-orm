@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
-use Emonkak\Orm\ResultSet\FrozenResultSet;
+use Emonkak\Orm\ResultSet\PreloadResultSet;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\OuterJoin
@@ -37,8 +37,8 @@ class OuterJoinTest extends \PHPUnit_Framework_TestCase
 
         $result = (new OuterJoin())
             ->join(
-                new FrozenResultSet($talents, null),
-                new FrozenResultSet($users, null),
+                new PreloadResultSet($talents, null),
+                new PreloadResultSet($users, null),
                 function($talent) { return $talent['talent_id']; },
                 function($user) { return $user['talent_id']; },
                 function($talent, $user) {
