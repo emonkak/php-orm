@@ -94,7 +94,10 @@ class CachedRelation extends Relation
     }
 
     /**
-     * {@inheritDoc}
+     * Adds the relation to this relation.
+     *
+     * @param RelationInterface $relation
+     * @return CachedRelation
      */
     public function with(RelationInterface $relation)
     {

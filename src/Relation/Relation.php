@@ -145,7 +145,10 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * {@inheritDoc}
+     * Adds the relation to this relation.
+     *
+     * @param RelationInterface $relation
+     * @return Relation
      */
     public function with(RelationInterface $relation)
     {

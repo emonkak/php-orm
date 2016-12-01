@@ -194,7 +194,10 @@ class ManyToMany extends AbstractRelation
     }
 
     /**
-     * {@inheritDoc}
+     * Adds the relation to this relation.
+     *
+     * @param RelationInterface $relation
+     * @return ManyToMany
      */
     public function with(RelationInterface $relation)
     {
