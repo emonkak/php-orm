@@ -5,7 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class ModelResultSet implements \IteratorAggregate, ResultSetInterface
+class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -15,17 +15,24 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
+     * @var callable
+     */
+    private $instantiator;
+
+    /**
      * @var string
      */
     private $class;
 
     /**
      * @param PDOStatementInterface $stmt
+     * @param callable              $instantiator
      * @param string                $class
      */
-    public function __construct(PDOStatementInterface $stmt, $class)
+    public function __construct(PDOStatementInterface $stmt, callable $instantiator, $class)
     {
         $this->stmt = $stmt;
+        $this->instantiator = $instantiator;
         $this->class = $class;
     }
 
@@ -44,7 +51,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     {
         $this->stmt->execute();
         $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $instantiator = $this->getInstantiator();
+        $instantiator = $this->instantiator;
         foreach ($this->stmt as $row) {
             yield $instantiator($row);
         }
@@ -56,7 +63,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     public function toArray()
     {
         $this->stmt->execute();
-        $instantiator = $this->getInstantiator();
+        $instantiator = $this->instantiator;
         $rows = $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
         return array_map($instantiator, $rows);
     }
@@ -68,7 +75,7 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
     {
         $this->stmt->execute();
 
-        $instantiator = $this->getInstantiator();
+        $instantiator = $this->instantiator;
 
         if ($predicate) {
             $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
@@ -86,20 +93,5 @@ class ModelResultSet implements \IteratorAggregate, ResultSetInterface
         }
 
         throw new \RuntimeException('Sequence contains no elements.');
-    }
-
-    /**
-     * @return callable
-     */
-    protected function getInstantiator()
-    {
-        $class = $this->class;
-        return \Closure::bind(
-            static function($props) use ($class) {
-                return new $class($props);
-            },
-            null,
-            $class
-        );
     }
 }
