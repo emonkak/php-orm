@@ -14,7 +14,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritDoc}
      */
-    public function join(ResultSetInterface $result)
+    public function associate(ResultSetInterface $result)
     {
         $outerElements = $result->toArray();
         if (empty($outerElements)) {

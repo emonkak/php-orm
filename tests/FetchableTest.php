@@ -60,7 +60,7 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
         $relation1 = $this->createMock(RelationInterface::class);
         $relation1
             ->expects($this->once())
-            ->method('join')
+            ->method('associate')
             ->will($this->returnCallback(function($result) use ($relationElements1) {
                 foreach ($result as $i => $element) {
                     yield $element + $relationElements1[$i];
@@ -70,7 +70,7 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
         $relation2 = $this->createMock(RelationInterface::class);
         $relation2
             ->expects($this->once())
-            ->method('join')
+            ->method('associate')
             ->will($this->returnCallback(function($result) use ($relationElements2) {
                 foreach ($result as $i => $element) {
                     yield $element + $relationElements2[$i];

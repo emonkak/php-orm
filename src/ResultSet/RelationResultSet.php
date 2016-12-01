@@ -43,6 +43,6 @@ class RelationResultSet implements ResultSetInterface
      */
     public function getIterator()
     {
-        return $this->relation->join($this->result);
+        return $this->relation->associate($this->result);
     }
 }
