@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\ArrayResultSet;
-use Emonkak\Orm\Tests\Stubs\MockedPDOStatementInterface;
+use Emonkak\Orm\Tests\Fixtures\MockedPDOStatementInterface;
 
 /**
  * @covers Emonkak\Orm\ResultSet\ArrayResultSet

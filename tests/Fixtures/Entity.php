@@ -1,6 +1,6 @@
 <?php
 
-namespace Emonkak\Orm\Tests\Stubs;
+namespace Emonkak\Orm\Tests\Fixtures;
 
 class Entity
 {

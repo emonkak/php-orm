@@ -4,7 +4,7 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
-use Emonkak\Orm\Tests\Stubs\Model;
+use Emonkak\Orm\Tests\Fixtures\Model;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**

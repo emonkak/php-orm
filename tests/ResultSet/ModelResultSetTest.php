@@ -3,8 +3,8 @@
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\ModelResultSet;
-use Emonkak\Orm\Tests\Stubs\MockedPDOStatementInterface;
-use Emonkak\Orm\Tests\Stubs\Model;
+use Emonkak\Orm\Tests\Fixtures\MockedPDOStatementInterface;
+use Emonkak\Orm\Tests\Fixtures\Model;
 
 /**
  * @covers Emonkak\Orm\ResultSet\ModelResultSet
