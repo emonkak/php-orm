@@ -16,20 +16,24 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function associate(ResultSetInterface $result)
     {
-        $outerElements = $result->toArray();
+        $outerClass = $result->getClass();
+        $outerKeySelector = $this->resolveOuterKeySelector($outerClass);
+        $outerElements = [];
+        $outerKeys = [];
+
+        foreach ($result as $element) {
+            $outerElements[] = $element;
+            $outerKeys[] = $outerKeySelector($element);
+        }
+
         if (empty($outerElements)) {
             return new \EmptyIterator();
         }
 
-        $outerClass = $result->getClass();
         $outerResult = new FrozenResultSet($outerElements, $outerClass);
-        $outerKeySelector = $this->resolveOuterKeySelector($outerClass);
-        $outerKeys = array_map($outerKeySelector, $outerElements);
-
         $innerResult = $this->getResult($outerKeys);
         $innerClass = $innerResult->getClass();
         $innerKeySelector = $this->resolveInnerKeySelector($innerClass);
-
         $resultSelector = $this->resolveResultSelector($outerClass, $innerClass);
 
         return $this->doJoin(
