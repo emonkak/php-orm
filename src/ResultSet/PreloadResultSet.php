@@ -43,4 +43,12 @@ class PreloadResultSet implements ResultSetInterface
     {
         return $this->class;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSource()
+    {
+        return $this->elements;
+    }
 }

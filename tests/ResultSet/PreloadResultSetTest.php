@@ -20,4 +20,11 @@ class PreloadResultSetTest extends \PHPUnit_Framework_TestCase
         $result = new PreloadResultSet(['foo', 'bar'], \stdClass::class);
         $this->assertEquals(['foo', 'bar'], iterator_to_array($result));
     }
+
+    public function testGetSource()
+    {
+        $source = ['foo', 'bar'];
+        $result = new PreloadResultSet($source, \stdClass::class);
+        $this->assertSame($source, $result->getSource());
+    }
 }
