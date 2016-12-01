@@ -2,7 +2,6 @@
 
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
-use Emonkak\Enumerable\Iterator\MemoizeIterator;
 use Emonkak\Enumerable\Iterator\SelectIterator;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
