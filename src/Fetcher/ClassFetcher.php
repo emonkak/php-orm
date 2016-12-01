@@ -3,9 +3,9 @@
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\ResultSet\PopoResultSet;
+use Emonkak\Orm\ResultSet\ClassResultSet;
 
-class PopoFetcher implements FetcherInterface
+class ClassFetcher implements FetcherInterface
 {
     /**
      * @var string
@@ -33,6 +33,6 @@ class PopoFetcher implements FetcherInterface
      */
     public function fetch(PDOStatementInterface $stmt)
     {
-        return new PopoResultSet($stmt, $this->class);
+        return new ClassResultSet($stmt, $this->class);
     }
 }
