@@ -6,6 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Pagination\Paginator;
+use Emonkak\Orm\Pagination\PaginatorIterator;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
@@ -15,6 +16,19 @@ use Emonkak\Orm\SelectBuilder;
  */
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetIterator()
+    {
+        $builder = (new SelectBuilder())->from('t1');
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $perPage = 100;
+        $numItems = 201;
+
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+
+        $this->assertInstanceOf(PaginatorIterator::class, $paginator->getIterator());
+    }
+
     public function testAt()
     {
         $perPage = 100;

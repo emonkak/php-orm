@@ -54,6 +54,14 @@ class Paginator implements PaginatorInterface
     /**
      * {@inheritDoc}
      */
+    public function getIterator()
+    {
+        return new PaginatorIterator($this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function at($index)
     {
         if ($index < 0) {
