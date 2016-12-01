@@ -5,7 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Pagination\PaginatorInterface;
 
-class PaginatedResultSet implements ResultSetInterface
+class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 

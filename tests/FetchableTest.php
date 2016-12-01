@@ -9,6 +9,7 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\Tests\Fixtures\IterableResultSetInterface;
 
 /**
  * @covers Emonkak\Orm\Fetchable
@@ -17,7 +18,7 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetResult()
     {
-        $result = $this->createMock(ResultSetInterface::class);
+        $result = $this->createMock(IterableResultSetInterface::class);
         $result
             ->expects($this->once())
             ->method('getIterator')
