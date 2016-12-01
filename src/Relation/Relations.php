@@ -298,6 +298,16 @@ final class Relations
     }
 
     /**
+     * @param string $morphKey
+     * @param array  $polymorphics
+     * @return Polymorphic
+     */
+    public static function polymorphic($morphKey, array $polymorphics)
+    {
+        return new Polymorphic($morphKey, $polymorphics);
+    }
+
+    /**
      * @codeCoverageIgnore
      */
     private function __construct()
