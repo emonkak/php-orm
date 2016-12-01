@@ -36,6 +36,21 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($entity['__pivot_foo']));
     }
 
+    public function testToKeyEraser()
+    {
+        $entity = new Entity();
+        $entity->__foo = 123;
+        $eraser = AccessorCreators::toKeyEraser('__foo', Entity::class);
+        $eraser($entity);
+        $this->assertFalse(isset($entity->_foo));
+
+        $entity = [];
+        $entity['__foo'] = 123;
+        $eraser = AccessorCreators::toKeyEraser('__foo', null);
+        $eraser($entity);
+        $this->assertFalse(isset($entity['__foo']));
+    }
+
     public function testToKeyAssignee()
     {
         $entity = new Entity();

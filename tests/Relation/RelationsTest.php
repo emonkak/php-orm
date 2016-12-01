@@ -11,7 +11,9 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\Relation\ManyToMany;
+use Emonkak\Orm\Relation\Polymorphic;
 use Emonkak\Orm\Relation\Relation;
+use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\Relations;
 use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -261,5 +263,22 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($builder, $relation->getBuilder());
         $this->assertInstanceOf(GroupJoin::class, $relation->getJoinStrategy());
+    }
+
+    public function testPolymorphic()
+    {
+        $polymorphics = [
+            'morph_key1' => $this->createMock(RelationInterface::class),
+            'morph_key2' => $this->createMock(RelationInterface::class),
+        ];
+
+        $relation = Relations::polymorphic(
+            'morph_key',
+            $polymorphics
+        );
+
+        $this->assertInstanceOf(Polymorphic::class, $relation);
+        $this->assertSame('morph_key', $relation->getMorphKey());
+        $this->assertSame($polymorphics, $relation->getPolymorphics());
     }
 }

@@ -8,13 +8,6 @@ namespace Emonkak\Orm\Relation;
 class AccessorCreators
 {
     /**
-     * @codeCoverageIgnore
-     */
-    private function __construct()
-    {
-    }
-
-    /**
      * @param string $key
      * @param string $class
      * @return \Closure
@@ -67,6 +60,28 @@ class AccessorCreators
      * @param string $class
      * @return \Closure
      */
+    public static function toKeyEraser($key, $class)
+    {
+        if ($class !== null) {
+            return \Closure::bind(
+                static function($obj) use ($key) {
+                    unset($obj->$key);
+                },
+                null,
+                $class
+            );
+        } else {
+            return static function(&$array) use ($key) {
+                unset($array[$key]);
+            };
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param string $class
+     * @return \Closure
+     */
     public static function toKeyAssignee($key, $class)
     {
         if ($class !== null) {
@@ -84,5 +99,12 @@ class AccessorCreators
                 return $lhs;
             };
         }
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    private function __construct()
+    {
     }
 }
