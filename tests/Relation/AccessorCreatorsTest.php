@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\AccessorCreators;
-use Emonkak\Orm\Tests\Stubs\Entity;
+use Emonkak\Orm\Tests\Fixtures\Entity;
 
 /**
  * @cover Emonkak\Orm\Relation\AccessorCreators
