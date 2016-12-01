@@ -4,7 +4,7 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class EmptyResultSet implements ResultSetInterface
+class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
 {
     use EnumerableExtensions;
 
@@ -19,14 +19,6 @@ class EmptyResultSet implements ResultSetInterface
     public function __construct($class)
     {
         $this->class = $class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
-    {
-        return new \EmptyIterator();
     }
 
     /**

@@ -5,7 +5,7 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class ModelResultSet implements ResultSetInterface
+class ModelResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 

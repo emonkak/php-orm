@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\PopoResultSet;
-use Emonkak\Orm\Tests\Fixtures\MockedPDOStatementInterface;
+use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
 
 /**
  * @covers Emonkak\Orm\ResultSet\PopoResultSet
@@ -16,7 +16,7 @@ class PopoResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stmt = $this->createMock(MockedPDOStatementInterface::class);
+        $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
         $this->result = new PopoResultSet($this->stmt, \stdClass::class);
     }
 

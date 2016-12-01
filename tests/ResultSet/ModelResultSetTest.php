@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\ModelResultSet;
-use Emonkak\Orm\Tests\Fixtures\MockedPDOStatementInterface;
+use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
 use Emonkak\Orm\Tests\Fixtures\Model;
 
 /**
@@ -17,7 +17,7 @@ class ModelResultSetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stmt = $this->createMock(MockedPDOStatementInterface::class);
+        $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
         $this->result = new ModelResultSet($this->stmt, Model::class);
     }
 
