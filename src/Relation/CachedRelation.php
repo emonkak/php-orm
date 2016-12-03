@@ -8,14 +8,14 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class CachedRelation extends Relation
 {
     /**
-     * @var CacheItemPoolInterface
+     * @var CacheInterface
      */
-    private $cachePool;
+    private $cache;
 
     /**
      * @var string
@@ -23,22 +23,22 @@ class CachedRelation extends Relation
     private $cachePrefix;
 
     /**
-     * @var integer
+     * @var integer|\DateInterval|null
      */
-    private $cacheLifetime;
+    private $cacheTtl;
 
     /**
-     * @param string                 $relationKey
-     * @param string                 $table
-     * @param string                 $outerKey
-     * @param string                 $innerKey
-     * @param PDOInterface           $pdo
-     * @param FetcherInterface       $fetcher
-     * @param CacheItemPoolInterface $cachePool
-     * @param string                 $cachePrefix
-     * @param integer                $cacheLifetime
-     * @param SelectBuilder          $builder
-     * @param JoinStrategyInterface  $joinStrategy
+     * @param string                     $relationKey
+     * @param string                     $table
+     * @param string                     $outerKey
+     * @param string                     $innerKey
+     * @param PDOInterface               $pdo
+     * @param FetcherInterface           $fetcher
+     * @param CacheInterface             $cache
+     * @param string                     $cachePrefix
+     * @param integer|\DateInterval|null $cacheTtl
+     * @param SelectBuilder              $builder
+     * @param JoinStrategyInterface      $joinStrategy
      */
     public function __construct(
         $relationKey,
@@ -47,9 +47,9 @@ class CachedRelation extends Relation
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        CacheItemPoolInterface $cachePool,
+        CacheInterface $cache,
         $cachePrefix,
-        $cacheLifetime,
+        $cacheTtl,
         SelectBuilder $builder,
         JoinStrategyInterface $joinStrategy
     ) {
@@ -64,17 +64,17 @@ class CachedRelation extends Relation
             $joinStrategy
         );
 
-        $this->cachePool = $cachePool;
+        $this->cache = $cache;
         $this->cachePrefix = $cachePrefix;
-        $this->cacheLifetime = $cacheLifetime;
+        $this->cacheTtl = $cacheTtl;
     }
 
     /**
-     * @return CacheItemPoolInterface
+     * @return CacheInterface
      */
-    public function getCachePool()
+    public function getCache()
     {
-        return $this->cachePool;
+        return $this->cache;
     }
 
     /**
@@ -86,11 +86,11 @@ class CachedRelation extends Relation
     }
 
     /**
-     * @return integer
+     * @return integer|\DateInterval|null
      */
-    public function getCacheLifetime()
+    public function getCacheTtl()
     {
-        return $this->cacheLifetime;
+        return $this->cacheTtl;
     }
 
     /**
@@ -108,9 +108,9 @@ class CachedRelation extends Relation
             $this->innerKey,
             $this->pdo,
             $this->fetcher,
-            $this->cachePool,
+            $this->cache,
             $this->cachePrefix,
-            $this->cacheLifetime,
+            $this->cacheTtl,
             $this->builder->with($relation),
             $this->joinStrategy
         );
@@ -128,40 +128,34 @@ class CachedRelation extends Relation
             $cacheKeys[] = $this->cachePrefix . $outerKey;
         }
 
-        $cacheItems = $this->cachePool->getItems($cacheKeys);
-        $uncachedItems = [];
+        $cacheItems = $this->cache->getMultiple($cacheKeys);
         $cachedElements = [];
+        $uncachedKeys = [];
 
-        foreach ($cacheItems as $cacheItem) {
-            if ($cacheItem->isHit()) {
-                $cachedElements[] = $cacheItem->get();
+        foreach ($cacheItems as $key => $value) {
+            if ($value !== null) {
+                $cachedElements[] = $value;
             } else {
-                $key = substr($cacheItem->getKey(), $prefixLength);
-                $uncachedItems[$key] = $cacheItem;
+                $uncachedKeys[] = substr($key, $prefixLength);
             }
         }
 
         $innerClass = $this->fetcher->getClass();
 
-        if (!empty($uncachedItems)) {
-            $result = parent::getResult(array_keys($uncachedItems));
+        if (!empty($uncachedKeys)) {
+            $result = parent::getResult($uncachedKeys);
             $innerKeySelector = $this->resolveInnerKeySelector($innerClass);
+            $freshCacheItems = [];
 
             foreach ($result as $element) {
-                $key = $innerKeySelector($element);
+                $cacheKey = $this->cachePrefix . $innerKeySelector($element);
 
-                if (isset($uncachedItems[$key])) {
-                    $cacheItem = $uncachedItems[$key]->set($element);
-                    if ($this->cacheLifetime !== null) {
-                        $cacheItem->expiresAfter($this->cacheLifetime);
-                    }
-                    $this->cachePool->saveDeferred($cacheItem);
-                }
+                $freshCacheItems[$cacheKey] = $element;
 
                 $cachedElements[] = $element;
             }
 
-            $this->cachePool->commit();
+            $this->cache->setMultiple($freshCacheItems, $this->cacheTtl);
         }
 
         return new PreloadResultSet($cachedElements, $innerClass);

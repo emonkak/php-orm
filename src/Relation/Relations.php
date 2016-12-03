@@ -11,7 +11,7 @@ use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 
 final class Relations
 {
@@ -177,16 +177,16 @@ final class Relations
     }
 
     /**
-     * @param string                 $relationKey
-     * @param string                 $table
-     * @param string                 $outerKey
-     * @param string                 $innerKey
-     * @param PDOInterface           $pdo
-     * @param FetcherInterface       $fetcher
-     * @param CacheItemPoolInterface $cachePool
-     * @param string                 $cachePrefix
-     * @param integer|null           $cacheLifetime
-     * @param SelectBuilder|null     $builder
+     * @param string                     $relationKey
+     * @param string                     $table
+     * @param string                     $outerKey
+     * @param string                     $innerKey
+     * @param PDOInterface               $pdo
+     * @param FetcherInterface           $fetcher
+     * @param CacheInterface             $cache
+     * @param string                     $cachePrefix
+     * @param integer|\DateInterval|null $cacheTtl
+     * @param SelectBuilder|null         $builder
      * @return CachedRelation
      */
     public static function cachedOneToOne(
@@ -196,9 +196,9 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        CacheItemPoolInterface $cachePool,
+        CacheInterface $cache,
         $cachePrefix,
-        $cacheLifetime = null,
+        $cacheTtl = null,
         SelectBuilder $builder = null
     ) {
         return new CachedRelation(
@@ -208,25 +208,25 @@ final class Relations
             $innerKey,
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             $cachePrefix,
-            $cacheLifetime,
+            $cacheTtl,
             $builder ?: new SelectBuilder(),
             new OuterJoin()
         );
     }
 
     /**
-     * @param string                 $relationKey
-     * @param string                 $table
-     * @param string                 $outerKey
-     * @param string                 $innerKey
-     * @param PDOInterface           $pdo
-     * @param FetcherInterface       $fetcher
-     * @param CacheItemPoolInterface $cachePool
-     * @param string                 $cachePrefix
-     * @param integer|null           $cacheLifetime
-     * @param SelectBuilder|null     $builder
+     * @param string                     $relationKey
+     * @param string                     $table
+     * @param string                     $outerKey
+     * @param string                     $innerKey
+     * @param PDOInterface               $pdo
+     * @param FetcherInterface           $fetcher
+     * @param CacheInterface             $cache
+     * @param string                     $cachePrefix
+     * @param integer|\DateInterval|null $cacheTtl
+     * @param SelectBuilder|null         $builder
      * @return CachedRelation
      */
     public static function cachedOneToMany(
@@ -236,9 +236,9 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        CacheItemPoolInterface $cachePool,
+        CacheInterface $cache,
         $cachePrefix,
-        $cacheLifetime = null,
+        $cacheTtl = null,
         SelectBuilder $builder = null
     ) {
         return new CachedRelation(
@@ -248,9 +248,9 @@ final class Relations
             $innerKey,
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             $cachePrefix,
-            $cacheLifetime,
+            $cacheTtl,
             $builder ?: new SelectBuilder(),
             new GroupJoin()
         );

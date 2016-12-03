@@ -12,8 +12,7 @@ use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\SelectBuilder;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * @covers Emonkak\Orm\Relation\AbstractRelation
@@ -26,7 +25,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cache = $this->createMock(CacheInterface::class);
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $relation = new CachedRelation(
@@ -36,7 +35,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             'cache_prefix',
             3600,
             $builder,
@@ -49,9 +48,9 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('inner_key', $relation->getInnerKey());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($cachePool, $relation->getCachePool());
+        $this->assertSame($cache, $relation->getCache());
         $this->assertSame('cache_prefix', $relation->getCachePrefix());
-        $this->assertSame(3600, $relation->getCacheLifetime());
+        $this->assertSame(3600, $relation->getCacheTtl());
         $this->assertSame($builder, $relation->getBuilder());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
     }
@@ -61,7 +60,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $builder = new SelectBuilder();
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cache = $this->createMock(CacheInterface::class);
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $childRelation1 = $this->createMock(RelationInterface::class);
@@ -74,7 +73,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
                 'inner_key',
                 $pdo,
                 $fetcher,
-                $cachePool,
+                $cache,
                 'cache_prefix',
                 3600,
                 $builder,
@@ -127,8 +126,8 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(2))
             ->method('bindValue')
             ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 3, \PDO::PARAM_INT]
+                [1, '1', \PDO::PARAM_STR],
+                [2, '3', \PDO::PARAM_STR]
             )
             ->willReturn(true);
 
@@ -146,80 +145,23 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadResultSet([$innerElements[0], $innerElements[2]], null));
 
-        $cacheItems = [
-            $this->createMock(CacheItemInterface::class),
-            $this->createMock(CacheItemInterface::class),
-            $this->createMock(CacheItemInterface::class),
-        ];
-
-        $cacheItems[0]
+        $cache = $this->createMock(CacheInterface::class);
+        $cache
             ->expects($this->once())
-            ->method('isHit')
-            ->willReturn(false);
-        $cacheItems[0]
-            ->expects($this->any())
-            ->method('getKey')
-            ->willReturn('cache-prefix-1');
-        $cacheItems[0]
-            ->expects($this->once())
-            ->method('set')
-            ->with($innerElements[0])
-            ->will($this->returnSelf());
-        $cacheItems[0]
-            ->expects($this->once())
-            ->method('expiresAfter')
-            ->with(3600)
-            ->will($this->returnSelf());
-
-        $cacheItems[1]
-            ->expects($this->once())
-            ->method('isHit')
-            ->willReturn(true);
-        $cacheItems[1]
-            ->expects($this->any())
-            ->method('getKey')
-            ->willReturn('cache-prefix-2');
-        $cacheItems[1]
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn($innerElements[1]);
-
-        $cacheItems[2]
-            ->expects($this->once())
-            ->method('isHit')
-            ->willReturn(false);
-        $cacheItems[2]
-            ->expects($this->any())
-            ->method('getKey')
-            ->willReturn('cache-prefix-3');
-        $cacheItems[2]
-            ->expects($this->once())
-            ->method('set')
-            ->with($innerElements[2])
-            ->will($this->returnSelf());
-        $cacheItems[2]
-            ->expects($this->once())
-            ->method('expiresAfter')
-            ->with(3600)
-            ->will($this->returnSelf());
-
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
-        $cachePool
-            ->expects($this->once())
-            ->method('getItems')
+            ->method('getMultiple')
             ->with(['cache-prefix-1', 'cache-prefix-2', 'cache-prefix-3'])
-            ->willReturn($cacheItems);
-        $cachePool
-            ->expects($this->exactly(2))
-            ->method('saveDeferred')
-            ->withConsecutive(
-                [$cacheItems[0]],
-                [$cacheItems[2]]
-            )
-            ->willReturn(true);
-        $cachePool
+            ->willReturn([
+                'cache-prefix-1' => null,
+                'cache-prefix-2' => $innerElements[1],
+                'cache-prefix-3' => null,
+            ]);
+        $cache
             ->expects($this->once())
-            ->method('commit')
+            ->method('setMultiple')
+            ->with([
+                'cache-prefix-1' => $innerElements[0],
+                'cache-prefix-3' => $innerElements[2],
+            ], 3600)
             ->willReturn(true);
 
         $builder = new SelectBuilder();
@@ -232,7 +174,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             'cache-prefix-',
             3600,
             $builder,
@@ -247,7 +189,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cache = $this->createMock(CacheInterface::class);
         $builder = new SelectBuilder();
         $joinStrategy = new GroupJoin();
 
@@ -258,7 +200,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             'cache-prefix-',
             3600,
             $builder,
