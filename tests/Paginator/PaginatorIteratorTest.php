@@ -18,6 +18,18 @@ class PaginatorIteratorTest extends \PHPUnit_Framework_TestCase
             $this->createMock(PaginatedResultSet::class),
             $this->createMock(PaginatedResultSet::class),
         ];
+        $results[0]
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([['foo' => 123]]));
+        $results[1]
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([['bar' => 456]]));
+        $results[2]
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([['baz' => 789]]));
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
@@ -31,6 +43,6 @@ class PaginatorIteratorTest extends \PHPUnit_Framework_TestCase
 
         $iterator = new PaginatorIterator($paginator);
 
-        $this->assertSame($results, iterator_to_array($iterator));
+        $this->assertEquals([['foo' => 123], ['bar' => 456], ['baz' => 789]], iterator_to_array($iterator));
     }
 }

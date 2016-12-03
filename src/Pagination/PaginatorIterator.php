@@ -23,7 +23,9 @@ class PaginatorIterator implements \IteratorAggregate
     public function getIterator()
     {
         for ($i = 0, $l = $this->paginator->getNumPages(); $i < $l; $i++) {
-            yield $this->paginator->at($i);
+            foreach ($this->paginator->at($i) as $element) {
+                yield $element;
+            }
         }
     }
 }
