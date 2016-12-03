@@ -17,7 +17,7 @@ use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\Relations;
 use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * @covers Emonkak\Orm\Relation\Relations
@@ -168,7 +168,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cache = $this->createMock(CacheInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::cachedOneToOne(
@@ -178,7 +178,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             'cache_prefix',
             3600,
             $builder
@@ -191,9 +191,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('inner_key', $relation->getInnerKey());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($cachePool, $relation->getCachePool());
+        $this->assertSame($cache, $relation->getCache());
         $this->assertSame('cache_prefix', $relation->getCachePrefix());
-        $this->assertSame(3600, $relation->getCacheLifetime());
+        $this->assertSame(3600, $relation->getCacheTtl());
         $this->assertSame($builder, $relation->getBuilder());
         $this->assertInstanceOf(OuterJoin::class, $relation->getJoinStrategy());
     }
@@ -202,7 +202,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cache = $this->createMock(CacheInterface::class);
         $builder = new SelectBuilder();
 
         $relation = Relations::cachedOneToMany(
@@ -212,7 +212,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
-            $cachePool,
+            $cache,
             'cache_prefix',
             3600,
             $builder
@@ -225,9 +225,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('inner_key', $relation->getInnerKey());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($cachePool, $relation->getCachePool());
+        $this->assertSame($cache, $relation->getCache());
         $this->assertSame('cache_prefix', $relation->getCachePrefix());
-        $this->assertSame(3600, $relation->getCacheLifetime());
+        $this->assertSame(3600, $relation->getCacheTtl());
         $this->assertSame($builder, $relation->getBuilder());
         $this->assertInstanceOf(GroupJoin::class, $relation->getJoinStrategy());
     }
