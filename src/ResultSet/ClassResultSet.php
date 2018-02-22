@@ -20,13 +20,20 @@ class ClassResultSet implements \IteratorAggregate, ResultSetInterface
     private $class;
 
     /**
+     * @var mixed[]
+     */
+    private $constructorArguments;
+
+    /**
      * @param PDOStatementInterface $stmt
      * @param string                $class
+     * @param mixed[]               $constructorArguments
      */
-    public function __construct(PDOStatementInterface $stmt, $class)
+    public function __construct(PDOStatementInterface $stmt, $class, array $constructorArguments)
     {
         $this->stmt = $stmt;
         $this->class = $class;
+        $this->constructorArguments = $constructorArguments;
     }
 
     /**
@@ -43,7 +50,7 @@ class ClassResultSet implements \IteratorAggregate, ResultSetInterface
     public function getIterator()
     {
         $this->stmt->execute();
-        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
         return $this->stmt;
     }
 
@@ -53,7 +60,7 @@ class ClassResultSet implements \IteratorAggregate, ResultSetInterface
     public function toArray()
     {
         $this->stmt->execute();
-        return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class);
+        return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
     }
 
     /**
@@ -63,15 +70,15 @@ class ClassResultSet implements \IteratorAggregate, ResultSetInterface
     {
         $this->stmt->execute();
 
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
+
         if ($predicate) {
-            $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
                     return $element;
                 }
             }
         } else {
-            $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class);
             $element = $this->stmt->fetch();
             if ($element !== false) {
                 return $element;

@@ -13,7 +13,7 @@ class ClassFetcherTest extends \PHPUnit_Framework_TestCase
 {
     public function testFetch()
     {
-        $fetcher = new ClassFetcher('stdClass');
+        $fetcher = new ClassFetcher('stdClass', ['foo']);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
 

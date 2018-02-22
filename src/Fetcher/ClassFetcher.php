@@ -13,11 +13,18 @@ class ClassFetcher implements FetcherInterface
     private $class;
 
     /**
-     * @param string $class
+     * @var mixed[]
      */
-    public function __construct($class)
+    private $constructorArguments;
+
+    /**
+     * @param string  $class
+     * @param mixed[] $constructorArguments
+     */
+    public function __construct($class, array $constructorArguments = [])
     {
         $this->class = $class;
+        $this->constructorArguments = $constructorArguments;
     }
 
     /**
@@ -33,6 +40,6 @@ class ClassFetcher implements FetcherInterface
      */
     public function fetch(PDOStatementInterface $stmt)
     {
-        return new ClassResultSet($stmt, $this->class);
+        return new ClassResultSet($stmt, $this->class, $this->constructorArguments);
     }
 }

@@ -17,7 +17,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
-        $this->result = new ClassResultSet($this->stmt, \stdClass::class);
+        $this->result = new ClassResultSet($this->stmt, \stdClass::class, ['foo']);
     }
 
     public function testGetClass()
@@ -36,7 +36,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('setFetchMode')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
@@ -57,7 +57,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('fetchAll')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->result->toArray());
@@ -74,7 +74,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('setFetchMode')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
@@ -97,7 +97,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('setFetchMode')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
@@ -117,7 +117,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('setFetchMode')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
@@ -148,7 +148,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('setFetchMode')
-            ->with(\PDO::FETCH_CLASS, \stdClass::class)
+            ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
