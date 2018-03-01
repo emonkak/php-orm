@@ -77,34 +77,34 @@ class RelationTest extends \PHPUnit_Framework_TestCase
     public function testAssociate()
     {
         $outerElements = [
-            ['user_id' => 1, 'name' => 'foo'],
-            ['user_id' => 2, 'name' => 'bar'],
-            ['user_id' => 3, 'name' => 'baz'],
+            (object) ['user_id' => 1, 'name' => 'foo'],
+            (object) ['user_id' => 2, 'name' => 'bar'],
+            (object) ['user_id' => 3, 'name' => 'baz'],
         ];
         $innerElements = [
-            ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
-            ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
-            ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
+            (object) ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
+            (object) ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
+            (object) ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
         ];
         $expectedResult = [
-            [
+            (object) [
                 'user_id' => 1,
                 'name' => 'foo',
                 'posts' => [
-                    ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
-                    ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
+                    (object) ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
+                    (object) ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
                 ],
             ],
-            [
+            (object) [
                 'user_id' => 2,
                 'name' => 'bar',
                 'posts' => [],
             ],
-            [
+            (object) [
                 'user_id' => 3,
                 'name' => 'baz',
                 'posts' => [
-                    ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
+                    (object) ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
                 ],
             ],
         ];

@@ -85,37 +85,37 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
     public function testAssociate()
     {
         $outerElements = [
-            ['user_id' => 1, 'name' => 'foo'],
-            ['user_id' => 2, 'name' => 'bar'],
-            ['user_id' => 3, 'name' => 'baz'],
+            (object) ['user_id' => 1, 'name' => 'foo'],
+            (object) ['user_id' => 2, 'name' => 'bar'],
+            (object) ['user_id' => 3, 'name' => 'baz'],
         ];
         $innerElements = [
-            ['__pivot_user_id' => 1, 'user_id' => 2, 'name' => 'bar'],
-            ['__pivot_user_id' => 1, 'user_id' => 3, 'name' => 'baz'],
-            ['__pivot_user_id' => 2, 'user_id' => 1, 'name' => 'foo'],
-            ['__pivot_user_id' => 3, 'user_id' => 2, 'name' => 'bar'],
+            (object) ['__pivot_user_id' => 1, 'user_id' => 2, 'name' => 'bar'],
+            (object) ['__pivot_user_id' => 1, 'user_id' => 3, 'name' => 'baz'],
+            (object) ['__pivot_user_id' => 2, 'user_id' => 1, 'name' => 'foo'],
+            (object) ['__pivot_user_id' => 3, 'user_id' => 2, 'name' => 'bar'],
         ];
         $expectedResult = [
-            [
+            (object) [
                 'user_id' => 1,
                 'name' => 'foo',
                 'friends' => [
-                    ['user_id' => 2, 'name' => 'bar'],
-                    ['user_id' => 3, 'name' => 'baz'],
+                    (object) ['user_id' => 2, 'name' => 'bar'],
+                    (object) ['user_id' => 3, 'name' => 'baz'],
                 ],
             ],
-            [
+            (object) [
                 'user_id' => 2,
                 'name' => 'bar',
                 'friends' => [
-                    ['user_id' => 1, 'name' => 'foo'],
+                    (object) ['user_id' => 1, 'name' => 'foo'],
                 ],
             ],
-            [
+            (object) [
                 'user_id' => 3,
                 'name' => 'baz',
                 'friends' => [
-                    ['user_id' => 2, 'name' => 'bar'],
+                    (object) ['user_id' => 2, 'name' => 'bar'],
                 ],
             ],
         ];
