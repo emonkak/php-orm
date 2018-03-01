@@ -16,10 +16,6 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
         $entity->setFoo(123);
         $keySelector = AccessorCreators::toKeySelector('foo', Entity::class);
         $this->assertSame(123, $keySelector($entity));
-
-        $entity = ['foo' => 123];
-        $keySelector = AccessorCreators::toKeySelector('foo', null);
-        $this->assertSame(123, $keySelector($entity));
     }
 
     public function testToPivotKeySelector()
@@ -29,11 +25,6 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
         $pivotKeySelector = AccessorCreators::toPivotKeySelector('__pivot_foo', Entity::class);
         $this->assertSame(123, $pivotKeySelector($entity));
         $this->assertFalse(isset($entity->__pivot_foo));
-
-        $entity = ['__pivot_foo' => 123];
-        $pivotKeySelector = AccessorCreators::toPivotKeySelector('__pivot_foo', null);
-        $this->assertSame(123, $pivotKeySelector($entity));
-        $this->assertFalse(isset($entity['__pivot_foo']));
     }
 
     public function testToKeyEraser()
@@ -43,12 +34,6 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
         $eraser = AccessorCreators::toKeyEraser('__foo', Entity::class);
         $eraser($entity);
         $this->assertFalse(isset($entity->_foo));
-
-        $entity = [];
-        $entity['__foo'] = 123;
-        $eraser = AccessorCreators::toKeyEraser('__foo', null);
-        $eraser($entity);
-        $this->assertFalse(isset($entity['__foo']));
     }
 
     public function testToKeyAssignee()
@@ -57,11 +42,5 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
         $keyAssignee = AccessorCreators::toKeyAssignee('foo', Entity::class);
         $keyAssignee($entity, 123);
         $this->assertSame(123, $entity->getFoo());
-
-        $entity = [];
-        $keyAssignee = AccessorCreators::toKeyAssignee('foo', null);
-        $entity = $keyAssignee($entity, 123);
-        $this->assertTrue(isset($entity['foo']));
-        $this->assertSame(123, $entity['foo']);
     }
 }

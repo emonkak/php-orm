@@ -3,9 +3,9 @@
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\ResultSet\ClassResultSet;
+use Emonkak\Orm\ResultSet\ObjectResultSet;
 
-class ClassFetcher implements FetcherInterface
+class ObjectFetcher implements FetcherInterface
 {
     /**
      * @var string
@@ -40,6 +40,6 @@ class ClassFetcher implements FetcherInterface
      */
     public function fetch(PDOStatementInterface $stmt)
     {
-        return new ClassResultSet($stmt, $this->class, $this->constructorArguments);
+        return new ObjectResultSet($stmt, $this->class, $this->constructorArguments);
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Emonkak\Orm\Tests\ResultSet;
 
-use Emonkak\Orm\ResultSet\ClassResultSet;
+use Emonkak\Orm\ResultSet\ObjectResultSet;
 use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
 
 /**
- * @covers Emonkak\Orm\ResultSet\ClassResultSet
+ * @covers Emonkak\Orm\ResultSet\ObjectResultSet
  */
-class ClassResultSetTest extends \PHPUnit_Framework_TestCase
+class ObjectResultSetTest extends \PHPUnit_Framework_TestCase
 {
     private $stmt;
 
@@ -17,7 +17,7 @@ class ClassResultSetTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
-        $this->result = new ClassResultSet($this->stmt, \stdClass::class, ['foo']);
+        $this->result = new ObjectResultSet($this->stmt, \stdClass::class, ['foo']);
     }
 
     public function testGetClass()
