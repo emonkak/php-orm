@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
-use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\SelectBuilder;
 
 /**
@@ -11,10 +11,10 @@ use Emonkak\Orm\SelectBuilder;
  */
 class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGrammar()
+    public function testGetGrammar()
     {
         $builder = (new DeleteBuilder());
-        $this->assertEquals(DefaultGrammar::getInstance(), $builder->getGrammar());
+        $this->assertEquals(GrammarProvider::get(), $builder->getGrammar());
     }
 
     public function testPrefix()

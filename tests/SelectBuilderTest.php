@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Tests;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
@@ -15,10 +15,10 @@ use Emonkak\Orm\Sql;
  */
 class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGrammar()
+    public function testGetGrammar()
     {
         $builder = (new SelectBuilder());
-        $this->assertEquals(DefaultGrammar::getInstance(), $builder->getGrammar());
+        $this->assertEquals(GrammarProvider::get(), $builder->getGrammar());
     }
 
     public function testSelect()

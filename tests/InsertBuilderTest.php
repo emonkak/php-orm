@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
@@ -12,10 +12,10 @@ use Emonkak\Orm\Sql;
  */
 class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGrammar()
+    public function testGetGrammar()
     {
         $builder = (new InsertBuilder());
-        $this->assertEquals(DefaultGrammar::getInstance(), $builder->getGrammar());
+        $this->assertEquals(GrammarProvider::get(), $builder->getGrammar());
     }
 
     public function testPrefix()

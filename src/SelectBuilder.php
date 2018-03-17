@@ -4,8 +4,8 @@ namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\Grammar\GrammarInterface;
+use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\Pagination\Paginator;
 
 /**
@@ -88,7 +88,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function __construct(GrammarInterface $grammar = null)
     {
-        $this->grammar = $grammar ?: DefaultGrammar::getInstance();
+        $this->grammar = $grammar ?: GrammarProvider::get();
     }
 
     /**

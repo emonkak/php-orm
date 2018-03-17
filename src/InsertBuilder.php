@@ -2,8 +2,8 @@
 
 namespace Emonkak\Orm;
 
-use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\Grammar\GrammarInterface;
+use Emonkak\Orm\Grammar\GrammarProvider;
 
 /**
  * Provides the query building of INSERT statement.
@@ -48,7 +48,7 @@ class InsertBuilder implements QueryBuilderInterface
      */
     public function __construct(GrammarInterface $grammar = null)
     {
-        $this->grammar = $grammar ?: DefaultGrammar::getInstance();
+        $this->grammar = $grammar ?: GrammarProvider::get();
     }
 
     /**

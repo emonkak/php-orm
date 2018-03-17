@@ -4,32 +4,9 @@ namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\Sql;
 
-class DefaultGrammar implements GrammarInterface
+class MySqlGrammar implements GrammarInterface
 {
     use Liftable;
-
-    /**
-     * @codeCoverageIgnore
-     *
-     * @return DefaultGrammar
-     */
-    public static function getInstance()
-    {
-        static $instance;
-
-        if (!isset($instance)) {
-            $instance = new DefaultGrammar();
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    private function __construct()
-    {
-    }
 
     /**
      * {@inheritDoc}

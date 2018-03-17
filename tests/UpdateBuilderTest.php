@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
@@ -12,10 +12,10 @@ use Emonkak\Orm\UpdateBuilder;
  */
 class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGrammar()
+    public function testGetGrammar()
     {
         $builder = (new UpdateBuilder());
-        $this->assertEquals(DefaultGrammar::getInstance(), $builder->getGrammar());
+        $this->assertEquals(GrammarProvider::get(), $builder->getGrammar());
     }
 
     public function testPrefix()
