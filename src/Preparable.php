@@ -43,13 +43,11 @@ trait Preparable
 
     /**
      * @param PDOInterface $pdo
-     * @return PDOStatementInterface
+     * @return bool
      */
     public function execute(PDOInterface $pdo)
     {
-        $stmt = $this->prepare($pdo);
-        $stmt->execute();
-        return $stmt;
+        return $this->prepare($pdo)->execute();
     }
 
     /**

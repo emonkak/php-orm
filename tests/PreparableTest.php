@@ -111,6 +111,6 @@ class PreparableTest extends \PHPUnit_Framework_TestCase
             ->with($query->getSql())
             ->willReturn($stmt);
 
-        $this->assertSame($stmt, $preparable->execute($pdo));
+        $this->assertSame(true, $preparable->execute($pdo));
     }
 }
