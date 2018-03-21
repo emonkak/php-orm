@@ -5,13 +5,14 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Relation\CachedRelation;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
-use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -20,11 +21,13 @@ use Psr\SimpleCache\CacheInterface;
  */
 class CachedRelationTest extends \PHPUnit_Framework_TestCase
 {
+    use QueryBuilderTestTrait;
+
     public function testConstructor()
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $cache = $this->createMock(CacheInterface::class);
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
@@ -35,11 +38,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
+            $builder,
+            $joinStrategy,
             $cache,
             'cache_prefix',
-            3600,
-            $builder,
-            $joinStrategy
+            3600
         );
 
         $this->assertSame('relation_key', $relation->getRelationKey());
@@ -59,7 +62,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $cache = $this->createMock(CacheInterface::class);
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
@@ -73,11 +76,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
                 'inner_key',
                 $pdo,
                 $fetcher,
+                $builder,
+                $joinStrategy,
                 $cache,
                 'cache_prefix',
-                3600,
-                $builder,
-                $joinStrategy
+                3600
             ))
             ->with($childRelation1)
             ->with($childRelation2);
@@ -164,7 +167,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ], 3600)
             ->willReturn(true);
 
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $joinStrategy = new GroupJoin();
 
         $relation = new CachedRelation(
@@ -174,11 +177,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
+            $builder,
+            $joinStrategy,
             $cache,
             'cache-prefix-',
-            3600,
-            $builder,
-            $joinStrategy
+            3600
         );
 
         $result = $relation->associate(new PreloadResultSet($outerElements, null));
@@ -190,7 +193,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $cache = $this->createMock(CacheInterface::class);
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $joinStrategy = new GroupJoin();
 
         $relation = new CachedRelation(
@@ -200,11 +203,11 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
+            $builder,
+            $joinStrategy,
             $cache,
             'cache-prefix-',
-            3600,
-            $builder,
-            $joinStrategy
+            3600
         );
 
         $result = $relation->associate(new EmptyResultSet(null));

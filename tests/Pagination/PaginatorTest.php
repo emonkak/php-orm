@@ -5,20 +5,23 @@ namespace Emonkak\Orm\Tests\Pagination;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\Pagination\PaginatorIterator;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
  * @covers Emonkak\Orm\Pagination\Paginator
  */
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {
+    use QueryBuilderTestTrait;
+
     public function testGetIterator()
     {
-        $builder = (new SelectBuilder())->from('t1');
+        $builder = $this->createSelectBuilder()->from('t1');
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $perPage = 100;
@@ -34,7 +37,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $builder = (new SelectBuilder())->from('t1');
+        $builder = $this->createSelectBuilder()->from('t1');
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -98,7 +101,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testAtThrowsOutOfRangeException()
     {
-        $builder = (new SelectBuilder())->from('t1');
+        $builder = $this->createSelectBuilder()->from('t1');
         $perPage = 100;
         $numItems = 201;
 
@@ -112,7 +115,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFirst()
     {
-        $builder = (new SelectBuilder())->from('t1');
+        $builder = $this->createSelectBuilder()->from('t1');
         $perPage = 100;
         $numItems = 201;
 
@@ -159,7 +162,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $builder = (new SelectBuilder())->from('t1');
+        $builder = $this->createSelectBuilder()->from('t1');
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt

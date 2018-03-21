@@ -5,46 +5,64 @@ namespace Emonkak\Orm\Tests\Grammar;
 use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
  * @covers Emonkak\Orm\Grammar\MySqlGrammar
  */
 class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
 {
+    use QueryBuilderTestTrait;
+
     public function testAlias()
     {
         $grammar = new MySqlGrammar();
         $query = $grammar->alias(new Sql('c1 + ?', [1]), 'a1');
-        $this->assertEquals('c1 + ? AS a1', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'c1 + ? AS a1',
+            [1],
+            $query
+        );
     }
 
     public function testOrder()
     {
         $grammar = new MySqlGrammar();
         $query = $grammar->order(new Sql('c1 + ?', [1]), 'DESC');
-        $this->assertEquals('c1 + ? DESC', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'c1 + ? DESC',
+            [1],
+            $query
+        );
     }
 
     public function testJoin()
     {
         $grammar = new MySqlGrammar();
         $query = $grammar->join(Sql::literal('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
-        $this->assertEquals('LEFT INNER JOIN t2 ON t1.c1 = t2.c1 AND t2.c2 = ?', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'LEFT INNER JOIN t2 ON t1.c1 = t2.c1 AND t2.c2 = ?',
+            ['foo'],
+            $query
+        );
 
         $query = $grammar->join(Sql::literal('t2'), null, 'CROSS JOIN');
-        $this->assertEquals('CROSS JOIN t2', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'CROSS JOIN t2',
+            [],
+            $query
+        );
     }
 
     public function testUnion()
     {
         $grammar = new MySqlGrammar();
         $query = $grammar->union(new Sql('SELECT * FROM t1 WHERE c1 = ?', ['foo']), 'UNION ALL');
-        $this->assertEquals('UNION ALL SELECT * FROM t1 WHERE c1 = ?', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'UNION ALL SELECT * FROM t1 WHERE c1 = ?',
+            ['foo'],
+            $query
+        );
     }
 
     /**

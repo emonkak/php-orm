@@ -5,24 +5,27 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyToMany;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
-use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
  * @covers Emonkak\Orm\Relation\ManyToMany
  */
 class ManyToManyTest extends \PHPUnit_Framework_TestCase
 {
+    use QueryBuilderTestTrait;
+
     public function testConstructor()
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $relation = new ManyToMany(
@@ -56,7 +59,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
         $childRelation1 = $this->createMock(RelationInterface::class);
@@ -145,7 +148,7 @@ class ManyToManyTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadResultSet($innerElements, null));
 
-        $builder = new SelectBuilder();
+        $builder = $this->createSelectBuilder();
         $joinStrategy = new GroupJoin();
 
         $relation = new ManyToMany(

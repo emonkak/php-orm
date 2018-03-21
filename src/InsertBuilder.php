@@ -46,9 +46,9 @@ class InsertBuilder implements QueryBuilderInterface
     /**
      * @param GrammarInterface $grammar
      */
-    public function __construct(GrammarInterface $grammar = null)
+    public function __construct(GrammarInterface $grammar)
     {
-        $this->grammar = $grammar ?: GrammarProvider::get();
+        $this->grammar = $grammar;
     }
 
     /**

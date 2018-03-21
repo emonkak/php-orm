@@ -4,6 +4,7 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Relation\CachedRelation;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
@@ -28,7 +29,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::oneToOne(
             'relation_key',
@@ -55,7 +57,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::oneToMany(
             'relation_key',
@@ -82,7 +85,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::throughOneToMany(
             'relation_key',
@@ -111,7 +115,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::lazyOneToOne(
             'relation_key',
@@ -120,8 +125,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
-            $proxyFactory,
-            $builder
+            $builder,
+            $proxyFactory
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -140,7 +145,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::lazyOneToMany(
             'relation_key',
@@ -149,8 +155,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
-            $proxyFactory,
-            $builder
+            $builder,
+            $proxyFactory
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -169,7 +175,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $cache = $this->createMock(CacheInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::cachedOneToOne(
             'relation_key',
@@ -178,10 +185,10 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
+            $builder,
             $cache,
             'cache_prefix',
-            3600,
-            $builder
+            3600
         );
 
         $this->assertInstanceOf(CachedRelation::class, $relation);
@@ -203,7 +210,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $cache = $this->createMock(CacheInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::cachedOneToMany(
             'relation_key',
@@ -212,10 +220,10 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             'inner_key',
             $pdo,
             $fetcher,
+            $builder,
             $cache,
             'cache_prefix',
-            3600,
-            $builder
+            3600
         );
 
         $this->assertInstanceOf(CachedRelation::class, $relation);
@@ -236,7 +244,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = new SelectBuilder();
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
 
         $relation = Relations::manyToMany(
             'relation_key',

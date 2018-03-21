@@ -34,11 +34,11 @@ class CachedRelation extends Relation
      * @param string                     $innerKey
      * @param PDOInterface               $pdo
      * @param FetcherInterface           $fetcher
+     * @param SelectBuilder              $builder
+     * @param JoinStrategyInterface      $joinStrategy
      * @param CacheInterface             $cache
      * @param string                     $cachePrefix
      * @param integer|\DateInterval|null $cacheTtl
-     * @param SelectBuilder              $builder
-     * @param JoinStrategyInterface      $joinStrategy
      */
     public function __construct(
         $relationKey,
@@ -47,11 +47,11 @@ class CachedRelation extends Relation
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
+        SelectBuilder $builder,
+        JoinStrategyInterface $joinStrategy,
         CacheInterface $cache,
         $cachePrefix,
-        $cacheTtl,
-        SelectBuilder $builder,
-        JoinStrategyInterface $joinStrategy
+        $cacheTtl
     ) {
         parent::__construct(
             $relationKey,
@@ -108,11 +108,11 @@ class CachedRelation extends Relation
             $this->innerKey,
             $this->pdo,
             $this->fetcher,
+            $this->builder->with($relation),
+            $this->joinStrategy,
             $this->cache,
             $this->cachePrefix,
-            $this->cacheTtl,
-            $this->builder->with($relation),
-            $this->joinStrategy
+            $this->cacheTtl
         );
     }
 

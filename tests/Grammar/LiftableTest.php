@@ -3,19 +3,22 @@
 namespace Emonkak\Orm\Tests\Grammar;
 
 use Emonkak\Orm\Grammar\Liftable;
-use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
  * @covers Emonkak\Orm\Grammar\Liftable
  */
 class LiftableTest extends \PHPUnit_Framework_TestCase
 {
-    private $grammar;
+    use QueryBuilderTestTrait;
+
+    private $liftable;
 
     public function setUp()
     {
-        $this->grammar = $this->getMockForTrait(Liftable::class);
+        $this->liftable = $this->getMockForTrait(Liftable::class);
     }
 
     /**
@@ -23,16 +26,15 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
      */
     public function testLift($value, $expectedSql, array $expectedBindings)
     {
-        $query = $this->grammar->lift($value);
-        $this->assertEquals($expectedSql, $query->getSql());
-        $this->assertEquals($expectedBindings, $query->getBindings());
+        $query = $this->liftable->lift($value);
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
     public function providerLift()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [(new SelectBuilder())->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             ['foo', 'foo', []],
         ];
     }
@@ -44,7 +46,7 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
      */
     public function testLiftThrowsUnexpectedValueException($value)
     {
-        $this->grammar->lift($value);
+        $this->liftable->lift($value);
     }
 
     public function providerLiftThrowsUnexpectedValueException()
@@ -65,16 +67,15 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
      */
     public function testLiftValue($value, $expectedSql, array $expectedBindings)
     {
-        $query = $this->grammar->liftValue($value);
-        $this->assertEquals($expectedSql, $query->getSql());
-        $this->assertEquals($expectedBindings, $query->getBindings());
+        $query = $this->liftable->liftValue($value);
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
     public function providerLiftValue()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [(new SelectBuilder())->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             ['foo', '?', ['foo']],
             [123, '?', [123]],
             [1.23, '?', [1.23]],
@@ -92,7 +93,7 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
      */
     public function testLiftValueThrowsUnexpectedValueException($value)
     {
-        $this->grammar->liftValue($value);
+        $this->liftable->liftValue($value);
     }
 
     public function providerLiftValueThrowsUnexpectedValueException()
@@ -104,47 +105,50 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
 
     public function testLiftCondition()
     {
-        $query = $this->grammar->liftCondition('c1 IS NULL');
-        $this->assertEquals('c1 IS NULL', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $query = $this->liftable->liftCondition('c1 IS NULL');
+        $this->assertQueryIs(
+            'c1 IS NULL',
+            [],
+            $query
+        );
     }
 
     public function testLiftConditionWithUnaryOperator()
     {
         $expectedQuery = Sql::literal('(c1 IS NULL)');
 
-        $this->grammar
+        $this->liftable
             ->expects($this->once())
             ->method('unaryOperator')
             ->with('IS NULL', Sql::literal('c1'))
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $this->grammar->liftCondition('c1', 'IS NULL'));
+        $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', 'IS NULL'));
     }
 
     public function testLiftConditionWithOperator()
     {
         $expectedQuery = new Sql('(c1 = ?)', ['foo']);
 
-        $this->grammar
+        $this->liftable
             ->expects($this->once())
             ->method('operator')
             ->with('=', Sql::literal('c1'), Sql::value('foo'))
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $this->grammar->liftCondition('c1', '=', 'foo'));
+        $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', '=', 'foo'));
     }
 
     public function testLiftConditionWithBetweenOperator()
     {
         $expectedQuery = new Sql('(c1 BETWEEN ? AND ?)', ['foo', 'bar']);
 
-        $this->grammar
+        $this->liftable
             ->expects($this->once())
             ->method('betweenOperator')
             ->with('BETWEEN', Sql::literal('c1'), Sql::value('foo'), Sql::value('bar'))
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $this->grammar->liftCondition('c1', 'BETWEEN', 'foo', 'bar'));
+        $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', 'BETWEEN', 'foo', 'bar'));
     }
 }

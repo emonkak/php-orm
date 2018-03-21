@@ -5,7 +5,8 @@ namespace Emonkak\Orm\Tests;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\GrammarProvider;
+use Emonkak\Orm\Grammar\GrammarInterface;
+use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
@@ -15,61 +16,82 @@ use Emonkak\Orm\Sql;
  */
 class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    use QueryBuilderTestTrait;
+
     public function testGetGrammar()
     {
-        $builder = (new SelectBuilder());
-        $this->assertEquals(GrammarProvider::get(), $builder->getGrammar());
+        $grammar = $this->createMock(GrammarInterface::class);
+        $builder = new SelectBuilder($grammar);
+        $this->assertSame($grammar, $builder->getGrammar());
     }
 
     public function testSelect()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT * FROM t1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->select('1')
             ->build();
-        $this->assertEquals('SELECT 1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT 1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->select('c1')
             ->select('c2')
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT c1, c2 FROM t1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT c1, c2 FROM t1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->select('c1', 'a1')
             ->select('c2', 'a2')
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT c1 AS a1, c2 AS a2 FROM t1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT c1 AS a1, c2 AS a2 FROM t1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->select(new Sql('? + 1', [100]), 'c1')
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT ? + 1 AS c1 FROM t1', $query->getSql());
-        $this->assertEquals([100], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT ? + 1 AS c1 FROM t1',
+            [100],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->from('t2')->where('c1', '=', 'foo');
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->from('t2')->where('c1', '=', 'foo');
+        $query = $this->createSelectBuilder()
             ->select($builder, 'c1')
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT (SELECT * FROM t2 WHERE (c1 = ?)) AS c1 FROM t1', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT (SELECT * FROM t2 WHERE (c1 = ?)) AS c1 FROM t1',
+            ['foo'],
+            $query
+        );
     }
 
     public function testSelectAll()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->selectAll([
                 'c1',
                 'c2' => '1',
@@ -77,238 +99,316 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ])
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT c1, 1 AS c2, ? + 1 AS c3 FROM t1', $query->getSql());
-        $this->assertEquals([100], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT c1, 1 AS c2, ? + 1 AS c3 FROM t1',
+            [100],
+            $query
+        );
     }
 
     public function testPrefix()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->prefix('SELECT SQL_CALC_FOUND_ROWS')
             ->from('t1')
             ->build();
-        $this->assertEquals('SELECT SQL_CALC_FOUND_ROWS * FROM t1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT SQL_CALC_FOUND_ROWS * FROM t1',
+            [],
+            $query
+        );
     }
 
     public function testFrom()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->select('c1')
             ->from('t1', 'a1')
             ->build();
-        $this->assertEquals('SELECT c1 FROM t1 AS a1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT c1 FROM t1 AS a1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->from('t2')
             ->build();
-        $this->assertEquals('SELECT * FROM t1, t2', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1, t2',
+            [],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->from('t1');
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->from('t1');
+        $query = $this->createSelectBuilder()
             ->from($builder, 'a1')
             ->build();
-        $this->assertEquals('SELECT * FROM (SELECT * FROM t1) AS a1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM (SELECT * FROM t1) AS a1',
+            [],
+            $query
+        );
     }
 
     public function testJoin()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->join('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 JOIN t2 ON t1.id = t2.id JOIN t3 ON t2.id = t3.id', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 JOIN t2 ON t1.id = t2.id JOIN t3 ON t2.id = t3.id',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->outerJoin('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id', null, 'INNER JOIN')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id',
+            [],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->from('t2');
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->from('t2');
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->join($builder, 't1.id = t2.id', 't2')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 JOIN (SELECT * FROM t2) AS t2 ON t1.id = t2.id', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 JOIN (SELECT * FROM t2) AS t2 ON t1.id = t2.id',
+            [],
+            $query
+        );
     }
 
     public function testWhereEqual()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->where('c2', 'IS NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))',
+            ['foo'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'var_dump')
             ->where('c2', '=', 'var_dump')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 = ?))', $query->getSql());
-        $this->assertEquals(['var_dump', 'var_dump'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 = ?))',
+            ['var_dump', 'var_dump'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->where('c2', 'IS NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))',
+            ['foo'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '!=', 'foo')
             ->where('c2', '<>', 'bar')
             ->where('c3', 'IS NOT NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (((c1 != ?) AND (c2 <> ?)) AND (c3 IS NOT NULL))', $query->getSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (((c1 != ?) AND (c2 <> ?)) AND (c3 IS NOT NULL))',
+            ['foo', 'bar'],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, '=', 'bar')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) = ?)', $query->getSql());
-        $this->assertEquals(['foo', 1, 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) = ?)',
+            ['foo', 1, 'bar'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', $builder)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (c1 = (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))', $query->getSql());
-        $this->assertEquals(['foo', 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (c1 = (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))',
+            ['foo', 1],
+            $query
+        );
     }
 
     public function testWhereComparing()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '>', 0)
             ->where('c2', '<', 1)
             ->where('c3', '>=', 0)
             ->where('c4', '<=', 1)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((((c1 > ?) AND (c2 < ?)) AND (c3 >= ?)) AND (c4 <= ?))', $query->getSql());
-        $this->assertEquals([0, 1, 0, 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((((c1 > ?) AND (c2 < ?)) AND (c3 >= ?)) AND (c4 <= ?))',
+            [0, 1, 0, 1],
+            $query
+        );
     }
 
     public function testWhereLike()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', 'LIKE', '%foo%')
             ->where('c2', 'NOT LIKE', '%bar%')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 LIKE ?) AND (c2 NOT LIKE ?))', $query->getSql());
-        $this->assertEquals(['%foo%', '%bar%'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 LIKE ?) AND (c2 NOT LIKE ?))',
+            ['%foo%', '%bar%'],
+            $query
+        );
     }
 
     public function testWhereBetween()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', 'BETWEEN', 1, 10)
             ->where('c2', 'NOT BETWEEN', 2, 20)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 BETWEEN ? AND ?) AND (c2 NOT BETWEEN ? AND ?))', $query->getSql());
-        $this->assertEquals([1, 10, 2, 20], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 BETWEEN ? AND ?) AND (c2 NOT BETWEEN ? AND ?))',
+            [1, 10, 2, 20],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo');
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'BETWEEN', 1, 10)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?)) BETWEEN ? AND ?)', $query->getSql());
-        $this->assertEquals(['foo', 1, 10], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?)) BETWEEN ? AND ?)',
+            ['foo', 1, 10],
+            $query
+        );
     }
 
     public function testWhereIn()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', 'IN', [1, 2, 3])
             ->where('c2', 'NOT IN', [10, 20, 30])
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 IN (?, ?, ?)) AND (c2 NOT IN (?, ?, ?)))', $query->getSql());
-        $this->assertEquals([1, 2, 3, 10, 20, 30], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 IN (?, ?, ?)) AND (c2 NOT IN (?, ?, ?)))',
+            [1, 2, 3, 10, 20, 30],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo');
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', 'IN', $builder)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (c1 IN (SELECT c1 FROM t2 WHERE (c2 = ?)))', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (c1 IN (SELECT c1 FROM t2 WHERE (c2 = ?)))',
+            ['foo'],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'IN', [1, 2, 3])
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IN (?, ?, ?))', $query->getSql());
-        $this->assertEquals(['foo', 1, 1, 2, 3], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IN (?, ?, ?))',
+            ['foo', 1, 1, 2, 3],
+            $query
+        );
     }
 
     public function testWhereSql()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where(new Sql('(c1 = ?)', ['hoge']))
             ->where(new Sql('(c2 = ? OR c3 = ?)', [1, 2]))
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 = ? OR c3 = ?))', $query->getSql());
-        $this->assertEquals(['hoge', 1, 2], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 = ? OR c3 = ?))',
+            ['hoge', 1, 2],
+            $query
+        );
     }
 
     public function testWhereExists()
     {
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'EXISTS')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))', $query->getSql());
-        $this->assertEquals(['foo', 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))',
+            ['foo', 1],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'NOT EXISTS')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (NOT EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))', $query->getSql());
-        $this->assertEquals(['foo', 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (NOT EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))',
+            ['foo', 1],
+            $query
+        );
     }
 
     public function testWhereIsNull()
     {
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'IS NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NULL)', $query->getSql());
-        $this->assertEquals(['foo', 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NULL)',
+            ['foo', 1],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where($builder, 'IS NOT NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NOT NULL)', $query->getSql());
-        $this->assertEquals(['foo', 1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NOT NULL)',
+            ['foo', 1],
+            $query
+        );
     }
 
     /**
@@ -316,7 +416,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testWhereInvalidOperator()
     {
-        (new SelectBuilder())
+        $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '==', 'foo')
             ->build();
@@ -324,18 +424,21 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrWhere()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->orWhere('c2', '=', 'bar')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) OR (c2 = ?))', $query->getSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) OR (c2 = ?))',
+            ['foo', 'bar'],
+            $query
+        );
     }
 
     public function testGroupWhere()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->groupWhere(function($builder) {
@@ -344,23 +447,29 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                     ->orWhere('c3', '=', 'baz');
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))', $query->getSql());
-        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->groupWhere(function($builder) {
                 return $builder;
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (c1 = ?)', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (c1 = ?)',
+            ['foo'],
+            $query
+        );
     }
 
     public function testOrGroupWhere()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->orGroupWhere(function($builder) {
@@ -369,79 +478,103 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                     ->where('c3', '=', 'baz');
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))', $query->getSql());
-        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->orGroupWhere(function($builder) {
                 return $builder;
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 WHERE (c1 = ?)', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 WHERE (c1 = ?)',
+            ['foo'],
+            $query
+        );
     }
 
     public function testGroupBy()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy(new Sql('c1 + ?', [1]), 'DESC')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 + ? DESC', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 + ? DESC',
+            [1],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->groupBy('c2')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1, c2', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1, c2',
+            [],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy($builder, 'DESC')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY (SELECT c1 FROM t2 LIMIT ?) DESC', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY (SELECT c1 FROM t2 LIMIT ?) DESC',
+            [1],
+            $query
+        );
     }
 
     public function testHaving()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c2', '=', 'foo')
             ->having('c3', '=', 'bar')
             ->having('c4', 'IS NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING (((c2 = ?) AND (c3 = ?)) AND (c4 IS NULL))', $query->getSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 = ?) AND (c3 = ?)) AND (c4 IS NULL))',
+            ['foo', 'bar'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c2', '!=', 'foo')
             ->having('c3', '<>', 'bar')
             ->having('c4', 'IS NOT NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))', $query->getSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))',
+            ['foo', 'bar'],
+            $query
+        );
     }
 
     public function testGroupHaving()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c1', '=', 'foo')
@@ -451,10 +584,13 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                     ->orHaving('c3', '=', 'baz');
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))', $query->getSql());
-        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c1', '=', 'foo')
@@ -462,13 +598,16 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                 return $builder;
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)',
+            ['foo'],
+            $query
+        );
     }
 
     public function testGroupOrHaving()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c1', '=', 'foo')
@@ -478,10 +617,13 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                     ->having('c3', '=', 'baz');
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))', $query->getSql());
-        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c1', '=', 'foo')
@@ -489,102 +631,135 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
                 return $builder;
             })
             ->build();
-        $this->assertEquals('SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)', $query->getSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)',
+            ['foo'],
+            $query
+        );
     }
 
     public function testOrderBy()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->orderBy('c1')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 ORDER BY c1', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 ORDER BY c1',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->orderBy('NULL')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 ORDER BY NULL', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 ORDER BY NULL',
+            [],
+            $query
+        );
 
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->orderBy(new Sql('c1 + ?', [1]), 'DESC')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 ORDER BY c1 + ? DESC', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 ORDER BY c1 + ? DESC',
+            [1],
+            $query
+        );
 
-        $builder = (new SelectBuilder())->select('c1')->from('t2')->limit(1);
-        $query = (new SelectBuilder())
+        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->orderBy($builder, 'DESC')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 ORDER BY (SELECT c1 FROM t2 LIMIT ?) DESC', $query->getSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 ORDER BY (SELECT c1 FROM t2 LIMIT ?) DESC',
+            [1],
+            $query
+        );
     }
 
     public function testLimit()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->limit(10)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 LIMIT ?', $query->getSql());
-        $this->assertEquals([10], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 LIMIT ?',
+            [10],
+            $query
+        );
     }
 
     public function testOffset()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->limit(10)
             ->offset(10)
             ->build();
-        $this->assertEquals('SELECT * FROM t1 LIMIT ? OFFSET ?', $query->getSql(), 'OFFSET');
-        $this->assertEquals([10, 10], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 LIMIT ? OFFSET ?',
+            [10, 10],
+            $query
+        );
     }
 
     public function testSuffix()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->suffix('FOR UPDATE')
             ->build();
-        $this->assertEquals('SELECT * FROM t1 FOR UPDATE', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 FOR UPDATE',
+            [],
+            $query
+        );
     }
 
     public function testForUpdate()
     {
-        $query = (new SelectBuilder())
+        $query = $this->createSelectBuilder()
             ->from('t1')
             ->forUpdate()
             ->build();
-        $this->assertEquals('SELECT * FROM t1 FOR UPDATE', $query->getSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertQueryIs(
+            'SELECT * FROM t1 FOR UPDATE',
+            [],
+            $query
+        );
     }
 
     public function testUnion()
     {
-        $builder1 = (new SelectBuilder())->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = (new SelectBuilder())->select('c1')->from('t1')->where('c1', '=', 'bar');
+        $builder1 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
 
         $query = $builder1->union($builder2)->build();
-        $this->assertEquals('(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION (SELECT c1 FROM t1 WHERE (c1 = ?))', $query->getSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertQueryIs(
+            '(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            ['foo', 'bar'],
+            $query
+        );
     }
 
     public function testUnionAll()
     {
-        $builder1 = (new SelectBuilder())->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = (new SelectBuilder())->select('c1')->from('t1')->where('c1', '=', 'bar');
-        $builder3 = (new SelectBuilder())->select('c1')->from('t1')->where('c1', '=', 'baz');
+        $builder1 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
+        $builder3 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'baz');
 
         $query = $builder1->unionAll($builder2)->unionAll($builder3)->build();
-        $this->assertEquals('(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?))', $query->getSql());
-        $this->assertEquals(['foo', 'bar', 'baz'], $query->getBindings());
+        $this->assertQueryIs(
+            '(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
     }
 
     public function testAggregate()
@@ -605,7 +780,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('prepare')
             ->willReturn($stmt);
 
-        $builder = (new SelectBuilder());
+        $builder = $this->createSelectBuilder();
         $this->assertSame(123, $builder->aggregate($pdo, 'COUNT(*)'));
     }
 
@@ -629,7 +804,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $fetcher = $this->createMock(FetcherInterface::class);
 
-        $paginator = (new SelectBuilder())->paginate($pdo, $fetcher, 100);
+        $paginator = $this->createSelectBuilder()->paginate($pdo, $fetcher, 100);
         $this->assertInstanceOf(Paginator::class, $paginator);
         $this->assertSame(100, $paginator->getPerPage());
         $this->assertSame(1000, $paginator->getNumItems());
