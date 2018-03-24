@@ -115,6 +115,56 @@ class CachedTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Model::class, $result->getClass());
     }
 
+    public function testGetResultFromOnlyCache()
+    {
+        $outerKeys = [1, 2, 3];
+        $expectedResult = [
+            new Model(['id' => 1]),
+            new Model(['id' => 2]),
+            new Model(['id' => 3])
+        ];
+
+        $cachePrefix = 'model:';
+        $cacheTtl = 3600;
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cache
+            ->expects($this->once())
+            ->method('getMultiple')
+            ->with([
+                'model:1',
+                'model:2',
+                'model:3'
+            ])
+            ->willReturn([
+                'model:1' => $expectedResult[0],
+                'model:2' => $expectedResult[1],
+                'model:3' => $expectedResult[2]
+            ]);
+        $cache
+            ->expects($this->never())
+            ->method('setMultiple');
+
+        $innerRelationStrategy = $this->createMock(RelationStrategyInterface::class);
+        $innerRelationStrategy
+            ->expects($this->never())
+            ->method('getResult');
+
+        $builder = $this->createSelectBuilder();
+
+        $relationStrategy = new Cached(
+            $innerRelationStrategy,
+            $cache,
+            $cachePrefix,
+            $cacheTtl
+        );
+
+        $result = $relationStrategy->getResult($outerKeys);
+
+        $this->assertEquals($expectedResult, $result->toArray());
+        $this->assertSame(Model::class, $result->getClass());
+    }
+
     public function testWith()
     {
         $cache = $this->createMock(CacheInterface::class);

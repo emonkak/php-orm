@@ -79,7 +79,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadResultSet($innerElements, null));
+            ->willReturn(new PreloadResultSet($innerElements, Model::class));
 
         $builder = $this->createSelectBuilder();
 

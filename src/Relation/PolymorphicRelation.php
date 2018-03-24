@@ -78,6 +78,6 @@ class PolymorphicRelation implements RelationInterface
 
         return (new ConcatIterator($outerResults))
             ->orderBy($sortKeySelector)
-            ->_do($sortKeyEraser);
+            ->select($sortKeyEraser);
     }
 }

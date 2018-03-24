@@ -30,53 +30,53 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
     public function testAssociate()
     {
         $comments = [
-            (object) ['comment_id' => 1, 'commentable_id' => 1, 'commentable_type' => 'posts', 'body' => 'foo'],
-            (object) ['comment_id' => 2, 'commentable_id' => 2, 'commentable_type' => 'videos', 'body' => 'bar'],
-            (object) ['comment_id' => 3, 'commentable_id' => 3, 'commentable_type' => 'posts', 'body' => 'baz'],
-            (object) ['comment_id' => 4, 'commentable_id' => null, 'commentable_type' => null, 'body' => 'qux'],
+            ['comment_id' => 1, 'commentable_id' => 1, 'commentable_type' => 'posts', 'body' => 'foo'],
+            ['comment_id' => 2, 'commentable_id' => 2, 'commentable_type' => 'videos', 'body' => 'bar'],
+            ['comment_id' => 3, 'commentable_id' => 3, 'commentable_type' => 'posts', 'body' => 'baz'],
+            ['comment_id' => 4, 'commentable_id' => null, 'commentable_type' => null, 'body' => 'qux'],
         ];
         $posts = [
-            (object) ['post_id' => 1, 'content' => 'foo'],
-            (object) ['post_id' => 2, 'content' => 'bar'],
-            (object) ['post_id' => 3, 'content' => 'baz'],
+            ['post_id' => 1, 'content' => 'foo'],
+            ['post_id' => 2, 'content' => 'bar'],
+            ['post_id' => 3, 'content' => 'baz'],
         ];
         $videos = [
-            (object) ['video_id' => 1, 'title' => 'foo'],
-            (object) ['video_id' => 2, 'title' => 'bar'],
-            (object) ['video_id' => 3, 'title' => 'baz'],
+            ['video_id' => 1, 'title' => 'foo'],
+            ['video_id' => 2, 'title' => 'bar'],
+            ['video_id' => 3, 'title' => 'baz'],
         ];
         $expectedResult = [
-            (object) [
+            [
                 'comment_id' => 1,
                 'commentable_id' => 1,
                 'commentable_type' => 'posts',
-                'commentable' => (object) [
+                'commentable' => [
                     'post_id' => 1,
                     'content' => 'foo',
                 ],
                 'body' => 'foo',
             ],
-            (object) [
+            [
                 'comment_id' => 2,
                 'commentable_id' => 2,
                 'commentable_type' => 'videos',
-                'commentable' => (object) [
+                'commentable' => [
                     'video_id' => 2,
                     'title' => 'bar',
                 ],
                 'body' => 'bar',
             ],
-            (object) [
+            [
                 'comment_id' => 3,
                 'commentable_id' => 3,
                 'commentable_type' => 'posts',
-                'commentable' => (object) [
+                'commentable' => [
                     'post_id' => 3,
                     'content' => 'baz',
                 ],
                 'body' => 'baz',
             ],
-            (object) [
+            [
                 'comment_id' => 4,
                 'commentable_id' => null,
                 'commentable_type' => null,
@@ -89,13 +89,13 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('associate')
             ->with(new PreloadResultSet([
-                (object) ((array) $comments[0] + ['__sort' => 0]),
-                (object) ((array) $comments[2] + ['__sort' => 2])
+                $comments[0] + ['__sort' => 0],
+                $comments[2] + ['__sort' => 2]
             ], null))
             ->will($this->returnCallback(function($result) use ($posts) {
                 return new \ArrayIterator([
-                    (object) ((array) $result->elementAt(0) + ['commentable' => $posts[0]]),
-                    (object) ((array) $result->elementAt(1) + ['commentable' => $posts[2]]),
+                     $result->elementAt(0) + ['commentable' => $posts[0]],
+                     $result->elementAt(1) + ['commentable' => $posts[2]],
                 ]);
             }));
 
@@ -104,11 +104,11 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('associate')
             ->with(new PreloadResultSet([
-                (object) ((array) $comments[1] + ['__sort' => 1])
+                 $comments[1] + ['__sort' => 1]
             ], null))
             ->will($this->returnCallback(function($result) use ($videos) {
                 return new \ArrayIterator([
-                    (object) ((array) $result->elementAt(0) + ['commentable' => $videos[1]]),
+                     $result->elementAt(0) + ['commentable' => $videos[1]],
                 ]);
             }));
 
