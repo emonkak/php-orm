@@ -5,8 +5,8 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 trait Fetchable
@@ -44,11 +44,13 @@ trait Fetchable
     {
         $stmt = $this->prepare($pdo);
 
+        $result = $fetcher->fetch($stmt);
+
         foreach ($this->relations as $relation) {
-            $fetcher = new RelationFetcher($fetcher, $relation);
+            $result = new RelationResultSet($result, $relation);
         }
 
-        return $fetcher->fetch($stmt);
+        return $result;
     }
 
     /**

@@ -59,28 +59,24 @@ class Polymorphic implements RelationInterface
         foreach ($result as $index => $element) {
             $morphKey = $morphKeySelector($element);
             $element = $sortKeyAssignee($element, $index);
-            if (isset($outerElementsByMorphKey[$morphKey])) {
-                $outerElementsByMorphKey[$morphKey][] = $element;
-            } else {
-                $outerElementsByMorphKey[$morphKey] = [$element];
-            }
+            $outerElementsByMorphKey[$morphKey][] = $element;
         }
 
-        $iterators = [];
+        $outerResults = [];
         foreach ($outerElementsByMorphKey as $morphKey => $outerElements) {
             if (isset($this->polymorphics[$morphKey])) {
                 $relation = $this->polymorphics[$morphKey];
-                $outer = new PreloadResultSet($outerElements, $outerClass);
-                $iterators[] = $relation->associate($outer);
+                $outerResult = new PreloadResultSet($outerElements, $outerClass);
+                $outerResults[] = $relation->associate($outerResult);
             } else {
-                $iterators[] = $outerElements;
+                $outerResults[] = $outerElements;
             }
         }
 
         $sortKeySelector = AccessorCreators::toKeySelector(self::SORT_KEY, $outerClass);
         $sortKeyEraser = AccessorCreators::toKeyEraser(self::SORT_KEY, $outerClass);
 
-        return (new ConcatIterator($iterators))
+        return (new ConcatIterator($outerResults))
             ->orderBy($sortKeySelector)
             ->_do($sortKeyEraser);
     }
