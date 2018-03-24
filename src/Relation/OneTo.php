@@ -4,61 +4,54 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
-class StandardRelation extends AbstractStandardRelation
+class OneTo implements RelationStrategyInterface
 {
     /**
      * @var string
      */
-    protected $relationKey;
+    private $relationKey;
 
     /**
      * @var string
      */
-    protected $table;
+    private $table;
 
     /**
      * @var string
      */
-    protected $outerKey;
+    private $outerKey;
 
     /**
      * @var string
      */
-    protected $innerKey;
+    private $innerKey;
 
     /**
      * @var PDOInterface
      */
-    protected $pdo;
+    private $pdo;
 
     /**
      * @var FetcherInterface
      */
-    protected $fetcher;
+    private $fetcher;
 
     /**
      * @var SelectBuilder
      */
-    protected $builder;
+    private $builder;
 
     /**
-     * @var JoinStrategyInterface
-     */
-    protected $joinStrategy;
-
-    /**
-     * @param string                $relationKey
-     * @param string                $table
-     * @param string                $outerKey
-     * @param string                $innerKey
-     * @param PDOInterface          $pdo
-     * @param FetcherInterface      $fetcher
-     * @param SelectBuilder         $builder
-     * @param JoinStrategyInterface $joinStrategy
+     * @param string           $relationKey
+     * @param string           $table
+     * @param string           $outerKey
+     * @param string           $innerKey
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
      */
     public function __construct(
         $relationKey,
@@ -67,8 +60,7 @@ class StandardRelation extends AbstractStandardRelation
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
-        JoinStrategyInterface $joinStrategy
+        SelectBuilder $builder
     ) {
         $this->relationKey = $relationKey;
         $this->table = $table;
@@ -77,7 +69,6 @@ class StandardRelation extends AbstractStandardRelation
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->builder = $builder;
-        $this->joinStrategy = $joinStrategy;
     }
 
     /**
@@ -139,14 +130,6 @@ class StandardRelation extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function getJoinStrategy()
-    {
-        return $this->joinStrategy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getResult(array $outerKeys)
     {
         $grammar = $this->builder->getGrammar();
@@ -163,7 +146,7 @@ class StandardRelation extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveOuterKeySelector($outerClass)
+    public function getOuterKeySelector($outerClass)
     {
         return AccessorCreators::toKeySelector($this->outerKey, $outerClass);
     }
@@ -171,7 +154,7 @@ class StandardRelation extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveInnerKeySelector($innerClass)
+    public function getInnerKeySelector($innerClass)
     {
         return AccessorCreators::toKeySelector($this->innerKey, $innerClass);
     }
@@ -179,7 +162,7 @@ class StandardRelation extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveResultSelector($outerClass, $innerClass)
+    public function getResultSelector($outerClass, $innerClass)
     {
         return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
@@ -189,15 +172,14 @@ class StandardRelation extends AbstractStandardRelation
      */
     public function with(RelationInterface $relation)
     {
-        return new StandardRelation(
+        return new OneTo(
             $this->relationKey,
             $this->table,
             $this->outerKey,
             $this->innerKey,
             $this->pdo,
             $this->fetcher,
-            $this->builder->with($relation),
-            $this->joinStrategy
+            $this->builder->with($relation)
         );
     }
 }

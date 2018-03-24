@@ -2,14 +2,14 @@
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Orm\Relation\Polymorphic;
+use Emonkak\Orm\Relation\PolymorphicRelation;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 
 /**
- * @covers Emonkak\Orm\Relation\Polymorphic
+ * @covers Emonkak\Orm\Relation\PolymorphicRelation
  */
-class PolymorphicTest extends \PHPUnit_Framework_TestCase
+class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
@@ -18,7 +18,7 @@ class PolymorphicTest extends \PHPUnit_Framework_TestCase
             'morph_key2' => $this->createMock(RelationInterface::class),
         ];
 
-        $relation = new Polymorphic(
+        $relation = new PolymorphicRelation(
             'morph_key',
             $polymorphics
         );
@@ -117,7 +117,7 @@ class PolymorphicTest extends \PHPUnit_Framework_TestCase
             'posts' => $hasPost,
         ];
 
-        $relation = new Polymorphic(
+        $relation = new PolymorphicRelation(
             'commentable_type',
             $polymorphics
         );

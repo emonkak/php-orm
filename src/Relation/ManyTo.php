@@ -9,75 +9,69 @@ use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
-class ManyToMany extends AbstractStandardRelation
+class ManyTo implements RelationStrategyInterface
 {
     /**
      * @var string
      */
-    protected $relationKey;
+    private $relationKey;
 
     /**
      * @var string
      */
-    protected $oneToManyTable;
+    private $oneToManyTable;
 
     /**
      * @var string
      */
-    protected $oneToManyOuterKey;
+    private $oneToManyOuterKey;
 
     /**
      * @var string
      */
-    protected $oneToManyInnerKey;
+    private $oneToManyInnerKey;
 
     /**
      * @var string
      */
-    protected $manyToOneTable;
+    private $manyToOneTable;
 
     /**
      * @var string
      */
-    protected $manyToOneOuterKey;
+    private $manyToOneOuterKey;
 
     /**
      * @var string
      */
-    protected $manyToOneInnerKey;
+    private $manyToOneInnerKey;
 
     /**
      * @var PDOInterface
      */
-    protected $pdo;
+    private $pdo;
 
     /**
      * @var FetcherInterface
      */
-    protected $fetcher;
+    private $fetcher;
 
     /**
      * @var SelectBuilder
      */
-    protected $builder;
+    private $builder;
 
     /**
-     * @var JoinStrategyInterface
-     */
-    protected $joinStrategy;
-
-    /**
-     * @param string                $relationKey
-     * @param string                $oneToManyTable
-     * @param string                $oneToManyOuterKey
-     * @param string                $oneToManyInnerKey
-     * @param string                $manyToOneTable
-     * @param string                $manyToOneOuterKey
-     * @param string                $manyToOneInnerKey
-     * @param PDOInterface          $pdo
-     * @param FetcherInterface      $fetcher
-     * @param SelectBuilder         $builder
-     * @param JoinStrategyInterface $joinStrategy
+     * @param string           $relationKey
+     * @param string           $oneToManyTable
+     * @param string           $oneToManyOuterKey
+     * @param string           $oneToManyInnerKey
+     * @param string           $manyToOneTable
+     * @param string           $manyToOneOuterKey
+     * @param string           $manyToOneInnerKey
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
      */
     public function __construct(
         $relationKey,
@@ -89,8 +83,7 @@ class ManyToMany extends AbstractStandardRelation
         $manyToOneInnerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
-        JoinStrategyInterface $joinStrategy
+        SelectBuilder $builder
     ) {
         $this->relationKey = $relationKey;
         $this->oneToManyTable = $oneToManyTable;
@@ -102,7 +95,6 @@ class ManyToMany extends AbstractStandardRelation
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->builder = $builder;
-        $this->joinStrategy = $joinStrategy;
     }
 
     /**
@@ -162,14 +154,6 @@ class ManyToMany extends AbstractStandardRelation
     }
 
     /**
-     * @return string
-     */
-    public function getPivotKey()
-    {
-        return '__pivot_' . $this->oneToManyInnerKey;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getPdo()
@@ -191,14 +175,6 @@ class ManyToMany extends AbstractStandardRelation
     public function getBuilder()
     {
         return $this->builder;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getJoinStrategy()
-    {
-        return $this->joinStrategy;
     }
 
     /**
@@ -235,7 +211,7 @@ class ManyToMany extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveOuterKeySelector($outerClass)
+    public function getOuterKeySelector($outerClass)
     {
         return AccessorCreators::toKeySelector($this->oneToManyOuterKey, $outerClass);
     }
@@ -243,7 +219,7 @@ class ManyToMany extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveInnerKeySelector($innerClass)
+    public function getInnerKeySelector($innerClass)
     {
         return AccessorCreators::toPivotKeySelector($this->getPivotKey(), $innerClass);
     }
@@ -251,7 +227,7 @@ class ManyToMany extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveResultSelector($outerClass, $innerClass)
+    public function getResultSelector($outerClass, $innerClass)
     {
         return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
@@ -261,7 +237,7 @@ class ManyToMany extends AbstractStandardRelation
      */
     public function with(RelationInterface $relation)
     {
-        return new ManyToMany(
+        return new ManyTo(
             $this->relationKey,
             $this->oneToManyTable,
             $this->oneToManyOuterKey,
@@ -271,8 +247,15 @@ class ManyToMany extends AbstractStandardRelation
             $this->manyToOneInnerKey,
             $this->pdo,
             $this->fetcher,
-            $this->builder->with($relation),
-            $this->joinStrategy
+            $this->builder->with($relation)
         );
+    }
+
+    /**
+     * @return string
+     */
+    private function getPivotKey()
+    {
+        return '__pivot_' . $this->oneToManyInnerKey;
     }
 }

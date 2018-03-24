@@ -8,28 +8,8 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
-interface StandardRelationInterface extends RelationInterface
+interface RelationStrategyInterface
 {
-    /**
-     * @return PDOInterface
-     */
-    public function getPdo();
-
-    /**
-     * @return FetcherInterface
-     */
-    public function getFetcher();
-
-    /**
-     * @return SelectBuilder
-     */
-    public function getBuilder();
-
-    /**
-     * @return JoinStrategyInterface
-     */
-    public function getJoinStrategy();
-
     /**
      * @param mixed[] $outerKeys
      * @return ResultSetInterface
@@ -40,24 +20,22 @@ interface StandardRelationInterface extends RelationInterface
      * @param string $outerClass
      * @return callable
      */
-    public function resolveOuterKeySelector($outerClass);
+    public function getOuterKeySelector($outerClass);
 
     /**
      * @param string $innerClass
      * @return callable
      */
-    public function resolveInnerKeySelector($innerClass);
+    public function getInnerKeySelector($innerClass);
 
     /**
      * @param string $outerClass
      * @param string $innerClass
      * @return callable
      */
-    public function resolveResultSelector($outerClass, $innerClass);
+    public function getResultSelector($outerClass, $innerClass);
 
     /**
-     * Adds the relation to this relation.
-     *
      * @param RelationInterface $relation
      * @return $this
      */

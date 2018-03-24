@@ -21,6 +21,11 @@ class Model
         $this->props[$key] = $value;
     }
 
+    public function __unset($key)
+    {
+        unset($this->props[$key]);
+    }
+
     public function toArray()
     {
         return $this->props;

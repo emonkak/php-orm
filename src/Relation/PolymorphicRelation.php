@@ -6,19 +6,19 @@ use Emonkak\Enumerable\Iterator\ConcatIterator;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
-class Polymorphic implements RelationInterface
+class PolymorphicRelation implements RelationInterface
 {
     const SORT_KEY = '__sort';
 
     /**
      * @var string
      */
-    protected $morphKey;
+    private $morphKey;
 
     /**
      * @var array
      */
-    protected $polymorphics;
+    private $polymorphics;
 
     /**
      * @param string $morphKey

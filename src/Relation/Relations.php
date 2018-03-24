@@ -23,7 +23,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return StandardRelation
+     * @return Relation
      */
     public static function oneToOne(
         $relationKey,
@@ -34,14 +34,16 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new StandardRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
             new OuterJoin()
         );
     }
@@ -54,7 +56,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return StandardRelation
+     * @return Relation
      */
     public static function oneToMany(
         $relationKey,
@@ -65,14 +67,16 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new StandardRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
             new GroupJoin()
         );
     }
@@ -86,7 +90,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return StandardRelation
+     * @return Relation
      */
     public static function throughOneToMany(
         $relationKey,
@@ -98,28 +102,30 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new StandardRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
             new ThroughGroupJoin($throughKey)
         );
     }
 
     /**
-     * @param string                             $relationKey
-     * @param string                             $table
-     * @param string                             $outerKey
-     * @param string                             $innerKey
-     * @param PDOInterface                       $pdo
-     * @param FetcherInterface                   $fetcher
-     * @param SelectBuilder                      $builder
-     * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @return StandardRelation
+     * @param string                        $relationKey
+     * @param string                        $table
+     * @param string                        $outerKey
+     * @param string                        $innerKey
+     * @param PDOInterface                  $pdo
+     * @param FetcherInterface              $fetcher
+     * @param SelectBuilder                 $builder
+     * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @return Relation
      */
     public static function lazyOneToOne(
         $relationKey,
@@ -129,30 +135,32 @@ final class Relations
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder,
-        LazyLoadingValueHolderFactory $proxyFactory = null
+        LazyLoadingValueHolderFactory $proxyFactory
     ) {
-        return new StandardRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
-            new LazyOuterJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
+            new LazyOuterJoin($proxyFactory)
         );
     }
 
     /**
-     * @param string                             $relationKey
-     * @param string                             $table
-     * @param string                             $outerKey
-     * @param string                             $innerKey
-     * @param PDOInterface                       $pdo
-     * @param FetcherInterface                   $fetcher
-     * @param SelectBuilder                      $builder
-     * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @return StandardRelation
+     * @param string                        $relationKey
+     * @param string                        $table
+     * @param string                        $outerKey
+     * @param string                        $innerKey
+     * @param PDOInterface                  $pdo
+     * @param FetcherInterface              $fetcher
+     * @param SelectBuilder                 $builder
+     * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @return Relation
      */
     public static function lazyOneToMany(
         $relationKey,
@@ -162,32 +170,34 @@ final class Relations
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $builder,
-        LazyLoadingValueHolderFactory $proxyFactory = null
+        LazyLoadingValueHolderFactory $proxyFactory
     ) {
-        return new StandardRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
             new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
         );
     }
 
     /**
-     * @param string                     $relationKey
-     * @param string                     $table
-     * @param string                     $outerKey
-     * @param string                     $innerKey
-     * @param PDOInterface               $pdo
-     * @param FetcherInterface           $fetcher
-     * @param SelectBuilder              $builder
-     * @param CacheInterface             $cache
-     * @param string                     $cachePrefix
-     * @param integer|\DateInterval|null $cacheTtl
-     * @return CachedRelation
+     * @param string           $relationKey
+     * @param string           $table
+     * @param string           $outerKey
+     * @param string           $innerKey
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
+     * @param CacheInterface   $cache
+     * @param string           $cachePrefix
+     * @param integer|null     $cacheTtl
+     * @return Relation
      */
     public static function cachedOneToOne(
         $relationKey,
@@ -201,36 +211,38 @@ final class Relations
         $cachePrefix,
         $cacheTtl = null
     ) {
-        return new CachedRelation(
-            new StandardRelation(
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
-                $pdo,
-                $fetcher,
-                $builder,
-                new OuterJoin()
+        return new Relation(
+            new Cached(
+                new OneTo(
+                    $relationKey,
+                    $table,
+                    $outerKey,
+                    $innerKey,
+                    $pdo,
+                    $fetcher,
+                    $builder
+                ),
+                $cache,
+                $cachePrefix,
+                $cacheTtl
             ),
-            $cache,
-            $cachePrefix,
-            $cacheTtl
+            new OuterJoin()
         );
     }
 
     /**
-     * @param string                $relationKey
-     * @param string                $oneToManyTable
-     * @param string                $oneToManyOuterKey
-     * @param string                $oneToManyInnerKey
-     * @param string                $manyToOneTable
-     * @param string                $manyToOneOuterKey
-     * @param string                $manyToOneInnerKey
-     * @param SelectBuilder         $builder
-     * @param PDOInterface          $pdo
-     * @param FetcherInterface      $fetcher
-     * @param SelectBuilder         $builder
-     * @return ManyToMany
+     * @param string           $relationKey
+     * @param string           $oneToManyTable
+     * @param string           $oneToManyOuterKey
+     * @param string           $oneToManyInnerKey
+     * @param string           $manyToOneTable
+     * @param string           $manyToOneOuterKey
+     * @param string           $manyToOneInnerKey
+     * @param SelectBuilder    $builder
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
+     * @return Relation
      */
     public static function manyToMany(
         $relationKey,
@@ -244,17 +256,19 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new ManyToMany(
-            $relationKey,
-            $oneToManyTable,
-            $oneToManyOuterKey,
-            $oneToManyInnerKey,
-            $manyToOneTable,
-            $manyToOneOuterKey,
-            $manyToOneInnerKey,
-            $pdo,
-            $fetcher,
-            $builder,
+        return new Relation(
+            new ManyTo(
+                $relationKey,
+                $oneToManyTable,
+                $oneToManyOuterKey,
+                $oneToManyInnerKey,
+                $manyToOneTable,
+                $manyToOneOuterKey,
+                $manyToOneInnerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
             new GroupJoin()
         );
     }
@@ -262,11 +276,11 @@ final class Relations
     /**
      * @param string $morphKey
      * @param array  $polymorphics
-     * @return Polymorphic
+     * @return PolymorphicRelation
      */
     public static function polymorphic($morphKey, array $polymorphics)
     {
-        return new Polymorphic($morphKey, $polymorphics);
+        return new PolymorphicRelation($morphKey, $polymorphics);
     }
 
     /**

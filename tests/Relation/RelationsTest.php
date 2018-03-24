@@ -5,17 +5,20 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Relation\CachedRelation;
+use Emonkak\Orm\Relation\Cached;
+use Emonkak\Orm\Relation\CachedRelationStrategy;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
-use Emonkak\Orm\Relation\ManyToMany;
-use Emonkak\Orm\Relation\Polymorphic;
+use Emonkak\Orm\Relation\ManyTo;
+use Emonkak\Orm\Relation\OneTo;
+use Emonkak\Orm\Relation\PolymorphicRelation;
+use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\Orm\Relation\RelationStrategyInterface;
 use Emonkak\Orm\Relation\Relations;
-use Emonkak\Orm\Relation\StandardRelation;
 use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
@@ -27,91 +30,124 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 {
     public function testOneToOne()
     {
+        $relationKey = 'relation_key';
+        $table = 'table';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::oneToOne(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
+            $relationKey,
+            $table,
+            $outerKey,
+            $innerKey,
             $pdo,
             $fetcher,
             $builder
         );
 
-        $this->assertInstanceOf(StandardRelation::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(OuterJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testOneToMany()
     {
+        $relationKey = 'relation_key';
+        $table = 'table';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::oneToMany(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
+            $relationKey,
+            $table,
+            $outerKey,
+            $innerKey,
             $pdo,
             $fetcher,
             $builder
         );
 
-        $this->assertInstanceOf(StandardRelation::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(GroupJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testThroughOneToMany()
     {
+        $relationKey = 'relation_key';
+        $table = 'table';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+        $throughKey = 'through_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::throughOneToMany(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
-            'through_key',
+            $relationKey,
+            $table,
+            $outerKey,
+            $innerKey,
+            $throughKey,
             $pdo,
             $fetcher,
             $builder
         );
 
-        $this->assertInstanceOf(StandardRelation::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(ThroughGroupJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testLazyOneToOne()
     {
+        $relationKey = 'relation_key';
+        $table = 'table';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
@@ -119,29 +155,38 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::lazyOneToOne(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
+            $relationKey,
+            $table,
+            $outerKey,
+            $innerKey,
             $pdo,
             $fetcher,
             $builder,
             $proxyFactory
         );
 
-        $this->assertInstanceOf(StandardRelation::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(LazyOuterJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testLazyOneToMany()
     {
+        $relationKey = 'relation_key';
+        $table = 'table';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $proxyFactory = new LazyLoadingValueHolderFactory();
@@ -149,25 +194,29 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::lazyOneToMany(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
+            $relationKey,
+            $table,
+            $outerKey,
+            $innerKey,
             $pdo,
             $fetcher,
             $builder,
             $proxyFactory
         );
 
-        $this->assertInstanceOf(StandardRelation::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(LazyGroupJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testCachedOneToOne()
@@ -199,52 +248,69 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $cacheTtl
         );
 
-        $this->assertInstanceOf(CachedRelation::class, $relation);
-        $this->assertSame($relationKey, $relation->getInnerRelation()->getRelationKey());
-        $this->assertSame($table, $relation->getInnerRelation()->getTable());
-        $this->assertSame($outerKey, $relation->getInnerRelation()->getOuterKey());
-        $this->assertSame($innerKey, $relation->getInnerRelation()->getInnerKey());
-        $this->assertSame($pdo, $relation->getInnerRelation()->getPdo());
-        $this->assertSame($fetcher, $relation->getInnerRelation()->getFetcher());
-        $this->assertSame($builder, $relation->getInnerRelation()->getBuilder());
-        $this->assertInstanceOf(OuterJoin::class, $relation->getInnerRelation()->getJoinStrategy());
-        $this->assertSame($cache, $relation->getCache());
-        $this->assertSame($cachePrefix, $relation->getCachePrefix());
-        $this->assertSame($cacheTtl, $relation->getCacheTtl());
+        $this->assertInstanceOf(Relation::class, $relation);
+        $this->assertInstanceOf(OuterJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(Cached::class, $relationStrategy);
+        $this->assertSame($cache, $relationStrategy->getCache());
+        $this->assertSame($cachePrefix, $relationStrategy->getCachePrefix());
+        $this->assertSame($cacheTtl, $relationStrategy->getCacheTtl());
+
+        $innerRelationStrategy = $relationStrategy->getInnerRelationStrategy();
+
+        $this->assertInstanceOf(OneTo::class, $innerRelationStrategy);
+        $this->assertSame($relationKey, $innerRelationStrategy->getRelationKey());
+        $this->assertSame($table, $innerRelationStrategy->getTable());
+        $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
     }
 
-    public function testManyToMany()
+    public function testManyTo()
     {
+        $relationKey = 'relation_key';
+        $oneToManyTable = 'one_to_many_table';
+        $oneToManyOuterKey = 'one_to_many_outer_key';
+        $oneToManyInnerKey = 'one_to_many_inner_key';
+        $manyToOneTable = 'many_to_one_table';
+        $manyToOneOuterKey = 'many_to_one_outer_key';
+        $manyToOneInnerKey = 'many_to_one_inner_key';
+
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
 
         $relation = Relations::manyToMany(
-            'relation_key',
-            'one_to_many_table',
-            'one_to_many_outer_key',
-            'one_to_many_inner_key',
-            'many_to_one_table',
-            'many_to_one_outer_key',
-            'many_to_one_inner_key',
+            $relationKey,
+            $oneToManyTable,
+            $oneToManyOuterKey,
+            $oneToManyInnerKey,
+            $manyToOneTable,
+            $manyToOneOuterKey,
+            $manyToOneInnerKey,
             $pdo,
             $fetcher,
             $builder
         );
 
-        $this->assertInstanceOf(ManyToMany::class, $relation);
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('one_to_many_table', $relation->getOneToManyTable());
-        $this->assertSame('one_to_many_outer_key', $relation->getOneToManyOuterKey());
-        $this->assertSame('one_to_many_inner_key', $relation->getOneToManyInnerKey());
-        $this->assertSame('many_to_one_table', $relation->getManyToOneTable());
-        $this->assertSame('many_to_one_outer_key', $relation->getManyToOneOuterKey());
-        $this->assertSame('many_to_one_inner_key', $relation->getManyToOneInnerKey());
-        $this->assertSame($pdo, $relation->getPdo());
-        $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertInstanceOf(GroupJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(ManyTo::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($oneToManyTable, $relationStrategy->getOneToManyTable());
+        $this->assertSame($oneToManyOuterKey, $relationStrategy->getOneToManyOuterKey());
+        $this->assertSame($oneToManyInnerKey, $relationStrategy->getOneToManyInnerKey());
+        $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
+        $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
+        $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
+        $this->assertSame($pdo, $relationStrategy->getPdo());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
+        $this->assertSame($builder, $relationStrategy->getBuilder());
     }
 
     public function testPolymorphic()
@@ -259,7 +325,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $polymorphics
         );
 
-        $this->assertInstanceOf(Polymorphic::class, $relation);
+        $this->assertInstanceOf(PolymorphicRelation::class, $relation);
         $this->assertSame('morph_key', $relation->getMorphKey());
         $this->assertSame($polymorphics, $relation->getPolymorphics());
     }

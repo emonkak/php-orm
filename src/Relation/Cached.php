@@ -6,12 +6,12 @@ use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class CachedRelation extends AbstractStandardRelation
+class Cached implements RelationStrategyInterface
 {
     /**
-     * @var StandardRelationInterface
+     * @var RelationStrategyInterface
      */
-    private $innerRelation;
+    private $relationStrategy;
 
     /**
      * @var CacheInterface
@@ -24,34 +24,34 @@ class CachedRelation extends AbstractStandardRelation
     private $cachePrefix;
 
     /**
-     * @var integer|\DateInterval|null
+     * @var integer|null
      */
     private $cacheTtl;
 
     /**
-     * @param StandardRelationInterface  $innerRelation
-     * @param CacheInterface             $cache
-     * @param string                     $cachePrefix
-     * @param integer|\DateInterval|null $cacheTtl
+     * @param RelationStrategyInterface $relationStrategy
+     * @param CacheInterface            $cache
+     * @param string                    $cachePrefix
+     * @param integer|null              $cacheTtl
      */
     public function __construct(
-        StandardRelationInterface $innerRelation,
+        RelationStrategyInterface $relationStrategy,
         CacheInterface $cache,
         $cachePrefix,
         $cacheTtl
     ) {
-        $this->innerRelation = $innerRelation;
+        $this->relationStrategy = $relationStrategy;
         $this->cache = $cache;
         $this->cachePrefix = $cachePrefix;
         $this->cacheTtl = $cacheTtl;
     }
 
     /**
-     * @return RelationInterface
+     * @return RelationStrategyInterface
      */
-    public function getInnerRelation()
+    public function getInnerRelationStrategy()
     {
-        return $this->innerRelation;
+        return $this->relationStrategy;
     }
 
     /**
@@ -71,43 +71,11 @@ class CachedRelation extends AbstractStandardRelation
     }
 
     /**
-     * @return integer|\DateInterval|null
+     * @return integer|null
      */
     public function getCacheTtl()
     {
         return $this->cacheTtl;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPdo()
-    {
-        return $this->innerRelation->getPdo();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getFetcher()
-    {
-        return $this->innerRelation->getFetcher();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getBuilder()
-    {
-        return $this->innerRelation->getBuilder();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getJoinStrategy()
-    {
-        return $this->innerRelation->getJoinStrategy();
     }
 
     /**
@@ -134,11 +102,10 @@ class CachedRelation extends AbstractStandardRelation
             }
         }
 
-        $innerClass = $this->innerRelation->getFetcher()->getClass();
-
         if (!empty($uncachedOuterKeys)) {
-            $result = $this->innerRelation->getResult($uncachedOuterKeys);
-            $innerKeySelector = $this->innerRelation->resolveInnerKeySelector($innerClass);
+            $result = $this->relationStrategy->getResult($uncachedOuterKeys);
+            $innerClass = $result->getClass();
+            $innerKeySelector = $this->relationStrategy->getInnerKeySelector($innerClass);
             $freshCacheItems = [];
 
             foreach ($result as $element) {
@@ -151,6 +118,8 @@ class CachedRelation extends AbstractStandardRelation
             }
 
             $this->cache->setMultiple($freshCacheItems, $this->cacheTtl);
+        } else {
+            $innerClass = get_class($cachedElements[0]);
         }
 
         return new PreloadResultSet($cachedElements, $innerClass);
@@ -159,25 +128,25 @@ class CachedRelation extends AbstractStandardRelation
     /**
      * {@inheritDoc}
      */
-    public function resolveOuterKeySelector($outerClass)
+    public function getOuterKeySelector($outerClass)
     {
-        return $this->innerRelation->resolveOuterKeySelector($outerClass);
+        return $this->relationStrategy->getOuterKeySelector($outerClass);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function resolveInnerKeySelector($innerClass)
+    public function getInnerKeySelector($innerClass)
     {
-        return $this->innerRelation->resolveInnerKeySelector($innerClass);
+        return $this->relationStrategy->getInnerKeySelector($innerClass);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function resolveResultSelector($outerClass, $innerClass)
+    public function getResultSelector($outerClass, $innerClass)
     {
-        return $this->innerRelation->resolveResultSelector($outerClass, $innerClass);
+        return $this->relationStrategy->getResultSelector($outerClass, $innerClass);
     }
 
     /**
@@ -185,8 +154,8 @@ class CachedRelation extends AbstractStandardRelation
      */
     public function with(RelationInterface $relation)
     {
-        return new CachedRelation(
-            $this->innerRelation->with($relation),
+        return new Cached(
+            $this->relationStrategy->with($relation),
             $this->cache,
             $this->cachePrefix,
             $this->cacheTtl
