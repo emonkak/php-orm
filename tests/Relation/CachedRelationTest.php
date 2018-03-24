@@ -5,18 +5,19 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Relation\CachedRelation;
-use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
+use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\Orm\Relation\StandardRelation;
+use Emonkak\Orm\Relation\StandardRelationInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * @covers Emonkak\Orm\Relation\AbstractRelation
+ * @covers Emonkak\Orm\Relation\AbstractStandardRelation
  * @covers Emonkak\Orm\Relation\CachedRelation
  */
 class CachedRelationTest extends \PHPUnit_Framework_TestCase
@@ -28,109 +29,157 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $builder = $this->createSelectBuilder();
-        $cache = $this->createMock(CacheInterface::class);
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
+        $innerRelation = $this->createMock(StandardRelationInterface::class);
+        $innerRelation
+            ->expects($this->once())
+            ->method('getPdo')
+            ->willReturn($pdo);
+        $innerRelation
+            ->expects($this->once())
+            ->method('getFetcher')
+            ->willReturn($fetcher);
+        $innerRelation
+            ->expects($this->once())
+            ->method('getBuilder')
+            ->willReturn($builder);
+        $innerRelation
+            ->expects($this->once())
+            ->method('getJoinStrategy')
+            ->willReturn($joinStrategy);
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cachePrefix = 'prefix';
+        $cacheTtl = 3600;
+
         $relation = new CachedRelation(
-            'relation_key',
-            'table',
-            'outer_key',
-            'inner_key',
-            $pdo,
-            $fetcher,
-            $builder,
-            $joinStrategy,
+            $innerRelation,
             $cache,
-            'cache_prefix',
-            3600
+            $cachePrefix,
+            $cacheTtl
         );
 
-        $this->assertSame('relation_key', $relation->getRelationKey());
-        $this->assertSame('table', $relation->getTable());
-        $this->assertSame('outer_key', $relation->getOuterKey());
-        $this->assertSame('inner_key', $relation->getInnerKey());
+        $this->assertSame($innerRelation, $relation->getInnerRelation());
+        $this->assertSame($cache, $relation->getCache());
+        $this->assertSame($cachePrefix, $relation->getCachePrefix());
+        $this->assertSame($cacheTtl, $relation->getCacheTtl());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($cache, $relation->getCache());
-        $this->assertSame('cache_prefix', $relation->getCachePrefix());
-        $this->assertSame(3600, $relation->getCacheTtl());
         $this->assertSame($builder, $relation->getBuilder());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
     }
 
     public function testWith()
     {
-        $pdo = $this->createMock(PDOInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
         $cache = $this->createMock(CacheInterface::class);
-        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+        $cachePrefix = 'prefix';
+        $cacheTtl = 3600;
 
         $childRelation1 = $this->createMock(RelationInterface::class);
         $childRelation2 = $this->createMock(RelationInterface::class);
 
+        $innerRelation = $this->createMock(StandardRelationInterface::class);
+        $innerRelation
+            ->expects($this->at(0))
+            ->method('with')
+            ->with($this->identicalTo($childRelation1))
+            ->willReturn($innerRelation);
+        $innerRelation
+            ->expects($this->at(1))
+            ->method('with')
+            ->with($this->identicalTo($childRelation2))
+            ->willReturn($innerRelation);
+
         $relation = (new CachedRelation(
-                'relation_key',
-                'table',
-                'outer_key',
-                'inner_key',
-                $pdo,
-                $fetcher,
-                $builder,
-                $joinStrategy,
+                $innerRelation,
                 $cache,
-                'cache_prefix',
-                3600
+                $cachePrefix,
+                $cacheTtl
             ))
             ->with($childRelation1)
             ->with($childRelation2);
 
         $this->assertInstanceOf(CachedRelation::class, $relation);
-        $this->assertEquals([$childRelation1, $childRelation2], $relation->getBuilder()->getRelations());
     }
 
     public function testAssociate()
     {
         $outerElements = [
-            (object) ['user_id' => 1, 'name' => 'foo'],
-            (object) ['user_id' => 2, 'name' => 'bar'],
-            (object) ['user_id' => 3, 'name' => 'baz'],
+            (object) ['page_id' => 1, 'revision_id' => 4, 'title' => 'foo', 'version' => 10],
+            (object) ['page_id' => 2, 'revision_id' => 5, 'title' => 'bar', 'version' => 20],
+            (object) ['page_id' => 3, 'revision_id' => 6, 'title' => 'baz', 'version' => 30],
+            (object) ['page_id' => 4, 'revision_id' => 6, 'title' => 'baz', 'version' => 40]
         ];
         $innerElements = [
-            (object) ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
-            (object) ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
-            (object) ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
+            (object) ['revision_id' => 4, 'content' => 'foo'],
+            (object) ['revision_id' => 5, 'content' => 'bar'],
+            (object) ['revision_id' => 6, 'content' => 'baz']
         ];
         $expectedResult = [
             (object) [
-                'user_id' => 1,
-                'name' => 'foo',
-                'posts' => [
-                    (object) ['post_id' => 2, 'user_id' => 1, 'content' => 'bar'],
-                    (object) ['post_id' => 1, 'user_id' => 1, 'content' => 'foo'],
-                ],
+                'page_id' => 1,
+                'revision_id' => 4,
+                'title' => 'foo',
+                'version' => 10,
+                'revision' => (object) ['revision_id' => 4, 'content' => 'foo']
             ],
             (object) [
-                'user_id' => 2,
-                'name' => 'bar',
-                'posts' => [],
+                'page_id' => 2,
+                'revision_id' => 5,
+                'title' => 'bar',
+                'version' => 20,
+                'revision' => (object) ['revision_id' => 5, 'content' => 'bar']
             ],
             (object) [
-                'user_id' => 3,
-                'name' => 'baz',
-                'posts' => [
-                    (object) ['post_id' => 3, 'user_id' => 3, 'content' => 'baz'],
-                ],
+                'page_id' => 3,
+                'revision_id' => 6,
+                'title' => 'baz',
+                'version' => 30,
+                'revision' => (object) ['revision_id' => 6, 'content' => 'baz']
             ],
+            (object) [
+                'page_id' => 4,
+                'revision_id' => 6,
+                'title' => 'baz',
+                'version' => 40,
+                'revision' => (object) ['revision_id' => 6, 'content' => 'baz']
+            ]
         ];
+
+        $cachePrefix = 'revision:';
+        $cacheTtl = 3600;
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cache
+            ->expects($this->once())
+            ->method('getMultiple')
+            ->with([
+                'revision:4',
+                'revision:5',
+                'revision:6'
+            ])
+            ->willReturn([
+                'revision:4' => null,
+                'revision:5' => $innerElements[1],
+                'revision:6' => null
+            ]);
+        $cache
+            ->expects($this->once())
+            ->method('setMultiple')
+            ->with([
+                'revision:4' => $innerElements[0],
+                'revision:6' => $innerElements[2]
+            ], $cacheTtl)
+            ->willReturn(true);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
             ->withConsecutive(
-                [1, '1', \PDO::PARAM_STR],
-                [2, '3', \PDO::PARAM_STR]
+                [1, 4, \PDO::PARAM_STR],
+                [2, 6, \PDO::PARAM_STR]
             )
             ->willReturn(true);
 
@@ -138,7 +187,7 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
-            ->with('SELECT * FROM `posts` WHERE (`posts`.`user_id` IN (?, ?))')
+            ->with('SELECT * FROM `revisions` WHERE (`revisions`.`revision_id` IN (?, ?))')
             ->willReturn($stmt);
 
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -148,40 +197,23 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadResultSet([$innerElements[0], $innerElements[2]], null));
 
-        $cache = $this->createMock(CacheInterface::class);
-        $cache
-            ->expects($this->once())
-            ->method('getMultiple')
-            ->with(['cache-prefix-1', 'cache-prefix-2', 'cache-prefix-3'])
-            ->willReturn([
-                'cache-prefix-1' => null,
-                'cache-prefix-2' => $innerElements[1],
-                'cache-prefix-3' => null,
-            ]);
-        $cache
-            ->expects($this->once())
-            ->method('setMultiple')
-            ->with([
-                'cache-prefix-1' => $innerElements[0],
-                'cache-prefix-3' => $innerElements[2],
-            ], 3600)
-            ->willReturn(true);
-
         $builder = $this->createSelectBuilder();
-        $joinStrategy = new GroupJoin();
+        $joinStrategy = new OuterJoin();
 
         $relation = new CachedRelation(
-            'posts',
-            'posts',
-            'user_id',
-            'user_id',
-            $pdo,
-            $fetcher,
-            $builder,
-            $joinStrategy,
+            new StandardRelation(
+                'revision',
+                'revisions',
+                'revision_id',
+                'revision_id',
+                $pdo,
+                $fetcher,
+                $builder,
+                $joinStrategy
+            ),
             $cache,
-            'cache-prefix-',
-            3600
+            $cachePrefix,
+            $cacheTtl
         );
 
         $result = $relation->associate(new PreloadResultSet($outerElements, null));
@@ -192,22 +224,29 @@ class CachedRelationTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $cache = $this->createMock(CacheInterface::class);
         $builder = $this->createSelectBuilder();
-        $joinStrategy = new GroupJoin();
+        $joinStrategy = new OuterJoin();
+
+        $cache = $this->createMock(CacheInterface::class);
+        $cacheKeySelector = function($element, $key) {
+            return $key;
+        };
+        $cacheTtl = 3600;
 
         $relation = new CachedRelation(
-            'posts',
-            'posts',
-            'user_id',
-            'user_id',
-            $pdo,
-            $fetcher,
-            $builder,
-            $joinStrategy,
+            new StandardRelation(
+                'revision',
+                'revisions',
+                'revision_id',
+                'revision_id',
+                $pdo,
+                $fetcher,
+                $builder,
+                $joinStrategy
+            ),
             $cache,
-            'cache-prefix-',
-            3600
+            $cacheKeySelector,
+            $cacheTtl
         );
 
         $result = $relation->associate(new EmptyResultSet(null));

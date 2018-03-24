@@ -5,7 +5,6 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyToMany;
@@ -15,6 +14,7 @@ use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
+ * @covers Emonkak\Orm\Relation\AbstractStandardRelation
  * @covers Emonkak\Orm\Relation\ManyToMany
  */
 class ManyToManyTest extends \PHPUnit_Framework_TestCase

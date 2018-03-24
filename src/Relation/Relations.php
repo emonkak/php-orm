@@ -23,7 +23,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return Relation
+     * @return StandardRelation
      */
     public static function oneToOne(
         $relationKey,
@@ -34,7 +34,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new Relation(
+        return new StandardRelation(
             $relationKey,
             $table,
             $outerKey,
@@ -54,7 +54,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return Relation
+     * @return StandardRelation
      */
     public static function oneToMany(
         $relationKey,
@@ -65,7 +65,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new Relation(
+        return new StandardRelation(
             $relationKey,
             $table,
             $outerKey,
@@ -86,7 +86,7 @@ final class Relations
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
-     * @return Relation
+     * @return StandardRelation
      */
     public static function throughOneToMany(
         $relationKey,
@@ -98,7 +98,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder
     ) {
-        return new Relation(
+        return new StandardRelation(
             $relationKey,
             $table,
             $outerKey,
@@ -119,7 +119,7 @@ final class Relations
      * @param FetcherInterface                   $fetcher
      * @param SelectBuilder                      $builder
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @return Relation
+     * @return StandardRelation
      */
     public static function lazyOneToOne(
         $relationKey,
@@ -131,7 +131,7 @@ final class Relations
         SelectBuilder $builder,
         LazyLoadingValueHolderFactory $proxyFactory = null
     ) {
-        return new Relation(
+        return new StandardRelation(
             $relationKey,
             $table,
             $outerKey,
@@ -152,7 +152,7 @@ final class Relations
      * @param FetcherInterface                   $fetcher
      * @param SelectBuilder                      $builder
      * @param LazyLoadingValueHolderFactory|null $proxyFactory
-     * @return Relation
+     * @return StandardRelation
      */
     public static function lazyOneToMany(
         $relationKey,
@@ -164,7 +164,7 @@ final class Relations
         SelectBuilder $builder,
         LazyLoadingValueHolderFactory $proxyFactory = null
     ) {
-        return new Relation(
+        return new StandardRelation(
             $relationKey,
             $table,
             $outerKey,
@@ -202,54 +202,16 @@ final class Relations
         $cacheTtl = null
     ) {
         return new CachedRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
-            new OuterJoin(),
-            $cache,
-            $cachePrefix,
-            $cacheTtl
-        );
-    }
-
-    /**
-     * @param string                     $relationKey
-     * @param string                     $table
-     * @param string                     $outerKey
-     * @param string                     $innerKey
-     * @param PDOInterface               $pdo
-     * @param FetcherInterface           $fetcher
-     * @param SelectBuilder              $builder
-     * @param CacheInterface             $cache
-     * @param string                     $cachePrefix
-     * @param integer|\DateInterval|null $cacheTtl
-     * @return CachedRelation
-     */
-    public static function cachedOneToMany(
-        $relationKey,
-        $table,
-        $outerKey,
-        $innerKey,
-        PDOInterface $pdo,
-        FetcherInterface $fetcher,
-        SelectBuilder $builder,
-        CacheInterface $cache,
-        $cachePrefix,
-        $cacheTtl = null
-    ) {
-        return new CachedRelation(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
-            new GroupJoin(),
+            new StandardRelation(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder,
+                new OuterJoin()
+            ),
             $cache,
             $cachePrefix,
             $cacheTtl

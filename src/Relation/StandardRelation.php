@@ -8,7 +8,7 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
-class Relation extends AbstractRelation
+class StandardRelation extends AbstractStandardRelation
 {
     /**
      * @var string
@@ -113,7 +113,7 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * @return PDOInterface
+     * {@inheritDoc}
      */
     public function getPdo()
     {
@@ -121,7 +121,7 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * @return FetcherInterface
+     * {@inheritDoc}
      */
     public function getFetcher()
     {
@@ -129,7 +129,7 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * @return SelectBuilder
+     * {@inheritDoc}
      */
     public function getBuilder()
     {
@@ -137,7 +137,7 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * @return JoinStrategyInterface
+     * {@inheritDoc}
      */
     public function getJoinStrategy()
     {
@@ -145,14 +145,51 @@ class Relation extends AbstractRelation
     }
 
     /**
-     * Adds the relation to this relation.
-     *
-     * @param RelationInterface $relation
-     * @return Relation
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys)
+    {
+        $grammar = $this->builder->getGrammar();
+        return $this->builder
+            ->from($grammar->identifier($this->table))
+            ->where(
+                $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
+                'IN',
+                array_unique($outerKeys)
+            )
+            ->getResult($this->pdo, $this->fetcher);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveOuterKeySelector($outerClass)
+    {
+        return AccessorCreators::toKeySelector($this->outerKey, $outerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveInnerKeySelector($innerClass)
+    {
+        return AccessorCreators::toKeySelector($this->innerKey, $innerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveResultSelector($outerClass, $innerClass)
+    {
+        return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function with(RelationInterface $relation)
     {
-        return new Relation(
+        return new StandardRelation(
             $this->relationKey,
             $this->table,
             $this->outerKey,
@@ -162,59 +199,5 @@ class Relation extends AbstractRelation
             $this->builder->with($relation),
             $this->joinStrategy
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getResult($outerKeys)
-    {
-        $grammar = $this->builder->getGrammar();
-        return $this->builder
-            ->from($grammar->identifier($this->table))
-            ->where(
-                $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
-                'IN',
-                $outerKeys
-            )
-            ->getResult($this->pdo, $this->fetcher);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function doJoin(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
-    {
-        return $this->joinStrategy->join(
-            $outer,
-            $inner,
-            $outerKeySelector,
-            $innerKeySelector,
-            $resultSelector
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function resolveOuterKeySelector($outerClass)
-    {
-        return AccessorCreators::toKeySelector($this->outerKey, $outerClass);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function resolveInnerKeySelector($innerClass)
-    {
-        return AccessorCreators::toKeySelector($this->innerKey, $innerClass);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function resolveResultSelector($outerClass, $innerClass)
-    {
-        return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
 }

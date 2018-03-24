@@ -6,7 +6,6 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;

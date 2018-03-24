@@ -9,7 +9,7 @@ interface RelationInterface
     /**
      * Associates between the outer result and the relation result.
      *
-     * @param ResultSetInterface  $result
+     * @param ResultSetInterface $result
      * @return \Traversable
      */
     public function associate(ResultSetInterface $result);

@@ -6,19 +6,18 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Grammar\MySqlGrammar;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\Orm\Relation\StandardRelation;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
- * @covers Emonkak\Orm\Relation\AbstractRelation
- * @covers Emonkak\Orm\Relation\Relation
+ * @covers Emonkak\Orm\Relation\AbstractStandardRelation
+ * @covers Emonkak\Orm\Relation\StandardRelation
  */
 class RelationTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +30,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder();
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-        $relation = new Relation(
+        $relation = new StandardRelation(
             'relation_key',
             'table',
             'outer_key',
@@ -62,7 +61,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $childRelation1 = $this->createMock(RelationInterface::class);
         $childRelation2 = $this->createMock(RelationInterface::class);
 
-        $relation = (new Relation(
+        $relation = (new StandardRelation(
                 'relation_key',
                 'table',
                 'outer_key',
@@ -75,7 +74,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($childRelation1)
             ->with($childRelation2);
 
-        $this->assertInstanceOf(Relation::class, $relation);
+        $this->assertInstanceOf(StandardRelation::class, $relation);
         $this->assertEquals([$childRelation1, $childRelation2], $relation->getBuilder()->getRelations());
     }
 
@@ -142,7 +141,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder();
         $joinStrategy = new GroupJoin();
 
-        $relation = new Relation(
+        $relation = new StandardRelation(
             'posts',
             'posts',
             'user_id',
@@ -165,7 +164,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder();
         $joinStrategy = new GroupJoin();
 
-        $relation = new Relation(
+        $relation = new StandardRelation(
             'posts',
             'posts',
             'user_id',

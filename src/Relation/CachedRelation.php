@@ -2,16 +2,17 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\SelectBuilder;
 use Psr\SimpleCache\CacheInterface;
 
-class CachedRelation extends Relation
+class CachedRelation extends AbstractStandardRelation
 {
+    /**
+     * @var StandardRelationInterface
+     */
+    private $innerRelation;
+
     /**
      * @var CacheInterface
      */
@@ -28,45 +29,29 @@ class CachedRelation extends Relation
     private $cacheTtl;
 
     /**
-     * @param string                     $relationKey
-     * @param string                     $table
-     * @param string                     $outerKey
-     * @param string                     $innerKey
-     * @param PDOInterface               $pdo
-     * @param FetcherInterface           $fetcher
-     * @param SelectBuilder              $builder
-     * @param JoinStrategyInterface      $joinStrategy
+     * @param StandardRelationInterface  $innerRelation
      * @param CacheInterface             $cache
      * @param string                     $cachePrefix
      * @param integer|\DateInterval|null $cacheTtl
      */
     public function __construct(
-        $relationKey,
-        $table,
-        $outerKey,
-        $innerKey,
-        PDOInterface $pdo,
-        FetcherInterface $fetcher,
-        SelectBuilder $builder,
-        JoinStrategyInterface $joinStrategy,
+        StandardRelationInterface $innerRelation,
         CacheInterface $cache,
         $cachePrefix,
         $cacheTtl
     ) {
-        parent::__construct(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder,
-            $joinStrategy
-        );
-
+        $this->innerRelation = $innerRelation;
         $this->cache = $cache;
         $this->cachePrefix = $cachePrefix;
         $this->cacheTtl = $cacheTtl;
+    }
+
+    /**
+     * @return RelationInterface
+     */
+    public function getInnerRelation()
+    {
+        return $this->innerRelation;
     }
 
     /**
@@ -94,61 +79,71 @@ class CachedRelation extends Relation
     }
 
     /**
-     * Adds the relation to this relation.
-     *
-     * @param RelationInterface $relation
-     * @return CachedRelation
+     * {@inheritDoc}
      */
-    public function with(RelationInterface $relation)
+    public function getPdo()
     {
-        return new CachedRelation(
-            $this->relationKey,
-            $this->table,
-            $this->outerKey,
-            $this->innerKey,
-            $this->pdo,
-            $this->fetcher,
-            $this->builder->with($relation),
-            $this->joinStrategy,
-            $this->cache,
-            $this->cachePrefix,
-            $this->cacheTtl
-        );
+        return $this->innerRelation->getPdo();
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function getResult($outerKeys)
+    public function getFetcher()
     {
-        $prefixLength = strlen($this->cachePrefix);
+        return $this->innerRelation->getFetcher();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBuilder()
+    {
+        return $this->innerRelation->getBuilder();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getJoinStrategy()
+    {
+        return $this->innerRelation->getJoinStrategy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys)
+    {
         $cacheKeys = [];
+        $cachePrefixLength = strlen($this->cachePrefix);
 
         foreach ($outerKeys as $outerKey) {
             $cacheKeys[] = $this->cachePrefix . $outerKey;
         }
 
-        $cacheItems = $this->cache->getMultiple($cacheKeys);
+        $cacheItems = $this->cache->getMultiple(array_unique($cacheKeys));
         $cachedElements = [];
-        $uncachedKeys = [];
+        $uncachedOuterKeys = [];
 
         foreach ($cacheItems as $key => $value) {
             if ($value !== null) {
                 $cachedElements[] = $value;
             } else {
-                $uncachedKeys[] = substr($key, $prefixLength);
+                $uncachedOuterKeys[] = substr($key, $cachePrefixLength);
             }
         }
 
-        $innerClass = $this->fetcher->getClass();
+        $innerClass = $this->innerRelation->getFetcher()->getClass();
 
-        if (!empty($uncachedKeys)) {
-            $result = parent::getResult($uncachedKeys);
-            $innerKeySelector = $this->resolveInnerKeySelector($innerClass);
+        if (!empty($uncachedOuterKeys)) {
+            $result = $this->innerRelation->getResult($uncachedOuterKeys);
+            $innerKeySelector = $this->innerRelation->resolveInnerKeySelector($innerClass);
             $freshCacheItems = [];
 
             foreach ($result as $element) {
-                $cacheKey = $this->cachePrefix . $innerKeySelector($element);
+                $innerKey = $innerKeySelector($element);
+                $cacheKey = $this->cachePrefix . $innerKey;
 
                 $freshCacheItems[$cacheKey] = $element;
 
@@ -159,5 +154,42 @@ class CachedRelation extends Relation
         }
 
         return new PreloadResultSet($cachedElements, $innerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveOuterKeySelector($outerClass)
+    {
+        return $this->innerRelation->resolveOuterKeySelector($outerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveInnerKeySelector($innerClass)
+    {
+        return $this->innerRelation->resolveInnerKeySelector($innerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveResultSelector($outerClass, $innerClass)
+    {
+        return $this->innerRelation->resolveResultSelector($outerClass, $innerClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function with(RelationInterface $relation)
+    {
+        return new CachedRelation(
+            $this->innerRelation->with($relation),
+            $this->cache,
+            $this->cachePrefix,
+            $this->cacheTtl
+        );
     }
 }
