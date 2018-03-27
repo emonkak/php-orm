@@ -9,6 +9,7 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
+use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\SelectBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
@@ -78,6 +79,41 @@ final class Relations
                 $builder
             ),
             new GroupJoin()
+        );
+    }
+
+    /**
+     * @param string           $relationKey
+     * @param string           $table
+     * @param string           $outerKey
+     * @param string           $innerKey
+     * @param string           $throughKey
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
+     * @return Relation
+     */
+    public static function throughOneToOne(
+        $relationKey,
+        $table,
+        $outerKey,
+        $innerKey,
+        $throughKey,
+        PDOInterface $pdo,
+        FetcherInterface $fetcher,
+        SelectBuilder $builder
+    ) {
+        return new Relation(
+            new OneTo(
+                $relationKey,
+                $table,
+                $outerKey,
+                $innerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
+            new ThroughOuterJoin($throughKey)
         );
     }
 
@@ -270,6 +306,50 @@ final class Relations
                 $builder
             ),
             new GroupJoin()
+        );
+    }
+
+    /**
+     * @param string           $relationKey
+     * @param string           $oneToManyTable
+     * @param string           $oneToManyOuterKey
+     * @param string           $oneToManyInnerKey
+     * @param string           $manyToOneTable
+     * @param string           $manyToOneOuterKey
+     * @param string           $manyToOneInnerKey
+     * @param SelectBuilder    $builder
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder    $builder
+     * @return Relation
+     */
+    public static function throughManyToMany(
+        $relationKey,
+        $oneToManyTable,
+        $oneToManyOuterKey,
+        $oneToManyInnerKey,
+        $manyToOneTable,
+        $manyToOneOuterKey,
+        $manyToOneInnerKey,
+        $throughKey,
+        PDOInterface $pdo,
+        FetcherInterface $fetcher,
+        SelectBuilder $builder
+    ) {
+        return new Relation(
+            new ManyTo(
+                $relationKey,
+                $oneToManyTable,
+                $oneToManyOuterKey,
+                $oneToManyInnerKey,
+                $manyToOneTable,
+                $manyToOneOuterKey,
+                $manyToOneInnerKey,
+                $pdo,
+                $fetcher,
+                $builder
+            ),
+            new ThroughGroupJoin($throughKey)
         );
     }
 

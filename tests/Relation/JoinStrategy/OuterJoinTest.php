@@ -19,30 +19,28 @@ class OuterJoinTest extends \PHPUnit_Framework_TestCase
             ['talent_id' => 4, 'name' => 'Natsumi Takamori'],
             ['talent_id' => 5, 'name' => 'Shiori Mikami'],
         ];
-        $users = [
-            ['talent_id' => 1, 'user_id' => 139557376],
-            ['talent_id' => 2, 'user_id' => 255386927],
-            ['talent_id' => 2, 'user_id' => 53669663],
-            ['talent_id' => 4, 'user_id' => 2445518118],
-            ['talent_id' => 5, 'user_id' => 199932799],
+        $programs = [
+            ['program_id' => 1, 'talent_id' => 1],
+            ['program_id' => 3, 'talent_id' => 2],
+            ['program_id' => 5, 'talent_id' => 4],
+            ['program_id' => 6, 'talent_id' => 5],
         ];
         $expected = [
-            ['talent_id' => 1, 'name' => 'Sumire Uesaka', 'user' => $users[0]],
-            ['talent_id' => 2, 'name' => 'Mikako Komatsu', 'user' => $users[1]],
-            ['talent_id' => 2, 'name' => 'Mikako Komatsu', 'user' => $users[2]],
-            ['talent_id' => 3, 'name' => 'Rumi Okubo', 'user' => null],
-            ['talent_id' => 4, 'name' => 'Natsumi Takamori', 'user' => $users[3]],
-            ['talent_id' => 5, 'name' => 'Shiori Mikami', 'user' => $users[4]],
+            $talents[0] + ['program' => $programs[0]],
+            $talents[1] + ['program' => $programs[1]],
+            $talents[2] + ['program' => null],
+            $talents[3] + ['program' => $programs[2]],
+            $talents[4] + ['program' => $programs[3]],
         ];
 
         $result = (new OuterJoin())
             ->join(
                 new PreloadResultSet($talents, null),
-                new PreloadResultSet($users, null),
+                new PreloadResultSet($programs, null),
                 function($talent) { return $talent['talent_id']; },
-                function($user) { return $user['talent_id']; },
-                function($talent, $user) {
-                    $talent['user'] = $user;
+                function($program) { return $program['talent_id']; },
+                function($talent, $program) {
+                    $talent['program'] = $program;
                     return $talent;
                 }
             );
