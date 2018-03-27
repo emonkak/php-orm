@@ -24,7 +24,7 @@ class UpdateBuilder implements QueryBuilderInterface
     private $prefix = 'UPDATE';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $table;
 
@@ -34,7 +34,7 @@ class UpdateBuilder implements QueryBuilderInterface
     private $update = [];
 
     /**
-     * @var Sql
+     * @var Sql|null
      */
     private $where;
 
@@ -52,6 +52,38 @@ class UpdateBuilder implements QueryBuilderInterface
     public function getGrammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getUpdate()
+    {
+        return $this->update;
+    }
+
+    /**
+     * @return Sql|null
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 
     /**

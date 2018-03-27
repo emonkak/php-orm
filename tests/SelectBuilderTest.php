@@ -24,6 +24,37 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
+    public function testGetAccesors()
+    {
+        $unionBuilder = $this->createSelectBuilder()->select('c1')->from('t1');
+
+        $builder = $this->createSelectBuilder()
+            ->select('c1')
+            ->from('t1')
+            ->join('t2', 't1.id = t2.id')
+            ->where('t1.c1', '=', 123)
+            ->groupBy('t1.c1')
+            ->orderBy('t1.c2')
+            ->having('t1.c2', '=', 456)
+            ->offset(12)
+            ->limit(34)
+            ->suffix('FOR UPDATE')
+            ->union($unionBuilder);
+
+        $this->assertSame('SELECT', $builder->getPrefix());
+        $this->assertEquals([new Sql('c1')], $builder->getSelect());
+        $this->assertEquals([new Sql('t1')], $builder->getFrom());
+        $this->assertEquals([new Sql('JOIN t2 ON t1.id = t2.id', [])], $builder->getJoin());
+        $this->assertQueryIs('(t1.c1 = ?)', [123], $builder->getWhere());
+        $this->assertEquals([new Sql('t1.c1')], $builder->getGroupBy());
+        $this->assertEquals([new Sql('t1.c2')], $builder->getOrderBy());
+        $this->assertQueryIs('(t1.c2 = ?)', [456], $builder->getHaving());
+        $this->assertSame(12, $builder->getOffset());
+        $this->assertSame(34, $builder->getLimit());
+        $this->assertSame('FOR UPDATE', $builder->getSuffix());
+        $this->assertEquals([new Sql('UNION (SELECT c1 FROM t1)')], $builder->getUnion());
+    }
+
     public function testSelect()
     {
         $query = $this->createSelectBuilder()

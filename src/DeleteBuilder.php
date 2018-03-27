@@ -29,19 +29,9 @@ class DeleteBuilder implements QueryBuilderInterface
     private $from;
 
     /**
-     * @var Sql
+     * @var Sql|null
      */
     private $where;
-
-    /**
-     * @var Sql[]
-     */
-    private $orderBy = [];
-
-    /**
-     * @var integer
-     */
-    private $limit = null;
 
     /**
      * @param GrammarInterface $grammar
@@ -57,6 +47,30 @@ class DeleteBuilder implements QueryBuilderInterface
     public function getGrammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @return Sql|null
+     */
+    public function getWhere()
+    {
+        return $this->where;
     }
 
     /**

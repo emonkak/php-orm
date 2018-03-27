@@ -20,6 +20,18 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
+    public function testGetters()
+    {
+        $builder = $this->createUpdateBuilder()
+            ->table('t1')
+            ->set('c1', 123)
+            ->where('c2', '=', 456);
+        $this->assertSame('UPDATE', $builder->getPrefix());
+        $this->assertSame('t1', $builder->getTable());
+        $this->assertEquals(['c1' => new Sql('?', [123])], $builder->getUpdate());
+        $this->assertQueryIs('(c2 = ?)', [456], $builder->getWhere());
+    }
+
     public function testPrefix()
     {
         $query = $this->createUpdateBuilder()

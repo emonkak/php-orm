@@ -19,6 +19,16 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
+    public function testGetters()
+    {
+        $builder = $this->createDeleteBuilder()
+            ->from('t1')
+            ->where('c1', '=', 123);
+        $this->assertSame('DELETE', $builder->getPrefix());
+        $this->assertSame('t1', $builder->getFrom());
+        $this->assertQueryIs('(c1 = ?)', [123], $builder->getWhere());
+    }
+
     public function testPrefix()
     {
         $query = $this->createDeleteBuilder()

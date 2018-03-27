@@ -44,9 +44,9 @@ class SelectBuilder implements QueryBuilderInterface
     private $join = [];
 
     /**
-     * @var Sql
+     * @var Sql|null
      */
-    private $where = null;
+    private $where;
 
     /**
      * @var Sql[]
@@ -54,9 +54,9 @@ class SelectBuilder implements QueryBuilderInterface
     private $groupBy = [];
 
     /**
-     * @var Sql
+     * @var Sql|null
      */
-    private $having = null;
+    private $having;
 
     /**
      * @var Sql[]
@@ -64,19 +64,19 @@ class SelectBuilder implements QueryBuilderInterface
     private $orderBy = [];
 
     /**
-     * @var integer
+     * @var integer|null
      */
-    private $offset = null;
+    private $offset;
 
     /**
-     * @var integer
+     * @var integer|null
      */
-    private $limit = null;
+    private $limit;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $suffix = null;
+    private $suffix;
 
     /**
      * @var Sql[]
@@ -97,6 +97,102 @@ class SelectBuilder implements QueryBuilderInterface
     public function getGrammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getSelect()
+    {
+        return $this->select;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getJoin()
+    {
+        return $this->join;
+    }
+
+    /**
+     * @return Sql|null
+     */
+    public function getWhere()
+    {
+        return $this->where;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getGroupby()
+    {
+        return $this->groupBy;
+    }
+
+    /**
+     * @return Sql|null
+     */
+    public function getHaving()
+    {
+        return $this->having;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getOrderby()
+    {
+        return $this->orderBy;
+    }
+
+    /**
+     * @return integer|null
+     */
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+
+    /**
+     * @return integer|null
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuffix()
+    {
+        return $this->suffix;
+    }
+
+    /**
+     * @return Sql[]
+     */
+    public function getUnion()
+    {
+        return $this->union;
     }
 
     /**

@@ -24,7 +24,7 @@ class InsertBuilder implements QueryBuilderInterface
     private $prefix = 'INSERT';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $into;
 
@@ -39,7 +39,7 @@ class InsertBuilder implements QueryBuilderInterface
     private $values = [];
 
     /**
-     * @var Sql
+     * @var Sql|null
      */
     private $select;
 
@@ -57,6 +57,46 @@ class InsertBuilder implements QueryBuilderInterface
     public function getGrammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInto()
+    {
+        return $this->into;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
+     * @return Sql[][]
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * @return Sql|null
+     */
+    public function getSelect()
+    {
+        return $this->select;
     }
 
     /**

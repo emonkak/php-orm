@@ -69,7 +69,7 @@ class Sql implements QueryBuilderInterface
      * @param string  $sql
      * @param mixed[] $bindings
      */
-    public function __construct($sql, array $bindings)
+    public function __construct($sql, array $bindings = [])
     {
         $this->sql = $sql;
         $this->bindings = $bindings;

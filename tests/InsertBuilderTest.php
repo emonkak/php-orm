@@ -20,6 +20,35 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
+    public function testGetters()
+    {
+        $builder = $this->createInsertBuilder()
+            ->into('t1', ['c1', 'c2', 'c3'])
+            ->values(['foo', 'bar', 'baz']);
+        $this->assertSame('INSERT', $builder->getPrefix());
+        $this->assertSame('t1', $builder->getInto());
+        $this->assertEquals(['c1', 'c2', 'c3'], $builder->getColumns());
+        $this->assertEquals([
+            [
+                new Sql('?', ['foo']),
+                new Sql('?', ['bar']),
+                new Sql('?', ['baz'])
+            ]
+        ], $builder->getValues());
+
+        $selectQuery = $this->createSelectBuilder()
+            ->select('c1')
+            ->from('t1')
+            ->build();
+        $builder = $this->createInsertBuilder()
+            ->into('t1', ['c1'])
+            ->select($selectQuery);
+        $this->assertSame('INSERT', $builder->getPrefix());
+        $this->assertSame('t1', $builder->getInto());
+        $this->assertEquals(['c1'], $builder->getColumns());
+        $this->assertEquals($selectQuery, $builder->getSelect());
+    }
+
     public function testPrefix()
     {
         $query = $this->createInsertBuilder()
@@ -36,15 +65,16 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSelect()
     {
-        $builder = $this->createSelectBuilder()
+        $selectQuery = $this->createSelectBuilder()
             ->select('c1')
             ->select('c2')
             ->select('c3')
             ->from('t1')
-            ->where('c1', '=', 'foo');
+            ->where('c1', '=', 'foo')
+            ->build();
         $query = $this->createInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
-            ->select($builder->build())
+            ->select($selectQuery)
             ->build();
         $this->assertQueryIs(
             'INSERT INTO t1 (c1, c2, c3) SELECT c1, c2, c3 FROM t1 WHERE (c1 = ?)',
