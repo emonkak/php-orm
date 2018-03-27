@@ -183,12 +183,8 @@ class ManyTo implements RelationStrategyInterface
     public function getResult(array $outerKeys)
     {
         $grammar = $this->builder->getGrammar();
-        return $this->builder
-            ->select($grammar->identifier($this->manyToOneTable) . '.*')
-            ->select(
-                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
-                $grammar->identifier($this->getPivotKey())
-            )
+
+        $builder = $this->builder
             ->from($grammar->identifier($this->oneToManyTable))
             ->outerJoin(
                 $grammar->identifier($this->manyToOneTable),
@@ -204,6 +200,17 @@ class ManyTo implements RelationStrategyInterface
                 $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
                 'IN',
                 array_unique($outerKeys)
+            );
+
+        if (count($builder->getSelect()) === 0) {
+            $builder = $builder
+                ->select($grammar->identifier($this->manyToOneTable) . '.*');
+        }
+
+        return $builder
+            ->select(
+                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
+                $grammar->identifier($this->getPivotKey())
             )
             ->getResult($this->pdo, $this->fetcher);
     }
