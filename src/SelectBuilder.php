@@ -495,7 +495,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function aggregate(PDOInterface $pdo, $expr)
     {
-        $stmt = $this->selectAll([$expr])->prepare($pdo);
+        $stmt = $this->selectAll([$expr])->withoutOrderBy()->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
@@ -573,6 +573,13 @@ class SelectBuilder implements QueryBuilderInterface
         }
         $cloned = clone $this;
         $cloned->having = $this->having ? $this->grammar->operator($havingOperator, $this->having, $builder->having) : $builder->having;
+        return $cloned;
+    }
+
+    private function withoutOrderBy()
+    {
+        $cloned = clone $this;
+        $cloned->orderBy = [];
         return $cloned;
     }
 }

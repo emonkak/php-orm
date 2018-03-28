@@ -808,9 +808,10 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
+            ->with('SELECT COUNT(*)')
             ->willReturn($stmt);
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->createSelectBuilder()->orderBy('c1');
         $this->assertSame(123, $builder->aggregate($pdo, 'COUNT(*)'));
     }
 
