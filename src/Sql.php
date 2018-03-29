@@ -37,15 +37,6 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param string $string
-     * @return Sql
-     */
-    public static function literal($string)
-    {
-        return new Sql($string, []);
-    }
-
-    /**
      * @param mixed $value
      * @return Sql
      */

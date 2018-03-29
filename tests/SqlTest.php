@@ -21,16 +21,6 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testLiteral()
-    {
-        $query = Sql::literal('c1 = c2');
-        $this->assertQueryIs(
-            'c1 = c2',
-            [],
-            $query
-        );
-    }
-
     public function testValue()
     {
         $query = Sql::value(123);
@@ -66,7 +56,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testAppend()
     {
-        $query = Sql::literal('SELECT')
+        $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
@@ -81,7 +71,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testAppendSql()
     {
-        $query = Sql::literal('SELECT')
+        $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
@@ -93,7 +83,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = Sql::literal('INSERT INTO t1 VALUES')
+        $query = (new Sql('INSERT INTO t1 VALUES'))
             ->appendSql(Sql::values([1, 2, 3]))
             ->appendSql(Sql::values([4, 5, 6]), ', ')
             ->appendSql(Sql::values([7, 8, 9]), ', ');
@@ -106,7 +96,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testAppendBuilder()
     {
-        $query = Sql::literal('SELECT')
+        $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
@@ -121,7 +111,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepend()
     {
-        $query = Sql::literal('SELECT')
+        $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
@@ -137,7 +127,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependSql()
     {
-        $query = Sql::literal('UNION ALL')
+        $query = (new Sql('UNION ALL'))
             ->appendSql(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
             ->prependSql(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
         $this->assertQueryIs(
@@ -146,7 +136,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = Sql::literal('INSERT INTO t1 VALUES')
+        $query = (new Sql('INSERT INTO t1 VALUES'))
             ->appendSql(
                 Sql::values([1, 2, 3])
                     ->prependSql(Sql::values([4, 5, 6]), ', ')
@@ -161,7 +151,7 @@ class SqlTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependBuilder()
     {
-        $query = Sql::literal('UNION ALL')
+        $query = (new Sql('UNION ALL'))
             ->appendBuilder(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
             ->prependBuilder(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
         $this->assertQueryIs(

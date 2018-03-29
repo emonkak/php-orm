@@ -18,7 +18,7 @@ class ExplainableTest extends \PHPUnit_Framework_TestCase
         $explainable
             ->expects($this->once())
             ->method('build')
-            ->willReturn(Sql::literal('SELECT * FROM t1'));
+            ->willReturn(new Sql('SELECT * FROM t1'));
 
         $explainResult = ['foo', 'bar'];
 

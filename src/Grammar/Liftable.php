@@ -20,7 +20,7 @@ trait Liftable
             return $value->build()->enclosed();
         }
         if (is_string($value)) {
-            return Sql::literal($value);
+            return new Sql($value);
         }
         $type = gettype($value);
         throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
@@ -39,7 +39,7 @@ trait Liftable
             return $value->build()->enclosed();
         }
         if ($value === null) {
-            return Sql::literal('NULL');
+            return new Sql('NULL');
         }
         if (is_scalar($value)) {
             return Sql::value($value);

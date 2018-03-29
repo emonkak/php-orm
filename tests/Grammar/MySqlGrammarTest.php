@@ -39,14 +39,14 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function testJoin()
     {
         $grammar = new MySqlGrammar();
-        $query = $grammar->join(Sql::literal('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
+        $query = $grammar->join(new Sql('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
         $this->assertQueryIs(
             'LEFT INNER JOIN t2 ON t1.c1 = t2.c1 AND t2.c2 = ?',
             ['foo'],
             $query
         );
 
-        $query = $grammar->join(Sql::literal('t2'), null, 'CROSS JOIN');
+        $query = $grammar->join(new Sql('t2'), null, 'CROSS JOIN');
         $this->assertQueryIs(
             'CROSS JOIN t2',
             [],
@@ -79,17 +79,17 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function providerOperator()
     {
         return [
-            ['=', Sql::literal('c1'), Sql::value('foo'), '(c1 = ?)', ['foo']],
-            ['!=', Sql::literal('c1'), Sql::value('foo'), '(c1 != ?)', ['foo']],
-            ['<>', Sql::literal('c1'), Sql::value('foo'), '(c1 <> ?)', ['foo']],
-            ['<', Sql::literal('c1'), Sql::value('foo'), '(c1 < ?)', ['foo']],
-            ['<=', Sql::literal('c1'), Sql::value('foo'), '(c1 <= ?)', ['foo']],
-            ['>', Sql::literal('c1'), Sql::value('foo'), '(c1 > ?)', ['foo']],
-            ['>=', Sql::literal('c1'), Sql::value('foo'), '(c1 >= ?)', ['foo']],
-            ['IN', Sql::literal('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['NOT IN', Sql::literal('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['LIKE', Sql::literal('c1'), Sql::value('foo'), '(c1 LIKE ?)', ['foo']],
-            ['NOT LIKE', Sql::literal('c1'), Sql::value('foo'), '(c1 NOT LIKE ?)', ['foo']],
+            ['=', new Sql('c1'), Sql::value('foo'), '(c1 = ?)', ['foo']],
+            ['!=', new Sql('c1'), Sql::value('foo'), '(c1 != ?)', ['foo']],
+            ['<>', new Sql('c1'), Sql::value('foo'), '(c1 <> ?)', ['foo']],
+            ['<', new Sql('c1'), Sql::value('foo'), '(c1 < ?)', ['foo']],
+            ['<=', new Sql('c1'), Sql::value('foo'), '(c1 <= ?)', ['foo']],
+            ['>', new Sql('c1'), Sql::value('foo'), '(c1 > ?)', ['foo']],
+            ['>=', new Sql('c1'), Sql::value('foo'), '(c1 >= ?)', ['foo']],
+            ['IN', new Sql('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['NOT IN', new Sql('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['LIKE', new Sql('c1'), Sql::value('foo'), '(c1 LIKE ?)', ['foo']],
+            ['NOT LIKE', new Sql('c1'), Sql::value('foo'), '(c1 NOT LIKE ?)', ['foo']],
             ['AND', new Sql('(c1 = ?)', ['foo']), new Sql('(c2 = ?)', ['bar']), '((c1 = ?) AND (c2 = ?))', ['foo', 'bar']],
             ['OR', new Sql('(c1 = ?)', ['foo']), new Sql('(c2 = ?)', ['bar']), '((c1 = ?) OR (c2 = ?))', ['foo', 'bar']],
         ];
@@ -101,7 +101,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function testOperatorThrowsUnexpectedValueException()
     {
         $grammar = new MySqlGrammar();
-        $grammar->operator('unknown', Sql::literal('c1'), Sql::value('foo'));
+        $grammar->operator('unknown', new Sql('c1'), Sql::value('foo'));
     }
 
     /**
@@ -118,8 +118,8 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function providerBetweenOperator()
     {
         return [
-            ['BETWEEN', Sql::literal('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 BETWEEN ? AND ?)', ['foo', 'bar']],
-            ['NOT BETWEEN', Sql::literal('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 NOT BETWEEN ? AND ?)', ['foo', 'bar']],
+            ['BETWEEN', new Sql('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 BETWEEN ? AND ?)', ['foo', 'bar']],
+            ['NOT BETWEEN', new Sql('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 NOT BETWEEN ? AND ?)', ['foo', 'bar']],
         ];
     }
 
@@ -129,7 +129,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function testBetweenOperatorThrowsUnexpectedValueException()
     {
         $grammar = new MySqlGrammar();
-        $grammar->betweenOperator('unknown', Sql::literal('c1'), Sql::value('foo'), Sql::value('bar'));
+        $grammar->betweenOperator('unknown', new Sql('c1'), Sql::value('foo'), Sql::value('bar'));
     }
 
     /**
@@ -146,9 +146,9 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function providerUnaryOperator()
     {
         return [
-            ['NOT', Sql::literal('c1'), '(NOT c1)', []],
-            ['IS NULL', Sql::literal('c1'), '(c1 IS NULL)', []],
-            ['IS NOT NULL', Sql::literal('c1'), '(c1 IS NOT NULL)', []],
+            ['NOT', new Sql('c1'), '(NOT c1)', []],
+            ['IS NULL', new Sql('c1'), '(c1 IS NULL)', []],
+            ['IS NOT NULL', new Sql('c1'), '(c1 IS NOT NULL)', []],
             ['EXISTS', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
             ['NOT EXISTS', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(NOT EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
             ['ALL', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(ALL (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
@@ -166,7 +166,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function testUnaryOperatorThrowsUnexpectedValueException()
     {
         $grammar = new MySqlGrammar();
-        $grammar->unaryOperator('unknown', Sql::literal('c1'));
+        $grammar->unaryOperator('unknown', new Sql('c1'));
     }
 
     public function testIdentifier()
@@ -192,13 +192,13 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'SELECT',
-                [Sql::literal('c1'), Sql::literal('c2')],
-                [Sql::literal('t1'), Sql::literal('t2')],
-                [Sql::literal('JOIN t3 ON t1.c1 = t3.c1'), Sql::literal('JOIN t4 ON t1.c1 = t4.c1')],
+                [new Sql('c1'), new Sql('c2')],
+                [new Sql('t1'), new Sql('t2')],
+                [new Sql('JOIN t3 ON t1.c1 = t3.c1'), new Sql('JOIN t4 ON t1.c1 = t4.c1')],
                 new Sql('c1 = ? AND c2 = ?', ['foo', 'bar']),
-                [Sql::literal('c3'), Sql::literal('c4')],
+                [new Sql('c3'), new Sql('c4')],
                 new Sql('c5 = ?', ['baz']),
-                [Sql::literal('c6'), Sql::literal('c7')],
+                [new Sql('c6'), new Sql('c7')],
                 100,
                 200,
                 'FOR UPDATE',
@@ -209,7 +209,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
             [
                 'SELECT',
                 [],
-                [Sql::literal('t1')],
+                [new Sql('t1')],
                 [],
                 new Sql('c1 = ?', ['foo']),
                 [],
@@ -224,7 +224,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'SELECT',
-                [Sql::literal('1')],
+                [new Sql('1')],
                 [],
                 [],
                 null,

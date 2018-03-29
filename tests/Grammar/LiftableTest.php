@@ -115,12 +115,12 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
 
     public function testLiftConditionWithUnaryOperator()
     {
-        $expectedQuery = Sql::literal('(c1 IS NULL)');
+        $expectedQuery = new Sql('(c1 IS NULL)');
 
         $this->liftable
             ->expects($this->once())
             ->method('unaryOperator')
-            ->with('IS NULL', Sql::literal('c1'))
+            ->with('IS NULL', new Sql('c1'))
             ->willReturn($expectedQuery);
 
         $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', 'IS NULL'));
@@ -133,7 +133,7 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
         $this->liftable
             ->expects($this->once())
             ->method('operator')
-            ->with('=', Sql::literal('c1'), Sql::value('foo'))
+            ->with('=', new Sql('c1'), Sql::value('foo'))
             ->willReturn($expectedQuery);
 
         $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', '=', 'foo'));
@@ -146,7 +146,7 @@ class LiftableTest extends \PHPUnit_Framework_TestCase
         $this->liftable
             ->expects($this->once())
             ->method('betweenOperator')
-            ->with('BETWEEN', Sql::literal('c1'), Sql::value('foo'), Sql::value('bar'))
+            ->with('BETWEEN', new Sql('c1'), Sql::value('foo'), Sql::value('bar'))
             ->willReturn($expectedQuery);
 
         $this->assertSame($expectedQuery, $this->liftable->liftCondition('c1', 'BETWEEN', 'foo', 'bar'));
