@@ -156,7 +156,7 @@ class InsertBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        return $this->grammar->compileInsert(
+        return $this->grammar->insertStatement(
             $this->prefix,
             $this->into,
             $this->columns,

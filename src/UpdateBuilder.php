@@ -132,45 +132,33 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function where($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doWhere('AND', $lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'AND', $condition) : $condition;
+        return $cloned;
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function orWhere($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doWhere('OR', $lhs, $operator, $rhs1, $rhs2);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function groupWhere(callable $callback)
-    {
-        return $this->doGroupWhere('AND', $callback);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function orGroupWhere(callable $callback)
-    {
-        return $this->doGroupWhere('OR', $callback);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'OR', $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -178,43 +166,11 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        return $this->grammar->compileUpdate(
+        return $this->grammar->updateStatement(
             $this->prefix,
             $this->table,
             $this->update,
             $this->where
         );
-    }
-
-    /**
-     * @param string      $whereOperator
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
-     * @return $this
-     */
-    private function doWhere($whereOperator, $lhs, $operator, $rhs1, $rhs2)
-    {
-        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($whereOperator, $this->where, $condition) : $condition;
-        return $cloned;
-    }
-
-    /**
-     * @param string $whereOperator
-     * @param callable $callback
-     * @return $this
-     */
-    private function doGroupWhere($whereOperator, callable $callback)
-    {
-        $builder = $callback(new UpdateBuilder($this->grammar));
-        if ($builder->where === null) {
-            return $this;
-        }
-        $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($whereOperator, $this->where, $builder->where) : $builder->where;
-        return $cloned;
     }
 }

@@ -14,39 +14,202 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testAlias()
+    /**
+     * @var MySqlGrammar
+     */
+    private $grammar;
+
+    public function setUp()
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->alias(new Sql('c1 + ?', [1]), 'a1');
+        $this->grammar = new MySqlGrammar();
+    }
+
+
+    /**
+     * @dataProvider providerLift
+     */
+    public function testLift($value, $expectedSql, array $expectedBindings)
+    {
+        $query = $this->grammar->lift($value);
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerLift()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', 'foo', []],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiftThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testLiftThrowsUnexpectedValueException($value)
+    {
+        $this->grammar->lift($value);
+    }
+
+    public function providerLiftThrowsUnexpectedValueException()
+    {
+        return [
+            [123],
+            [1.23],
+            [true],
+            [false],
+            [null],
+            [[1, 2, 3]],
+            [new \stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiftValue
+     */
+    public function testLiftValue($value, $expectedSql, array $expectedBindings)
+    {
+        $query = $this->grammar->liftValue($value);
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerLiftValue()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', '?', ['foo']],
+            [123, '?', [123]],
+            [1.23, '?', [1.23]],
+            [true, '?', [true]],
+            [false, '?', [false]],
+            [null, 'NULL', []],
+            [[1, 2, 3], '(?, ?, ?)', [1, 2, 3]],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiftValueThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testLiftValueThrowsUnexpectedValueException($value)
+    {
+        $this->grammar->liftValue($value);
+    }
+
+    public function providerLiftValueThrowsUnexpectedValueException()
+    {
+        return [
+            [new \stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider providerOperator
+     */
+    public function testOperator($lhsSql, array $lhsBindings, $operator, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings)
+    {
+        $lhs = new Sql($lhsSql, $lhsBindings);
+        $rhs = new Sql($rhsSql, $rhsBindings);
+
+        $query = $this->grammar->operator($lhs, $operator, $rhs);
+
         $this->assertQueryIs(
-            'c1 + ? AS a1',
-            [1],
+            $expectedSql,
+            $expectedBindings,
             $query
         );
     }
 
-    public function testOrder()
+    public function providerOperator()
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->order(new Sql('c1 + ?', [1]), 'DESC');
+        return [
+            ['c1', [], '=', '?', ['foo'], '(c1 = ?)', ['foo']],
+            ['c1', [], '!=', '?', ['foo'], '(c1 != ?)', ['foo']],
+            ['c1', [], '<>', '?', ['foo'], '(c1 <> ?)', ['foo']],
+            ['c1', [], '<', '?', ['foo'], '(c1 < ?)', ['foo']],
+            ['c1', [], '<=', '?', ['foo'], '(c1 <= ?)', ['foo']],
+            ['c1', [], '>', '?', ['foo'], '(c1 > ?)', ['foo']],
+            ['c1', [], '>=', '?', ['foo'], '(c1 >= ?)', ['foo']],
+            ['c1', [], 'IN', '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['c1', [], 'NOT IN', '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['c1', [], 'LIKE', '?', ['foo'], '(c1 LIKE ?)', ['foo']],
+            ['c1', [], 'NOT LIKE', '?', ['foo'], '(c1 NOT LIKE ?)', ['foo']],
+            ['(c1 = ?)', ['foo'], 'AND', '(c2 = ?)', ['bar'], '((c1 = ?) AND (c2 = ?))', ['foo', 'bar']],
+            ['(c1 = ?)', ['foo'], 'OR', '(c2 = ?)', ['bar'], '((c1 = ?) OR (c2 = ?))', ['foo', 'bar']],
+        ];
+    }
+
+    /**
+     * @dataProvider providerBetweenOperator
+     */
+    public function testBetweenOperator($lhsSql, array $lhsBindings, $operator, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
+    {
+        $lhs = new Sql($lhsSql, $lhsBindings);
+        $start = new Sql($startSql, $startBindings);
+        $end = new Sql($endSql, $endBindings);
+
+        $query = $this->grammar->betweenOperator($lhs, $operator, $start, $end);
+
         $this->assertQueryIs(
-            'c1 + ? DESC',
-            [1],
+            $expectedSql,
+            $expectedBindings,
             $query
         );
+    }
+
+    public function providerBetweenOperator()
+    {
+        return [
+            ['c1', [], 'BETWEEN', '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
+            ['c1', [], 'NOT BETWEEN', '?', [123], '?', [456], '(c1 NOT BETWEEN ? AND ?)', [123, 456]],
+        ];
+    }
+
+    /**
+     * @dataProvider providerUnaryOperator
+     */
+    public function testUnaryOperator($operator, $lhsSql, array $lhsBindings, $expectedSql, array $expectedBindings)
+    {
+        $lhs = new Sql($lhsSql, $lhsBindings);
+
+        $query = $this->grammar->unaryOperator($operator, $lhs);
+
+        $this->assertQueryIs(
+            $expectedSql,
+            $expectedBindings,
+            $query
+        );
+    }
+
+    public function providerUnaryOperator()
+    {
+        return [
+            ['NOT', 'c1', [], '(NOT c1)', []],
+            ['EXISTS', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['NOT EXISTS', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(NOT EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['ALL', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(ALL (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['NOT ALL', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(NOT ALL (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['ANY', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(ANY (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['NOT ANY', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(NOT ANY (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['SOME', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+            ['NOT SOME', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(NOT SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
+        ];
     }
 
     public function testJoin()
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->join(new Sql('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
+        $query = $this->grammar->join(new Sql('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
         $this->assertQueryIs(
             'LEFT INNER JOIN t2 ON t1.c1 = t2.c1 AND t2.c2 = ?',
             ['foo'],
             $query
         );
 
-        $query = $grammar->join(new Sql('t2'), null, 'CROSS JOIN');
+        $query = $this->grammar->join(new Sql('t2'), null, 'CROSS JOIN');
         $this->assertQueryIs(
             'CROSS JOIN t2',
             [],
@@ -54,10 +217,19 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testOrdering()
+    {
+        $query = $this->grammar->ordering(new Sql('c1 + ?', [1]), 'DESC');
+        $this->assertQueryIs(
+            'c1 + ? DESC',
+            [1],
+            $query
+        );
+    }
+
     public function testUnion()
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->union(new Sql('SELECT * FROM t1 WHERE c1 = ?', ['foo']), 'UNION ALL');
+        $query = $this->grammar->union(new Sql('SELECT * FROM t1 WHERE c1 = ?', ['foo']), 'UNION ALL');
         $this->assertQueryIs(
             'UNION ALL SELECT * FROM t1 WHERE c1 = ?',
             ['foo'],
@@ -65,115 +237,20 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider providerOperator
-     */
-    public function testOperator($operator, Sql $lhs, Sql $rhs, $expectedSql, $expectedBindings)
+    public function testAlias()
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->operator($operator, $lhs, $rhs);
-        $this->assertEquals($expectedSql, $query->getSql());
-        $this->assertEquals($expectedBindings, $query->getBindings());
-    }
-
-    public function providerOperator()
-    {
-        return [
-            ['=', new Sql('c1'), Sql::value('foo'), '(c1 = ?)', ['foo']],
-            ['!=', new Sql('c1'), Sql::value('foo'), '(c1 != ?)', ['foo']],
-            ['<>', new Sql('c1'), Sql::value('foo'), '(c1 <> ?)', ['foo']],
-            ['<', new Sql('c1'), Sql::value('foo'), '(c1 < ?)', ['foo']],
-            ['<=', new Sql('c1'), Sql::value('foo'), '(c1 <= ?)', ['foo']],
-            ['>', new Sql('c1'), Sql::value('foo'), '(c1 > ?)', ['foo']],
-            ['>=', new Sql('c1'), Sql::value('foo'), '(c1 >= ?)', ['foo']],
-            ['IN', new Sql('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['NOT IN', new Sql('c1'), Sql::values(['foo', 'bar', 'baz']), '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['LIKE', new Sql('c1'), Sql::value('foo'), '(c1 LIKE ?)', ['foo']],
-            ['NOT LIKE', new Sql('c1'), Sql::value('foo'), '(c1 NOT LIKE ?)', ['foo']],
-            ['AND', new Sql('(c1 = ?)', ['foo']), new Sql('(c2 = ?)', ['bar']), '((c1 = ?) AND (c2 = ?))', ['foo', 'bar']],
-            ['OR', new Sql('(c1 = ?)', ['foo']), new Sql('(c2 = ?)', ['bar']), '((c1 = ?) OR (c2 = ?))', ['foo', 'bar']],
-        ];
-    }
-
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testOperatorThrowsUnexpectedValueException()
-    {
-        $grammar = new MySqlGrammar();
-        $grammar->operator('unknown', new Sql('c1'), Sql::value('foo'));
-    }
-
-    /**
-     * @dataProvider providerBetweenOperator
-     */
-    public function testBetweenOperator($operator, Sql $lhs, Sql $rhs1, Sql $rhs2, $expectedSql, $expectedBindings)
-    {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->betweenOperator($operator, $lhs, $rhs1, $rhs2);
-        $this->assertEquals($expectedSql, $query->getSql());
-        $this->assertEquals($expectedBindings, $query->getBindings());
-    }
-
-    public function providerBetweenOperator()
-    {
-        return [
-            ['BETWEEN', new Sql('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 BETWEEN ? AND ?)', ['foo', 'bar']],
-            ['NOT BETWEEN', new Sql('c1'), Sql::value('foo'), Sql::value('bar'), '(c1 NOT BETWEEN ? AND ?)', ['foo', 'bar']],
-        ];
-    }
-
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testBetweenOperatorThrowsUnexpectedValueException()
-    {
-        $grammar = new MySqlGrammar();
-        $grammar->betweenOperator('unknown', new Sql('c1'), Sql::value('foo'), Sql::value('bar'));
-    }
-
-    /**
-     * @dataProvider providerUnaryOperator
-     */
-    public function testUnaryOperator($operator, Sql $lhs, $expectedSql, $expectedBindings)
-    {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->unaryOperator($operator, $lhs);
-        $this->assertEquals($expectedSql, $query->getSql());
-        $this->assertEquals($expectedBindings, $query->getBindings());
-    }
-
-    public function providerUnaryOperator()
-    {
-        return [
-            ['NOT', new Sql('c1'), '(NOT c1)', []],
-            ['IS NULL', new Sql('c1'), '(c1 IS NULL)', []],
-            ['IS NOT NULL', new Sql('c1'), '(c1 IS NOT NULL)', []],
-            ['EXISTS', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['NOT EXISTS', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(NOT EXISTS (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['ALL', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(ALL (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['NOT ALL', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(NOT ALL (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['ANY', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(ANY (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['NOT ANY', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(NOT ANY (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['SOME', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-            ['NOT SOME', new Sql('(SELECT * FROM t1 WHERE c1 = ?)', ['foo']), '(NOT SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
-        ];
-    }
-
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testUnaryOperatorThrowsUnexpectedValueException()
-    {
-        $grammar = new MySqlGrammar();
-        $grammar->unaryOperator('unknown', new Sql('c1'));
+        $query = $this->grammar->alias(new Sql('c1 + ?', [1]), 'a1');
+        $this->assertQueryIs(
+            'c1 + ? AS a1',
+            [1],
+            $query
+        );
     }
 
     public function testIdentifier()
     {
-        $grammar = new MySqlGrammar();
-        $this->assertEquals('`foo`', $grammar->identifier('foo'));
-        $this->assertEquals('```foo```', $grammar->identifier('`foo`'));
+        $this->assertEquals('`foo`', $this->grammar->identifier('foo'));
+        $this->assertEquals('```foo```', $this->grammar->identifier('`foo`'));
     }
 
     /**
@@ -181,8 +258,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union, $expectedSql, array $expectedBindings)
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->compileSelect($prefix, $select, $from, $join, $where, $groupBy, $having, $orderBy, $limit, $offset, $suffix, $union);
+        $query = $this->grammar->selectStatement($prefix, $select, $from, $join, $where, $groupBy, $having, $orderBy, $limit, $offset, $suffix, $union);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
@@ -246,8 +322,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompileInsert($prefix, $table, array $columns, array $values, Sql $select = null, $expectedSql, array $expectedBindings)
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->compileInsert($prefix, $table, $columns, $values, $select);
+        $query = $this->grammar->insertStatement($prefix, $table, $columns, $values, $select);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
@@ -281,8 +356,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompileUpdate($prefix, $table, array $update, Sql $where = null, $expectedSql, array $expectedBindings)
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->compileUpdate($prefix, $table, $update, $where);
+        $query = $this->grammar->updateStatement($prefix, $table, $update, $where);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
@@ -314,8 +388,7 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompileDelete($prefix, $from, Sql $where = null, $expectedSql, array $expectedBindings)
     {
-        $grammar = new MySqlGrammar();
-        $query = $grammar->compileDelete($prefix, $from, $where);
+        $query = $this->grammar->deleteStatement($prefix, $from, $where);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }

@@ -17,6 +17,9 @@ use Emonkak\Orm\ResultSet\PreloadResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
+/**
+ * @covers Emonkak\Orm\Relation\Relation
+ */
 class RelationTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;

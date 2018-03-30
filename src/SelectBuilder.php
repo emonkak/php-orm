@@ -258,45 +258,33 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function where($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doWhere('AND', $lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'AND', $condition) : $condition;
+        return $cloned;
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function orWhere($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doWhere('OR', $lhs, $operator, $rhs1, $rhs2);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function groupWhere(callable $callback)
-    {
-        return $this->doGroupWhere('AND', $callback);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function orGroupWhere(callable $callback)
-    {
-        return $this->doGroupWhere('OR', $callback);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'OR', $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -341,7 +329,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $expr = $this->grammar->lift($expr);
         if ($ordering !== null) {
-            $expr = $this->grammar->order($expr, $ordering);
+            $expr = $expr->append($ordering);
         }
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
@@ -349,45 +337,33 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function having($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doHaving('AND', $lhs, $operator, $rhs1, $rhs2);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->having = $this->having ? $this->grammar->operator($this->having, 'AND', $condition) : $condition;
+        return $cloned;
     }
 
     /**
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
      * @return $this
      */
-    public function orHaving($lhs, $operator = null, $rhs1 = null, $rhs2 = null)
+    public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        return $this->doHaving('OR', $lhs, $operator, $rhs1, $rhs2);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function groupHaving(callable $callback)
-    {
-        return $this->doGroupHaving('AND', $callback);
-    }
-
-    /**
-     * @param callable $callback
-     * @return $this
-     */
-    public function orGroupHaving(callable $callback)
-    {
-        return $this->doGroupHaving('OR', $callback);
+        $condition = $this->grammar->condition(...func_get_args());
+        $cloned = clone $this;
+        $cloned->having = $this->having ? $this->grammar->operator($this->having, 'OR', $condition) : $condition;
+        return $cloned;
     }
 
     /**
@@ -399,7 +375,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $expr = $this->grammar->lift($expr);
         if ($ordering !== null) {
-            $expr = $this->grammar->order($expr, $ordering);
+            $expr = $this->grammar->ordering($expr, $ordering);
         }
         $cloned = clone $this;
         $cloned->orderBy[] = $expr;
@@ -474,7 +450,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        return $this->grammar->compileSelect(
+        return $this->grammar->selectStatement(
             $this->prefix,
             $this->select,
             $this->from,
@@ -510,70 +486,6 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $numItems = $this->count($pdo);
         return new Paginator($this, $pdo, $fetcher, $perPage, $numItems);
-    }
-
-    /**
-     * @param string      $whereOperator
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
-     * @return $this
-     */
-    private function doWhere($whereOperator, $lhs, $operator, $rhs1, $rhs2)
-    {
-        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($whereOperator, $this->where, $condition) : $condition;
-        return $cloned;
-    }
-
-    /**
-     * @param string $whereOperator
-     * @param callable $callback
-     * @return $this
-     */
-    private function doGroupWhere($whereOperator, callable $callback)
-    {
-        $builder = $callback(new SelectBuilder($this->grammar));
-        if ($builder->where === null) {
-            return $this;
-        }
-        $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($whereOperator, $this->where, $builder->where) : $builder->where;
-        return $cloned;
-    }
-
-    /**
-     * @param string      $havingOperator
-     * @param mixed       $lhs
-     * @param string|null $operator
-     * @param mixed|null  $rhs1
-     * @param mixed|null  $rhs2
-     * @return $this
-     */
-    private function doHaving($havingOperator, $lhs, $operator, $rhs1, $rhs2)
-    {
-        $condition = $this->grammar->liftCondition($lhs, $operator, $rhs1, $rhs2);
-        $cloned = clone $this;
-        $cloned->having = $this->having ? $this->grammar->operator($havingOperator, $this->having, $condition) : $condition;
-        return $cloned;
-    }
-
-    /**
-     * @param string $havingOperator
-     * @param callable $callback
-     * @return $this
-     */
-    private function doGroupHaving($havingOperator, callable $callback)
-    {
-        $builder = $callback(new SelectBuilder($this->grammar));
-        if ($builder->having === null) {
-            return $this;
-        }
-        $cloned = clone $this;
-        $cloned->having = $this->having ? $this->grammar->operator($havingOperator, $this->having, $builder->having) : $builder->having;
-        return $cloned;
     }
 
     private function withoutOrderBy()

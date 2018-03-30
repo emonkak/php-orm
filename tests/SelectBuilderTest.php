@@ -223,7 +223,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
-            ->where('c2', 'IS NULL')
+            ->where('c2', 'IS', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))',
@@ -245,7 +245,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $query = $this->createSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
-            ->where('c2', 'IS NULL')
+            ->where('c2', 'IS', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE ((c1 = ?) AND (c2 IS NULL))',
@@ -257,7 +257,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->from('t1')
             ->where('c1', '!=', 'foo')
             ->where('c2', '<>', 'bar')
-            ->where('c3', 'IS NOT NULL')
+            ->where('c3', 'IS NOT', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE (((c1 != ?) AND (c2 <> ?)) AND (c3 IS NOT NULL))',
@@ -397,7 +397,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
         $query = $this->createSelectBuilder()
             ->from('t1')
-            ->where($builder, 'EXISTS')
+            ->where('EXISTS', $builder)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE (EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))',
@@ -407,7 +407,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->createSelectBuilder()
             ->from('t1')
-            ->where($builder, 'NOT EXISTS')
+            ->where('NOT EXISTS', $builder)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE (NOT EXISTS (SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?))',
@@ -421,7 +421,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
         $query = $this->createSelectBuilder()
             ->from('t1')
-            ->where($builder, 'IS NULL')
+            ->where($builder, 'IS', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NULL)',
@@ -432,24 +432,13 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
         $query = $this->createSelectBuilder()
             ->from('t1')
-            ->where($builder, 'IS NOT NULL')
+            ->where($builder, 'IS NOT', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE ((SELECT c1 FROM t2 WHERE (c2 = ?) LIMIT ?) IS NOT NULL)',
             ['foo', 1],
             $query
         );
-    }
-
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testWhereInvalidOperator()
-    {
-        $this->createSelectBuilder()
-            ->from('t1')
-            ->where('c1', '==', 'foo')
-            ->build();
     }
 
     public function testOrWhere()
@@ -462,68 +451,6 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE ((c1 = ?) OR (c2 = ?))',
             ['foo', 'bar'],
-            $query
-        );
-    }
-
-    public function testGroupWhere()
-    {
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->where('c1', '=', 'foo')
-            ->groupWhere(function($builder) {
-                return $builder
-                    ->where('c2', '=', 'bar')
-                    ->orWhere('c3', '=', 'baz');
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 WHERE ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))',
-            ['foo', 'bar', 'baz'],
-            $query
-        );
-
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->where('c1', '=', 'foo')
-            ->groupWhere(function($builder) {
-                return $builder;
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 WHERE (c1 = ?)',
-            ['foo'],
-            $query
-        );
-    }
-
-    public function testOrGroupWhere()
-    {
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->where('c1', '=', 'foo')
-            ->orGroupWhere(function($builder) {
-                return $builder
-                    ->where('c2', '=', 'bar')
-                    ->where('c3', '=', 'baz');
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 WHERE ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))',
-            ['foo', 'bar', 'baz'],
-            $query
-        );
-
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->where('c1', '=', 'foo')
-            ->orGroupWhere(function($builder) {
-                return $builder;
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 WHERE (c1 = ?)',
-            ['foo'],
             $query
         );
     }
@@ -580,7 +507,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->groupBy('c1')
             ->having('c2', '=', 'foo')
             ->having('c3', '=', 'bar')
-            ->having('c4', 'IS NULL')
+            ->having('c4', 'IS', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 = ?) AND (c3 = ?)) AND (c4 IS NULL))',
@@ -593,7 +520,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->groupBy('c1')
             ->having('c2', '!=', 'foo')
             ->having('c3', '<>', 'bar')
-            ->having('c4', 'IS NOT NULL')
+            ->having('c4', 'IS NOT', NULL)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))',
@@ -602,68 +529,18 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGroupHaving()
+    public function testOrHaving()
     {
         $query = $this->createSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
-            ->having('c1', '=', 'foo')
-            ->groupHaving(function($builder) {
-                return $builder
-                    ->having('c2', '=', 'bar')
-                    ->orHaving('c3', '=', 'baz');
-            })
+            ->having('c2', '=', 'foo')
+            ->orHaving('c3', '=', 'bar')
+            ->orHaving('c4', 'IS', null)
             ->build();
         $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) AND ((c2 = ?) OR (c3 = ?)))',
-            ['foo', 'bar', 'baz'],
-            $query
-        );
-
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->groupBy('c1')
-            ->having('c1', '=', 'foo')
-            ->groupHaving(function($builder) {
-                return $builder;
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)',
-            ['foo'],
-            $query
-        );
-    }
-
-    public function testGroupOrHaving()
-    {
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->groupBy('c1')
-            ->having('c1', '=', 'foo')
-            ->orGroupHaving(function($builder) {
-                return $builder
-                    ->having('c2', '=', 'bar')
-                    ->having('c3', '=', 'baz');
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY c1 HAVING ((c1 = ?) OR ((c2 = ?) AND (c3 = ?)))',
-            ['foo', 'bar', 'baz'],
-            $query
-        );
-
-        $query = $this->createSelectBuilder()
-            ->from('t1')
-            ->groupBy('c1')
-            ->having('c1', '=', 'foo')
-            ->orGroupHaving(function($builder) {
-                return $builder;
-            })
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY c1 HAVING (c1 = ?)',
-            ['foo'],
+            'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 = ?) OR (c3 = ?)) OR (c4 IS NULL))',
+            ['foo', 'bar'],
             $query
         );
     }

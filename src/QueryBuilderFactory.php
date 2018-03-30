@@ -9,7 +9,7 @@ class QueryBuilderFactory
     /**
      * @var GrammarInterface
      */
-    private $grammer;
+    private $grammar;
 
     /**
      * @var SelectBuilder
@@ -32,11 +32,11 @@ class QueryBuilderFactory
     private $deleteBuilder;
 
     /**
-     * @param $grammer GrammarInterface
+     * @param $grammar GrammarInterface
      */
-    public function __construct(GrammarInterface $grammer)
+    public function __construct(GrammarInterface $grammar)
     {
-        $this->grammer = $grammer;
+        $this->grammar = $grammar;
     }
 
     /**
@@ -45,7 +45,7 @@ class QueryBuilderFactory
     public function createSelect()
     {
         if ($this->selectBuilder === null) {
-            $this->selectBuilder = new SelectBuilder($this->grammer);
+            $this->selectBuilder = new SelectBuilder($this->grammar);
         }
         return $this->selectBuilder;
     }
@@ -56,7 +56,7 @@ class QueryBuilderFactory
     public function createInsert()
     {
         if ($this->insertBuilder === null) {
-            $this->insertBuilder = new InsertBuilder($this->grammer);
+            $this->insertBuilder = new InsertBuilder($this->grammar);
         }
         return $this->insertBuilder;
     }
@@ -67,7 +67,7 @@ class QueryBuilderFactory
     public function createUpdate()
     {
         if ($this->updateBuilder === null) {
-            $this->updateBuilder = new UpdateBuilder($this->grammer);
+            $this->updateBuilder = new UpdateBuilder($this->grammar);
         }
         return $this->updateBuilder;
     }
@@ -78,7 +78,7 @@ class QueryBuilderFactory
     public function createDelete()
     {
         if ($this->deleteBuilder === null) {
-            $this->deleteBuilder = new DeleteBuilder($this->grammer);
+            $this->deleteBuilder = new DeleteBuilder($this->grammar);
         }
         return $this->deleteBuilder;
     }

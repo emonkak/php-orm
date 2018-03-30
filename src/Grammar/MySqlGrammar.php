@@ -3,38 +3,82 @@
 namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\QueryBuilderInterface;
 
-class MySqlGrammar implements GrammarInterface
+class MySqlGrammar extends AbstractGrammar
 {
-    use Liftable;
+    /**
+     * {@inheritDoc}
+     */
+    public function lift($value)
+    {
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if (is_string($value)) {
+            return new Sql($value);
+        }
+        $type = gettype($value);
+        throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function alias(Sql $value, $alias)
+    public function liftValue($value)
     {
-        $sql = $value->getSql() . ' AS ' . $alias;
-        $bindings = $value->getBindings();
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if ($value === null) {
+            return new Sql('NULL');
+        }
+        if (is_scalar($value)) {
+            return Sql::value($value);
+        }
+        if (is_array($value)) {
+            return Sql::values($value);
+        }
+        $type = gettype($value);
+        throw new \UnexpectedValueException("Unexpected value, got '$type'.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function operator(Sql $lhs, $operator, Sql $rhs)
+    {
+        $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
+        $bindings = array_merge($lhs->getBindings(), $rhs->getBindings());
+
         return new Sql($sql, $bindings);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function order(Sql $expr, $ordering)
+    public function betweenOperator(Sql $lhs, $operator, Sql $start, Sql $end)
     {
-        $sql = $expr->getSql() . ' ' . $ordering;
-        $bindings = $expr->getBindings();
+        $sql = "({$lhs->getSql()} $operator {$start->getSql()} AND {$end->getSql()})";
+        $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
+
         return new Sql($sql, $bindings);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function union(Sql $query, $type)
+    public function unaryOperator($operator, Sql $rhs)
     {
-        $sql = $type . ' ' . $query->getSql();
-        $bindings = $query->getBindings();
+        $sql = "($operator {$rhs->getSql()})";
+        $bindings = $rhs->getBindings();
+
         return new Sql($sql, $bindings);
     }
 
@@ -56,70 +100,31 @@ class MySqlGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function operator($operator, Sql $lhs, Sql $rhs)
+    public function ordering(Sql $expr, $ordering)
     {
-        switch (strtoupper($operator)) {
-            case '=':
-            case '!=':
-            case '<>':
-            case '<':
-            case '<=':
-            case '>':
-            case '>=':
-            case 'IN':
-            case 'NOT IN':
-            case 'LIKE':
-            case 'NOT LIKE':
-            case 'AND':
-            case 'OR':
-                $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
-                $bindings = array_merge($lhs->getBindings(), $rhs->getBindings());
-                return new Sql($sql, $bindings);
-        }
-        throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
+        $sql = $expr->getSql() . ' ' . $ordering;
+        $bindings = $expr->getBindings();
+        return new Sql($sql, $bindings);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end)
+    public function union(Sql $query, $type)
     {
-        switch (strtoupper($operator)) {
-            case 'BETWEEN':
-            case 'NOT BETWEEN':
-                $sql = "({$lhs->getSql()} $operator {$start->getSql()} AND {$end->getSql()})";
-                $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
-                return new Sql($sql, $bindings);
-        }
-        throw new \UnexpectedValueException("Unexpected between operator, got '$operator'.");
+        $sql = $type . ' ' . $query->getSql();
+        $bindings = $query->getBindings();
+        return new Sql($sql, $bindings);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unaryOperator($operator, Sql $lhs)
+    public function alias(Sql $value, $alias)
     {
-        switch (strtoupper($operator)) {
-            case 'NOT':
-            case 'EXISTS':
-            case 'NOT EXISTS':
-            case 'ALL':
-            case 'NOT ALL':
-            case 'ANY':
-            case 'NOT ANY':
-            case 'SOME':
-            case 'NOT SOME':
-                $sql = "($operator {$lhs->getSql()})";
-                $bindings = $lhs->getBindings();
-                return new Sql($sql, $bindings);
-
-            case 'IS NULL':
-            case 'IS NOT NULL':
-                $sql = "({$lhs->getSql()} $operator)";
-                $bindings = $lhs->getBindings();
-                return new Sql($sql, $bindings);
-        }
-        throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
+        $sql = $value->getSql() . ' AS ' . $alias;
+        $bindings = $value->getBindings();
+        return new Sql($sql, $bindings);
     }
 
     /**
@@ -133,7 +138,7 @@ class MySqlGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function compileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
     {
         $bindings = [];
 
@@ -161,7 +166,7 @@ class MySqlGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function compileInsert($prefix, $into, array $columns, array $values, Sql $select = null)
+    public function insertStatement($prefix, $into, array $columns, array $values, Sql $select = null)
     {
         $bindings = [];
 
@@ -176,7 +181,7 @@ class MySqlGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function compileUpdate($prefix, $table, array $update, Sql $where = null)
+    public function updateStatement($prefix, $table, array $update, Sql $where = null)
     {
         $bindings = [];
 
@@ -190,7 +195,7 @@ class MySqlGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function compileDelete($prefix, $from, Sql $where = null)
+    public function deleteStatement($prefix, $from, Sql $where = null)
     {
         $bindings = [];
 
