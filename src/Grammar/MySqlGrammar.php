@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Grammar;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\QueryBuilderInterface;
 
-class MySqlGrammar extends AbstractGrammar
+class MySqlGrammar implements GrammarInterface
 {
     /**
      * {@inheritDoc}
@@ -46,28 +46,26 @@ class MySqlGrammar extends AbstractGrammar
             return Sql::values($value);
         }
         $type = gettype($value);
-        throw new \UnexpectedValueException("Unexpected value, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
     }
 
     /**
      * {@inheritDoc}
      */
-    public function operator(Sql $lhs, $operator, Sql $rhs)
+    public function operator($operator, Sql $lhs, Sql $rhs)
     {
         $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
         $bindings = array_merge($lhs->getBindings(), $rhs->getBindings());
-
         return new Sql($sql, $bindings);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function betweenOperator(Sql $lhs, $operator, Sql $start, Sql $end)
+    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end)
     {
         $sql = "({$lhs->getSql()} $operator {$start->getSql()} AND {$end->getSql()})";
         $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
-
         return new Sql($sql, $bindings);
     }
 
@@ -78,7 +76,6 @@ class MySqlGrammar extends AbstractGrammar
     {
         $sql = "($operator {$rhs->getSql()})";
         $bindings = $rhs->getBindings();
-
         return new Sql($sql, $bindings);
     }
 

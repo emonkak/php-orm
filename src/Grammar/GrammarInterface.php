@@ -8,41 +8,33 @@ use Emonkak\Orm\Sql;
 interface GrammarInterface
 {
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
-     * @return Sql
-     */
-    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null);
-
-    /**
      * @param mixed $value
      * @return Sql
      */
     public function lift($value);
 
     /**
+     * @param mixed $value
      * @return Sql
      */
     public function liftValue($value);
 
     /**
-     * @param Sql    $lhs
      * @param string $operator
+     * @param Sql    $lhs
      * @param Sql    $rhs
      * @return Sql
      */
-    public function operator(Sql $lhs, $operator, Sql $rhs);
+    public function operator($operator, Sql $lhs, Sql $rhs);
 
     /**
-     * @param Sql    $lhs
      * @param string $operator
+     * @param Sql    $lhs
      * @param Sql    $start
      * @param Sql    $end
      * @return Sql
      */
-    public function betweenOperator(Sql $lhs, $operator, Sql $start, Sql $end);
+    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end);
 
     /**
      * @param string $operator

@@ -140,9 +140,9 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->grammar->condition(...func_get_args());
+        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'AND', $condition) : $condition;
+        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -155,9 +155,9 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->grammar->condition(...func_get_args());
+        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator($this->where, 'OR', $condition) : $condition;
+        $cloned->where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
         return $cloned;
     }
 

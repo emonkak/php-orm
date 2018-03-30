@@ -34,7 +34,9 @@ trait Preparable
                 $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
                 break;
             default:
-                throw new \UnexpectedValueException("The value does not be bindable, got '$type'.");
+                throw new \UnexpectedValueException(
+                    "The value should be a bindable type. but got '$type'."
+                );
             }
         }
 

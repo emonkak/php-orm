@@ -110,12 +110,12 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerOperator
      */
-    public function testOperator($lhsSql, array $lhsBindings, $operator, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings)
+    public function testOperator($operator, $lhsSql, array $lhsBindings, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings)
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $rhs = new Sql($rhsSql, $rhsBindings);
 
-        $query = $this->grammar->operator($lhs, $operator, $rhs);
+        $query = $this->grammar->operator($operator, $lhs, $rhs);
 
         $this->assertQueryIs(
             $expectedSql,
@@ -127,32 +127,32 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function providerOperator()
     {
         return [
-            ['c1', [], '=', '?', ['foo'], '(c1 = ?)', ['foo']],
-            ['c1', [], '!=', '?', ['foo'], '(c1 != ?)', ['foo']],
-            ['c1', [], '<>', '?', ['foo'], '(c1 <> ?)', ['foo']],
-            ['c1', [], '<', '?', ['foo'], '(c1 < ?)', ['foo']],
-            ['c1', [], '<=', '?', ['foo'], '(c1 <= ?)', ['foo']],
-            ['c1', [], '>', '?', ['foo'], '(c1 > ?)', ['foo']],
-            ['c1', [], '>=', '?', ['foo'], '(c1 >= ?)', ['foo']],
-            ['c1', [], 'IN', '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['c1', [], 'NOT IN', '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
-            ['c1', [], 'LIKE', '?', ['foo'], '(c1 LIKE ?)', ['foo']],
-            ['c1', [], 'NOT LIKE', '?', ['foo'], '(c1 NOT LIKE ?)', ['foo']],
-            ['(c1 = ?)', ['foo'], 'AND', '(c2 = ?)', ['bar'], '((c1 = ?) AND (c2 = ?))', ['foo', 'bar']],
-            ['(c1 = ?)', ['foo'], 'OR', '(c2 = ?)', ['bar'], '((c1 = ?) OR (c2 = ?))', ['foo', 'bar']],
+            ['=', 'c1', [],'?', ['foo'], '(c1 = ?)', ['foo']],
+            ['!=','c1', [], '?', ['foo'], '(c1 != ?)', ['foo']],
+            ['<>','c1', [], '?', ['foo'], '(c1 <> ?)', ['foo']],
+            ['<', 'c1', [],'?', ['foo'], '(c1 < ?)', ['foo']],
+            ['<=','c1', [], '?', ['foo'], '(c1 <= ?)', ['foo']],
+            ['>', 'c1', [],'?', ['foo'], '(c1 > ?)', ['foo']],
+            ['>=','c1', [], '?', ['foo'], '(c1 >= ?)', ['foo']],
+            ['IN','c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['NOT IN', 'c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['LIKE', 'c1', [], '?', ['foo'], '(c1 LIKE ?)', ['foo']],
+            ['NOT LIKE', 'c1', [], '?', ['foo'], '(c1 NOT LIKE ?)', ['foo']],
+            ['AND', '(c1 = ?)', ['foo'], '(c2 = ?)', ['bar'], '((c1 = ?) AND (c2 = ?))', ['foo', 'bar']],
+            ['OR', '(c1 = ?)', ['foo'], '(c2 = ?)', ['bar'], '((c1 = ?) OR (c2 = ?))', ['foo', 'bar']],
         ];
     }
 
     /**
      * @dataProvider providerBetweenOperator
      */
-    public function testBetweenOperator($lhsSql, array $lhsBindings, $operator, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
+    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $start = new Sql($startSql, $startBindings);
         $end = new Sql($endSql, $endBindings);
 
-        $query = $this->grammar->betweenOperator($lhs, $operator, $start, $end);
+        $query = $this->grammar->betweenOperator($operator, $lhs, $start, $end);
 
         $this->assertQueryIs(
             $expectedSql,
@@ -164,8 +164,8 @@ class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
     public function providerBetweenOperator()
     {
         return [
-            ['c1', [], 'BETWEEN', '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
-            ['c1', [], 'NOT BETWEEN', '?', [123], '?', [456], '(c1 NOT BETWEEN ? AND ?)', [123, 456]],
+            ['BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
+            ['NOT BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 NOT BETWEEN ? AND ?)', [123, 456]],
         ];
     }
 

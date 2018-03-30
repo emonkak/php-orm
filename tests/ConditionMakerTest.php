@@ -1,28 +1,29 @@
 <?php
 
-namespace Emonkak\Orm\Tests\Grammar;
+namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\Grammar\AbstractGrammar;
+use Emonkak\Orm\ConditionMaker;
+use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Sql;
 
 /**
- * @covers Emonkak\Orm\Grammar\AbstractGrammar
+ * @covers Emonkak\Orm\ConditionMaker
  */
-class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
+class ConditionMakerTest extends \PHPUnit_Framework_TestCase
 {
     public function testConditionWithOneArgument()
     {
         $expr = 'SELECT 1';
         $expectedQuery = new Sql('SELECT 1');
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockForAbstractClass(GrammarInterface::class);
         $grammar
             ->expects($this->once())
             ->method('lift')
             ->with($expr)
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $grammar->condition($expr));
+        $this->assertSame($expectedQuery, ConditionMaker::make($grammar, $expr));
     }
 
     public function testConditionWithTwoArgument()
@@ -32,7 +33,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $lhs = new Sql($lhsExpr);
         $expectedQuery = new Sql('EXISTS (SELECT 1)');
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockForAbstractClass(GrammarInterface::class);
         $grammar
             ->expects($this->once())
             ->method('liftValue')
@@ -44,7 +45,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
             ->with($operator, $lhs)
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $grammar->condition($operator, $lhsExpr));
+        $this->assertSame($expectedQuery, ConditionMaker::make($grammar, $operator, $lhsExpr));
     }
 
     public function testConditionWithThreeArgument()
@@ -56,7 +57,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $rhs = new Sql('?', [$rhsExpr]);
         $expectedQuery = new Sql('c1 = ?', [123]);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockForAbstractClass(GrammarInterface::class);
         $grammar
             ->expects($this->once())
             ->method('lift')
@@ -70,10 +71,10 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $grammar
             ->expects($this->once())
             ->method('operator')
-            ->with($lhs, $operator, $rhs)
+            ->with($operator, $lhs, $rhs)
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $grammar->condition($lhsExpr, $operator, $rhsExpr));
+        $this->assertSame($expectedQuery, ConditionMaker::make($grammar, $lhsExpr, $operator, $rhsExpr));
     }
 
     public function testConditionWithFourArgument()
@@ -87,7 +88,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $end = new Sql('?', [$endExpr]);
         $expectedQuery = new Sql('c1 BETWEEN ? AND ?', [123, 456]);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockForAbstractClass(GrammarInterface::class);
         $grammar
             ->expects($this->once())
             ->method('lift')
@@ -106,9 +107,9 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $grammar
             ->expects($this->once())
             ->method('betweenOperator')
-            ->with($lhs, $operator, $start, $end)
+            ->with($operator, $lhs, $start, $end)
             ->willReturn($expectedQuery);
 
-        $this->assertSame($expectedQuery, $grammar->condition($lhsExpr, $operator, $startExpr, $endExpr));
+        $this->assertSame($expectedQuery, ConditionMaker::make($grammar, $lhsExpr, $operator, $startExpr, $endExpr));
     }
 }
