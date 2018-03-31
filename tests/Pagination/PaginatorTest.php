@@ -21,7 +21,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIterator()
     {
-        $builder = $this->createSelectBuilder()->from('t1');
+        $builder = $this->getSelectBuilder()->from('t1');
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $perPage = 100;
@@ -37,7 +37,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $builder = $this->createSelectBuilder()->from('t1');
+        $builder = $this->getSelectBuilder()->from('t1');
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -101,7 +101,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testAtThrowsOutOfRangeException()
     {
-        $builder = $this->createSelectBuilder()->from('t1');
+        $builder = $this->getSelectBuilder()->from('t1');
         $perPage = 100;
         $numItems = 201;
 
@@ -115,7 +115,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function testFirst()
     {
-        $builder = $this->createSelectBuilder()->from('t1');
+        $builder = $this->getSelectBuilder()->from('t1');
         $perPage = 100;
         $numItems = 201;
 
@@ -162,7 +162,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $perPage = 100;
         $numItems = 201;
 
-        $builder = $this->createSelectBuilder()->from('t1');
+        $builder = $this->getSelectBuilder()->from('t1');
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt

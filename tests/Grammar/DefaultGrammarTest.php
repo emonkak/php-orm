@@ -38,7 +38,7 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             ['foo', 'foo', []],
         ];
     }
@@ -79,7 +79,7 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [$this->createSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             ['foo', '?', ['foo']],
             [123, '?', [123]],
             [1.23, '?', [1.23]],

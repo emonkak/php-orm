@@ -100,7 +100,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
                 return $model->id;
             });
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new Cached(
             $innerRelationStrategy,
@@ -150,7 +150,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('getResult');
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new Cached(
             $innerRelationStrategy,
@@ -209,7 +209,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $outerClass = 'OuterClass';
         $innerClass = 'InnerClass';

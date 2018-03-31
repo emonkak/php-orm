@@ -84,7 +84,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadResultSet($innerElements, Model::class));
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'posts',
@@ -110,7 +110,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'posts',
@@ -194,7 +194,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadResultSet($innerElements, Model::class));
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new ManyTo(
             'friends',

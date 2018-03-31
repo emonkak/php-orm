@@ -30,7 +30,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             $relationKey,
@@ -69,7 +69,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $childRelation1 = $this->createMock(RelationInterface::class);
         $childRelation2 = $this->createMock(RelationInterface::class);
@@ -126,7 +126,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResult);
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             'friends',
@@ -156,7 +156,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $this->createMock(PDOInterface::class),
             $this->createMock(FetcherInterface::class),
-            $this->createSelectBuilder()
+            $this->getSelectBuilder()
         );
 
         $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);

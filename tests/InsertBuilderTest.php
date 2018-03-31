@@ -22,7 +22,7 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetters()
     {
-        $builder = $this->createInsertBuilder()
+        $builder = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
             ->values(['foo', 'bar', 'baz']);
         $this->assertSame('INSERT', $builder->getPrefix());
@@ -36,11 +36,11 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ], $builder->getValues());
 
-        $selectQuery = $this->createSelectBuilder()
+        $selectQuery = $this->getSelectBuilder()
             ->select('c1')
             ->from('t1')
             ->build();
-        $builder = $this->createInsertBuilder()
+        $builder = $this->getInsertBuilder()
             ->into('t1', ['c1'])
             ->select($selectQuery);
         $this->assertSame('INSERT', $builder->getPrefix());
@@ -51,7 +51,7 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrefix()
     {
-        $query = $this->createInsertBuilder()
+        $query = $this->getInsertBuilder()
             ->prefix('INSERT IGNORE')
             ->into('t1', ['c1', 'c2'])
             ->values(['foo', 'bar'])
@@ -65,14 +65,14 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSelect()
     {
-        $selectQuery = $this->createSelectBuilder()
+        $selectQuery = $this->getSelectBuilder()
             ->select('c1')
             ->select('c2')
             ->select('c3')
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->build();
-        $query = $this->createInsertBuilder()
+        $query = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
             ->select($selectQuery)
             ->build();
@@ -85,7 +85,7 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testValues()
     {
-        $query = $this->createInsertBuilder()
+        $query = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
             ->values(['foo', 'bar', 'baz'])
             ->values(['hoge', 'huga', 'piyo'])
@@ -96,7 +96,7 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createInsertBuilder()
+        $query = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
             ->values(
                 ['foo', 'bar', 'baz'],

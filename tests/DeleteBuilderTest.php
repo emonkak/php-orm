@@ -21,7 +21,7 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetters()
     {
-        $builder = $this->createDeleteBuilder()
+        $builder = $this->getDeleteBuilder()
             ->from('t1')
             ->where('c1', '=', 123);
         $this->assertSame('DELETE', $builder->getPrefix());
@@ -31,7 +31,7 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrefix()
     {
-        $query = $this->createDeleteBuilder()
+        $query = $this->getDeleteBuilder()
             ->prefix('DELETE IGNORE')
             ->from('t1')
             ->where('c1', '=', 'foo')
@@ -46,7 +46,7 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhere()
     {
-        $query = $this->createDeleteBuilder()
+        $query = $this->getDeleteBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->where('c2', 'IN', ['piyo', 'poyo'])
@@ -60,7 +60,7 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrWhere()
     {
-        $query = $this->createDeleteBuilder()
+        $query = $this->getDeleteBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->orWhere('c2', 'IN', ['piyo', 'poyo'])

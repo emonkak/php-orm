@@ -17,22 +17,22 @@ trait QueryBuilderTestTrait
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    protected function createSelectBuilder()
+    protected function getSelectBuilder()
     {
         return new SelectBuilder(new DefaultGrammar());
     }
 
-    protected function createInsertBuilder()
+    protected function getInsertBuilder()
     {
         return new InsertBuilder(new DefaultGrammar());
     }
 
-    protected function createUpdateBuilder()
+    protected function getUpdateBuilder()
     {
         return new UpdateBuilder(new DefaultGrammar());
     }
 
-    protected function createDeleteBuilder()
+    protected function getDeleteBuilder()
     {
         return new DeleteBuilder(new DefaultGrammar());
     }

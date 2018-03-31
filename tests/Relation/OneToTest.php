@@ -27,7 +27,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             $relationKey,
@@ -78,7 +78,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResultSet);
 
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'revisions',
@@ -102,7 +102,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->createSelectBuilder();
+        $builder = $this->getSelectBuilder();
 
         $childRelation1 = $this->createMock(RelationInterface::class);
         $childRelation2 = $this->createMock(RelationInterface::class);
@@ -135,7 +135,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             'id',
             $this->createMock(PDOInterface::class),
             $this->createMock(FetcherInterface::class),
-            $this->createSelectBuilder()
+            $this->getSelectBuilder()
         );
 
         $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);

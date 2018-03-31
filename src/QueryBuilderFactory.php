@@ -22,7 +22,7 @@ class QueryBuilderFactory
     /**
      * @return SelectBuilder
      */
-    public function createSelect()
+    public function getSelectBuilder()
     {
         return new SelectBuilder($this->grammar);
     }
@@ -30,7 +30,7 @@ class QueryBuilderFactory
     /**
      * @return InsertBuilder
      */
-    public function createInsert()
+    public function getInsertBuilder()
     {
         return new InsertBuilder($this->grammar);
     }
@@ -38,7 +38,7 @@ class QueryBuilderFactory
     /**
      * @return UpdateBuilder
      */
-    public function createUpdate()
+    public function getUpdateBuilder()
     {
         return new UpdateBuilder($this->grammar);
     }
@@ -46,7 +46,7 @@ class QueryBuilderFactory
     /**
      * @return DeleteBuilder
      */
-    public function createDelete()
+    public function getDeleteBuilder()
     {
         return new DeleteBuilder($this->grammar);
     }
@@ -54,7 +54,7 @@ class QueryBuilderFactory
     /**
      * @return ConditionMaker
      */
-    public function createConditionMaker()
+    public function getConditionMaker()
     {
         return new ConditionMaker($this->grammar);
     }

@@ -17,51 +17,51 @@ class QueryBuilderFactoryTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testCreateSelect()
+    public function testGetSelect()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $builder = $factory->createSelect();
+        $builder = $factory->getSelectBuilder();
 
         $this->assertInstanceOf(SelectBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testCreateInsert()
+    public function testGetInsert()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $builder = $factory->createInsert();
+        $builder = $factory->getInsertBuilder();
 
         $this->assertInstanceOf(InsertBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testCreateUpdate()
+    public function testGetUpdate()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $builder = $factory->createUpdate();
+        $builder = $factory->getUpdateBuilder();
 
         $this->assertInstanceOf(UpdateBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testCreateDelete()
+    public function testGetDelete()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $builder = $factory->createDelete();
+        $builder = $factory->getDeleteBuilder();
 
         $this->assertInstanceOf(DeleteBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testCreateConditionMaker()
+    public function testGetConditionMaker()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $conditionMaker = $factory->createConditionMaker();
+        $conditionMaker = $factory->getConditionMaker();
 
         $this->assertInstanceOf(ConditionMaker::class, $conditionMaker);
         $this->assertSame($grammar, $conditionMaker->getGrammar());

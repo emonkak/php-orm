@@ -26,9 +26,9 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAccesors()
     {
-        $unionBuilder = $this->createSelectBuilder()->select('c1')->from('t1');
+        $unionBuilder = $this->getSelectBuilder()->select('c1')->from('t1');
 
-        $builder = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()
             ->select('c1')
             ->from('t1')
             ->join('t2', 't1.id = t2.id')
@@ -57,7 +57,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSelect()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->build();
         $this->assertQueryIs(
@@ -66,7 +66,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->select('1')
             ->build();
         $this->assertQueryIs(
@@ -75,7 +75,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->select('c1')
             ->select('c2')
             ->from('t1')
@@ -86,7 +86,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->select('c1', 'a1')
             ->select('c2', 'a2')
             ->from('t1')
@@ -97,7 +97,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->select(new Sql('? + 1', [100]), 'c1')
             ->from('t1')
             ->build();
@@ -107,8 +107,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->from('t2')->where('c1', '=', 'foo');
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->from('t2')->where('c1', '=', 'foo');
+        $query = $this->getSelectBuilder()
             ->select($builder, 'c1')
             ->from('t1')
             ->build();
@@ -121,7 +121,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSelectAll()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->selectAll([
                 'c1',
                 'c2' => '1',
@@ -138,7 +138,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrefix()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->prefix('SELECT SQL_CALC_FOUND_ROWS')
             ->from('t1')
             ->build();
@@ -151,7 +151,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFrom()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->select('c1')
             ->from('t1', 'a1')
             ->build();
@@ -161,7 +161,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->from('t2')
             ->build();
@@ -171,8 +171,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->from('t1');
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->from('t1');
+        $query = $this->getSelectBuilder()
             ->from($builder, 'a1')
             ->build();
         $this->assertQueryIs(
@@ -184,7 +184,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testJoin()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->join('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id')
@@ -195,7 +195,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->outerJoin('t2', 't1.id = t2.id')
             ->join('t3', 't2.id = t3.id', null, 'INNER JOIN')
@@ -206,8 +206,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->from('t2');
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->from('t2');
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->join($builder, 't1.id = t2.id', 't2')
             ->build();
@@ -220,7 +220,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereEqual()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->where('c2', 'IS', null)
@@ -231,7 +231,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'var_dump')
             ->where('c2', '=', 'var_dump')
@@ -242,7 +242,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->where('c2', 'IS', null)
@@ -253,7 +253,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '!=', 'foo')
             ->where('c2', '<>', 'bar')
@@ -265,8 +265,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where($builder, '=', 'bar')
             ->build();
@@ -276,7 +276,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '=', $builder)
             ->build();
@@ -289,7 +289,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereComparing()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '>', 0)
             ->where('c2', '<', 1)
@@ -305,7 +305,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereLike()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', 'LIKE', '%foo%')
             ->where('c2', 'NOT LIKE', '%bar%')
@@ -319,7 +319,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereBetween()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', 'BETWEEN', 1, 10)
             ->where('c2', 'NOT BETWEEN', 2, 20)
@@ -330,8 +330,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where($builder, 'BETWEEN', 1, 10)
             ->build();
@@ -344,7 +344,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereIn()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', 'IN', [1, 2, 3])
             ->where('c2', 'NOT IN', [10, 20, 30])
@@ -355,8 +355,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo');
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', 'IN', $builder)
             ->build();
@@ -366,8 +366,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where($builder, 'IN', [1, 2, 3])
             ->build();
@@ -380,7 +380,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereSql()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where(new Sql('(c1 = ?)', ['hoge']))
             ->where(new Sql('(c2 = ? OR c3 = ?)', [1, 2]))
@@ -394,8 +394,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereExists()
     {
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('EXISTS', $builder)
             ->build();
@@ -405,7 +405,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('NOT EXISTS', $builder)
             ->build();
@@ -418,8 +418,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhereIsNull()
     {
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where($builder, 'IS', null)
             ->build();
@@ -429,8 +429,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where($builder, 'IS NOT', null)
             ->build();
@@ -443,7 +443,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrWhere()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->where('c1', '=', 'foo')
             ->orWhere('c2', '=', 'bar')
@@ -457,7 +457,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGroupBy()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->build();
@@ -467,7 +467,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy(new Sql('c1 + ?', [1]), 'DESC')
             ->build();
@@ -477,7 +477,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->groupBy('c2')
@@ -488,8 +488,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy($builder, 'DESC')
             ->build();
@@ -502,7 +502,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testHaving()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c2', '=', 'foo')
@@ -515,7 +515,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c2', '!=', 'foo')
@@ -531,7 +531,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrHaving()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->groupBy('c1')
             ->having('c2', '=', 'foo')
@@ -547,7 +547,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrderBy()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy('c1')
             ->build();
@@ -557,7 +557,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy('NULL')
             ->build();
@@ -567,7 +567,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy(new Sql('c1 + ?', [1]), 'DESC')
             ->build();
@@ -577,8 +577,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
-        $query = $this->createSelectBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy($builder, 'DESC')
             ->build();
@@ -591,7 +591,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testLimit()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->limit(10)
             ->build();
@@ -604,7 +604,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOffset()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->limit(10)
             ->offset(10)
@@ -618,7 +618,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSuffix()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->suffix('FOR UPDATE')
             ->build();
@@ -631,7 +631,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testForUpdate()
     {
-        $query = $this->createSelectBuilder()
+        $query = $this->getSelectBuilder()
             ->from('t1')
             ->forUpdate()
             ->build();
@@ -644,8 +644,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnion()
     {
-        $builder1 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
+        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
 
         $query = $builder1->union($builder2)->build();
         $this->assertQueryIs(
@@ -657,9 +657,9 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnionAll()
     {
-        $builder1 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
-        $builder3 = $this->createSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'baz');
+        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
+        $builder3 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'baz');
 
         $query = $builder1->unionAll($builder2)->unionAll($builder3)->build();
         $this->assertQueryIs(
@@ -688,7 +688,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('SELECT COUNT(*)')
             ->willReturn($stmt);
 
-        $builder = $this->createSelectBuilder()->orderBy('c1');
+        $builder = $this->getSelectBuilder()->orderBy('c1');
         $this->assertSame(123, $builder->aggregate($pdo, 'COUNT(*)'));
     }
 
@@ -712,7 +712,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $fetcher = $this->createMock(FetcherInterface::class);
 
-        $paginator = $this->createSelectBuilder()->paginate($pdo, $fetcher, 100);
+        $paginator = $this->getSelectBuilder()->paginate($pdo, $fetcher, 100);
         $this->assertInstanceOf(Paginator::class, $paginator);
         $this->assertSame(100, $paginator->getPerPage());
         $this->assertSame(1000, $paginator->getNumItems());

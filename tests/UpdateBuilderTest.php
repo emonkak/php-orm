@@ -22,7 +22,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetters()
     {
-        $builder = $this->createUpdateBuilder()
+        $builder = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', 123)
             ->where('c2', '=', 456);
@@ -34,7 +34,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrefix()
     {
-        $query = $this->createUpdateBuilder()
+        $query = $this->getUpdateBuilder()
             ->prefix('UPDATE IGNORE')
             ->table('t1')
             ->set('c1', 'foo')
@@ -49,7 +49,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSet()
     {
-        $query = $this->createUpdateBuilder()
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', new Sql('c1 + ?', [1]))
             ->set('c2', 100)
@@ -60,8 +60,8 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
-        $query = $this->createUpdateBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', $builder)
             ->set('c2', 100)
@@ -75,7 +75,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetAll()
     {
-        $query = $this->createUpdateBuilder()
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->setAll(['c1' => new Sql('c1 + ?', [1]), 'c2' => 100])
             ->build();
@@ -85,8 +85,8 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->createSelectBuilder()->select('c1')->from('t2')->limit(1);
-        $query = $this->createUpdateBuilder()
+        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->setAll(['c1' => $builder, 'c2' => 100])
             ->build();
@@ -99,7 +99,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhere()
     {
-        $query = $this->createUpdateBuilder()
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', 123)
             ->where('c2', '=', 456)
@@ -114,7 +114,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testOrWhere()
     {
-        $query = $this->createUpdateBuilder()
+        $query = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', 123)
             ->where('c2', '=', 456)
