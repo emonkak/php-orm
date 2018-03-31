@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Grammar;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\QueryBuilderInterface;
 
-class MySqlGrammar implements GrammarInterface
+class DefaultGrammar implements GrammarInterface
 {
     /**
      * {@inheritDoc}

@@ -2,26 +2,26 @@
 
 namespace Emonkak\Orm\Tests\Grammar;
 
-use Emonkak\Orm\Grammar\MySqlGrammar;
+use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
- * @covers Emonkak\Orm\Grammar\MySqlGrammar
+ * @covers Emonkak\Orm\Grammar\DefaultGrammar
  */
-class MySqlGrammarTest extends \PHPUnit_Framework_TestCase
+class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
 
     /**
-     * @var MySqlGrammar
+     * @var DefaultGrammar
      */
     private $grammar;
 
     public function setUp()
     {
-        $this->grammar = new MySqlGrammar();
+        $this->grammar = new DefaultGrammar();
     }
 
 

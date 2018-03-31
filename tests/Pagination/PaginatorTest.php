@@ -5,7 +5,7 @@ namespace Emonkak\Orm\Tests\Pagination;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Grammar\MySqlGrammar;
+use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\Pagination\PaginatorIterator;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
