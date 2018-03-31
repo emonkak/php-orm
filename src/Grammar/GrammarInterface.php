@@ -11,13 +11,13 @@ interface GrammarInterface
      * @param mixed $value
      * @return Sql
      */
-    public function lift($value);
+    public function liftExpr($value);
 
     /**
      * @param mixed $value
      * @return Sql
      */
-    public function liftValue($value);
+    public function liftLiteral($value);
 
     /**
      * @param string $operator

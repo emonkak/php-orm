@@ -116,7 +116,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function set($column, $expr)
     {
         $cloned = clone $this;
-        $cloned->update[$column] = $this->grammar->liftValue($expr);
+        $cloned->update[$column] = $this->grammar->liftLiteral($expr);
         return $cloned;
     }
 
@@ -127,7 +127,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function setAll(array $update)
     {
         $cloned = clone $this;
-        $cloned->update = array_map([$this->grammar, 'liftValue'], $update);
+        $cloned->update = array_map([$this->grammar, 'liftLiteral'], $update);
         return $cloned;
     }
 

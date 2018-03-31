@@ -24,17 +24,16 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
         $this->grammar = new DefaultGrammar();
     }
 
-
     /**
-     * @dataProvider providerLift
+     * @dataProvider providerLiftExpr
      */
-    public function testLift($value, $expectedSql, array $expectedBindings)
+    public function testLiftExpr($value, $expectedSql, array $expectedBindings)
     {
-        $query = $this->grammar->lift($value);
+        $query = $this->grammar->liftExpr($value);
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerLift()
+    public function providerLiftExpr()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
@@ -44,16 +43,16 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLiftThrowsUnexpectedValueException
+     * @dataProvider providerLiftExprThrowsUnexpectedValueException
      *
      * @expectedException UnexpectedValueException
      */
     public function testLiftThrowsUnexpectedValueException($value)
     {
-        $this->grammar->lift($value);
+        $this->grammar->liftExpr($value);
     }
 
-    public function providerLiftThrowsUnexpectedValueException()
+    public function providerLiftExprThrowsUnexpectedValueException()
     {
         return [
             [123],
@@ -67,15 +66,15 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLiftValue
+     * @dataProvider providerLiteral
      */
-    public function testLiftValue($value, $expectedSql, array $expectedBindings)
+    public function testLiftLiteral($value, $expectedSql, array $expectedBindings)
     {
-        $query = $this->grammar->liftValue($value);
+        $query = $this->grammar->liftLiteral($value);
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerLiftValue()
+    public function providerLiteral()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
@@ -91,16 +90,16 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLiftValueThrowsUnexpectedValueException
+     * @dataProvider providerLiteralThrowsUnexpectedValueException
      *
      * @expectedException UnexpectedValueException
      */
-    public function testLiftValueThrowsUnexpectedValueException($value)
+    public function testLiftLiteralThrowsUnexpectedValueException($value)
     {
-        $this->grammar->liftValue($value);
+        $this->grammar->liftLiteral($value);
     }
 
-    public function providerLiftValueThrowsUnexpectedValueException()
+    public function providerLiteralThrowsUnexpectedValueException()
     {
         return [
             [new \stdClass()],

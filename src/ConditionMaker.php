@@ -24,21 +24,21 @@ class ConditionMaker
         switch (func_num_args() - 1) {
             case 1:
                 $expr = $arg1;
-                return $grammar->lift($expr);
+                return $grammar->liftExpr($expr);
             case 2:
                 $operator = $arg1;
-                $rhs = $grammar->liftValue($arg2);
+                $rhs = $grammar->liftLiteral($arg2);
                 return $grammar->unaryOperator($operator, $rhs);
             case 3:
-                $lhs = $grammar->lift($arg1);
+                $lhs = $grammar->liftExpr($arg1);
                 $operator = $arg2;
-                $rhs = $grammar->liftValue($arg3);
+                $rhs = $grammar->liftLiteral($arg3);
                 return $grammar->operator($operator, $lhs, $rhs);
             default:
-                $lhs = $grammar->lift($arg1);
+                $lhs = $grammar->liftExpr($arg1);
                 $operator = $arg2;
-                $start = $grammar->liftValue($arg3);
-                $end = $grammar->liftValue($arg4);
+                $start = $grammar->liftLiteral($arg3);
+                $end = $grammar->liftLiteral($arg4);
                 return $grammar->betweenOperator($operator, $lhs, $start, $end);
         }
     }
@@ -77,18 +77,18 @@ class ConditionMaker
                 ');
             case 1:
                 $operator = strtoupper($operator);
-                $rhs = $this->grammar->liftValue($arguments[0]);
+                $rhs = $this->grammar->liftLiteral($arguments[0]);
                 return $this->grammar->unaryOperator($operator, $rhs);
             case 2:
                 $operator = strtoupper($operator);
-                $lhs = $this->grammar->lift($arguments[0]);
-                $rhs = $this->grammar->liftValue($arguments[1]);
+                $lhs = $this->grammar->liftExpr($arguments[0]);
+                $rhs = $this->grammar->liftLiteral($arguments[1]);
                 return $this->grammar->operator($operator, $lhs, $rhs);
             default:
                 $operator = strtoupper($operator);
-                $lhs = $this->grammar->lift($arguments[0]);
-                $start = $this->grammar->liftValue($arguments[1]);
-                $end = $this->grammar->liftValue($arguments[2]);
+                $lhs = $this->grammar->liftExpr($arguments[0]);
+                $start = $this->grammar->liftLiteral($arguments[1]);
+                $end = $this->grammar->liftLiteral($arguments[2]);
                 return $this->grammar->betweenOperator($operator, $lhs, $start, $end);
         }
     }

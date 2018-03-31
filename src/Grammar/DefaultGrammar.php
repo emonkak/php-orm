@@ -10,7 +10,7 @@ class DefaultGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function lift($value)
+    public function liftExpr($value)
     {
         if ($value instanceof Sql) {
             return $value;
@@ -22,13 +22,13 @@ class DefaultGrammar implements GrammarInterface
             return new Sql($value);
         }
         $type = gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
     }
 
     /**
      * {@inheritDoc}
      */
-    public function liftValue($value)
+    public function liftLiteral($value)
     {
         if ($value instanceof Sql) {
             return $value;
@@ -46,7 +46,7 @@ class DefaultGrammar implements GrammarInterface
             return Sql::values($value);
         }
         $type = gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
     }
 
     /**

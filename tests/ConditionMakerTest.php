@@ -21,7 +21,7 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('lift')
+            ->method('liftExpr')
             ->with($expr)
             ->willReturn($expectedQuery);
 
@@ -40,7 +40,7 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($lhsExpr)
             ->willReturn($lhs);
         $grammar
@@ -66,12 +66,12 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('lift')
+            ->method('liftExpr')
             ->with($lhsExpr)
             ->willReturn($lhs);
         $grammar
             ->expects($this->once())
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($rhsExpr)
             ->willReturn($rhs);
         $grammar
@@ -99,17 +99,17 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('lift')
+            ->method('liftExpr')
             ->with($lhsExpr)
             ->willReturn($lhs);
         $grammar
             ->expects($this->at(1))
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($startExpr)
             ->willReturn($start);
         $grammar
             ->expects($this->at(2))
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($endExpr)
             ->willReturn($end);
         $grammar
@@ -144,7 +144,7 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($rhsExpr)
             ->willReturn($rhs);
         $grammar
@@ -169,12 +169,12 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('lift')
+            ->method('liftExpr')
             ->with($lhsExpr)
             ->willReturn($lhs);
         $grammar
             ->expects($this->once())
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($rhsExpr)
             ->willReturn($rhs);
         $grammar
@@ -201,17 +201,17 @@ class ConditionMakerTest extends \PHPUnit_Framework_TestCase
         $grammar = $this->createMock(GrammarInterface::class);
         $grammar
             ->expects($this->once())
-            ->method('lift')
+            ->method('liftExpr')
             ->with($lhsExpr)
             ->willReturn($lhs);
         $grammar
             ->expects($this->at(1))
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($startExpr)
             ->willReturn($start);
         $grammar
             ->expects($this->at(2))
-            ->method('liftValue')
+            ->method('liftLiteral')
             ->with($endExpr)
             ->willReturn($end);
         $grammar

@@ -213,7 +213,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function select($expr, $alias = null)
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->liftExpr($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -230,7 +230,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = $this->grammar->lift($expr);
+            $expr = $this->grammar->liftExpr($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -248,7 +248,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function from($table, $alias = null)
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->liftExpr($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -296,13 +296,13 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->liftExpr($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         $join = $this->join;
         if ($condition !== null) {
-            $condition = $this->grammar->lift($condition);
+            $condition = $this->grammar->liftExpr($condition);
         }
         $cloned = clone $this;
         $cloned->join[] = $this->grammar->join($table, $condition, $type);
@@ -327,7 +327,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function groupBy($expr, $ordering = null)
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->liftExpr($expr);
         if ($ordering !== null) {
             $expr = $expr->append($ordering);
         }
@@ -373,7 +373,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orderBy($expr, $ordering = null)
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->liftExpr($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -430,7 +430,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function union($query, $type = 'UNION')
     {
-        $query = $this->grammar->lift($query);
+        $query = $this->grammar->liftExpr($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;
