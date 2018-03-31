@@ -2,6 +2,7 @@
 
 namespace Emonkak\Orm\Tests;
 
+use Emonkak\Orm\ConditionMaker;
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\InsertBuilder;
@@ -54,5 +55,15 @@ class QueryBuilderFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(DeleteBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
+    }
+
+    public function testCreateConditionMaker()
+    {
+        $grammar = $this->createMock(GrammarInterface::class);
+        $factory = new QueryBuilderFactory($grammar);
+        $conditionMaker = $factory->createConditionMaker();
+
+        $this->assertInstanceOf(ConditionMaker::class, $conditionMaker);
+        $this->assertSame($grammar, $conditionMaker->getGrammar());
     }
 }

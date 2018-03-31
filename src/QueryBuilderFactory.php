@@ -12,26 +12,6 @@ class QueryBuilderFactory
     private $grammar;
 
     /**
-     * @var SelectBuilder
-     */
-    private $selectBuilder;
-
-    /**
-     * @var InsertBuilder
-     */
-    private $insertBuilder;
-
-    /**
-     * @var UpdateBuilder
-     */
-    private $updateBuilder;
-
-    /**
-     * @var DeleteBuilder
-     */
-    private $deleteBuilder;
-
-    /**
      * @param $grammar GrammarInterface
      */
     public function __construct(GrammarInterface $grammar)
@@ -44,10 +24,7 @@ class QueryBuilderFactory
      */
     public function createSelect()
     {
-        if ($this->selectBuilder === null) {
-            $this->selectBuilder = new SelectBuilder($this->grammar);
-        }
-        return $this->selectBuilder;
+        return new SelectBuilder($this->grammar);
     }
 
     /**
@@ -55,10 +32,7 @@ class QueryBuilderFactory
      */
     public function createInsert()
     {
-        if ($this->insertBuilder === null) {
-            $this->insertBuilder = new InsertBuilder($this->grammar);
-        }
-        return $this->insertBuilder;
+        return new InsertBuilder($this->grammar);
     }
 
     /**
@@ -66,10 +40,7 @@ class QueryBuilderFactory
      */
     public function createUpdate()
     {
-        if ($this->updateBuilder === null) {
-            $this->updateBuilder = new UpdateBuilder($this->grammar);
-        }
-        return $this->updateBuilder;
+        return new UpdateBuilder($this->grammar);
     }
 
     /**
@@ -77,9 +48,14 @@ class QueryBuilderFactory
      */
     public function createDelete()
     {
-        if ($this->deleteBuilder === null) {
-            $this->deleteBuilder = new DeleteBuilder($this->grammar);
-        }
-        return $this->deleteBuilder;
+        return new DeleteBuilder($this->grammar);
+    }
+
+    /**
+     * @return ConditionMaker
+     */
+    public function createConditionMaker()
+    {
+        return new ConditionMaker($this->grammar);
     }
 }
