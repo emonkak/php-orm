@@ -21,6 +21,24 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testJoin()
+    {
+        $query = Sql::join(
+            ' AND ',
+            [
+                new Sql('c1 = ?', [123]),
+                new Sql('c2 = ?', [456]),
+                new Sql('c3 = ?', [789])
+            ]
+        );
+
+        $this->assertQueryIs(
+            'c1 = ? AND c2 = ? AND c3 = ?',
+            [123, 456, 789],
+            $query
+        );
+    }
+
     public function testValue()
     {
         $query = Sql::value(123);

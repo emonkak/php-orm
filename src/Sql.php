@@ -32,7 +32,25 @@ class Sql implements QueryBuilderInterface
             $tmpBindings[] = $arg->bindings;
         }
         $sql = vsprintf($format, $tmpSqls);
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * @param string $separator
+     * @param Sql[]  $queries
+     * @return Sql
+     */
+    public static function join($separator, array $queries)
+    {
+        $tmpSqls = [];
+        $tmpBindings = [];
+        foreach ($queries as $query) {
+            $tmpSqls[] = $query->sql;
+            $tmpBindings[] = $query->bindings;
+        }
+        $sql = implode($separator, $tmpSqls);
+        $bindings = array_merge(...$tmpBindings);
         return new Sql($sql, $bindings);
     }
 

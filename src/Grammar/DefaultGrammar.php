@@ -218,7 +218,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' ' . implode(', ', $tmpSqls);
     }
 
@@ -238,7 +238,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' FROM ' . implode(', ', $tmpSqls);
     }
 
@@ -258,7 +258,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' ' . implode(' ', $tmpSqls);
     }
 
@@ -292,7 +292,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' GROUP BY ' . implode(', ', $tmpSqls);
     }
 
@@ -326,7 +326,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' ORDER BY ' . implode(', ', $tmpSqls);
     }
 
@@ -374,7 +374,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $definition->getSql();
             $tmpBindings[] = $definition->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' ' . implode(' ', $tmpSqls);
     }
 
@@ -412,7 +412,7 @@ class DefaultGrammar implements GrammarInterface
             }
             $tmpSqls[] = '(' . implode(', ', $innerSqls) . ')';
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' VALUES ' . implode(', ', $tmpSqls);
     }
 
@@ -446,7 +446,7 @@ class DefaultGrammar implements GrammarInterface
             $tmpSqls[] = $key . ' = ' . $value->getSql();
             $tmpBindings[] = $value->getBindings();
         }
-        $bindings = call_user_func_array('array_merge', $tmpBindings);
+        $bindings = array_merge(...$tmpBindings);
         return ' SET ' . implode(', ', $tmpSqls);
     }
 }
