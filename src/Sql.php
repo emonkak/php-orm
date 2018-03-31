@@ -28,8 +28,8 @@ class Sql implements QueryBuilderInterface
         $tmpSqls = [];
         $tmpBindings = [];
         foreach ($args as $arg) {
-            $tmpSqls[] = $arg->getSql();
-            $tmpBindings[] = $arg->getBindings();
+            $tmpSqls[] = $arg->sql;
+            $tmpBindings[] = $arg->bindings;
         }
         $sql = vsprintf($format, $tmpSqls);
         $bindings = call_user_func_array('array_merge', $tmpBindings);
@@ -94,7 +94,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     public function getSql()
     {
@@ -102,7 +102,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return mixed[]
      */
     public function getBindings()
     {
@@ -124,13 +124,13 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param Sql    $sql
+     * @param Sql    $query
      * @param string $separator
      * @return Sql
      */
-    public function appendSql(Sql $query, $separator = ' ')
+    public function appendQuery(Sql $query, $separator = ' ')
     {
-        return $this->append($query->getSql(), $query->getBindings(), $separator);
+        return $this->append($query->sql, $query->bindings, $separator);
     }
 
     /**
@@ -141,7 +141,7 @@ class Sql implements QueryBuilderInterface
     public function appendBuilder(QueryBuilderInterface $builder, $separator = ' ')
     {
         $query = $builder->build();
-        return $this->append('(' . $query->getSql() . ')', $query->getBindings(), $separator);
+        return $this->append('(' . $query->sql . ')', $query->bindings, $separator);
     }
 
     /**
@@ -158,13 +158,13 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param Sql    $sql
+     * @param Sql    $query
      * @param string $separator
      * @return Sql
      */
-    public function prependSql(Sql $query, $separator = ' ')
+    public function prependQuery(Sql $query, $separator = ' ')
     {
-        return $this->prepend($query->getSql(), $query->getBindings(), $separator);
+        return $this->prepend($query->sql, $query->bindings, $separator);
     }
 
     /**
@@ -175,7 +175,7 @@ class Sql implements QueryBuilderInterface
     public function prependBuilder(QueryBuilderInterface $builder, $separator = ' ')
     {
         $query = $builder->build();
-        return $this->prepend('(' . $query->getSql() . ')', $query->getBindings(), $separator);
+        return $this->prepend('(' . $query->sql . ')', $query->bindings, $separator);
     }
 
     /**

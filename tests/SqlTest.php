@@ -69,14 +69,14 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAppendSql()
+    public function testAppendQuery()
     {
         $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
             ->append('WHERE')
-            ->appendSql(new Sql('c1 IN (?, ?, ?)', [1, 2, 3]));
+            ->appendQuery(new Sql('c1 IN (?, ?, ?)', [1, 2, 3]));
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE c1 IN (?, ?, ?)',
             [1, 2, 3],
@@ -84,9 +84,9 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
 
         $query = (new Sql('INSERT INTO t1 VALUES'))
-            ->appendSql(Sql::values([1, 2, 3]))
-            ->appendSql(Sql::values([4, 5, 6]), ', ')
-            ->appendSql(Sql::values([7, 8, 9]), ', ');
+            ->appendQuery(Sql::values([1, 2, 3]))
+            ->appendQuery(Sql::values([4, 5, 6]), ', ')
+            ->appendQuery(Sql::values([7, 8, 9]), ', ');
         $this->assertQueryIs(
             'INSERT INTO t1 VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?)',
             [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -125,11 +125,11 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPrependSql()
+    public function testPrependQuery()
     {
         $query = (new Sql('UNION ALL'))
-            ->appendSql(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
-            ->prependSql(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
+            ->appendQuery(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
+            ->prependQuery(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
         $this->assertQueryIs(
             'SELECT * FROM t2 WHERE c1 = ? UNION ALL SELECT * FROM t1 WHERE c1 = ?',
             [456, 123],
@@ -137,10 +137,10 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
 
         $query = (new Sql('INSERT INTO t1 VALUES'))
-            ->appendSql(
+            ->appendQuery(
                 Sql::values([1, 2, 3])
-                    ->prependSql(Sql::values([4, 5, 6]), ', ')
-                    ->prependSql(Sql::values([7, 8, 9]), ', ')
+                    ->prependQuery(Sql::values([4, 5, 6]), ', ')
+                    ->prependQuery(Sql::values([7, 8, 9]), ', ')
             );
         $this->assertQueryIs(
             'INSERT INTO t1 VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?)',
