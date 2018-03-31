@@ -54,9 +54,27 @@ class DefaultGrammar implements GrammarInterface
      */
     public function operator($operator, Sql $lhs, Sql $rhs)
     {
-        $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
-        $bindings = array_merge($lhs->getBindings(), $rhs->getBindings());
-        return new Sql($sql, $bindings);
+        switch (strtoupper($operator)) {
+            case '=':
+            case '!=':
+            case '<>':
+            case '<':
+            case '<=':
+            case '>':
+            case '>=':
+            case 'IS':
+            case 'IS NOT':
+            case 'IN':
+            case 'NOT IN':
+            case 'LIKE':
+            case 'NOT LIKE':
+            case 'AND':
+            case 'OR':
+                $sql = "({$lhs->getSql()} $operator {$rhs->getSql()})";
+                $bindings = array_merge($lhs->getBindings(), $rhs->getBindings());
+                return new Sql($sql, $bindings);
+        }
+        throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
     }
 
     /**
@@ -64,9 +82,14 @@ class DefaultGrammar implements GrammarInterface
      */
     public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end)
     {
-        $sql = "({$lhs->getSql()} $operator {$start->getSql()} AND {$end->getSql()})";
-        $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
-        return new Sql($sql, $bindings);
+        switch (strtoupper($operator)) {
+            case 'BETWEEN':
+            case 'NOT BETWEEN':
+                $sql = "({$lhs->getSql()} $operator {$start->getSql()} AND {$end->getSql()})";
+                $bindings = array_merge($lhs->getBindings(), $start->getBindings(), $end->getBindings());
+                return new Sql($sql, $bindings);
+        }
+        throw new \UnexpectedValueException("Unexpected between operator, got '$operator'.");
     }
 
     /**
@@ -74,9 +97,21 @@ class DefaultGrammar implements GrammarInterface
      */
     public function unaryOperator($operator, Sql $rhs)
     {
-        $sql = "($operator {$rhs->getSql()})";
-        $bindings = $rhs->getBindings();
-        return new Sql($sql, $bindings);
+        switch (strtoupper($operator)) {
+            case 'NOT':
+            case 'EXISTS':
+            case 'NOT EXISTS':
+            case 'ALL':
+            case 'NOT ALL':
+            case 'ANY':
+            case 'NOT ANY':
+            case 'SOME':
+            case 'NOT SOME':
+                $sql = "($operator {$rhs->getSql()})";
+                $bindings = $rhs->getBindings();
+                return new Sql($sql, $bindings);
+        }
+        throw new \UnexpectedValueException("Unexpected unary operator, got '$operator'.");
     }
 
     /**

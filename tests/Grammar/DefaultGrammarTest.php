@@ -133,6 +133,8 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
             ['<=','c1', [], '?', ['foo'], '(c1 <= ?)', ['foo']],
             ['>', 'c1', [],'?', ['foo'], '(c1 > ?)', ['foo']],
             ['>=','c1', [], '?', ['foo'], '(c1 >= ?)', ['foo']],
+            ['IS', 'c1', [],'NULL', [], '(c1 IS NULL)', []],
+            ['IS NOT','c1', [], 'NULL', [], '(c1 IS NOT NULL)', []],
             ['IN','c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
             ['NOT IN', 'c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
             ['LIKE', 'c1', [], '?', ['foo'], '(c1 LIKE ?)', ['foo']],
@@ -143,29 +145,11 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerBetweenOperator
+     * @expectedException UnexpectedValueException
      */
-    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
+    public function testInvalidOperatorThrowsException()
     {
-        $lhs = new Sql($lhsSql, $lhsBindings);
-        $start = new Sql($startSql, $startBindings);
-        $end = new Sql($endSql, $endBindings);
-
-        $query = $this->grammar->betweenOperator($operator, $lhs, $start, $end);
-
-        $this->assertQueryIs(
-            $expectedSql,
-            $expectedBindings,
-            $query
-        );
-    }
-
-    public function providerBetweenOperator()
-    {
-        return [
-            ['BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
-            ['NOT BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 NOT BETWEEN ? AND ?)', [123, 456]],
-        ];
+        $this->grammar->operator('==', new Sql('c1'), new Sql('?', [123]));
     }
 
     /**
@@ -197,6 +181,48 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
             ['SOME', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
             ['NOT SOME', '(SELECT * FROM t1 WHERE c1 = ?)', ['foo'], '(NOT SOME (SELECT * FROM t1 WHERE c1 = ?))', ['foo']],
         ];
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testInvalidUnaryOperatorThrowsException()
+    {
+        $this->grammar->unaryOperator('AND', new Sql('c1'));
+    }
+
+    /**
+     * @dataProvider providerBetweenOperator
+     */
+    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
+    {
+        $lhs = new Sql($lhsSql, $lhsBindings);
+        $start = new Sql($startSql, $startBindings);
+        $end = new Sql($endSql, $endBindings);
+
+        $query = $this->grammar->betweenOperator($operator, $lhs, $start, $end);
+
+        $this->assertQueryIs(
+            $expectedSql,
+            $expectedBindings,
+            $query
+        );
+    }
+
+    public function providerBetweenOperator()
+    {
+        return [
+            ['BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
+            ['NOT BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 NOT BETWEEN ? AND ?)', [123, 456]],
+        ];
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testInvalidBetweenOperatorThrowsException()
+    {
+        $this->grammar->betweenOperator('=', new Sql('c1'), new Sql('?', [123]), new Sql('?', [456]));
     }
 
     public function testJoin()
