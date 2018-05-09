@@ -56,7 +56,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
 
         $result = new PaginatedResultSet($innerResult, $paginator, 123);
 
-        $this->assertSame(124, $result->getPageNum());
+        $this->assertSame(123, $result->getIndex());
     }
 
     public function testGetPaginator()

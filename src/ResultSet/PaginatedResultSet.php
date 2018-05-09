@@ -61,14 +61,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
-     */
-    public function getPageNum()
-    {
-        return $this->index + 1;
-    }
-
-    /**
      * @return PaginatorInterface
      */
     public function getPaginator()

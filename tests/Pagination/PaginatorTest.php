@@ -78,22 +78,18 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $paginator->at(0);
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(0, $page->getIndex());
-        $this->assertSame(1, $page->getPageNum());
 
         $page = $paginator->at(1);
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(1, $page->getIndex());
-        $this->assertSame(2, $page->getPageNum());
 
         $page = $paginator->at(2);
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(2, $page->getIndex());
-        $this->assertSame(3, $page->getPageNum());
 
         $page = $paginator->at(999);
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(999, $page->getIndex());
-        $this->assertSame(1000, $page->getPageNum());
     }
 
     /**
@@ -154,7 +150,6 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $paginator->firstPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(0, $page->getIndex());
-        $this->assertSame(1, $page->getPageNum());
     }
 
     public function testLastPage()
@@ -199,7 +194,6 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $paginator->lastPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(2, $page->getIndex());
-        $this->assertSame(3, $page->getPageNum());
     }
 
     public function testLastPageWithEmpty()
@@ -222,7 +216,6 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $paginator->lastPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(0, $page->getIndex());
-        $this->assertSame(1, $page->getPageNum());
         $this->assertEquals([], $page->toArray());
     }
 }
