@@ -95,7 +95,8 @@ class Paginator implements PaginatorInterface
      */
     public function lastPage()
     {
-        return $this->at($this->getNumPages() - 1);
+        $numPages = $this->getNumPages();
+        return $this->at($numPages > 0 ? $numPages - 1 : 0);
     }
 
     /**
