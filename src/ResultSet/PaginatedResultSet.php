@@ -69,6 +69,14 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
+     * @return PaginatorInterface
+     */
+    public function getPaginator()
+    {
+        return $this->paginator;
+    }
+
+    /**
      * @return PaginatedResultSet
      */
     public function nextPage()
