@@ -52,10 +52,10 @@ class QueryBuilderFactory
     }
 
     /**
-     * @return ConditionMaker
+     * @return GrammarInterface
      */
-    public function getConditionMaker()
+    public function getGrammar()
     {
-        return new ConditionMaker($this->grammar);
+        return $this->grammar;
     }
 }

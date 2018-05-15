@@ -59,6 +59,108 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider providerExpr
+     */
+    public function testExpr($value, $expectedSql, array $expectedBindings)
+    {
+        $query = Sql::expr($value);
+
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerExpr()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', 'foo', []],
+        ];
+    }
+
+    /**
+     * @dataProvider providerExprThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testExprThrowsUnexpectedValueException($value)
+    {
+        Sql::expr($value);
+    }
+
+    public function providerExprThrowsUnexpectedValueException()
+    {
+        return [
+            [123],
+            [1.23],
+            [true],
+            [false],
+            [null],
+            [[1, 2, 3]],
+            [new \stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiteral
+     */
+    public function testLiteral($value, $expectedSql, array $expectedBindings)
+    {
+        $query = Sql::literal($value);
+
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerLiteral()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', '?', ['foo']],
+            [123, '?', [123]],
+            [1.23, '?', [1.23]],
+            [true, '?', [true]],
+            [false, '?', [false]],
+            [null, 'NULL', []],
+            [[1, 2, 3], '(?, ?, ?)', [1, 2, 3]],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiteralThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testLiteralThrowsUnexpectedValueException($value)
+    {
+        Sql::literal($value);
+    }
+
+    public function providerLiteralThrowsUnexpectedValueException()
+    {
+        return [
+            [new \stdClass()],
+        ];
+    }
+
+    public function testAnd()
+    {
+        $query = Sql::_and(
+            Sql::_or(
+                new Sql('foo = ?' , [1]),
+                new Sql('bar = ?' , [2])
+            ),
+            new Sql('qux = ?' , [3]),
+            new Sql('baz = ?' , [4])
+        );
+
+        $this->assertQueryIs(
+            '(((foo = ? OR bar = ?) AND qux = ?) AND baz = ?)',
+            [1, 2, 3, 4],
+            $query
+        );
+    }
+
     public function testToString()
     {
         $sql = 'SELECT * FROM t1 WHERE (((((c1 IN (?, ?, ?)) AND (c2 = ?)) AND (c3 IS NOT ?)) AND (c4 = ?)) AND (c5 = ?)) ORDER BY c1';

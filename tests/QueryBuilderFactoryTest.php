@@ -57,13 +57,11 @@ class QueryBuilderFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testGetConditionMaker()
+    public function testGetGrammar()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $factory = new QueryBuilderFactory($grammar);
-        $conditionMaker = $factory->getConditionMaker();
 
-        $this->assertInstanceOf(ConditionMaker::class, $conditionMaker);
-        $this->assertSame($grammar, $conditionMaker->getGrammar());
+        $this->assertSame($grammar, $factory->getGrammar());
     }
 }

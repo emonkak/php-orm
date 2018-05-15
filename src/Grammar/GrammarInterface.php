@@ -8,18 +8,6 @@ use Emonkak\Orm\Sql;
 interface GrammarInterface
 {
     /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public function liftExpr($value);
-
-    /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public function liftLiteral($value);
-
-    /**
      * @param string $operator
      * @param Sql    $lhs
      * @param Sql    $rhs

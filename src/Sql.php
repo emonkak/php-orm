@@ -75,6 +75,90 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
+     * @param mixed $value
+     * @return Sql
+     */
+    public static function expr($value)
+    {
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if (is_string($value)) {
+            return new Sql($value);
+        }
+        $type = gettype($value);
+        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
+    }
+
+    /**
+     * @param mixed $value
+     * @return Sql
+     */
+    public static function literal($value)
+    {
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if ($value === null) {
+            return new Sql('NULL');
+        }
+        if (is_scalar($value)) {
+            return Sql::value($value);
+        }
+        if (is_array($value)) {
+            return Sql::values($value);
+        }
+        $type = gettype($value);
+        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
+    }
+
+    /**
+     * @param Sql $lhs
+     * @param Sql ...$rest
+     * @return Sql
+     */
+    public static function _and(Sql $lhs, Sql ...$rest)
+    {
+        $sql = $lhs->getSql();
+        $nestedBindings = [$lhs->getBindings()];
+
+        foreach ($rest as $rhs) {
+            $sql = '(' . $sql . ' AND ' . $rhs->getSql() . ')';
+            $nestedBindings[] = $rhs->getBindings();
+        }
+
+        $bindings = array_merge(...$nestedBindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * @param Sql $lhs
+     * @param Sql ...$rest
+     * @return Sql
+     */
+    public static function _or(Sql $lhs, Sql ...$rest)
+    {
+        $sql = $lhs->getSql();
+        $nestedBindings = [$lhs->getBindings()];
+
+        foreach ($rest as $rhs) {
+            $sql = '(' . $sql . ' OR ' . $rhs->getSql() . ')';
+            $nestedBindings[] = $rhs->getBindings();
+        }
+
+        $bindings = array_merge(...$nestedBindings);
+
+        return new Sql($sql, $bindings);
+    }
+
+    /**
      * @param string  $sql
      * @param mixed[] $bindings
      */

@@ -10,48 +10,6 @@ class DefaultGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function liftExpr($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if (is_string($value)) {
-            return new Sql($value);
-        }
-        $type = gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function liftLiteral($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if ($value === null) {
-            return new Sql('NULL');
-        }
-        if (is_scalar($value)) {
-            return Sql::value($value);
-        }
-        if (is_array($value)) {
-            return Sql::values($value);
-        }
-        $type = gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function operator($operator, Sql $lhs, Sql $rhs)
     {
         switch (strtoupper($operator)) {

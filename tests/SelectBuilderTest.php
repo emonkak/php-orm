@@ -48,7 +48,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertQueryIs('(t1.c1 = ?)', [123], $builder->getWhere());
         $this->assertEquals([new Sql('t1.c1')], $builder->getGroupBy());
         $this->assertEquals([new Sql('t1.c2')], $builder->getOrderBy());
-        $this->assertQueryIs('(t1.c2 = ?)', [456], $builder->getHaving());
+        $this->assertQueryIs('(t1.c2 = ?)', [456], $builder->getHaving()->build());
         $this->assertSame(12, $builder->getOffset());
         $this->assertSame(34, $builder->getLimit());
         $this->assertSame('FOR UPDATE', $builder->getSuffix());

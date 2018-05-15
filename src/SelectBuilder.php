@@ -14,6 +14,7 @@ use Emonkak\Orm\Pagination\Paginator;
 class SelectBuilder implements QueryBuilderInterface
 {
     use Aggregatable;
+    use Conditional;
     use Explainable;
     use Fetchable;
     use Preparable;
@@ -213,7 +214,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function select($expr, $alias = null)
     {
-        $expr = $this->grammar->liftExpr($expr);
+        $expr = Sql::expr($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -230,7 +231,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = $this->grammar->liftExpr($expr);
+            $expr = Sql::expr($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -248,7 +249,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function from($table, $alias = null)
     {
-        $table = $this->grammar->liftExpr($table);
+        $table = Sql::expr($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -266,9 +267,9 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -281,9 +282,9 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -296,13 +297,13 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
     {
-        $table = $this->grammar->liftExpr($table);
+        $table = Sql::expr($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         $join = $this->join;
         if ($condition !== null) {
-            $condition = $this->grammar->liftExpr($condition);
+            $condition = Sql::expr($condition);
         }
         $cloned = clone $this;
         $cloned->join[] = $this->grammar->join($table, $condition, $type);
@@ -327,7 +328,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function groupBy($expr, $ordering = null)
     {
-        $expr = $this->grammar->liftExpr($expr);
+        $expr = Sql::expr($expr);
         if ($ordering !== null) {
             $expr = $expr->append($ordering);
         }
@@ -345,9 +346,9 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->having = $this->having ? $this->grammar->operator('AND', $this->having, $condition) : $condition;
+        $cloned->having = $this->having ? Sql::_and($this->having, $condition) : $condition;
         return $cloned;
     }
 
@@ -360,9 +361,9 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->having = $this->having ? $this->grammar->operator('OR', $this->having, $condition) : $condition;
+        $cloned->having = $this->having ? Sql::_or($this->having, $condition) : $condition;
         return $cloned;
     }
 
@@ -373,7 +374,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orderBy($expr, $ordering = null)
     {
-        $expr = $this->grammar->liftExpr($expr);
+        $expr = Sql::expr($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -430,7 +431,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function union($query, $type = 'UNION')
     {
-        $query = $this->grammar->liftExpr($query);
+        $query = Sql::expr($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;
@@ -488,6 +489,9 @@ class SelectBuilder implements QueryBuilderInterface
         return new Paginator($this, $pdo, $fetcher, $perPage, $numItems);
     }
 
+    /**
+     * @return $this
+     */
     private function withoutOrderBy()
     {
         $cloned = clone $this;

@@ -10,6 +10,7 @@ use Emonkak\Orm\Grammar\GrammarProvider;
  */
 class UpdateBuilder implements QueryBuilderInterface
 {
+    use Conditional;
     use Explainable;
     use Preparable;
 
@@ -116,7 +117,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function set($column, $expr)
     {
         $cloned = clone $this;
-        $cloned->update[$column] = $this->grammar->liftLiteral($expr);
+        $cloned->update[$column] = Sql::literal($expr);
         return $cloned;
     }
 
@@ -127,7 +128,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function setAll(array $update)
     {
         $cloned = clone $this;
-        $cloned->update = array_map([$this->grammar, 'liftLiteral'], $update);
+        $cloned->update = array_map([Sql::class, 'literal'], $update);
         return $cloned;
     }
 
@@ -140,9 +141,9 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -155,9 +156,9 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
         return $cloned;
     }
 

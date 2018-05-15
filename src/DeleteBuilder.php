@@ -10,6 +10,7 @@ use Emonkak\Orm\Grammar\GrammarProvider;
  */
 class DeleteBuilder implements QueryBuilderInterface
 {
+    use Conditional;
     use Explainable;
     use Preparable;
 
@@ -104,9 +105,9 @@ class DeleteBuilder implements QueryBuilderInterface
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('AND', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -119,9 +120,9 @@ class DeleteBuilder implements QueryBuilderInterface
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = ConditionMaker::make($this->grammar, ...func_get_args());
+        $condition = $this->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? $this->grammar->operator('OR', $this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
         return $cloned;
     }
 
