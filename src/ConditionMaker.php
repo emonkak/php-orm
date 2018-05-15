@@ -133,7 +133,6 @@ class ConditionMaker
 
     /**
      * @param mixed $lhs
-     * @param mixed $rhs
      * @return Sql
      */
     public function isNull($lhs)
@@ -143,7 +142,6 @@ class ConditionMaker
 
     /**
      * @param mixed $lhs
-     * @param mixed $rhs
      * @return Sql
      */
     public function isNotNull($lhs)
@@ -293,9 +291,9 @@ class ConditionMaker
     }
 
     /**
-     * @param mixed  $lhs
-     * @param mixed  $start
-     * @param mixed  $end
+     * @param mixed $lhs
+     * @param mixed $start
+     * @param mixed $end
      * @return Sql
      */
     public function between($lhs, $start, $end)
@@ -304,9 +302,9 @@ class ConditionMaker
     }
 
     /**
-     * @param mixed  $lhs
-     * @param mixed  $start
-     * @param mixed  $end
+     * @param mixed $lhs
+     * @param mixed $start
+     * @param mixed $end
      * @return Sql
      */
     public function notBetween($lhs, $start, $end)
