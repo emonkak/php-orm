@@ -15,20 +15,10 @@ use Emonkak\Orm\UpdateBuilder;
  */
 class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
 {
-    use QueryBuilderTestTrait;
-
-    public function testGetGrammar()
-    {
-        $grammar = $this->createMock(GrammarInterface::class);
-        $provider = new QueryBuilderProvider($grammar);
-
-        $this->assertSame($grammar, $provider->getGrammar());
-    }
-
     public function testSelect()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $provider = new QueryBuilderProvider($grammar);
+        $provider = QueryBuilderProvider::create($grammar);
         $builder = $provider->select();
 
         $this->assertInstanceOf(SelectBuilder::class, $builder);
@@ -38,7 +28,7 @@ class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
     public function testInsert()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $provider = new QueryBuilderProvider($grammar);
+        $provider = QueryBuilderProvider::create($grammar);
         $builder = $provider->insert();
 
         $this->assertInstanceOf(InsertBuilder::class, $builder);
@@ -48,7 +38,7 @@ class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
     public function testUpdate()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $provider = new QueryBuilderProvider($grammar);
+        $provider = QueryBuilderProvider::create($grammar);
         $builder = $provider->update();
 
         $this->assertInstanceOf(UpdateBuilder::class, $builder);
@@ -58,7 +48,7 @@ class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
     public function testDelete()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $provider = new QueryBuilderProvider($grammar);
+        $provider = QueryBuilderProvider::create($grammar);
         $builder = $provider->delete();
 
         $this->assertInstanceOf(DeleteBuilder::class, $builder);
