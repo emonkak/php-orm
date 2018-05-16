@@ -27,12 +27,15 @@ class Sql implements QueryBuilderInterface
     {
         $tmpSqls = [];
         $tmpBindings = [];
+
         foreach ($args as $arg) {
             $tmpSqls[] = $arg->sql;
             $tmpBindings[] = $arg->bindings;
         }
+
         $sql = vsprintf($format, $tmpSqls);
         $bindings = array_merge(...$tmpBindings);
+
         return new Sql($sql, $bindings);
     }
 
@@ -45,12 +48,15 @@ class Sql implements QueryBuilderInterface
     {
         $tmpSqls = [];
         $tmpBindings = [];
+
         foreach ($queries as $query) {
             $tmpSqls[] = $query->sql;
             $tmpBindings[] = $query->bindings;
         }
+
         $sql = implode($separator, $tmpSqls);
         $bindings = array_merge(...$tmpBindings);
+
         return new Sql($sql, $bindings);
     }
 
@@ -125,12 +131,12 @@ class Sql implements QueryBuilderInterface
      */
     public static function _and(Sql $lhs, Sql ...$rest)
     {
-        $sql = $lhs->getSql();
-        $nestedBindings = [$lhs->getBindings()];
+        $sql = $lhs->sql;
+        $nestedBindings = [$lhs->bindings];
 
         foreach ($rest as $rhs) {
-            $sql = '(' . $sql . ' AND ' . $rhs->getSql() . ')';
-            $nestedBindings[] = $rhs->getBindings();
+            $sql = '(' . $sql . ' AND ' . $rhs->sql . ')';
+            $nestedBindings[] = $rhs->bindings;
         }
 
         $bindings = array_merge(...$nestedBindings);
@@ -145,12 +151,12 @@ class Sql implements QueryBuilderInterface
      */
     public static function _or(Sql $lhs, Sql ...$rest)
     {
-        $sql = $lhs->getSql();
-        $nestedBindings = [$lhs->getBindings()];
+        $sql = $lhs->sql;
+        $nestedBindings = [$lhs->bindings];
 
         foreach ($rest as $rhs) {
-            $sql = '(' . $sql . ' OR ' . $rhs->getSql() . ')';
-            $nestedBindings[] = $rhs->getBindings();
+            $sql = '(' . $sql . ' OR ' . $rhs->sql . ')';
+            $nestedBindings[] = $rhs->bindings;
         }
 
         $bindings = array_merge(...$nestedBindings);
@@ -189,7 +195,6 @@ class Sql implements QueryBuilderInterface
                 } else {  // binary string
                     return "x'" . bin2hex($binding) . "'";
                 }
-                break;
             }
         }, $this->bindings);
         return vsprintf($format, $args);
