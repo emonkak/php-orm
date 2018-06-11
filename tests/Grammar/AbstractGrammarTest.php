@@ -2,14 +2,14 @@
 
 namespace Emonkak\Orm\Tests;
 
-use Emonkak\Orm\Conditional;
+use Emonkak\Orm\Grammar\AbstractGrammar;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Sql;
 
 /**
- * @covers Emonkak\Orm\Conditional
+ * @covers Emonkak\Orm\Grammar\AbstractGrammar
  */
-class ConditionalTest extends \PHPUnit_Framework_TestCase
+class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
 
@@ -18,11 +18,9 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $expr = 'SELECT 1';
         $expectedQuery = new Sql('SELECT 1');
 
-        $grammar = $this->createMock(GrammarInterface::class);
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
 
-        $conditional = new ConditionalImpl($grammar);
-
-        $this->assertEquals($expectedQuery, $conditional->condition($expr));
+        $this->assertEquals($expectedQuery, $grammar->condition($expr));
     }
 
     public function testConditionWithTwoArgument()
@@ -32,16 +30,14 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $lhs = new Sql($lhsExpr);
         $expectedQuery = new Sql('EXISTS (SELECT 1)');
 
-        $grammar = $this->createMock(GrammarInterface::class);
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $grammar
             ->expects($this->any())
             ->method('unaryOperator')
             ->with($operator, $lhs)
             ->willReturn($expectedQuery);
 
-        $conditional = new ConditionalImpl($grammar);
-
-        $this->assertEquals($expectedQuery, $conditional->condition($operator, $lhsExpr));
+        $this->assertEquals($expectedQuery, $grammar->condition($operator, $lhsExpr));
     }
 
     public function testConditionWithThreeArgument()
@@ -53,16 +49,14 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $rhs = new Sql('?', [$rhsExpr]);
         $expectedQuery = new Sql('c1 = ?', [123]);
 
-        $grammar = $this->createMock(GrammarInterface::class);
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $grammar
             ->expects($this->any())
             ->method('operator')
             ->with($operator, $lhs, $rhs)
             ->willReturn($expectedQuery);
 
-        $conditional = new ConditionalImpl($grammar);
-
-        $this->assertEquals($expectedQuery, $conditional->condition($lhsExpr, $operator, $rhsExpr));
+        $this->assertEquals($expectedQuery, $grammar->condition($lhsExpr, $operator, $rhsExpr));
     }
 
     public function testConditionWithFourArgument()
@@ -76,30 +70,13 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $end = new Sql('?', [$endExpr]);
         $expectedQuery = new Sql('c1 BETWEEN ? AND ?', [123, 456]);
 
-        $grammar = $this->createMock(GrammarInterface::class);
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $grammar
             ->expects($this->any())
             ->method('betweenOperator')
             ->with($operator, $lhs, $start, $end)
             ->willReturn($expectedQuery);
 
-        $conditional = new ConditionalImpl($grammar);
-
-        $this->assertEquals($expectedQuery, $conditional->condition($lhsExpr, $operator, $startExpr, $endExpr));
-    }
-}
-
-class ConditionalImpl
-{
-    use Conditional;
-
-    public function __construct(GrammarInterface $grammar)
-    {
-        $this->grammar = $grammar;
-    }
-
-    public function getGrammar()
-    {
-        return $this->grammar;
+        $this->assertEquals($expectedQuery, $grammar->condition($lhsExpr, $operator, $startExpr, $endExpr));
     }
 }

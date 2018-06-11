@@ -14,7 +14,6 @@ use Emonkak\Orm\Pagination\Paginator;
 class SelectBuilder implements QueryBuilderInterface
 {
     use Aggregatable;
-    use Conditional;
     use Explainable;
     use Fetchable;
     use Preparable;
@@ -267,7 +266,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->condition(...func_get_args());
+        $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
         $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
         return $cloned;
@@ -282,7 +281,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->condition(...func_get_args());
+        $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
         $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
         return $cloned;
@@ -346,7 +345,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->condition(...func_get_args());
+        $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
         $cloned->having = $this->having ? Sql::_and($this->having, $condition) : $condition;
         return $cloned;
@@ -361,7 +360,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
-        $condition = $this->condition(...func_get_args());
+        $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
         $cloned->having = $this->having ? Sql::_or($this->having, $condition) : $condition;
         return $cloned;

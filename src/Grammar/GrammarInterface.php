@@ -8,6 +8,15 @@ use Emonkak\Orm\Sql;
 interface GrammarInterface
 {
     /**
+     * @param mixed      $arg1
+     * @param mixed|null $arg2
+     * @param mixed|null $arg3
+     * @param mixed|null $arg4
+     * @return Sql
+     */
+    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null);
+
+    /**
      * @param string $operator
      * @param Sql    $lhs
      * @param Sql    $rhs
