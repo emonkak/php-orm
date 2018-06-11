@@ -61,7 +61,7 @@ class QueryBuilderProvider
     /**
      * @return SelectBuilder
      */
-    public function select()
+    public function getSelect()
     {
         return $this->selectBuilder;
     }
@@ -69,7 +69,7 @@ class QueryBuilderProvider
     /**
      * @return InsertBuilder
      */
-    public function insert()
+    public function getInsert()
     {
         return $this->insertBuilder;
     }
@@ -77,7 +77,7 @@ class QueryBuilderProvider
     /**
      * @return UpdateBuilder
      */
-    public function update()
+    public function getUpdate()
     {
         return $this->updateBuilder;
     }
@@ -85,7 +85,7 @@ class QueryBuilderProvider
     /**
      * @return DeleteBuilder
      */
-    public function delete()
+    public function getDelete()
     {
         return $this->deleteBuilder;
     }

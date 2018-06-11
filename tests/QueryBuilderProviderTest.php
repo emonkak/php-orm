@@ -15,41 +15,41 @@ use Emonkak\Orm\UpdateBuilder;
  */
 class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSelect()
+    public function testGetSelect()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $provider = QueryBuilderProvider::create($grammar);
-        $builder = $provider->select();
+        $builder = $provider->getSelect();
 
         $this->assertInstanceOf(SelectBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testInsert()
+    public function testGetInsert()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $provider = QueryBuilderProvider::create($grammar);
-        $builder = $provider->insert();
+        $builder = $provider->getInsert();
 
         $this->assertInstanceOf(InsertBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testUpdate()
+    public function testGetUpdate()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $provider = QueryBuilderProvider::create($grammar);
-        $builder = $provider->update();
+        $builder = $provider->getUpdate();
 
         $this->assertInstanceOf(UpdateBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
-    public function testDelete()
+    public function testGetDelete()
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $provider = QueryBuilderProvider::create($grammar);
-        $builder = $provider->delete();
+        $builder = $provider->getDelete();
 
         $this->assertInstanceOf(DeleteBuilder::class, $builder);
         $this->assertSame($grammar, $builder->getGrammar());
