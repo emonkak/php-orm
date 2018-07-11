@@ -484,8 +484,8 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage)
     {
-        $numItems = $this->count($pdo);
-        return new Paginator($this, $pdo, $fetcher, $perPage, $numItems);
+        $itemCount = $this->count($pdo);
+        return new Paginator($this, $pdo, $fetcher, $perPage, $itemCount);
     }
 
     /**

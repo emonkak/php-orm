@@ -25,9 +25,9 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $perPage = 100;
-        $numItems = 201;
+        $itemCount = 201;
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
 
         $this->assertInstanceOf(PaginatorIterator::class, $paginator->getIterator());
     }
@@ -35,7 +35,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
     public function testAt()
     {
         $perPage = 100;
-        $numItems = 201;
+        $itemCount = 201;
 
         $builder = $this->getSelectBuilder()->from('t1');
 
@@ -69,11 +69,11 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($result);
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
 
         $this->assertSame($perPage, $paginator->getPerPage());
-        $this->assertSame($numItems, $paginator->getNumItems());
-        $this->assertSame(3, $paginator->getNumPages());
+        $this->assertSame($itemCount, $paginator->getItemCount());
+        $this->assertSame(3, $paginator->getPageCount());
 
         $page = $paginator->at(0);
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
@@ -99,13 +99,13 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $builder = $this->getSelectBuilder()->from('t1');
         $perPage = 100;
-        $numItems = 201;
+        $itemCount = 201;
 
         $pdo = $this->createMock(PDOInterface::class);
 
         $fetcher = $this->createMock(FetcherInterface::class);
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
         $paginator->at(-1);
     }
 
@@ -113,7 +113,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $builder = $this->getSelectBuilder()->from('t1');
         $perPage = 100;
-        $numItems = 201;
+        $itemCount = 201;
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -141,11 +141,11 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($result);
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
 
         $this->assertSame($perPage, $paginator->getPerPage());
-        $this->assertSame($numItems, $paginator->getNumItems());
-        $this->assertSame(3, $paginator->getNumPages());
+        $this->assertSame($itemCount, $paginator->getItemCount());
+        $this->assertSame(3, $paginator->getPageCount());
 
         $page = $paginator->firstPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
@@ -155,7 +155,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
     public function testLastPage()
     {
         $perPage = 100;
-        $numItems = 201;
+        $itemCount = 201;
 
         $builder = $this->getSelectBuilder()->from('t1');
 
@@ -185,11 +185,11 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($result);
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
 
         $this->assertSame($perPage, $paginator->getPerPage());
-        $this->assertSame($numItems, $paginator->getNumItems());
-        $this->assertSame(3, $paginator->getNumPages());
+        $this->assertSame($itemCount, $paginator->getItemCount());
+        $this->assertSame(3, $paginator->getPageCount());
 
         $page = $paginator->lastPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
@@ -199,7 +199,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
     public function testLastPageWithEmpty()
     {
         $perPage = 100;
-        $numItems = 0;
+        $itemCount = 0;
 
         $builder = $this->getSelectBuilder()->from('t1');
 
@@ -207,11 +207,11 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
         $fetcher = $this->createMock(FetcherInterface::class);
 
-        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $numItems);
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
 
         $this->assertSame($perPage, $paginator->getPerPage());
-        $this->assertSame($numItems, $paginator->getNumItems());
-        $this->assertSame(0, $paginator->getNumPages());
+        $this->assertSame($itemCount, $paginator->getItemCount());
+        $this->assertSame(0, $paginator->getPageCount());
 
         $page = $paginator->lastPage();
         $this->assertInstanceOf(PaginatedResultSet::class, $page);

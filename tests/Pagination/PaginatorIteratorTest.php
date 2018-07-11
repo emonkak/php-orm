@@ -34,7 +34,7 @@ class PaginatorIteratorTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(3);
         $paginator
             ->expects($this->exactly(3))

@@ -15,5 +15,5 @@ interface PaginatorInterface
     /**
      * @return integer
      */
-    public function getNumPages();
+    public function getPageCount();
 }

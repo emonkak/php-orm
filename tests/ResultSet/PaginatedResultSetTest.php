@@ -77,7 +77,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
         $paginator
             ->expects($this->once())
@@ -101,7 +101,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 1000);
@@ -117,7 +117,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
         $paginator
             ->expects($this->once())
@@ -141,7 +141,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 0);
@@ -157,7 +157,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 0);
@@ -177,7 +177,7 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
-            ->method('getNumPages')
+            ->method('getPageCount')
             ->willReturn(1000);
 
         $result = new PaginatedResultSet($innerResult, $paginator, 0);

@@ -715,6 +715,6 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $paginator = $this->getSelectBuilder()->paginate($pdo, $fetcher, 100);
         $this->assertInstanceOf(Paginator::class, $paginator);
         $this->assertSame(100, $paginator->getPerPage());
-        $this->assertSame(1000, $paginator->getNumItems());
+        $this->assertSame(1000, $paginator->getItemCount());
     }
 }

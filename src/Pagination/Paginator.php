@@ -33,22 +33,22 @@ class Paginator implements PaginatorInterface
     /**
      * @var integer
      */
-    private $numItems;
+    private $itemCount;
 
     /**
      * @param SelectBuilder    $builder
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
-     * @param integer          $numItems
+     * @param integer          $itemCount
      */
-    public function __construct(SelectBuilder $builder, PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $numItems)
+    public function __construct(SelectBuilder $builder, PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $itemCount)
     {
         $this->builder = $builder;
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->perPage = $perPage;
-        $this->numItems = $numItems;
+        $this->itemCount = $itemCount;
     }
 
     /**
@@ -70,7 +70,7 @@ class Paginator implements PaginatorInterface
             );
         }
 
-        if ($this->getNumPages() > $index) {
+        if ($this->getPageCount() > $index) {
             $result = $this->builder
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
@@ -95,7 +95,7 @@ class Paginator implements PaginatorInterface
      */
     public function lastPage()
     {
-        $numPages = $this->getNumPages();
+        $numPages = $this->getPageCount();
         return $this->at($numPages > 0 ? $numPages - 1 : 0);
     }
 
@@ -110,16 +110,16 @@ class Paginator implements PaginatorInterface
     /**
      * @return integer
      */
-    public function getNumItems()
+    public function getItemCount()
     {
-        return $this->numItems;
+        return $this->itemCount;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getNumPages()
+    public function getPageCount()
     {
-        return (int) ceil($this->numItems / $this->perPage);
+        return (int) ceil($this->itemCount / $this->perPage);
     }
 }

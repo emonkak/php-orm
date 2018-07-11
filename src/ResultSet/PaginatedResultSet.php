@@ -103,7 +103,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function hasNextPage()
     {
-        return ($this->index + 1) < $this->paginator->getNumPages();
+        return ($this->index + 1) < $this->paginator->getPageCount();
     }
 
     /**
@@ -119,6 +119,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function isLastPage()
     {
-        return $this->index == ($this->paginator->getNumPages() - 1);
+        return $this->index == ($this->paginator->getPageCount() - 1);
     }
 }
