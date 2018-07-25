@@ -267,6 +267,60 @@ final class Relations
     }
 
     /**
+     * @param string  $relationKey
+     * @param string  $outerKey
+     * @param string  $innerKey
+     * @param string  $innerClass
+     * @param mixed[] $innerElements
+     * @return Relation
+     */
+    public static function preloadedOneToOne(
+        $relationKey,
+        $outerKey,
+        $innerKey,
+        $innerClass,
+        array $innerElements
+    ) {
+        return new Relation(
+            new Preloaded(
+                $relationKey,
+                $outerKey,
+                $innerKey,
+                $innerClass,
+                $innerElements
+            ),
+            new OuterJoin()
+        );
+    }
+
+    /**
+     * @param string  $relationKey
+     * @param string  $outerKey
+     * @param string  $innerKey
+     * @param string  $innerClass
+     * @param mixed[] $innerElements
+     * @return Relation
+     */
+    public static function preloadedOneToMany(
+        $relationKey,
+        $outerKey,
+        $innerKey,
+        $innerClass,
+        array $innerElements
+    ) {
+        return new Relation(
+            new Preloaded(
+                $relationKey,
+                $outerKey,
+                $innerKey,
+                $innerClass,
+                $innerElements
+            ),
+            new GroupJoin()
+        );
+    }
+
+    /**
      * @param string           $relationKey
      * @param string           $oneToManyTable
      * @param string           $oneToManyOuterKey

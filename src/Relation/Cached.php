@@ -148,17 +148,4 @@ class Cached implements RelationStrategyInterface
     {
         return $this->relationStrategy->getResultSelector($outerClass, $innerClass);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function with(RelationInterface $relation)
-    {
-        return new Cached(
-            $this->relationStrategy->with($relation),
-            $this->cache,
-            $this->cachePrefix,
-            $this->cacheTtl
-        );
-    }
 }

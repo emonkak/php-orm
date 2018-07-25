@@ -166,20 +166,4 @@ class OneTo implements RelationStrategyInterface
     {
         return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function with(RelationInterface $relation)
-    {
-        return new OneTo(
-            $this->relationKey,
-            $this->table,
-            $this->outerKey,
-            $this->innerKey,
-            $this->pdo,
-            $this->fetcher,
-            $this->builder->with($relation)
-        );
-    }
 }

@@ -165,46 +165,6 @@ class CachedTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Model::class, $result->getClass());
     }
 
-    public function testWith()
-    {
-        $cache = $this->createMock(CacheInterface::class);
-        $cachePrefix = 'prefix';
-        $cacheTtl = 3600;
-
-        $childRelation1 = $this->createMock(RelationInterface::class);
-        $childRelation2 = $this->createMock(RelationInterface::class);
-
-        $innerRelationStrategy1 = $this->createMock(RelationStrategyInterface::class);
-        $innerRelationStrategy2 = $this->createMock(RelationStrategyInterface::class);
-        $innerRelationStrategy3 = $this->createMock(RelationStrategyInterface::class);
-
-        $innerRelationStrategy1
-            ->expects($this->once())
-            ->method('with')
-            ->with($this->identicalTo($childRelation1))
-            ->willReturn($innerRelationStrategy2);
-        $innerRelationStrategy2
-            ->expects($this->once())
-            ->method('with')
-            ->with($this->identicalTo($childRelation2))
-            ->willReturn($innerRelationStrategy3);
-
-        $relationStrategy = new Cached(
-            $innerRelationStrategy1,
-            $cache,
-            $cachePrefix,
-            $cacheTtl
-        );
-
-        $newRelationStrategy = $relationStrategy
-            ->with($childRelation1)
-            ->with($childRelation2);
-
-        $this->assertInstanceOf(Cached::class, $newRelationStrategy);
-        $this->assertNotSame($relationStrategy, $newRelationStrategy);
-        $this->assertSame($innerRelationStrategy3, $newRelationStrategy->getInnerRelationStrategy());
-    }
-
     public function testSelectorResolvings()
     {
         $pdo = $this->createMock(PDOInterface::class);

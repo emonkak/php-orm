@@ -16,11 +16,13 @@ use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\PolymorphicRelation;
+use Emonkak\Orm\Relation\Preloaded;
 use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\RelationStrategyInterface;
 use Emonkak\Orm\Relation\Relations;
 use Emonkak\Orm\SelectBuilder;
+use Emonkak\Orm\Tests\Fixtures\Model;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
 
@@ -305,6 +307,64 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($table, $innerRelationStrategy->getTable());
         $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
         $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
+    }
+
+    public function testPreloadedOneToOne()
+    {
+        $relationKey = 'relation_key';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+        $innerClass = Model::class;
+        $innerElements = [new Model([])];
+
+        $relation = Relations::preloadedOneToOne(
+            $relationKey,
+            $outerKey,
+            $innerKey,
+            $innerClass,
+            $innerElements
+        );
+
+        $this->assertInstanceOf(Relation::class, $relation);
+        $this->assertInstanceOf(OuterJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(Preloaded::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($innerClass, $relationStrategy->getInnerClass());
+        $this->assertSame($innerElements, $relationStrategy->getInnerElements());
+    }
+
+    public function testPreloadedOneToMany()
+    {
+        $relationKey = 'relation_key';
+        $outerKey = 'outer_key';
+        $innerKey = 'inner_key';
+        $innerClass = Model::class;
+        $innerElements = [new Model([])];
+
+        $relation = Relations::preloadedOneToMany(
+            $relationKey,
+            $outerKey,
+            $innerKey,
+            $innerClass,
+            $innerElements
+        );
+
+        $this->assertInstanceOf(Relation::class, $relation);
+        $this->assertInstanceOf(GroupJoin::class, $relation->getJoinStrategy());
+
+        $relationStrategy = $relation->getRelationStrategy();
+
+        $this->assertInstanceOf(Preloaded::class, $relationStrategy);
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($innerClass, $relationStrategy->getInnerClass());
+        $this->assertSame($innerElements, $relationStrategy->getInnerElements());
     }
 
     public function testManyToMany()

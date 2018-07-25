@@ -39,10 +39,10 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             $builder
         );
 
-        $this->assertSame('relation_key', $relationStrategy->getRelationKey());
-        $this->assertSame('table', $relationStrategy->getTable());
-        $this->assertSame('outer_key', $relationStrategy->getOuterKey());
-        $this->assertSame('inner_key', $relationStrategy->getInnerKey());
+        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
+        $this->assertSame($table, $relationStrategy->getTable());
+        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
+        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
@@ -91,39 +91,6 @@ class OneToTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys));
-    }
-
-    public function testWith()
-    {
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
-
-        $pdo = $this->createMock(PDOInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
-
-        $childRelation1 = $this->createMock(RelationInterface::class);
-        $childRelation2 = $this->createMock(RelationInterface::class);
-
-        $relationStrategy = new OneTo(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
-            $pdo,
-            $fetcher,
-            $builder
-        );
-
-        $newRelationStrategy = $relationStrategy
-            ->with($childRelation1)
-            ->with($childRelation2);
-
-        $this->assertInstanceOf(OneTo::class, $newRelationStrategy);
-        $this->assertNotSame($relationStrategy, $newRelationStrategy);
-        $this->assertEquals([$childRelation1, $childRelation2], $newRelationStrategy->getBuilder()->getRelations());
     }
 
     public function testResolveSelectors()

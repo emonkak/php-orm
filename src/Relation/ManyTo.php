@@ -240,25 +240,6 @@ class ManyTo implements RelationStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function with(RelationInterface $relation)
-    {
-        return new ManyTo(
-            $this->relationKey,
-            $this->oneToManyTable,
-            $this->oneToManyOuterKey,
-            $this->oneToManyInnerKey,
-            $this->manyToOneTable,
-            $this->manyToOneOuterKey,
-            $this->manyToOneInnerKey,
-            $this->pdo,
-            $this->fetcher,
-            $this->builder->with($relation)
-        );
-    }
-
-    /**
      * @return string
      */
     private function getPivotKey()

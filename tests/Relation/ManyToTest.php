@@ -57,45 +57,6 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($builder, $relation->getBuilder());
     }
 
-    public function testWith()
-    {
-        $relationKey = 'relation_key';
-        $oneToManyTable = 'one_to_many_table';
-        $oneToManyOuterKey = 'one_to_many_outer_key';
-        $oneToManyInnerKey = 'one_to_many_inner_key';
-        $manyToOneTable = 'many_to_one_table';
-        $manyToOneOuterKey = 'many_to_one_outer_key';
-        $manyToOneInnerKey = 'many_to_one_inner_key';
-
-        $pdo = $this->createMock(PDOInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
-
-        $childRelation1 = $this->createMock(RelationInterface::class);
-        $childRelation2 = $this->createMock(RelationInterface::class);
-
-        $relationStrategy = new ManyTo(
-            $relationKey,
-            $oneToManyTable,
-            $oneToManyOuterKey,
-            $oneToManyInnerKey,
-            $manyToOneTable,
-            $manyToOneOuterKey,
-            $manyToOneInnerKey,
-            $pdo,
-            $fetcher,
-            $builder
-        );
-
-        $newRelationStrategy = $relationStrategy
-            ->with($childRelation1)
-            ->with($childRelation2);
-
-        $this->assertInstanceOf(ManyTo::class, $newRelationStrategy);
-        $this->assertNotSame($relationStrategy, $newRelationStrategy);
-        $this->assertEquals([$childRelation1, $childRelation2], $newRelationStrategy->getBuilder()->getRelations());
-    }
-
     public function testGetResult()
     {
         $outerKeys = [1, 2, 3];
