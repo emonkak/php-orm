@@ -30,6 +30,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             new Model(['user_id' => 1, 'name' => 'foo']),
             new Model(['user_id' => 2, 'name' => 'bar']),
             new Model(['user_id' => 3, 'name' => 'baz']),
+            new Model(['user_id' => null, 'name' => 'qux']),
         ];
         $innerElements = [
             new Model(['post_id' => 1, 'user_id' => 1, 'content' => 'foo']),
@@ -55,6 +56,12 @@ class RelationTest extends \PHPUnit_Framework_TestCase
                 'name' => 'baz',
                 'posts' => [
                     new Model(['post_id' => 3, 'user_id' => 3, 'content' => 'baz']),
+                ],
+            ]),
+            new Model([
+                'user_id' => null,
+                'name' => 'qux',
+                'posts' => [
                 ],
             ]),
         ];

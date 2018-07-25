@@ -67,7 +67,10 @@ class Relation implements RelationInterface
 
         foreach ($result as $element) {
             $outerElements[] = $element;
-            $outerKeys[] = $outerKeySelector($element);
+            $outerKey = $outerKeySelector($element);
+            if ($outerKey !== null) {
+                $outerKeys[] = $outerKey;
+            }
         }
 
         if (empty($outerElements)) {
