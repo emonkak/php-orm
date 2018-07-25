@@ -34,10 +34,4 @@ interface RelationStrategyInterface
      * @return callable
      */
     public function getResultSelector($outerClass, $innerClass);
-
-    /**
-     * @param RelationInterface $relation
-     * @return $this
-     */
-    public function with(RelationInterface $relation);
 }

@@ -4,6 +4,7 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class Relation implements RelationInterface
@@ -19,13 +20,23 @@ class Relation implements RelationInterface
     private $joinStrategy;
 
     /**
+     * @var RelationInterface[]
+     */
+    private $childRelations;
+
+    /**
      * @param RelationStrategyInterface $relationStrategy
      * @param JoinStrategyInterface     $joinStrategy
+     * @param RelationInterface[]       $childRelations
      */
-    public function __construct(RelationStrategyInterface $relationStrategy, JoinStrategyInterface $joinStrategy)
-    {
+    public function __construct(
+        RelationStrategyInterface $relationStrategy,
+        JoinStrategyInterface $joinStrategy,
+        array $childRelations = []
+    ) {
         $this->relationStrategy = $relationStrategy;
         $this->joinStrategy = $joinStrategy;
+        $this->childRelations = $childRelations;
     }
 
     /**
@@ -45,13 +56,25 @@ class Relation implements RelationInterface
     }
 
     /**
+     * @return RelationInterface[]
+     */
+    public function getChildRelations()
+    {
+        return $this->childRelations;
+    }
+
+    /**
      * @param RelationInterface $relation
+     * @return Relation
      */
     public function with(RelationInterface $relation)
     {
+        $childRelations = $this->childRelations;
+        $childRelations[] = $relation;
         return new Relation(
-            $this->relationStrategy->with($relation),
-            $this->joinStrategy
+            $this->relationStrategy,
+            $this->joinStrategy,
+            $childRelations
         );
     }
 
@@ -67,7 +90,10 @@ class Relation implements RelationInterface
 
         foreach ($result as $element) {
             $outerElements[] = $element;
-            $outerKeys[] = $outerKeySelector($element);
+            $outerKey = $outerKeySelector($element);
+            if ($outerKey !== null) {
+                $outerKeys[] = $outerKey;
+            }
         }
 
         if (empty($outerElements)) {
@@ -76,6 +102,11 @@ class Relation implements RelationInterface
 
         $outerResult = new PreloadResultSet($outerElements, $outerClass);
         $innerResult = $this->relationStrategy->getResult($outerKeys);
+
+        foreach ($this->childRelations as $childRelation) {
+            $innerResult = new RelationResultSet($innerResult, $childRelation);
+        }
+
         $innerClass = $innerResult->getClass();
         $innerKeySelector = $this->relationStrategy->getInnerKeySelector($innerClass);
         $resultSelector = $this->relationStrategy->getResultSelector($outerClass, $innerClass);

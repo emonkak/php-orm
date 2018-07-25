@@ -30,6 +30,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             new Model(['user_id' => 1, 'name' => 'foo']),
             new Model(['user_id' => 2, 'name' => 'bar']),
             new Model(['user_id' => 3, 'name' => 'baz']),
+            new Model(['user_id' => null, 'name' => 'qux']),
         ];
         $innerElements = [
             new Model(['post_id' => 1, 'user_id' => 1, 'content' => 'foo']),
@@ -57,7 +58,16 @@ class RelationTest extends \PHPUnit_Framework_TestCase
                     new Model(['post_id' => 3, 'user_id' => 3, 'content' => 'baz']),
                 ],
             ]),
+            new Model([
+                'user_id' => null,
+                'name' => 'qux',
+                'posts' => [
+                ],
+            ]),
         ];
+
+        $outerResult = new PreloadResultSet($outerElements, Model::class);
+        $innerResult = new PreloadResultSet($innerElements, Model::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -82,7 +92,14 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadResultSet($innerElements, Model::class));
+            ->willReturn($innerResult);
+
+        $childRelation = $this->createMock(RelationInterface::class);
+        $childRelation
+            ->expects($this->once())
+            ->method('associate')
+            ->with($this->identicalTo($innerResult))
+            ->will($this->returnArgument(0));
 
         $builder = $this->getSelectBuilder();
 
@@ -96,9 +113,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             $builder
         );
         $joinStrategy = new GroupJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy);
-
-        $outerResult = new PreloadResultSet($outerElements, Model::class);
+        $relation = new Relation($relationStrategy, $joinStrategy, [$childRelation]);
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
@@ -220,26 +235,14 @@ class RelationTest extends \PHPUnit_Framework_TestCase
 
     public function testWith()
     {
+        $relationStrategy = $this->createMock(RelationStrategyInterface::class);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
         $childRelation = $this->createMock(RelationInterface::class);
 
-        $relationStrategy1 = $this->createMock(RelationStrategyInterface::class);
-        $relationStrategy2 = $this->createMock(RelationStrategyInterface::class);
-
-        $relationStrategy1
-            ->expects($this->once())
-            ->method('with')
-            ->with($this->identicalTo($childRelation))
-            ->willReturn($relationStrategy2);
-
-        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
-
-        $relation = new Relation($relationStrategy1, $joinStrategy);
-
+        $relation = new Relation($relationStrategy, $joinStrategy);
         $newRelation = $relation->with($childRelation);
 
-        $this->assertInstanceOf(Relation::class, $relation);
         $this->assertNotSame($relation, $newRelation);
-        $this->assertSame($relationStrategy2, $newRelation->getRelationStrategy());
-        $this->assertSame($joinStrategy, $newRelation->getJoinStrategy());
+        $this->assertSame([$childRelation], $newRelation->getChildRelations());
     }
 }
