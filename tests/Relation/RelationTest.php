@@ -120,7 +120,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult)));
     }
 
-    public function testOneToManyIfEmptyResult()
+    public function testOneToManyIfResultIsEmpty()
     {
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
@@ -144,6 +144,33 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
         $this->assertEmpty(iterator_to_array($relation->associate($outerResult)));
+    }
+
+    public function testOneToManyIfOuterKeysIsEmpty()
+    {
+        $outerElements = [new Model(['job_id' => null])];
+        $outerResult = new PreloadResultSet($outerElements, Model::class);
+
+        $stmt = $this->createMock(PDOStatementInterface::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $builder = $this->getSelectBuilder();
+
+        $relationStrategy = new OneTo(
+            'jobs',
+            'job',
+            'job_id',
+            'job_id',
+            $pdo,
+            $fetcher,
+            $builder
+        );
+        $joinStrategy = new GroupJoin();
+        $relation = new Relation($relationStrategy, $joinStrategy);
+
+        $this->assertSame($relationStrategy, $relation->getRelationStrategy());
+        $this->assertSame($joinStrategy, $relation->getJoinStrategy());
+        $this->assertSame($outerElements, iterator_to_array($relation->associate($outerResult)));
     }
 
     public function testManyTo()

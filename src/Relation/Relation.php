@@ -100,6 +100,10 @@ class Relation implements RelationInterface
             return new \EmptyIterator();
         }
 
+        if (empty($outerKeys)) {
+            return new \ArrayIterator($outerElements);
+        }
+
         $outerResult = new PreloadResultSet($outerElements, $outerClass);
         $innerResult = $this->relationStrategy->getResult($outerKeys);
 
