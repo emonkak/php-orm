@@ -10,8 +10,8 @@
     ],
     "require": {
         "php": ">=5.6",
-        "emonkak/enumerable": "^0.1.0",
-        "emonkak/database": "^0.2.0",
+        "emonkak/enumerable": "~0.1",
+        "emonkak/database": "~0.3",
         "ocramius/proxy-manager": "^1.0",
         "psr/simple-cache": "^0.2.0"
     },
