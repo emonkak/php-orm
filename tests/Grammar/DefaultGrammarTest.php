@@ -222,7 +222,7 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
                 200,
                 'FOR UPDATE',
                 [new Sql('UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)', ['qux'])],
-                '(SELECT c1, c2 FROM t1, t2 JOIN t3 ON t1.c1 = t3.c1 JOIN t4 ON t1.c1 = t4.c1 WHERE c1 = ? AND c2 = ? GROUP BY c3, c4 HAVING c5 = ? ORDER BY c6, c7 LIMIT ? OFFSET ? FOR UPDATE) UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)',
+                'SELECT c1, c2 FROM t1, t2 JOIN t3 ON t1.c1 = t3.c1 JOIN t4 ON t1.c1 = t4.c1 WHERE c1 = ? AND c2 = ? GROUP BY c3, c4 HAVING c5 = ? ORDER BY c6, c7 LIMIT ? OFFSET ? FOR UPDATE UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)',
                 ['foo', 'bar', 'baz', 100, 200, 'qux'],
             ],
             [

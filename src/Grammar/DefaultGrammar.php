@@ -144,10 +144,6 @@ class DefaultGrammar extends AbstractGrammar
              . $this->processOffset($offset, $bindings)
              . ($suffix !== null ? ' ' . $suffix : '');
 
-        if (!empty($union)) {
-            $sql = '(' . $sql . ')';
-        }
-
         $sql .= $this->processUnion($union, $bindings);
 
         return new Sql($sql, $bindings);

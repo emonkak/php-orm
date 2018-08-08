@@ -649,7 +649,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = $builder1->union($builder2)->build();
         $this->assertQueryIs(
-            '(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION (SELECT c1 FROM t1 WHERE (c1 = ?))',
             ['foo', 'bar'],
             $query
         );
@@ -663,7 +663,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = $builder1->unionAll($builder2)->unionAll($builder3)->build();
         $this->assertQueryIs(
-            '(SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?))',
             ['foo', 'bar', 'baz'],
             $query
         );
