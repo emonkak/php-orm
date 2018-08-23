@@ -72,4 +72,28 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
 
         throw new \RuntimeException('Sequence contains no elements.');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    {
+        $this->stmt->execute();
+
+        if ($predicate) {
+            $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            foreach ($this->stmt as $element) {
+                if ($predicate($element)) {
+                    return $element;
+                }
+            }
+        } else {
+            $element = $this->stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($element !== false) {
+                return $element;
+            }
+        }
+
+        return $defaultValue;
+    }
 }

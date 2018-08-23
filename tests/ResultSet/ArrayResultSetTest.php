@@ -68,16 +68,17 @@ class ArrayResultSetTest extends \PHPUnit_Framework_TestCase
         $expected = ['foo' => 123, 'bar' => 345];
 
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('fetch')
             ->with(\PDO::FETCH_ASSOC)
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->result->first());
+        $this->assertSame($expected, $this->result->firstOrDefault());
     }
 
     /**
@@ -98,7 +99,7 @@ class ArrayResultSetTest extends \PHPUnit_Framework_TestCase
         $this->result->first();
     }
 
-    public function testFirstWithPredicate()
+    public function testFirstOrDefaultReturnsDefaultValue()
     {
         $this->stmt
             ->expects($this->once())
@@ -106,11 +107,26 @@ class ArrayResultSetTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
+            ->method('fetch')
+            ->with(\PDO::FETCH_ASSOC)
+            ->willReturn(false);
+
+        $this->assertNull($this->result->firstOrDefault());
+    }
+
+    public function testFirstWithPredicate()
+    {
+        $this->stmt
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->exactly(2))
             ->method('setFetchMode')
             ->with(\PDO::FETCH_ASSOC)
             ->willReturn(true);
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
                 ['foo' => 1],
@@ -124,6 +140,7 @@ class ArrayResultSetTest extends \PHPUnit_Framework_TestCase
         };
 
         $this->assertEquals(['foo' => 2], $this->result->first($predicate));
+        $this->assertEquals(['foo' => 2], $this->result->firstOrDefault($predicate));
     }
 
     /**
@@ -155,5 +172,33 @@ class ArrayResultSetTest extends \PHPUnit_Framework_TestCase
         };
 
         $this->result->first($predicate);
+    }
+
+    public function testFirstOrDefaultWithPredicateReturnsDefaultValue()
+    {
+        $this->stmt
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->once())
+            ->method('setFetchMode')
+            ->with(\PDO::FETCH_ASSOC)
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([
+                ['foo' => 1],
+                ['foo' => 2],
+                ['foo' => 3],
+                ['foo' => 4],
+            ]));
+
+        $predicate = function($value) {
+            return false;
+        };
+
+        $this->assertNull($this->result->firstOrDefault($predicate));
     }
 }
