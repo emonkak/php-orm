@@ -3,13 +3,16 @@
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Database\PDOInterface;
+use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\SelectBuilder;
 
-class Paginator implements PaginatorInterface
+class Paginator implements \IteratorAggregate, PaginatorInterface
 {
+    use EnumerableExtensions;
+
     /**
      * @var SelectBuilder
      */
@@ -70,7 +73,7 @@ class Paginator implements PaginatorInterface
             );
         }
 
-        if ($this->getPageCount() > $index) {
+        if ($index < $this->getPageCount()) {
             $result = $this->builder
                 ->offset($this->perPage * $index)
                 ->limit($this->perPage)
@@ -83,7 +86,7 @@ class Paginator implements PaginatorInterface
     }
 
     /**
-     * @return PaginatedResultSet
+     * {@inheritDoc}
      */
     public function firstPage()
     {
@@ -91,7 +94,7 @@ class Paginator implements PaginatorInterface
     }
 
     /**
-     * @return PaginatedResultSet
+     * {@inheritDoc}
      */
     public function lastPage()
     {
@@ -100,7 +103,7 @@ class Paginator implements PaginatorInterface
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getPerPage()
     {
@@ -108,7 +111,7 @@ class Paginator implements PaginatorInterface
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getItemCount()
     {
@@ -121,5 +124,13 @@ class Paginator implements PaginatorInterface
     public function getPageCount()
     {
         return (int) ceil($this->itemCount / $this->perPage);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getClass()
+    {
+        return $this->fetcher->getClass();
     }
 }

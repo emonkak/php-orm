@@ -10,6 +10,7 @@ use Emonkak\Orm\Pagination\Paginator;
 use Emonkak\Orm\Pagination\PaginatorIterator;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
 /**
@@ -217,5 +218,25 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PaginatedResultSet::class, $page);
         $this->assertSame(0, $page->getIndex());
         $this->assertEquals([], $page->toArray());
+    }
+
+    public function testGetClass()
+    {
+        $perPage = 100;
+        $itemCount = 0;
+
+        $builder = $this->getSelectBuilder()->from('t1');
+
+        $pdo = $this->createMock(PDOInterface::class);
+
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $fetcher
+            ->expects($this->once())
+            ->method('getClass')
+            ->willReturn(Model::class);
+
+        $paginator = new Paginator($builder, $pdo, $fetcher, $perPage, $itemCount);
+
+        $this->assertSame(Model::class, $paginator->getClass());
     }
 }
