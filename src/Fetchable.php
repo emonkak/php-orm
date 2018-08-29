@@ -17,13 +17,15 @@ trait Fetchable
     private $relations = [];
 
     /**
-     * @param RelationInterface $relation
+     * @param RelationInterface[] ...$relations
      * @return $this
      */
-    public function with(RelationInterface $relation)
+    public function with(RelationInterface ...$relations)
     {
         $cloned = clone $this;
-        $cloned->relations[] = $relation;
+        foreach ($relations as $relation) {
+            $cloned->relations[] = $relation;
+        }
         return $cloned;
     }
 
