@@ -329,7 +329,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $expr = Sql::expr($expr);
         if ($ordering !== null) {
-            $expr = $expr->append($ordering);
+            $expr = $this->grammar->ordering($expr, $ordering);
         }
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;

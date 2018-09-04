@@ -92,9 +92,14 @@ class DefaultGrammar extends AbstractGrammar
      */
     public function ordering(Sql $expr, $ordering)
     {
-        $sql = $expr->getSql() . ' ' . $ordering;
-        $bindings = $expr->getBindings();
-        return new Sql($sql, $bindings);
+        switch (strtoupper($ordering)) {
+            case 'ASC':
+            case 'DESC':
+                $sql = $expr->getSql() . ' ' . $ordering;
+                $bindings = $expr->getBindings();
+                return new Sql($sql, $bindings);
+        }
+        throw new \UnexpectedValueException("Unexpected ordering literal, got '$ordering'");
     }
 
     /**

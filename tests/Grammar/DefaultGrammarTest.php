@@ -162,12 +162,19 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
 
     public function testOrdering()
     {
+        $query = $this->grammar->ordering(new Sql('c1 + ?', [1]), 'ASC');
+        $this->assertQueryIs('c1 + ? ASC', [1], $query);
+
         $query = $this->grammar->ordering(new Sql('c1 + ?', [1]), 'DESC');
-        $this->assertQueryIs(
-            'c1 + ? DESC',
-            [1],
-            $query
-        );
+        $this->assertQueryIs('c1 + ? DESC', [1], $query);
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testOrderingThrowsException()
+    {
+        $this->grammar->ordering(new Sql('c1 + ?', [1]), '');
     }
 
     public function testUnion()
