@@ -19,9 +19,9 @@ class Cached implements RelationStrategyInterface
     private $cache;
 
     /**
-     * @var string
+     * @var callable
      */
-    private $cachePrefix;
+    private $cacheKeySelector;
 
     /**
      * @var integer|null
@@ -31,18 +31,18 @@ class Cached implements RelationStrategyInterface
     /**
      * @param RelationStrategyInterface $relationStrategy
      * @param CacheInterface            $cache
-     * @param string                    $cachePrefix
+     * @param callable                  $cacheKeySelector
      * @param integer|null              $cacheTtl
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
         CacheInterface $cache,
-        $cachePrefix,
+        callable $cacheKeySelector,
         $cacheTtl
     ) {
         $this->relationStrategy = $relationStrategy;
         $this->cache = $cache;
-        $this->cachePrefix = $cachePrefix;
+        $this->cacheKeySelector = $cacheKeySelector;
         $this->cacheTtl = $cacheTtl;
     }
 
@@ -63,11 +63,11 @@ class Cached implements RelationStrategyInterface
     }
 
     /**
-     * @return string
+     * @return callable
      */
-    public function getCachePrefix()
+    public function getCacheKeySelector()
     {
-        return $this->cachePrefix;
+        return $this->cacheKeySelector;
     }
 
     /**
@@ -83,14 +83,14 @@ class Cached implements RelationStrategyInterface
      */
     public function getResult(array $outerKeys)
     {
-        $cacheKeys = [];
-        $cachePrefixLength = strlen($this->cachePrefix);
+        $cacheKeyIndexes = [];
+        $cacheKeySelector = $this->cacheKeySelector;
 
         foreach ($outerKeys as $outerKey) {
-            $cacheKeys[] = $this->cachePrefix . $outerKey;
+            $cacheKeyIndexes[$cacheKeySelector($outerKey)] = $outerKey;
         }
 
-        $cacheItems = $this->cache->getMultiple(array_unique($cacheKeys));
+        $cacheItems = $this->cache->getMultiple(array_keys($cacheKeyIndexes));
         $cachedElements = [];
         $uncachedOuterKeys = [];
 
@@ -98,7 +98,7 @@ class Cached implements RelationStrategyInterface
             if ($value !== null) {
                 $cachedElements[] = $value;
             } else {
-                $uncachedOuterKeys[] = substr($key, $cachePrefixLength);
+                $uncachedOuterKeys[] = $cacheKeyIndexes[$key];
             }
         }
 
@@ -109,8 +109,7 @@ class Cached implements RelationStrategyInterface
             $freshCacheItems = [];
 
             foreach ($result as $element) {
-                $innerKey = $innerKeySelector($element);
-                $cacheKey = $this->cachePrefix . $innerKey;
+                $cacheKey = $cacheKeySelector($innerKeySelector($element));
 
                 $freshCacheItems[$cacheKey] = $element;
 

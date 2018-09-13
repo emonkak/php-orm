@@ -274,7 +274,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $builder = new SelectBuilder($grammar);
 
         $cache = $this->createMock(CacheInterface::class);
-        $cachePrefix = 'prefix';
+        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
         $cacheTtl = 3600;
 
         $relation = Relations::cachedOneToOne(
@@ -286,7 +286,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $fetcher,
             $builder,
             $cache,
-            $cachePrefix,
+            $cacheKeySelector,
             $cacheTtl
         );
 
@@ -297,7 +297,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Cached::class, $relationStrategy);
         $this->assertSame($cache, $relationStrategy->getCache());
-        $this->assertSame($cachePrefix, $relationStrategy->getCachePrefix());
+        $this->assertSame($cacheKeySelector, $relationStrategy->getCacheKeySelector());
         $this->assertSame($cacheTtl, $relationStrategy->getCacheTtl());
 
         $innerRelationStrategy = $relationStrategy->getInnerRelationStrategy();

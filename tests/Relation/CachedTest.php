@@ -29,19 +29,19 @@ class CachedTest extends \PHPUnit_Framework_TestCase
         $innerRelationStrategy = $this->createMock(RelationStrategyInterface::class);
 
         $cache = $this->createMock(CacheInterface::class);
-        $cachePrefix = 'prefix';
+        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
         $cacheTtl = 3600;
 
         $relationStrategy = new Cached(
             $innerRelationStrategy,
             $cache,
-            $cachePrefix,
+            $cacheKeySelector,
             $cacheTtl
         );
 
         $this->assertSame($innerRelationStrategy, $relationStrategy->getInnerRelationStrategy());
         $this->assertSame($cache, $relationStrategy->getCache());
-        $this->assertSame($cachePrefix, $relationStrategy->getCachePrefix());
+        $this->assertSame($cacheKeySelector, $relationStrategy->getCacheKeySelector());
         $this->assertSame($cacheTtl, $relationStrategy->getCacheTtl());
     }
 
@@ -54,7 +54,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             new Model(['id' => 3])
         ];
 
-        $cachePrefix = 'model:';
+        $cacheKeySelector = function($key) { return 'model.' . $key; };
         $cacheTtl = 3600;
 
         $cache = $this->createMock(CacheInterface::class);
@@ -62,21 +62,21 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getMultiple')
             ->with([
-                'model:1',
-                'model:2',
-                'model:3'
+                'model.1',
+                'model.2',
+                'model.3'
             ])
             ->willReturn([
-                'model:1' => $expectedResult[0],
-                'model:2' => null,
-                'model:3' => null
+                'model.1' => $expectedResult[0],
+                'model.2' => null,
+                'model.3' => null
             ]);
         $cache
             ->expects($this->once())
             ->method('setMultiple')
             ->with([
-                'model:2' => $expectedResult[1],
-                'model:3' => $expectedResult[2]
+                'model.2' => $expectedResult[1],
+                'model.3' => $expectedResult[2]
             ], $cacheTtl)
             ->willReturn(true);
 
@@ -105,7 +105,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
         $relationStrategy = new Cached(
             $innerRelationStrategy,
             $cache,
-            $cachePrefix,
+            $cacheKeySelector,
             $cacheTtl
         );
 
@@ -124,7 +124,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             new Model(['id' => 3])
         ];
 
-        $cachePrefix = 'model:';
+        $cacheKeySelector = function($key) { return 'model.' . $key; };
         $cacheTtl = 3600;
 
         $cache = $this->createMock(CacheInterface::class);
@@ -132,14 +132,14 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getMultiple')
             ->with([
-                'model:1',
-                'model:2',
-                'model:3'
+                'model.1',
+                'model.2',
+                'model.3'
             ])
             ->willReturn([
-                'model:1' => $expectedResult[0],
-                'model:2' => $expectedResult[1],
-                'model:3' => $expectedResult[2]
+                'model.1' => $expectedResult[0],
+                'model.2' => $expectedResult[1],
+                'model.3' => $expectedResult[2]
             ]);
         $cache
             ->expects($this->never())
@@ -155,7 +155,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
         $relationStrategy = new Cached(
             $innerRelationStrategy,
             $cache,
-            $cachePrefix,
+            $cacheKeySelector,
             $cacheTtl
         );
 
@@ -196,13 +196,13 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             ->willReturn($resultSelector);
 
         $cache = $this->createMock(CacheInterface::class);
-        $cachePrefix = 'prefix';
+        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
         $cacheTtl = 3600;
 
         $relationStrategy = new Cached(
             $innerRelationStrategy,
             $cache,
-            $cachePrefix,
+            $cacheKeySelector,
             $cacheTtl
         );
 

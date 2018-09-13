@@ -231,7 +231,7 @@ final class Relations
      * @param FetcherInterface $fetcher
      * @param SelectBuilder    $builder
      * @param CacheInterface   $cache
-     * @param string           $cachePrefix
+     * @param callble          $cacheKeySelector
      * @param integer|null     $cacheTtl
      * @return Relation
      */
@@ -244,7 +244,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $builder,
         CacheInterface $cache,
-        $cachePrefix,
+        callable $cacheKeySelector,
         $cacheTtl = null
     ) {
         return new Relation(
@@ -259,7 +259,7 @@ final class Relations
                     $builder
                 ),
                 $cache,
-                $cachePrefix,
+                $cacheKeySelector,
                 $cacheTtl
             ),
             new OuterJoin()
