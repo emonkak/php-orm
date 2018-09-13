@@ -4,7 +4,7 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class PreloadResultSet implements \IteratorAggregate, ResultSetInterface
+class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 

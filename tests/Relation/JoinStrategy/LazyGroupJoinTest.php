@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
@@ -59,8 +59,8 @@ class LazyGroupJoinTest extends \PHPUnit_Framework_TestCase
         $proxyFactory = new LazyLoadingValueHolderFactory();
         $result = (new LazyGroupJoin($proxyFactory))
             ->join(
-                new PreloadResultSet($users, null),
-                new PreloadResultSet($tweets, null),
+                new PreloadedResultSet($users, null),
+                new PreloadedResultSet($tweets, null),
                 function($user) { return $user['user_id']; },
                 function($user) { return $user['user_id']; },
                 function($user, $tweets) {

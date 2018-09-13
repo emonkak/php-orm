@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Enumerable\Iterator\ConcatIterator;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class PolymorphicRelation implements RelationInterface
@@ -66,7 +66,7 @@ class PolymorphicRelation implements RelationInterface
         foreach ($outerElementsByMorphKey as $morphKey => $outerElements) {
             if (isset($this->polymorphics[$morphKey])) {
                 $relation = $this->polymorphics[$morphKey];
-                $outerResult = new PreloadResultSet($outerElements, $outerClass);
+                $outerResult = new PreloadedResultSet($outerElements, $outerClass);
                 $outerResults[] = $relation->associate($outerResult);
             } else {
                 $outerResults[] = $outerElements;

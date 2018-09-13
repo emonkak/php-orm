@@ -13,7 +13,7 @@ use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\RelationStrategyInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 
@@ -66,8 +66,8 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ]),
         ];
 
-        $outerResult = new PreloadResultSet($outerElements, Model::class);
-        $innerResult = new PreloadResultSet($innerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements, Model::class);
+        $innerResult = new PreloadedResultSet($innerElements, Model::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -149,7 +149,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
     public function testOneToManyIfOuterKeysIsEmpty()
     {
         $outerElements = [new Model(['job_id' => null])];
-        $outerResult = new PreloadResultSet($outerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements, Model::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
@@ -234,7 +234,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadResultSet($innerElements, Model::class));
+            ->willReturn(new PreloadedResultSet($innerElements, Model::class));
 
         $builder = $this->getSelectBuilder();
 
@@ -253,7 +253,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $joinStrategy = new GroupJoin();
         $relation = new Relation($relationStrategy, $joinStrategy);
 
-        $outerResult = new PreloadResultSet($outerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements, Model::class);
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());

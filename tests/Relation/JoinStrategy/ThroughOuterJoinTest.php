@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin
@@ -35,8 +35,8 @@ class ThroughOuterJoinTest extends \PHPUnit_Framework_TestCase
 
         $result = (new ThroughOuterJoin('program_id'))
             ->join(
-                new PreloadResultSet($talents, null),
-                new PreloadResultSet($programs, null),
+                new PreloadedResultSet($talents, null),
+                new PreloadedResultSet($programs, null),
                 function($talent) { return $talent['talent_id']; },
                 function($program) { return $program['talent_id']; },
                 function($talent, $program) {

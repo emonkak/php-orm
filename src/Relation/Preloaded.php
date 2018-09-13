@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class Preloaded implements RelationStrategyInterface
@@ -110,7 +110,7 @@ class Preloaded implements RelationStrategyInterface
             }
         }
 
-        return new PreloadResultSet($filteredElements, $this->innerClass);
+        return new PreloadedResultSet($filteredElements, $this->innerClass);
     }
 
     /**

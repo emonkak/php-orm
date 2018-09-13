@@ -4,7 +4,7 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\PolymorphicRelation;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 
 /**
  * @covers Emonkak\Orm\Relation\PolymorphicRelation
@@ -88,7 +88,7 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
         $hasPost
             ->expects($this->once())
             ->method('associate')
-            ->with(new PreloadResultSet([
+            ->with(new PreloadedResultSet([
                 $comments[0] + ['__sort' => 0],
                 $comments[2] + ['__sort' => 2]
             ], null))
@@ -103,7 +103,7 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
         $hasVideo
             ->expects($this->once())
             ->method('associate')
-            ->with(new PreloadResultSet([
+            ->with(new PreloadedResultSet([
                  $comments[1] + ['__sort' => 1]
             ], null))
             ->will($this->returnCallback(function($result) use ($videos) {
@@ -122,7 +122,7 @@ class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
             $polymorphics
         );
 
-        $result = $relation->associate(new PreloadResultSet($comments, null));
+        $result = $relation->associate(new PreloadedResultSet($comments, null));
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 }

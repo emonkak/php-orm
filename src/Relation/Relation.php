@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
@@ -104,7 +104,7 @@ class Relation implements RelationInterface
             return new \ArrayIterator($outerElements);
         }
 
-        $outerResult = new PreloadResultSet($outerElements, $outerClass);
+        $outerResult = new PreloadedResultSet($outerElements, $outerClass);
         $innerResult = $this->relationStrategy->getResult($outerKeys);
 
         foreach ($this->childRelations as $childRelation) {

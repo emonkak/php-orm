@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
@@ -38,8 +38,8 @@ class LazyOuterJoinTest extends \PHPUnit_Framework_TestCase
         $proxyFactory = new LazyLoadingValueHolderFactory();
         $result = (new LazyOuterJoin($proxyFactory))
             ->join(
-                new PreloadResultSet($talents, Model::class),
-                new PreloadResultSet($programs, Model::class),
+                new PreloadedResultSet($talents, Model::class),
+                new PreloadedResultSet($programs, Model::class),
                 function($talent) { return $talent->talent_id; },
                 function($program) { return $program->talent_id; },
                 function($talent, $program) {

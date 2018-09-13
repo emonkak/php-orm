@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -121,7 +121,7 @@ class Cached implements RelationStrategyInterface
             $innerClass = get_class($cachedElements[0]);
         }
 
-        return new PreloadResultSet($cachedElements, $innerClass);
+        return new PreloadedResultSet($cachedElements, $innerClass);
     }
 
     /**

@@ -8,7 +8,7 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\Cached;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\RelationStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadResultSet;
+use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use Psr\SimpleCache\CacheInterface;
@@ -85,7 +85,7 @@ class CachedTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getResult')
             ->with([2, 3])
-            ->willReturn(new PreloadResultSet(
+            ->willReturn(new PreloadedResultSet(
                 [
                     $expectedResult[1],
                     $expectedResult[2]
