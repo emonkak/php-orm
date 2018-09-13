@@ -7,6 +7,11 @@ use Emonkak\Orm\Grammar\GrammarInterface;
 class QueryBuilderProvider
 {
     /**
+     * @var GrammarInterface
+     */
+    private $grammar;
+
+    /**
      * @var SelectBuilder
      */
     private $selectBuilder;
@@ -33,6 +38,7 @@ class QueryBuilderProvider
     public static function create(GrammarInterface $grammar)
     {
         return new QueryBuilderProvider(
+            $grammar,
             new SelectBuilder($grammar),
             new InsertBuilder($grammar),
             new UpdateBuilder($grammar),
@@ -41,21 +47,32 @@ class QueryBuilderProvider
     }
 
     /**
+     * @param GrammarInterface grammar
      * @param SelectBuilder $selectBuilder
      * @param InsertBuilder $insertBuilder
      * @param UpdateBuilder $updateBuilder
      * @param DeleteBuilder $deleteBuilder
      */
     public function __construct(
+        GrammarInterface $grammar,
         SelectBuilder $selectBuilder,
         InsertBuilder $insertBuilder,
         UpdateBuilder $updateBuilder,
         DeleteBuilder $deleteBuilder
     ) {
+        $this->grammar = $grammar;
         $this->selectBuilder = $selectBuilder;
         $this->insertBuilder = $insertBuilder;
         $this->updateBuilder = $updateBuilder;
         $this->deleteBuilder = $deleteBuilder;
+    }
+
+    /**
+     * @return GrammarInterface
+     */
+    public function getGrammar()
+    {
+        return $this->grammar;
     }
 
     /**

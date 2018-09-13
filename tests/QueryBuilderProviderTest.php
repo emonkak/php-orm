@@ -15,6 +15,14 @@ use Emonkak\Orm\UpdateBuilder;
  */
 class QueryBuilderProviderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetGrammar()
+    {
+        $grammar = $this->createMock(GrammarInterface::class);
+        $provider = QueryBuilderProvider::create($grammar);
+
+        $this->assertSame($grammar, $provider->getGrammar());
+    }
+
     public function testGetSelect()
     {
         $grammar = $this->createMock(GrammarInterface::class);
