@@ -471,7 +471,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function aggregate(PDOInterface $pdo, $expr)
     {
-        $stmt = $this->selectAll([$expr])->withoutOrderBy()->prepare($pdo);
+        $stmt = $this->selectAll([$expr])->withoutSorting()->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
@@ -480,21 +480,23 @@ class SelectBuilder implements QueryBuilderInterface
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
+     * @param string           $countExpr
      * @return Paginator
      */
-    public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage)
+    public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $countExpr = 'COUNT(*)')
     {
-        $itemCount = $this->count($pdo);
-        return new Paginator($this, $pdo, $fetcher, $perPage, $itemCount);
+        $count = $this->aggregate($pdo, $countExpr);
+        return new Paginator($this, $pdo, $fetcher, $perPage, $count);
     }
 
     /**
      * @return $this
      */
-    private function withoutOrderBy()
+    private function withoutSorting()
     {
         $cloned = clone $this;
         $cloned->orderBy = [];
+        $cloned->groupBy = [];
         return $cloned;
     }
 }
