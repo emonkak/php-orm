@@ -48,6 +48,26 @@ class PaginatedResultSetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(123, $result->getIndex());
     }
 
+    public function testGetInitialItemIndex()
+    {
+        $innerResult = $this->createMock(ResultSetInterface::class);
+
+        $paginator = $this->createMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->any())
+            ->method('getPerPage')
+            ->willReturn(10);
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 0);
+        $this->assertSame(0, $result->getInitialItemIndex());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 1);
+        $this->assertSame(10, $result->getInitialItemIndex());
+
+        $result = new PaginatedResultSet($innerResult, $paginator, 2);
+        $this->assertSame(20, $result->getInitialItemIndex());
+    }
+
     public function testGetPageNum()
     {
         $innerResult = $this->createMock(ResultSetInterface::class);
