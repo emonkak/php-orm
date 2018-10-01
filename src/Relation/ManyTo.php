@@ -184,16 +184,21 @@ class ManyTo implements RelationStrategyInterface
     {
         $grammar = $this->builder->getGrammar();
 
-        $builder = $this->builder
-            ->from($grammar->identifier($this->oneToManyTable))
+        $builder = $this->builder;
+
+        if (count($builder->getFrom()) === 0) {
+            $builder = $builder->from($grammar->identifier($this->manyToOneTable));
+        }
+
+        $builder = $builder
             ->outerJoin(
-                $grammar->identifier($this->manyToOneTable),
+                $grammar->identifier($this->oneToManyTable),
                 sprintf(
                     '%s.%s = %s.%s',
-                    $grammar->identifier($this->oneToManyTable),
-                    $grammar->identifier($this->manyToOneOuterKey),
                     $grammar->identifier($this->manyToOneTable),
-                    $grammar->identifier($this->manyToOneInnerKey)
+                    $grammar->identifier($this->manyToOneInnerKey),
+                    $grammar->identifier($this->oneToManyTable),
+                    $grammar->identifier($this->manyToOneOuterKey)
                 )
             )
             ->where(

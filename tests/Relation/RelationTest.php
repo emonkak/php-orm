@@ -226,7 +226,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
-            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `friendships` LEFT OUTER JOIN `users` ON `friendships`.`friend_id` = `users`.`user_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
+            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
         $fetcher = $this->createMock(FetcherInterface::class);

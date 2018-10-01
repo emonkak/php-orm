@@ -133,8 +133,14 @@ class OneTo implements RelationStrategyInterface
     public function getResult(array $outerKeys)
     {
         $grammar = $this->builder->getGrammar();
-        return $this->builder
-            ->from($grammar->identifier($this->table))
+
+        $builder = $this->builder;
+
+        if (count($builder->getFrom()) === 0) {
+            $builder = $builder->from($grammar->identifier($this->table));
+        }
+
+        return $builder
             ->where(
                 $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
                 'IN',
