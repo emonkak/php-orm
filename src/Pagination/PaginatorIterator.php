@@ -5,14 +5,14 @@ namespace Emonkak\Orm\Pagination;
 class PaginatorIterator implements \IteratorAggregate
 {
     /**
-     * @var PaginatorInterface
+     * @var Paginator
      */
     private $paginator;
 
     /**
-     * @param PaginatorInterface $paginator
+     * @param Paginator $paginator
      */
-    public function __construct(PaginatorInterface $paginator)
+    public function __construct(Paginator $paginator)
     {
         $this->paginator = $paginator;
     }
