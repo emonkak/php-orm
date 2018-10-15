@@ -124,7 +124,7 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed[][] ...$values
+     * @param mixed[] ...$values
      * @return $this
      */
     public function values(...$values)
