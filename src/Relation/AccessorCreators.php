@@ -82,12 +82,16 @@ final class AccessorCreators
     {
         if ($class !== null) {
             $func = static function($lhs, $rhs) use ($key) {
-                $lhs->$key = $rhs;
+                if ($rhs !== null) {
+                    $lhs->$key = $rhs;
+                }
                 return $lhs;
             };
         } else {
             $func = static function($lhs, $rhs) use ($key) {
-                $lhs[$key] = $rhs;
+                if ($rhs !== null) {
+                    $lhs[$key] = $rhs;
+                }
                 return $lhs;
             };
         }
