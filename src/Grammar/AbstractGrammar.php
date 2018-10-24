@@ -2,11 +2,47 @@
 
 namespace Emonkak\Orm\Grammar;
 
+use Emonkak\Orm\DeleteBuilder;
+use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\QueryBuilderInterface;
+use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\UpdateBuilder;
 
 abstract class AbstractGrammar implements GrammarInterface
 {
+    /**
+     * @return SelectBuilder
+     */
+    public function getSelect()
+    {
+        return new SelectBuilder($this);
+    }
+
+    /**
+     * @return InsertBuilder
+     */
+    public function getInsert()
+    {
+        return new InsertBuilder($this);
+    }
+
+    /**
+     * @return UpdateBuilder
+     */
+    public function getUpdate()
+    {
+        return new UpdateBuilder($this);
+    }
+
+    /**
+     * @return DeleteBuilder
+     */
+    public function getDelete()
+    {
+        return new DeleteBuilder($this);
+    }
+
     /**
      * @param mixed      $arg1
      * @param mixed|null $arg2

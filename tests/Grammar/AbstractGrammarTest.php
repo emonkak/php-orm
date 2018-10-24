@@ -2,9 +2,13 @@
 
 namespace Emonkak\Orm\Tests;
 
+use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\Grammar\AbstractGrammar;
 use Emonkak\Orm\Grammar\GrammarInterface;
+use Emonkak\Orm\InsertBuilder;
+use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\UpdateBuilder;
 
 /**
  * @covers Emonkak\Orm\Grammar\AbstractGrammar
@@ -12,6 +16,42 @@ use Emonkak\Orm\Sql;
 class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
+
+    public function testGetSelect()
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $builder = $grammar->getSelect();
+
+        $this->assertInstanceOf(SelectBuilder::class, $builder);
+        $this->assertSame($grammar, $builder->getGrammar());
+    }
+
+    public function testGetInsert()
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $builder = $grammar->getInsert();
+
+        $this->assertInstanceOf(InsertBuilder::class, $builder);
+        $this->assertSame($grammar, $builder->getGrammar());
+    }
+
+    public function testGetUpdate()
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $builder = $grammar->getUpdate();
+
+        $this->assertInstanceOf(UpdateBuilder::class, $builder);
+        $this->assertSame($grammar, $builder->getGrammar());
+    }
+
+    public function testGetDelete()
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $builder = $grammar->getDelete();
+
+        $this->assertInstanceOf(DeleteBuilder::class, $builder);
+        $this->assertSame($grammar, $builder->getGrammar());
+    }
 
     public function testConditionWithOneArgument()
     {

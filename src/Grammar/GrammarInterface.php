@@ -2,11 +2,35 @@
 
 namespace Emonkak\Orm\Grammar;
 
+use Emonkak\Orm\DeleteBuilder;
+use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\QueryBuilderInterface;
+use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
+use Emonkak\Orm\UpdateBuilder;
 
 interface GrammarInterface
 {
+    /**
+     * @return SelectBuilder
+     */
+    public function getSelect();
+
+    /**
+     * @return InsertBuilder
+     */
+    public function getInsert();
+
+    /**
+     * @return UpdateBuilder
+     */
+    public function getUpdate();
+
+    /**
+     * @return DeleteBuilder
+     */
+    public function getDelete();
+
     /**
      * @param mixed      $arg1
      * @param mixed|null $arg2
