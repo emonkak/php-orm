@@ -207,8 +207,8 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed  $expr
-     * @param string $alias
+     * @param mixed       $expr
+     * @param string|null $alias
      * @return $this
      */
     public function select($expr, $alias = null)
@@ -242,8 +242,8 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed  $table
-     * @param string $alias
+     * @param mixed       $table
+     * @param string|null $alias
      * @return $this
      */
     public function from($table, $alias = null)
@@ -288,10 +288,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed  $table
-     * @param mixed  $condition
-     * @param string $alias
-     * @param string $type
+     * @param mixed       $table
+     * @param mixed|null  $condition
+     * @param string|null $alias
+     * @param string      $type
      * @return $this
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')

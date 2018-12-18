@@ -99,18 +99,18 @@ interface GrammarInterface
     public function identifier($string);
 
     /**
-     * @param string  $prefix
-     * @param Sql[]   $select
-     * @param Sql[]   $from
-     * @param Sql[]   $join
-     * @param Sql     $where
-     * @param Sql[]   $groupBy
-     * @param Sql     $having
-     * @param Sql[]   $orderBy
-     * @param integer $limit
-     * @param integer $offset
-     * @param string  $suffix
-     * @param Sql[]   $union
+     * @param string   $prefix
+     * @param Sql[]    $select
+     * @param Sql[]    $from
+     * @param Sql[]    $join
+     * @param Sql|null $where
+     * @param Sql[]    $groupBy
+     * @param Sql|null $having
+     * @param Sql[]    $orderBy
+     * @param integer  $limit
+     * @param integer  $offset
+     * @param string   $suffix
+     * @param Sql[]    $union
      * @return Sql
      */
     public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
