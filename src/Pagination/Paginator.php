@@ -7,10 +7,9 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
-class Paginator implements \IteratorAggregate, ResultSetInterface
+class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     use EnumerableExtensions;
 
@@ -66,15 +65,6 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function getClass()
-    {
-        return $this->fetcher->getClass();
-    }
-
-    /**
-     * @param integer $index
-     * @return PaginatedResultSet
-     */
     public function at($index)
     {
         if ($index < 0) {
@@ -96,7 +86,7 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return PaginatedResultSet
+     * {@inheritDoc}
      */
     public function firstPage()
     {
@@ -104,7 +94,7 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return PaginatedResultSet
+     * {@inheritDoc}
      */
     public function lastPage()
     {
@@ -113,7 +103,7 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getPerPage()
     {
@@ -121,7 +111,7 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getItemCount()
     {
@@ -129,10 +119,18 @@ class Paginator implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
+     * {@inheritDoc}
      */
     public function getPageCount()
     {
         return (int) ceil($this->itemCount / $this->perPage);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getClass()
+    {
+        return $this->fetcher->getClass();
     }
 }

@@ -3,7 +3,7 @@
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
-use Emonkak\Orm\Pagination\Paginator;
+use Emonkak\Orm\Pagination\PaginatorInterface;
 
 class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -15,7 +15,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     private $result;
 
     /**
-     * @var Paginator
+     * @var PaginatorInterface
      */
     private $paginator;
 
@@ -26,10 +26,10 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
 
     /**
      * @param ResultSetInterface $result
-     * @param Paginator          $paginator
+     * @param PaginatorInterface $paginator
      * @param integer            $index
      */
-    public function __construct(ResultSetInterface $result, Paginator $paginator, $index)
+    public function __construct(ResultSetInterface $result, PaginatorInterface $paginator, $index)
     {
         $this->result = $result;
         $this->paginator = $paginator;
@@ -69,7 +69,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return Paginator
+     * @return PaginatorInterface
      */
     public function getPaginator()
     {

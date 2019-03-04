@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Tests\Pagination;
 
-use Emonkak\Orm\Pagination\Paginator;
+use Emonkak\Orm\Pagination\PaginatorInterface;
 use Emonkak\Orm\Pagination\PaginatorIterator;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 
@@ -31,7 +31,7 @@ class PaginatorIteratorTest extends \PHPUnit_Framework_TestCase
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([['baz' => 789]]));
 
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('getPageCount')
