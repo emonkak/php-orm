@@ -19,28 +19,6 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty(iterator_to_array($result));
     }
 
-    /**
-     * @expectedException OutOfRangeException
-     */
-    public function testAtThrowsOutOfRangeException()
-    {
-        (new EmptyPaginator(Model::class, 10))->at(-1);
-    }
-
-    public function testFirstPage()
-    {
-        $result = (new EmptyPaginator(Model::class, 10))->firstPage();
-        $this->assertInstanceOf(PaginatedResultSet::class, $result);
-        $this->assertEmpty(iterator_to_array($result));
-    }
-
-    public function testLastPage()
-    {
-        $result = (new EmptyPaginator(Model::class, 10))->lastPage();
-        $this->assertInstanceOf(PaginatedResultSet::class, $result);
-        $this->assertEmpty(iterator_to_array($result));
-    }
-
     public function testGetPerPage()
     {
         $this->assertSame(10, (new EmptyPaginator(Model::class, 10))->getPerPage());
@@ -48,12 +26,12 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetItemCount()
     {
-        $this->assertSame(0, (new EmptyPaginator(Model::class, 10))->getItemCount());
+        $this->assertSame(0, (new EmptyPaginator(Model::class, 10))->getNumItems());
     }
 
     public function testGetPageCount()
     {
-        $this->assertSame(0, (new EmptyPaginator(Model::class, 10))->getPageCount());
+        $this->assertSame(0, (new EmptyPaginator(Model::class, 10))->getNumPages());
     }
 
     public function testGetClass()

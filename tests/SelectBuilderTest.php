@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Pagination\Paginator;
+use Emonkak\Orm\Pagination\PrecountPaginator;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 
@@ -713,8 +713,8 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
 
         $paginator = $this->getSelectBuilder()->paginate($pdo, $fetcher, 100);
-        $this->assertInstanceOf(Paginator::class, $paginator);
+        $this->assertInstanceOf(PrecountPaginator::class, $paginator);
         $this->assertSame(100, $paginator->getPerPage());
-        $this->assertSame(1000, $paginator->getItemCount());
+        $this->assertSame(1000, $paginator->getNumItems());
     }
 }

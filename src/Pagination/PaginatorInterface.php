@@ -14,6 +14,12 @@ interface PaginatorInterface extends ResultSetInterface
     public function at($index);
 
     /**
+     * @param integer $index
+     * @return boolean
+     */
+    public function has($index);
+
+    /**
      * @return PaginatedResultSet
      */
     public function firstPage();
@@ -31,10 +37,10 @@ interface PaginatorInterface extends ResultSetInterface
     /**
      * @return integer
      */
-    public function getItemCount();
+    public function getNumItems();
 
     /**
      * @return integer
      */
-    public function getPageCount();
+    public function getNumPages();
 }

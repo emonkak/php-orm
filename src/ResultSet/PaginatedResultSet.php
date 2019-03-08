@@ -2,6 +2,7 @@
 
 namespace Emonkak\Orm\ResultSet;
 
+use Emonkak\Enumerable\EnumerableInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Pagination\PaginatorInterface;
 
@@ -10,9 +11,9 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     use EnumerableExtensions;
 
     /**
-     * @var ResultSetInterface
+     * @var EnumerableInterface
      */
-    private $result;
+    private $elements;
 
     /**
      * @var PaginatorInterface
@@ -25,13 +26,13 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     private $index;
 
     /**
-     * @param ResultSetInterface $result
-     * @param PaginatorInterface $paginator
-     * @param integer            $index
+     * @param EnumerableInterface $elements
+     * @param PaginatorInterface  $paginator
+     * @param integer             $index
      */
-    public function __construct(ResultSetInterface $result, PaginatorInterface $paginator, $index)
+    public function __construct(EnumerableInterface $elements, PaginatorInterface $paginator, $index)
     {
-        $this->result = $result;
+        $this->elements = $elements;
         $this->paginator = $paginator;
         $this->index = $index;
     }
@@ -41,7 +42,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function getClass()
     {
-        return $this->result->getClass();
+        return $this->paginator->getClass();
     }
 
     /**
@@ -49,7 +50,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function getIterator()
     {
-        return $this->result;
+        return $this->elements;
     }
 
     /**
@@ -63,7 +64,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * @return integer
      */
-    public function getInitialItemIndex()
+    public function getOffset()
     {
         return $this->index * $this->paginator->getPerPage();
     }
@@ -81,9 +82,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function nextPage()
     {
-        if (!$this->hasNextPage()) {
-            throw new \OutOfRangeException('The next page does not exist.');
-        }
         return $this->paginator->at($this->index + 1);
     }
 
@@ -92,9 +90,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function prevPage()
     {
-        if (!$this->hasPrevPage()) {
-            throw new \OutOfRangeException('The previous page does not exist.');
-        }
         return $this->paginator->at($this->index - 1);
     }
 
@@ -103,7 +98,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function hasPrevPage()
     {
-        return $this->index > 0;
+        return $this->paginator->has($this->index - 1);
     }
 
     /**
@@ -111,7 +106,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function hasNextPage()
     {
-        return ($this->index + 1) < $this->paginator->getPageCount();
+        return $this->paginator->has($this->index + 1);
     }
 
     /**
@@ -119,7 +114,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function isFirstPage()
     {
-        return $this->index == 0;
+        return !$this->hasPrevPage();
     }
 
     /**
@@ -127,6 +122,6 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function isLastPage()
     {
-        return $this->index == ($this->paginator->getPageCount() - 1);
+        return !$this->hasNextPage();
     }
 }

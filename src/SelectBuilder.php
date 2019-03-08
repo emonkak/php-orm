@@ -6,7 +6,8 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Grammar\GrammarProvider;
-use Emonkak\Orm\Pagination\Paginator;
+use Emonkak\Orm\Pagination\PaginatorInterface;
+use Emonkak\Orm\Pagination\PrecountPaginator;
 
 /**
  * Provides the query building of SELECT statement.
@@ -481,12 +482,12 @@ class SelectBuilder implements QueryBuilderInterface
      * @param FetcherInterface $fetcher
      * @param integer          $perPage
      * @param string           $countExpr
-     * @return Paginator
+     * @return PaginatorInterface
      */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $countExpr = 'COUNT(*)')
     {
         $count = $this->aggregate($pdo, $countExpr);
-        return new Paginator($this, $pdo, $fetcher, $perPage, $count);
+        return new PrecountPaginator($this, $pdo, $fetcher, $perPage, $count);
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Emonkak\Orm\Pagination;
 
+use Emonkak\Enumerable\Enumerable;
 use Emonkak\Enumerable\EnumerableExtensions;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 
 class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
@@ -31,13 +31,15 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
      */
     public function at($index)
     {
-        if ($index < 0) {
-            throw new \OutOfRangeException(
-                "The value must be greater than or equal to zero. but got '$index'."
-            );
-        }
+        return new PaginatedResultSet(Enumerable::_empty(), $this, $index);
+    }
 
-        return new PaginatedResultSet(new EmptyResultSet($this->class), $this, $index);
+    /**
+     * {@inheritDoc}
+     */
+    public function has($index)
+    {
+        return false;
     }
 
     /**
@@ -67,7 +69,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getItemCount()
+    public function getNumItems()
     {
         return 0;
     }
@@ -75,7 +77,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getPageCount()
+    public function getNumPages()
     {
         return 0;
     }
