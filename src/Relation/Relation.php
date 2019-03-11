@@ -22,21 +22,21 @@ class Relation implements RelationInterface
     /**
      * @var RelationInterface[]
      */
-    private $childRelations;
+    private $childlen;
 
     /**
      * @param RelationStrategyInterface $relationStrategy
      * @param JoinStrategyInterface     $joinStrategy
-     * @param RelationInterface[]       $childRelations
+     * @param RelationInterface[]       $childlen
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
         JoinStrategyInterface $joinStrategy,
-        array $childRelations = []
+        array $childlen = []
     ) {
         $this->relationStrategy = $relationStrategy;
         $this->joinStrategy = $joinStrategy;
-        $this->childRelations = $childRelations;
+        $this->childlen = $childlen;
     }
 
     /**
@@ -60,7 +60,7 @@ class Relation implements RelationInterface
      */
     public function getChildRelations()
     {
-        return $this->childRelations;
+        return $this->childlen;
     }
 
     /**
@@ -69,12 +69,12 @@ class Relation implements RelationInterface
      */
     public function with(RelationInterface $relation)
     {
-        $childRelations = $this->childRelations;
-        $childRelations[] = $relation;
+        $childlen = $this->childlen;
+        $childlen[] = $relation;
         return new Relation(
             $this->relationStrategy,
             $this->joinStrategy,
-            $childRelations
+            $childlen
         );
     }
 
@@ -107,8 +107,8 @@ class Relation implements RelationInterface
         $outerResult = new PreloadedResultSet($outerElements, $outerClass);
         $innerResult = $this->relationStrategy->getResult($outerKeys);
 
-        foreach ($this->childRelations as $childRelation) {
-            $innerResult = new RelationResultSet($innerResult, $childRelation);
+        foreach ($this->childlen as $child) {
+            $innerResult = new RelationResultSet($innerResult, $child);
         }
 
         $innerClass = $innerResult->getClass();
