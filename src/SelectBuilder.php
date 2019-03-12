@@ -326,12 +326,9 @@ class SelectBuilder implements QueryBuilderInterface
      * @param string $ordering
      * @return $this
      */
-    public function groupBy($expr, $ordering = null)
+    public function groupBy($expr)
     {
         $expr = Sql::expr($expr);
-        if ($ordering !== null) {
-            $expr = $this->grammar->ordering($expr, $ordering);
-        }
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
         return $cloned;

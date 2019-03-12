@@ -469,33 +469,12 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getSelectBuilder()
             ->from('t1')
-            ->groupBy(new Sql('c1 + ?', [1]), 'DESC')
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY c1 + ? DESC',
-            [1],
-            $query
-        );
-
-        $query = $this->getSelectBuilder()
-            ->from('t1')
             ->groupBy('c1')
             ->groupBy('c2')
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 GROUP BY c1, c2',
             [],
-            $query
-        );
-
-        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
-        $query = $this->getSelectBuilder()
-            ->from('t1')
-            ->groupBy($builder, 'DESC')
-            ->build();
-        $this->assertQueryIs(
-            'SELECT * FROM t1 GROUP BY (SELECT c1 FROM t2 LIMIT ?) DESC',
-            [1],
             $query
         );
     }
