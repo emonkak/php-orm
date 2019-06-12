@@ -95,7 +95,7 @@ class Sql implements QueryBuilderInterface
         if (is_string($value)) {
             return new Sql($value);
         }
-        $type = gettype($value);
+        $type = is_object($value) ? get_class($value) : gettype($value);
         throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
     }
 
@@ -120,7 +120,7 @@ class Sql implements QueryBuilderInterface
         if (is_array($value)) {
             return Sql::values($value);
         }
-        $type = gettype($value);
+        $type = is_object($value) ? get_class($value) : gettype($value);
         throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
     }
 
