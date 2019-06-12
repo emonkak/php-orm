@@ -66,6 +66,9 @@ abstract class AbstractGrammar implements GrammarInterface
      */
     public function literal($value)
     {
+        if ($value === null) {
+            return new Sql('NULL');
+        }
         if ($value instanceof Sql) {
             return $value;
         }
@@ -78,17 +81,14 @@ abstract class AbstractGrammar implements GrammarInterface
             $dateTime = $date . ' ' . $time . ($micros != 0 ? rtrim('.' . $micros, '0') : '');
             return Sql::value($dateTime);
         }
-        if ($value === null) {
-            return new Sql('NULL');
-        }
         if (is_scalar($value)) {
             return Sql::value($value);
         }
-        if (is_array($value)) {
-            return Sql::values($value);
-        }
         if (is_object($value) && method_exists($value, '__toString')) {
             return Sql::value($value->__toString());
+        }
+        if (is_array($value)) {
+            return Sql::join(', ', array_map([$this, 'literal'], $value))->enclosed();
         }
         $type = is_object($value) ? get_class($value) : gettype($value);
         throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
