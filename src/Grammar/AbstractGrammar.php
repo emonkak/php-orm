@@ -75,17 +75,8 @@ abstract class AbstractGrammar implements GrammarInterface
         if ($value instanceof QueryBuilderInterface) {
             return $value->build()->enclosed();
         }
-        if ($value instanceof \DateTimeInterface) {
-            list ($date, $time, $micros) =
-                explode(' ', $value->format('Y-m-d H:i:s u'));
-            $dateTime = $date . ' ' . $time . ($micros != 0 ? rtrim('.' . $micros, '0') : '');
-            return Sql::value($dateTime);
-        }
         if (is_scalar($value)) {
             return Sql::value($value);
-        }
-        if (is_object($value) && method_exists($value, '__toString')) {
-            return Sql::value($value->__toString());
         }
         if (is_array($value)) {
             return Sql::join(', ', array_map([$this, 'literal'], $value))->enclosed();

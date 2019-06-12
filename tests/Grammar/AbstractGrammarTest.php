@@ -120,8 +120,6 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
             [false, '?', [false]],
             [null, 'NULL', []],
             [[1, 2, 3], '(?, ?, ?)', [1, 2, 3]],
-            [new \DateTime('2001-12-23T12:34:56.654321+09:00'), '?', ['2001-12-23 12:34:56.654321']],
-            [new ToStringable('foo'), '?', ['foo']],
         ];
     }
 
