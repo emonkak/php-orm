@@ -214,7 +214,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function select($expr, $alias = null)
     {
-        $expr = Sql::expr($expr);
+        $expr = $this->grammar->expression($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -231,7 +231,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = Sql::expr($expr);
+            $expr = $this->grammar->expression($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -249,7 +249,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function from($table, $alias = null)
     {
-        $table = Sql::expr($table);
+        $table = $this->grammar->expression($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -297,13 +297,13 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
     {
-        $table = Sql::expr($table);
+        $table = $this->grammar->expression($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         $join = $this->join;
         if ($condition !== null) {
-            $condition = Sql::expr($condition);
+            $condition = $this->grammar->expression($condition);
         }
         $cloned = clone $this;
         $cloned->join[] = $this->grammar->join($table, $condition, $type);
@@ -328,7 +328,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function groupBy($expr)
     {
-        $expr = Sql::expr($expr);
+        $expr = $this->grammar->expression($expr);
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
         return $cloned;
@@ -371,7 +371,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function orderBy($expr, $ordering = null)
     {
-        $expr = Sql::expr($expr);
+        $expr = $this->grammar->expression($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -428,7 +428,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function union($query, $type = 'UNION')
     {
-        $query = Sql::expr($query);
+        $query = $this->grammar->expression($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;

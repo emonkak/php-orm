@@ -32,6 +32,18 @@ interface GrammarInterface
     public function getDelete();
 
     /**
+     * @param mixed $value
+     * @return Sql
+     */
+    public function expression($value);
+
+    /**
+     * @param mixed $value
+     * @return Sql
+     */
+    public function literal($value);
+
+    /**
      * @param mixed      $arg1
      * @param mixed|null $arg2
      * @param mixed|null $arg3

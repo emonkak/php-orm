@@ -53,6 +53,96 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($grammar, $builder->getGrammar());
     }
 
+    /**
+     * @dataProvider providerExpression
+     */
+    public function testExpression($value, $expectedSql, array $expectedBindings)
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $query = $grammar->expression($value);
+
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerExpression()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', 'foo', []],
+        ];
+    }
+
+    /**
+     * @dataProvider providerExprThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testExprThrowsUnexpectedValueException($value)
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar->expression($value);
+    }
+
+    public function providerExprThrowsUnexpectedValueException()
+    {
+        return [
+            [123],
+            [1.23],
+            [true],
+            [false],
+            [null],
+            [[1, 2, 3]],
+            [new \stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiteral
+     */
+    public function testLiteral($value, $expectedSql, array $expectedBindings)
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $query = $grammar->literal($value);
+
+        $this->assertQueryIs($expectedSql, $expectedBindings, $query);
+    }
+
+    public function providerLiteral()
+    {
+        return [
+            [new Sql('?', ['foo']), '?', ['foo']],
+            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            ['foo', '?', ['foo']],
+            [123, '?', [123]],
+            [1.23, '?', [1.23]],
+            [true, '?', [true]],
+            [false, '?', [false]],
+            [null, 'NULL', []],
+            [[1, 2, 3], '(?, ?, ?)', [1, 2, 3]],
+            [new \DateTime('2001-12-23T12:34:56.654321+09:00'), '?', ['2001-12-23 12:34:56.654321']],
+            [new ToStringable('foo'), '?', ['foo']],
+        ];
+    }
+
+    /**
+     * @dataProvider providerLiteralThrowsUnexpectedValueException
+     *
+     * @expectedException UnexpectedValueException
+     */
+    public function testLiteralThrowsUnexpectedValueException($value)
+    {
+        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar->literal($value);
+    }
+
+    public function providerLiteralThrowsUnexpectedValueException()
+    {
+        return [
+            [new \stdClass()],
+        ];
+    }
+
     public function testConditionWithOneArgument()
     {
         $expr = 'SELECT 1';

@@ -133,7 +133,7 @@ class InsertBuilder implements QueryBuilderInterface
         foreach ($values as $row) {
             $innerValues = [];
             foreach ($row as $value) {
-                $innerValues[] = Sql::literal($value);
+                $innerValues[] = $this->grammar->literal($value);
             }
             $cloned->values[] = $innerValues;
         }
@@ -147,7 +147,7 @@ class InsertBuilder implements QueryBuilderInterface
     public function select($query)
     {
         $cloned = clone $this;
-        $cloned->select = Sql::expr($query);
+        $cloned->select = $this->grammar->expression($query);
         return $cloned;
     }
 

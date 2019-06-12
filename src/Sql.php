@@ -81,59 +81,6 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public static function expr($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if (is_string($value)) {
-            return new Sql($value);
-        }
-        $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
-    }
-
-    /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public static function literal($value)
-    {
-        if ($value instanceof Sql) {
-            return $value;
-        }
-        if ($value instanceof QueryBuilderInterface) {
-            return $value->build()->enclosed();
-        }
-        if ($value instanceof \DateTimeInterface) {
-            list ($date, $time, $micros) =
-                explode(' ', $value->format('Y-m-d H:i:s u'));
-            $dateTime = $date . ' ' . $time . ($micros != 0 ? rtrim('.' . $micros, '0') : '');
-            return Sql::value($dateTime);
-        }
-        if ($value === null) {
-            return new Sql('NULL');
-        }
-        if (is_scalar($value)) {
-            return Sql::value($value);
-        }
-        if (is_array($value)) {
-            return Sql::values($value);
-        }
-        if (is_object($value) && method_exists($value, '__toString')) {
-            return Sql::value($value->__toString());
-        }
-        $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
-    }
-
-    /**
      * @param Sql $lhs
      * @param Sql ...$rest
      * @return Sql

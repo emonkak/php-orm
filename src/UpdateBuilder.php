@@ -116,7 +116,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function set($column, $expr)
     {
         $cloned = clone $this;
-        $cloned->update[$column] = Sql::literal($expr);
+        $cloned->update[$column] = $this->grammar->literal($expr);
         return $cloned;
     }
 
@@ -127,7 +127,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function setAll(array $update)
     {
         $cloned = clone $this;
-        $cloned->update = array_map([Sql::class, 'literal'], $update);
+        $cloned->update = array_map([$this->grammar, 'literal'], $update);
         return $cloned;
     }
 

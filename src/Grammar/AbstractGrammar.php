@@ -12,7 +12,7 @@ use Emonkak\Orm\UpdateBuilder;
 abstract class AbstractGrammar implements GrammarInterface
 {
     /**
-     * @return SelectBuilder
+     * {@inheritDoc}
      */
     public function getSelect()
     {
@@ -20,7 +20,7 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @return InsertBuilder
+     * {@inheritDoc}
      */
     public function getInsert()
     {
@@ -28,7 +28,7 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @return UpdateBuilder
+     * {@inheritDoc}
      */
     public function getUpdate()
     {
@@ -36,7 +36,7 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @return DeleteBuilder
+     * {@inheritDoc}
      */
     public function getDelete()
     {
@@ -44,32 +44,79 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
-     * @return Sql
+     * {@inheritDoc}
+     */
+    public function expression($value)
+    {
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if (is_string($value)) {
+            return new Sql($value);
+        }
+        $type = is_object($value) ? get_class($value) : gettype($value);
+        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function literal($value)
+    {
+        if ($value instanceof Sql) {
+            return $value;
+        }
+        if ($value instanceof QueryBuilderInterface) {
+            return $value->build()->enclosed();
+        }
+        if ($value instanceof \DateTimeInterface) {
+            list ($date, $time, $micros) =
+                explode(' ', $value->format('Y-m-d H:i:s u'));
+            $dateTime = $date . ' ' . $time . ($micros != 0 ? rtrim('.' . $micros, '0') : '');
+            return Sql::value($dateTime);
+        }
+        if ($value === null) {
+            return new Sql('NULL');
+        }
+        if (is_scalar($value)) {
+            return Sql::value($value);
+        }
+        if (is_array($value)) {
+            return Sql::values($value);
+        }
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return Sql::value($value->__toString());
+        }
+        $type = is_object($value) ? get_class($value) : gettype($value);
+        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
     {
         switch (func_num_args()) {
             case 1:
-                $expr = Sql::expr($arg1);
-                return $expr;
+                $expression = $this->expression($arg1);
+                return $expression;
             case 2:
                 $operator = $arg1;
-                $rhs = Sql::expr($arg2);
+                $rhs = $this->expression($arg2);
                 return $this->unaryOperator($arg1, $rhs);
             case 3:
                 $operator = $arg2;
-                $lhs = Sql::expr($arg1);
-                $rhs = Sql::literal($arg3);
+                $lhs = $this->expression($arg1);
+                $rhs = $this->literal($arg3);
                 return $this->operator($operator, $lhs, $rhs);
             default:
                 $operator = $arg2;
-                $lhs = Sql::expr($arg1);
-                $start = Sql::literal($arg3);
-                $end = Sql::literal($arg4);
+                $lhs = $this->expression($arg1);
+                $start = $this->literal($arg3);
+                $end = $this->literal($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);
         }
     }
