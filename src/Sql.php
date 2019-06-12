@@ -87,17 +87,17 @@ class Sql implements QueryBuilderInterface
      */
     public static function _and(Sql $lhs, Sql ...$rest)
     {
-        $sql = $lhs->sql;
-        $nestedBindings = [$lhs->bindings];
+        $tmpSql = $lhs->sql;
+        $tmpBindings = [$lhs->bindings];
 
         foreach ($rest as $rhs) {
-            $sql = '(' . $sql . ' AND ' . $rhs->sql . ')';
-            $nestedBindings[] = $rhs->bindings;
+            $tmpSql = '(' . $tmpSql . ' AND ' . $rhs->sql . ')';
+            $tmpBindings[] = $rhs->bindings;
         }
 
-        $bindings = array_merge(...$nestedBindings);
+        $bindings = array_merge(...$tmpBindings);
 
-        return new Sql($sql, $bindings);
+        return new Sql($tmpSql, $bindings);
     }
 
     /**
@@ -107,17 +107,17 @@ class Sql implements QueryBuilderInterface
      */
     public static function _or(Sql $lhs, Sql ...$rest)
     {
-        $sql = $lhs->sql;
-        $nestedBindings = [$lhs->bindings];
+        $tmpSql = $lhs->sql;
+        $tmpBindings = [$lhs->bindings];
 
         foreach ($rest as $rhs) {
-            $sql = '(' . $sql . ' OR ' . $rhs->sql . ')';
-            $nestedBindings[] = $rhs->bindings;
+            $tmpSql = '(' . $tmpSql . ' OR ' . $rhs->sql . ')';
+            $tmpBindings[] = $rhs->bindings;
         }
 
-        $bindings = array_merge(...$nestedBindings);
+        $bindings = array_merge(...$tmpBindings);
 
-        return new Sql($sql, $bindings);
+        return new Sql($tmpSql, $bindings);
     }
 
     /**
