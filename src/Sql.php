@@ -126,6 +126,9 @@ class Sql implements QueryBuilderInterface
         if (is_array($value)) {
             return Sql::values($value);
         }
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return Sql::value($value->__toString());
+        }
         $type = is_object($value) ? get_class($value) : gettype($value);
         throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
     }
