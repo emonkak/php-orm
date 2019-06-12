@@ -111,6 +111,12 @@ class Sql implements QueryBuilderInterface
         if ($value instanceof QueryBuilderInterface) {
             return $value->build()->enclosed();
         }
+        if ($value instanceof \DateTimeInterface) {
+            list ($date, $time, $micros) =
+                explode(' ', $value->format('Y-m-d H:i:s u'));
+            $dateTime = $date . ' ' . $time . ($micros != 0 ? rtrim('.' . $micros, '0') : '');
+            return Sql::value($dateTime);
+        }
         if ($value === null) {
             return new Sql('NULL');
         }
