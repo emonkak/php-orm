@@ -158,7 +158,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
 
         $relationStrategy = new OneTo(
             'jobs',
-            'job',
+            'jobs',
             'job_id',
             'job_id',
             $pdo,
