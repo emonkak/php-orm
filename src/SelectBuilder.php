@@ -85,11 +85,17 @@ class SelectBuilder implements QueryBuilderInterface
     private $union = [];
 
     /**
+     * @var ?self
+     */
+    private $parent;
+
+    /**
      * @param GrammarInterface $grammar
      */
-    public function __construct(GrammarInterface $grammar)
+    public function __construct(GrammarInterface $grammar, SelectBuilder $parent = null)
     {
         $this->grammar = $grammar;
+        $this->parent = $parent;
     }
 
     /**
@@ -422,11 +428,30 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
+     * @param string $type
+     * @return $this
+     */
+    public function union($type = 'UNION')
+    {
+        $parent = clone $this;
+        $parent->suffix = ltrim($parent->suffix . ' ' . $type, ' ');
+        return new SelectBuilder($this->grammar, $parent);
+    }
+
+    /**
+     * @return $this
+     */
+    public function unionAll()
+    {
+        return $this->union('UNION ALL');
+    }
+
+    /**
      * @param mixed  $query
      * @param string $type
      * @return $this
      */
-    public function union($query, $type = 'UNION')
+    public function unionWith($query, $type = 'UNION')
     {
         $query = $this->grammar->expression($query);
         $cloned = clone $this;
@@ -438,9 +463,9 @@ class SelectBuilder implements QueryBuilderInterface
      * @param mixed $query
      * @return $this
      */
-    public function unionAll($query)
+    public function unionAllWith($query)
     {
-        return $this->union($query, 'UNION ALL');
+        return $this->unionWith($query, 'UNION ALL');
     }
 
     /**
@@ -448,20 +473,27 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        return $this->grammar->selectStatement(
-            $this->prefix,
-            $this->select,
-            $this->from,
-            $this->join,
-            $this->where,
-            $this->groupBy,
-            $this->having,
-            $this->orderBy,
-            $this->limit,
-            $this->offset,
-            $this->suffix,
-            $this->union
-        );
+        $builder = $this;
+        $sqls = [];
+
+        do {
+            $sqls[] = $this->grammar->selectStatement(
+                $builder->prefix,
+                $builder->select,
+                $builder->from,
+                $builder->join,
+                $builder->where,
+                $builder->groupBy,
+                $builder->having,
+                $builder->orderBy,
+                $builder->limit,
+                $builder->offset,
+                $builder->suffix,
+                $builder->union
+            );
+        } while ($builder = $builder->parent);
+
+        return count($sqls) > 1 ? Sql::join(' ', array_reverse($sqls)) : $sqls[0];
     }
 
     /**

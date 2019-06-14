@@ -39,7 +39,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->offset(12)
             ->limit(34)
             ->suffix('FOR UPDATE')
-            ->union($unionBuilder);
+            ->unionWith($unionBuilder);
 
         $this->assertSame('SELECT', $builder->getPrefix());
         $this->assertEquals([new Sql('c1')], $builder->getSelect());
@@ -623,12 +623,31 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnion()
     {
-        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
+        $query = $this->getSelectBuilder()
+            ->select('c1')
+            ->from('t1')
+            ->where('c1', '=', 'foo')
+            ->union()
+            ->select('c2')
+            ->from('t2')
+            ->where('c2', '=', 'bar')
+            ->build();
 
-        $query = $builder1->union($builder2)->build();
         $this->assertQueryIs(
-            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION SELECT c2 FROM t2 WHERE (c2 = ?)',
+            ['foo', 'bar'],
+            $query
+        );
+    }
+
+    public function testUnionWith()
+    {
+        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->getSelectBuilder()->select('c2')->from('t2')->where('c2', '=', 'bar');
+
+        $query = $builder1->unionWith($builder2)->build();
+        $this->assertQueryIs(
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION (SELECT c2 FROM t2 WHERE (c2 = ?))',
             ['foo', 'bar'],
             $query
         );
@@ -636,13 +655,36 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnionAll()
     {
-        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
-        $builder2 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'bar');
-        $builder3 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'baz');
+        $query = $this->getSelectBuilder()
+            ->select('c1')
+            ->from('t1')
+            ->where('c1', '=', 'foo')
+            ->unionAll()
+            ->select('c2')
+            ->from('t2')
+            ->where('c2', '=', 'bar')
+            ->unionAll()
+            ->select('c3')
+            ->from('t3')
+            ->where('c3', '=', 'baz')
+            ->build();
 
-        $query = $builder1->unionAll($builder2)->unionAll($builder3)->build();
         $this->assertQueryIs(
-            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?)) UNION ALL (SELECT c1 FROM t1 WHERE (c1 = ?))',
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION ALL SELECT c2 FROM t2 WHERE (c2 = ?) UNION ALL SELECT c3 FROM t3 WHERE (c3 = ?)',
+            ['foo', 'bar', 'baz'],
+            $query
+        );
+    }
+
+    public function testUnionAllWith()
+    {
+        $builder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
+        $builder2 = $this->getSelectBuilder()->select('c2')->from('t2')->where('c2', '=', 'bar');
+        $builder3 = $this->getSelectBuilder()->select('c3')->from('t3')->where('c3', '=', 'baz');
+
+        $query = $builder1->unionAllWith($builder2)->unionAllWith($builder3)->build();
+        $this->assertQueryIs(
+            'SELECT c1 FROM t1 WHERE (c1 = ?) UNION ALL (SELECT c2 FROM t2 WHERE (c2 = ?)) UNION ALL (SELECT c3 FROM t3 WHERE (c3 = ?))',
             ['foo', 'bar', 'baz'],
             $query
         );
