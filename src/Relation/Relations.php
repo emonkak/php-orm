@@ -218,7 +218,7 @@ final class Relations
                 $fetcher,
                 $builder
             ),
-            new LazyGroupJoin($proxyFactory ?: new LazyLoadingValueHolderFactory())
+            new LazyGroupJoin($proxyFactory)
         );
     }
 
