@@ -104,7 +104,7 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return PDOInterface
      */
     public function getPdo()
     {
@@ -112,7 +112,7 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return FetcherInterface
      */
     public function getFetcher()
     {
@@ -120,7 +120,7 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return SelectBuilder
      */
     public function getBuilder()
     {
