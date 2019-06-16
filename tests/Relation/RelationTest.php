@@ -7,6 +7,7 @@ use Emonkak\Database\PDOStatementInterface;;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
+use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\Relation;
@@ -24,43 +25,128 @@ class RelationTest extends \PHPUnit_Framework_TestCase
 {
     use QueryBuilderTestTrait;
 
+    public function testOneToOne()
+    {
+        $outerElements = [
+            new Model(['post_id' => 1, 'user_id' => 1]),
+            new Model(['post_id' => 2, 'user_id' => 1]),
+            new Model(['post_id' => 3, 'user_id' => 3]),
+            new Model(['post_id' => 4, 'user_id' => null]),
+        ];
+        $innerElements = [
+            new Model(['user_id' => 1]),
+            new Model(['user_id' => 2]),
+            new Model(['user_id' => 3]),
+        ];
+        $expectedResult = [
+            new Model([
+                'post_id' => 1,
+                'user_id' => 1,
+                'user' => new Model(['user_id' => 1]),
+            ]),
+            new Model([
+                'post_id' => 2,
+                'user_id' => 1,
+                'user' => new Model(['user_id' => 1]),
+            ]),
+            new Model([
+                'post_id' => 3,
+                'user_id' => 3,
+                'user' => new Model(['user_id' => 3]),
+            ]),
+            new Model([
+                'post_id' => 4,
+                'user_id' => null
+            ]),
+        ];
+
+        $outerResult = new PreloadedResultSet($outerElements, Model::class);
+        $innerResult = new PreloadedResultSet($innerElements, Model::class);
+
+        $stmt = $this->createMock(PDOStatementInterface::class);
+        $stmt
+            ->expects($this->exactly(2))
+            ->method('bindValue')
+            ->withConsecutive(
+                [1, 1, \PDO::PARAM_INT],
+                [2, 3, \PDO::PARAM_INT]
+            )
+            ->willReturn(true);
+
+        $pdo = $this->createMock(PDOInterface::class);
+        $pdo
+            ->expects($this->once())
+            ->method('prepare')
+            ->with('SELECT * FROM `users` WHERE (`users`.`user_id` IN (?, ?))')
+            ->willReturn($stmt);
+
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $fetcher
+            ->expects($this->once())
+            ->method('fetch')
+            ->with($this->identicalTo($stmt))
+            ->willReturn($innerResult);
+
+        $childRelation = $this->createMock(RelationInterface::class);
+        $childRelation
+            ->expects($this->once())
+            ->method('associate')
+            ->with($this->identicalTo($innerResult))
+            ->will($this->returnArgument(0));
+
+        $builder = $this->getSelectBuilder();
+
+        $relationStrategy = new OneTo(
+            'user',
+            'users',
+            'user_id',
+            'user_id',
+            $pdo,
+            $fetcher,
+            $builder,
+            []
+        );
+        $joinStrategy = new OuterJoin();
+        $relation = new Relation($relationStrategy, $joinStrategy, [$childRelation]);
+
+        $this->assertSame($relationStrategy, $relation->getRelationStrategy());
+        $this->assertSame($joinStrategy, $relation->getJoinStrategy());
+        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult)));
+    }
+
     public function testOneToMany()
     {
         $outerElements = [
-            new Model(['user_id' => 1, 'name' => 'foo']),
-            new Model(['user_id' => 2, 'name' => 'bar']),
-            new Model(['user_id' => 3, 'name' => 'baz']),
-            new Model(['user_id' => null, 'name' => 'qux']),
+            new Model(['user_id' => 1]),
+            new Model(['user_id' => 2]),
+            new Model(['user_id' => 3]),
+            new Model(['user_id' => null]),
         ];
         $innerElements = [
-            new Model(['post_id' => 1, 'user_id' => 1, 'content' => 'foo']),
-            new Model(['post_id' => 2, 'user_id' => 1, 'content' => 'bar']),
-            new Model(['post_id' => 3, 'user_id' => 3, 'content' => 'baz']),
+            new Model(['post_id' => 1, 'user_id' => 1]),
+            new Model(['post_id' => 2, 'user_id' => 1]),
+            new Model(['post_id' => 3, 'user_id' => 3]),
         ];
         $expectedResult = [
             new Model([
                 'user_id' => 1,
-                'name' => 'foo',
                 'posts' => [
-                    new Model(['post_id' => 1, 'user_id' => 1, 'content' => 'foo']),
-                    new Model(['post_id' => 2, 'user_id' => 1, 'content' => 'bar']),
+                    new Model(['post_id' => 1, 'user_id' => 1]),
+                    new Model(['post_id' => 2, 'user_id' => 1]),
                 ],
             ]),
             new Model([
                 'user_id' => 2,
-                'name' => 'bar',
                 'posts' => [],
             ]),
             new Model([
                 'user_id' => 3,
-                'name' => 'baz',
                 'posts' => [
-                    new Model(['post_id' => 3, 'user_id' => 3, 'content' => 'baz']),
+                    new Model(['post_id' => 3, 'user_id' => 3]),
                 ],
             ]),
             new Model([
                 'user_id' => null,
-                'name' => 'qux',
                 'posts' => [
                 ],
             ]),
@@ -179,37 +265,34 @@ class RelationTest extends \PHPUnit_Framework_TestCase
     public function testManyTo()
     {
         $outerElements = [
-            new Model(['user_id' => 1, 'name' => 'foo']),
-            new Model(['user_id' => 2, 'name' => 'bar']),
-            new Model(['user_id' => 3, 'name' => 'baz']),
+            new Model(['user_id' => 1]),
+            new Model(['user_id' => 2]),
+            new Model(['user_id' => 3]),
         ];
         $innerElements = [
-            new Model(['__pivot_user_id' => 1, 'user_id' => 2, 'name' => 'bar']),
-            new Model(['__pivot_user_id' => 1, 'user_id' => 3, 'name' => 'baz']),
-            new Model(['__pivot_user_id' => 2, 'user_id' => 1, 'name' => 'foo']),
-            new Model(['__pivot_user_id' => 3, 'user_id' => 2, 'name' => 'bar']),
+            new Model(['__pivot_user_id' => 1, 'user_id' => 2]),
+            new Model(['__pivot_user_id' => 1, 'user_id' => 3]),
+            new Model(['__pivot_user_id' => 2, 'user_id' => 1]),
+            new Model(['__pivot_user_id' => 3, 'user_id' => 2]),
         ];
         $expectedResult = [
             new Model([
                 'user_id' => 1,
-                'name' => 'foo',
                 'friends' => [
-                    new Model(['user_id' => 2, 'name' => 'bar']),
-                    new Model(['user_id' => 3, 'name' => 'baz']),
+                    new Model(['user_id' => 2]),
+                    new Model(['user_id' => 3]),
                 ],
             ]),
             new Model([
                 'user_id' => 2,
-                'name' => 'bar',
                 'friends' => [
-                    new Model(['user_id' => 1, 'name' => 'foo']),
+                    new Model(['user_id' => 1]),
                 ],
             ]),
             new Model([
                 'user_id' => 3,
-                'name' => 'baz',
                 'friends' => [
-                    new Model(['user_id' => 2, 'name' => 'bar']),
+                    new Model(['user_id' => 2]),
                 ],
             ]),
         ];
@@ -251,7 +334,8 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            []
         );
         $joinStrategy = new GroupJoin();
         $relation = new Relation($relationStrategy, $joinStrategy);

@@ -31,6 +31,9 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $builder = $this->getSelectBuilder();
+        $unions = [
+            'union' => $this->getSelectBuilder()
+        ];
 
         $relation = new ManyTo(
             $relationKey,
@@ -42,7 +45,8 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             $manyToOneInnerKey,
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            $unions
         );
 
         $this->assertSame($relationKey, $relation->getRelationKey());
@@ -55,6 +59,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($builder, $relation->getBuilder());
+        $this->assertSame($unions, $relation->getUnions());
     }
 
     public function testGetResult()
@@ -99,7 +104,62 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            []
+        );
+
+        $this->assertSame($expectedResult, $relation->getResult($outerKeys));
+    }
+
+    public function testGetResultWithUnion()
+    {
+        $outerKeys = [1, 2, 3];
+        $expectedResult = $this->createMock(ResultSetInterface::class);
+
+        $stmt = $this->createMock(PDOStatementInterface::class);
+        $stmt
+            ->expects($this->exactly(6))
+            ->method('bindValue')
+            ->withConsecutive(
+                [1, 1, \PDO::PARAM_INT],
+                [2, 2, \PDO::PARAM_INT],
+                [3, 3, \PDO::PARAM_INT],
+                [4, 1, \PDO::PARAM_INT],
+                [5, 2, \PDO::PARAM_INT],
+                [6, 3, \PDO::PARAM_INT]
+            )
+            ->willReturn(true);
+
+        $pdo = $this->createMock(PDOInterface::class);
+        $pdo
+            ->expects($this->once())
+            ->method('prepare')
+            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)) UNION ALL (SELECT `users2`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users2` LEFT OUTER JOIN `friendships` ON `users2`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)))')
+            ->willReturn($stmt);
+
+        $fetcher = $this->createMock(FetcherInterface::class);
+        $fetcher
+            ->expects($this->once())
+            ->method('fetch')
+            ->with($this->identicalTo($stmt))
+            ->willReturn($expectedResult);
+
+        $builder = $this->getSelectBuilder();
+
+        $relation = new ManyTo(
+            'friends',
+            'friendships',
+            'user_id',
+            'user_id',
+            'users',
+            'friend_id',
+            'user_id',
+            $pdo,
+            $fetcher,
+            $builder,
+            [
+                'users2' => $this->getSelectBuilder()
+            ]
         );
 
         $this->assertSame($expectedResult, $relation->getResult($outerKeys));
@@ -117,7 +177,8 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $this->createMock(PDOInterface::class),
             $this->createMock(FetcherInterface::class),
-            $this->getSelectBuilder()
+            $this->getSelectBuilder(),
+            []
         );
 
         $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);

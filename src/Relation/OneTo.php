@@ -148,32 +148,10 @@ class OneTo implements RelationStrategyInterface
      */
     public function getResult(array $outerKeys)
     {
-        $grammar = $this->builder->getGrammar();
-
-        $builder = $this->builder;
-
-        if (count($builder->getFrom()) === 0) {
-            $builder = $builder->from($grammar->identifier($this->table));
-        }
-
-        $builder = $builder
-            ->where(
-                $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
-                'IN',
-                array_unique($outerKeys)
-            );
+        $builder = $this->getBuilderFrom($this->builder, $this->table, $outerKeys);
 
         foreach ($this->unions as $unionTable => $unionBuilder) {
-            if (count($unionBuilder->getFrom()) === 0) {
-                $unionBuilder = $unionBuilder->from($grammar->identifier($unionTable));
-            }
-
-            $unionBuilder = $unionBuilder
-                ->where(
-                    $grammar->identifier($unionTable) . '.' . $grammar->identifier($this->innerKey),
-                    'IN',
-                    array_unique($outerKeys)
-                );
+            $unionBuilder = $this->getBuilderFrom($unionBuilder, $unionTable, $outerKeys);
 
             $builder = $builder->unionAllWith($unionBuilder);
         }
@@ -204,5 +182,23 @@ class OneTo implements RelationStrategyInterface
     public function getResultSelector($outerClass, $innerClass)
     {
         return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
+    }
+
+    private function getBuilderFrom(SelectBuilder $builder, string $table, array $outerKeys)
+    {
+        $grammar = $this->builder->getGrammar();
+
+        if (count($builder->getFrom()) === 0) {
+            $builder = $builder->from($grammar->identifier($table));
+        }
+
+        $builder = $builder
+            ->where(
+                $grammar->identifier($table) . '.' . $grammar->identifier($this->innerKey),
+                'IN',
+                $outerKeys
+            );
+
+        return $builder;
     }
 }

@@ -342,17 +342,18 @@ final class Relations
     }
 
     /**
-     * @param string           $relationKey
-     * @param string           $oneToManyTable
-     * @param string           $oneToManyOuterKey
-     * @param string           $oneToManyInnerKey
-     * @param string           $manyToOneTable
-     * @param string           $manyToOneOuterKey
-     * @param string           $manyToOneInnerKey
-     * @param SelectBuilder    $builder
-     * @param PDOInterface     $pdo
-     * @param FetcherInterface $fetcher
-     * @param SelectBuilder    $builder
+     * @param string                      $relationKey
+     * @param string                      $oneToManyTable
+     * @param string                      $oneToManyOuterKey
+     * @param string                      $oneToManyInnerKey
+     * @param string                      $manyToOneTable
+     * @param string                      $manyToOneOuterKey
+     * @param string                      $manyToOneInnerKey
+     * @param SelectBuilder               $builder
+     * @param PDOInterface                $pdo
+     * @param FetcherInterface            $fetcher
+     * @param SelectBuilder               $builder
+     * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
     public static function manyToMany(
@@ -365,7 +366,8 @@ final class Relations
         $manyToOneInnerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder
+        SelectBuilder $builder,
+        array $unions = []
     ) {
         return new Relation(
             new ManyTo(
@@ -378,24 +380,26 @@ final class Relations
                 $manyToOneInnerKey,
                 $pdo,
                 $fetcher,
-                $builder
+                $builder,
+                $unions
             ),
             new GroupJoin()
         );
     }
 
     /**
-     * @param string           $relationKey
-     * @param string           $oneToManyTable
-     * @param string           $oneToManyOuterKey
-     * @param string           $oneToManyInnerKey
-     * @param string           $manyToOneTable
-     * @param string           $manyToOneOuterKey
-     * @param string           $manyToOneInnerKey
-     * @param SelectBuilder    $builder
-     * @param PDOInterface     $pdo
-     * @param FetcherInterface $fetcher
-     * @param SelectBuilder    $builder
+     * @param string                      $relationKey
+     * @param string                      $oneToManyTable
+     * @param string                      $oneToManyOuterKey
+     * @param string                      $oneToManyInnerKey
+     * @param string                      $manyToOneTable
+     * @param string                      $manyToOneOuterKey
+     * @param string                      $manyToOneInnerKey
+     * @param SelectBuilder               $builder
+     * @param PDOInterface                $pdo
+     * @param FetcherInterface            $fetcher
+     * @param SelectBuilder               $builder
+     * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
     public static function throughManyToMany(
@@ -409,7 +413,8 @@ final class Relations
         $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder
+        SelectBuilder $builder,
+        array $unions = []
     ) {
         return new Relation(
             new ManyTo(
@@ -422,7 +427,8 @@ final class Relations
                 $manyToOneInnerKey,
                 $pdo,
                 $fetcher,
-                $builder
+                $builder,
+                $unions
             ),
             new ThroughGroupJoin($throughKey)
         );

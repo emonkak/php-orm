@@ -105,7 +105,7 @@ class Relation implements RelationInterface
         }
 
         $outerResult = new PreloadedResultSet($outerElements, $outerClass);
-        $innerResult = $this->relationStrategy->getResult($outerKeys);
+        $innerResult = $this->relationStrategy->getResult(array_unique($outerKeys));
 
         foreach ($this->childlen as $child) {
             $innerResult = new RelationResultSet($innerResult, $child);
