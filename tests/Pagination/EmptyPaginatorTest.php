@@ -19,6 +19,25 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty(iterator_to_array($result));
     }
 
+    public function testHas()
+    {
+        $this->assertFalse((new EmptyPaginator(Model::class, 10))->has(0));
+    }
+
+    public function testFirstPage()
+    {
+        $result = (new EmptyPaginator(Model::class, 10))->firstPage();
+        $this->assertInstanceOf(PaginatedResultSet::class, $result);
+        $this->assertEmpty(iterator_to_array($result));
+    }
+
+    public function testLastPage()
+    {
+        $result = (new EmptyPaginator(Model::class, 10))->lastPage();
+        $this->assertInstanceOf(PaginatedResultSet::class, $result);
+        $this->assertEmpty(iterator_to_array($result));
+    }
+
     public function testGetPerPage()
     {
         $this->assertSame(10, (new EmptyPaginator(Model::class, 10))->getPerPage());

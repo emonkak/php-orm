@@ -54,6 +54,43 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([['foo' => 123], ['bar' => 456], ['baz' => 789]], iterator_to_array($paginator));
     }
 
+    /**
+     * @dataProvider providerHas
+     */
+    public function testHas($index, $numPages, $expected)
+    {
+        $paginator = $this->getMockForAbstractClass(
+            AbstractPaginator::class,
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['getNumPages']
+        );
+        $paginator
+            ->expects($this->once())
+            ->method('getNumPages')
+            ->willReturn($numPages);
+
+        $this->assertSame($expected, $paginator->has($index));
+    }
+
+    public function providerHas()
+    {
+        return [
+            [0, 0, false],
+            [0, 1, true],
+            [1, 1, false],
+            [2, 1, false],
+            [0, 10, true],
+            [1, 10, true],
+            [9, 10, true],
+            [10, 10, false],
+            [11, 10, false]
+        ];
+    }
+
     public function testFirstPage()
     {
         $page = $this->createMock(PaginatedResultSet::class);

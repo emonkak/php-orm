@@ -41,7 +41,7 @@ class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new \ColumnIterator($expected));
+            ->willReturn(new \ArrayIterator($expected));
 
         $this->assertSame($expected, iterator_to_array($this->result));
     }
@@ -60,7 +60,7 @@ class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn($expected);
 
-        $this->assertSame($expected, $this->result->toColumn());
+        $this->assertSame($expected, $this->result->toArray());
     }
 
     public function testFirst()
@@ -128,7 +128,7 @@ class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->exactly(2))
             ->method('getIterator')
-            ->willReturn(new \ColumnIterator([
+            ->willReturn(new \ArrayIterator([
                 ['foo' => 1],
                 ['foo' => 2],
                 ['foo' => 3],
@@ -160,7 +160,7 @@ class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new \ColumnIterator([
+            ->willReturn(new \ArrayIterator([
                 ['foo' => 1],
                 ['foo' => 2],
                 ['foo' => 3],
@@ -188,7 +188,7 @@ class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
         $this->stmt
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new \ColumnIterator([
+            ->willReturn(new \ArrayIterator([
                 ['foo' => 1],
                 ['foo' => 2],
                 ['foo' => 3],
