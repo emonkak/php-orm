@@ -110,7 +110,8 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            []
         );
         $joinStrategy = new GroupJoin();
         $relation = new Relation($relationStrategy, $joinStrategy, [$childRelation]);
@@ -134,7 +135,8 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            []
         );
         $joinStrategy = new GroupJoin();
         $relation = new Relation($relationStrategy, $joinStrategy);
@@ -163,7 +165,8 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'job_id',
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            []
         );
         $joinStrategy = new GroupJoin();
         $relation = new Relation($relationStrategy, $joinStrategy);

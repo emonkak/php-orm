@@ -45,13 +45,19 @@ class OneTo implements RelationStrategyInterface
     private $builder;
 
     /**
-     * @param string           $relationKey
-     * @param string           $table
-     * @param string           $outerKey
-     * @param string           $innerKey
-     * @param PDOInterface     $pdo
-     * @param FetcherInterface $fetcher
-     * @param SelectBuilder    $builder
+     * @var array<string,SelectBuilder>
+     */
+    private $unions;
+
+    /**
+     * @param string                      $relationKey
+     * @param string                      $table
+     * @param string                      $outerKey
+     * @param string                      $innerKey
+     * @param PDOInterface                $pdo
+     * @param FetcherInterface            $fetcher
+     * @param SelectBuilder               $builder
+     * @param array<string,SelectBuilder> $unions
      */
     public function __construct(
         $relationKey,
@@ -60,7 +66,8 @@ class OneTo implements RelationStrategyInterface
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder
+        SelectBuilder $builder,
+        array $unions
     ) {
         $this->relationKey = $relationKey;
         $this->table = $table;
@@ -69,6 +76,7 @@ class OneTo implements RelationStrategyInterface
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->builder = $builder;
+        $this->unions = $unions;
     }
 
     /**
@@ -128,6 +136,14 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
+     * @return array<string,SelectBuilder>
+     */
+    public function getUnions()
+    {
+        return $this->unions;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getResult(array $outerKeys)
@@ -140,12 +156,29 @@ class OneTo implements RelationStrategyInterface
             $builder = $builder->from($grammar->identifier($this->table));
         }
 
-        return $builder
+        $builder = $builder
             ->where(
                 $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
                 'IN',
                 array_unique($outerKeys)
-            )
+            );
+
+        foreach ($this->unions as $unionTable => $unionBuilder) {
+            if (count($unionBuilder->getFrom()) === 0) {
+                $unionBuilder = $unionBuilder->from($grammar->identifier($unionTable));
+            }
+
+            $unionBuilder = $unionBuilder
+                ->where(
+                    $grammar->identifier($unionTable) . '.' . $grammar->identifier($this->innerKey),
+                    'IN',
+                    array_unique($outerKeys)
+                );
+
+            $builder = $builder->unionAllWith($unionBuilder);
+        }
+
+        return $builder
             ->getResult($this->pdo, $this->fetcher);
     }
 

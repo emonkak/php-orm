@@ -42,6 +42,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
 
         $relation = Relations::oneToOne(
             $relationKey,
@@ -50,7 +53,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            $unions
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -66,6 +70,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testOneToMany()
@@ -79,6 +84,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
 
         $relation = Relations::oneToMany(
             $relationKey,
@@ -87,7 +95,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            $unions
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -103,6 +112,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testThroughOneToOne()
@@ -117,6 +127,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
 
         $relation = Relations::throughOneToOne(
             $relationKey,
@@ -126,7 +139,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $throughKey,
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            $unions
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -142,6 +156,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testThroughOneToMany()
@@ -156,6 +171,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
 
         $relation = Relations::throughOneToMany(
             $relationKey,
@@ -165,7 +183,8 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $throughKey,
             $pdo,
             $fetcher,
-            $builder
+            $builder,
+            $unions
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -181,6 +200,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testLazyOneToOne()
@@ -192,9 +212,13 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $proxyFactory = new LazyLoadingValueHolderFactory();
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
+
+        $proxyFactory = new LazyLoadingValueHolderFactory();
 
         $relation = Relations::lazyOneToOne(
             $relationKey,
@@ -204,6 +228,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $pdo,
             $fetcher,
             $builder,
+            $unions,
             $proxyFactory
         );
 
@@ -220,6 +245,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testLazyOneToMany()
@@ -231,9 +257,13 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $proxyFactory = new LazyLoadingValueHolderFactory();
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
+
+        $proxyFactory = new LazyLoadingValueHolderFactory();
 
         $relation = Relations::lazyOneToMany(
             $relationKey,
@@ -243,6 +273,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $pdo,
             $fetcher,
             $builder,
+            $unions,
             $proxyFactory
         );
 
@@ -259,6 +290,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
     public function testCachedOneToOne()
@@ -272,6 +304,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
         $builder = new SelectBuilder($grammar);
+        $unions = [
+            'union' => new SelectBuilder($grammar)
+        ];
 
         $cache = $this->createMock(CacheInterface::class);
         $cacheKeySelector = function($key) { return 'prefix.' . $key; };
@@ -285,6 +320,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $pdo,
             $fetcher,
             $builder,
+            $unions,
             $cache,
             $cacheKeySelector,
             $cacheTtl
