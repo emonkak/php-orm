@@ -184,7 +184,13 @@ class OneTo implements RelationStrategyInterface
         return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
     }
 
-    private function getBuilderFrom(SelectBuilder $builder, string $table, array $outerKeys)
+    /**
+     * @param SelectBuilder $builder
+     * @param string        $table
+     * @param string        $outerKey
+     * @return SelectBuilder
+     */
+    private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)
     {
         $grammar = $this->builder->getGrammar();
 

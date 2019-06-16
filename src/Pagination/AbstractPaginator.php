@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;

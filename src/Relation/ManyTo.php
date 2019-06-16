@@ -244,7 +244,13 @@ class ManyTo implements RelationStrategyInterface
         return '__pivot_' . $this->oneToManyInnerKey;
     }
 
-    private function getBuilderFrom(SelectBuilder $builder, string $table, array $outerKeys): SelectBuilder
+    /**
+     * @param SelectBuilder $builder
+     * @param string        $table
+     * @param string        $outerKey
+     * @return SelectBuilder
+     */
+    private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)
     {
         $grammar = $this->builder->getGrammar();
 
