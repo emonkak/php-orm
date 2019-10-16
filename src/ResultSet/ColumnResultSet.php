@@ -15,7 +15,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @var integer
+     * @var int
      */
     private $columnNumber;
 

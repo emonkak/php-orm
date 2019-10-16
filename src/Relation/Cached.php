@@ -24,7 +24,7 @@ class Cached implements RelationStrategyInterface
     private $cacheKeySelector;
 
     /**
-     * @var integer|null
+     * @var ?int
      */
     private $cacheTtl;
 
@@ -32,7 +32,7 @@ class Cached implements RelationStrategyInterface
      * @param RelationStrategyInterface $relationStrategy
      * @param CacheInterface            $cache
      * @param callable                  $cacheKeySelector
-     * @param integer|null              $cacheTtl
+     * @param ?int                      $cacheTtl
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
@@ -71,7 +71,7 @@ class Cached implements RelationStrategyInterface
     }
 
     /**
-     * @return integer|null
+     * @return ?int
      */
     public function getCacheTtl()
     {

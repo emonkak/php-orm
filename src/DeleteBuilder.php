@@ -29,7 +29,7 @@ class DeleteBuilder implements QueryBuilderInterface
     private $from;
 
     /**
-     * @var Sql|null
+     * @var ?Sql
      */
     private $where;
 
@@ -66,7 +66,7 @@ class DeleteBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return Sql|null
+     * @return ?Sql
      */
     public function getWhere()
     {
@@ -96,10 +96,10 @@ class DeleteBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -111,10 +111,10 @@ class DeleteBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)

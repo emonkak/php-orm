@@ -20,14 +20,14 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     private $class;
 
     /**
-     * @var mixed[]|null
+     * @var ?mixed[]
      */
     private $constructorArguments;
 
     /**
      * @param PDOStatementInterface $stmt
      * @param string                $class
-     * @param mixed[]|null          $constructorArguments
+     * @param ?mixed[]              $constructorArguments
      */
     public function __construct(PDOStatementInterface $stmt, $class, array $constructorArguments = null)
     {

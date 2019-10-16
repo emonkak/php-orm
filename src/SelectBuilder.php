@@ -45,7 +45,7 @@ class SelectBuilder implements QueryBuilderInterface
     private $join = [];
 
     /**
-     * @var Sql|null
+     * @var ?Sql
      */
     private $where;
 
@@ -55,7 +55,7 @@ class SelectBuilder implements QueryBuilderInterface
     private $groupBy = [];
 
     /**
-     * @var Sql|null
+     * @var ?Sql
      */
     private $having;
 
@@ -65,17 +65,17 @@ class SelectBuilder implements QueryBuilderInterface
     private $orderBy = [];
 
     /**
-     * @var integer|null
+     * @var ?int
      */
     private $offset;
 
     /**
-     * @var integer|null
+     * @var ?int
      */
     private $limit;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     private $suffix;
 
@@ -139,7 +139,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return Sql|null
+     * @return ?Sql
      */
     public function getWhere()
     {
@@ -155,7 +155,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return Sql|null
+     * @return ?Sql
      */
     public function getHaving()
     {
@@ -171,7 +171,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return integer|null
+     * @return ?int
      */
     public function getOffset()
     {
@@ -179,7 +179,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return integer|null
+     * @return ?int
      */
     public function getLimit()
     {
@@ -214,8 +214,8 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $expr
-     * @param string|null $alias
+     * @param mixed   $expr
+     * @param ?string $alias
      * @return $this
      */
     public function select($expr, $alias = null)
@@ -249,8 +249,8 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $table
-     * @param string|null $alias
+     * @param mixed   $table
+     * @param ?string $alias
      * @return $this
      */
     public function from($table, $alias = null)
@@ -265,10 +265,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -280,10 +280,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -295,10 +295,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $table
-     * @param mixed|null  $condition
-     * @param string|null $alias
-     * @param string      $type
+     * @param mixed   $table
+     * @param ?mixed  $condition
+     * @param ?string $alias
+     * @param string  $type
      * @return $this
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
@@ -341,10 +341,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -356,10 +356,10 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -371,8 +371,8 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed       $expr
-     * @param string|null $ordering
+     * @param mixed   $expr
+     * @param ?string $ordering
      * @return $this
      */
     public function orderBy($expr, $ordering = null)
@@ -387,7 +387,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param integer $integer
+     * @param int $int
      * @return $this
      */
     public function limit($limit)
@@ -398,7 +398,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param integer $integer
+     * @param int $int
      * @return $this
      */
     public function offset($offset)
@@ -509,7 +509,7 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
-     * @param integer          $perPage
+     * @param int              $perPage
      * @param string           $countExpr
      * @return PaginatorInterface
      */

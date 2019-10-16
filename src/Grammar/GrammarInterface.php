@@ -44,10 +44,10 @@ interface GrammarInterface
     public function literal($value);
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return Sql
      */
     public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null);
@@ -77,9 +77,9 @@ interface GrammarInterface
     public function unaryOperator($operator, Sql $rhs);
 
     /**
-     * @param Sql      $table
-     * @param Sql|null $condition
-     * @param string   $type
+     * @param Sql    $table
+     * @param ?Sql   $condition
+     * @param string $type
      */
     public function join(Sql $table, Sql $condition = null, $type);
 
@@ -111,18 +111,18 @@ interface GrammarInterface
     public function identifier($string);
 
     /**
-     * @param string   $prefix
-     * @param Sql[]    $select
-     * @param Sql[]    $from
-     * @param Sql[]    $join
-     * @param Sql|null $where
-     * @param Sql[]    $groupBy
-     * @param Sql|null $having
-     * @param Sql[]    $orderBy
-     * @param integer  $limit
-     * @param integer  $offset
-     * @param string   $suffix
-     * @param Sql[]    $union
+     * @param string $prefix
+     * @param Sql[]  $select
+     * @param Sql[]  $from
+     * @param Sql[]  $join
+     * @param ?Sql   $where
+     * @param Sql[]  $groupBy
+     * @param ?Sql   $having
+     * @param Sql[]  $orderBy
+     * @param int    $limit
+     * @param int    $offset
+     * @param string $suffix
+     * @param Sql[]  $union
      * @return Sql
      */
     public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
@@ -132,24 +132,24 @@ interface GrammarInterface
      * @param string   $table
      * @param string[] $columns
      * @param Sql[][]  $values
-     * @param Sql|null $select
+     * @param ?Sql     $select
      * @return Sql
      */
     public function insertStatement($prefix, $table, array $columns, array $values, Sql $select = null);
 
     /**
-     * @param string   $prefix
-     * @param string   $table
-     * @param Sql[]    $update
-     * @param Sql|null $where
+     * @param string $prefix
+     * @param string $table
+     * @param Sql[]  $update
+     * @param ?Sql   $where
      * @return Sql
      */
     public function updateStatement($prefix, $table, array $update, Sql $where = null);
 
     /**
-     * @param string   $prefix
-     * @param string   $from
-     * @param Sql|null $where
+     * @param string $prefix
+     * @param string $from
+     * @param ?Sql   $where
      * @return Sql
      */
     public function deleteStatement($prefix, $from, Sql $where = null);

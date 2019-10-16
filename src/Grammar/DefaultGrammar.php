@@ -257,8 +257,8 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql|null $where
-     * @param mixed[]  &$bindings
+     * @param ?Sql    $where
+     * @param mixed[] &$bindings
      * @return string
      */
     private function processWhere(Sql $where = null, array &$bindings)
@@ -291,8 +291,8 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql|null $having
-     * @param mixed[]  &$bindings
+     * @param ?Sql    $having
+     * @param mixed[] &$bindings
      * @return string
      */
     private function processHaving(Sql $having = null, array &$bindings)
@@ -325,7 +325,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param integer $limit
+     * @param int     $limit
      * @param mixed[] &$bindings
      * @return string
      */
@@ -339,7 +339,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param integer $offset
+     * @param int     $offset
      * @param mixed[] &$bindings
      * @return string
      */
@@ -411,8 +411,8 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql|null $select
-     * @param mixed[]  &$bindings
+     * @param ?Sql    $select
+     * @param mixed[] &$bindings
      * @return string
      */
     private function processInsertSelect(Sql $select = null, array &$bindings)

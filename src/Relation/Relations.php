@@ -251,7 +251,7 @@ final class Relations
      * @param CacheInterface              $cache
      * @param array<string,SelectBuilder> $unions
      * @param callble                     $cacheKeySelector
-     * @param integer|null                $cacheTtl
+     * @param ?int                        $cacheTtl
      * @return Relation
      */
     public static function cachedOneToOne(

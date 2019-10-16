@@ -21,14 +21,14 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     private $paginator;
 
     /**
-     * @var integer
+     * @var int
      */
     private $index;
 
     /**
      * @param EnumerableInterface $elements
      * @param PaginatorInterface  $paginator
-     * @param integer             $index
+     * @param int                 $index
      */
     public function __construct(EnumerableInterface $elements, PaginatorInterface $paginator, $index)
     {
@@ -54,7 +54,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getIndex()
     {
@@ -62,7 +62,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getOffset()
     {
@@ -94,7 +94,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasPrevPage()
     {
@@ -102,7 +102,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function hasNextPage()
     {
@@ -110,7 +110,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isFirstPage()
     {
@@ -118,7 +118,7 @@ class PaginatedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isLastPage()
     {

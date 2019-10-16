@@ -13,13 +13,13 @@ class ObjectFetcher implements FetcherInterface
     private $class;
 
     /**
-     * @var mixed[]|null
+     * @var ?mixed[]
      */
     private $constructorArguments;
 
     /**
-     * @param string       $class
-     * @param mixed[]|null $constructorArguments
+     * @param string   $class
+     * @param ?mixed[] $constructorArguments
      */
     public function __construct($class, array $constructorArguments = null)
     {

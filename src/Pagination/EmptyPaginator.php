@@ -16,7 +16,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     private $class;
 
     /**
-     * @var integer
+     * @var int
      */
     private $perPage;
 

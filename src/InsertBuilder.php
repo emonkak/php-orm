@@ -24,7 +24,7 @@ class InsertBuilder implements QueryBuilderInterface
     private $prefix = 'INSERT';
 
     /**
-     * @var string|null
+     * @var ?string
      */
     private $into;
 
@@ -39,7 +39,7 @@ class InsertBuilder implements QueryBuilderInterface
     private $values = [];
 
     /**
-     * @var Sql|null
+     * @var ?Sql
      */
     private $select;
 
@@ -92,7 +92,7 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return Sql|null
+     * @return ?Sql
      */
     public function getSelect()
     {

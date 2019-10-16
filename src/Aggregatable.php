@@ -10,7 +10,7 @@ trait Aggregatable
     /**
      * @param PDOInterface $pdo
      * @param mixed        $expr
-     * @return integer
+     * @return int
      */
     public function avg(PDOInterface $pdo, $expr)
     {
@@ -20,7 +20,7 @@ trait Aggregatable
     /**
      * @param PDOInterface $pdo
      * @param mixed        $expr
-     * @return integer
+     * @return int
      */
     public function count(PDOInterface $pdo, $expr = '*')
     {
@@ -30,7 +30,7 @@ trait Aggregatable
     /**
      * @param PDOInterface $pdo
      * @param mixed        $expr
-     * @return integer
+     * @return int
      */
     public function max(PDOInterface $pdo, $expr)
     {
@@ -40,7 +40,7 @@ trait Aggregatable
     /**
      * @param PDOInterface $pdo
      * @param mixed        $expr
-     * @return integer
+     * @return int
      */
     public function min(PDOInterface $pdo, $expr)
     {
@@ -50,7 +50,7 @@ trait Aggregatable
     /**
      * @param PDOInterface $pdo
      * @param mixed        $expr
-     * @return integer
+     * @return int
      */
     public function sum(PDOInterface $pdo, $expr)
     {

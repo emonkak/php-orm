@@ -24,7 +24,7 @@ class UpdateBuilder implements QueryBuilderInterface
     private $prefix = 'UPDATE';
 
     /**
-     * @var string|null
+     * @var ?string
      */
     private $table;
 
@@ -34,7 +34,7 @@ class UpdateBuilder implements QueryBuilderInterface
     private $update = [];
 
     /**
-     * @var Sql|null
+     * @var ?Sql
      */
     private $where;
 
@@ -79,7 +79,7 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return Sql|null
+     * @return ?Sql
      */
     public function getWhere()
     {
@@ -132,10 +132,10 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
@@ -147,10 +147,10 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed      $arg1
-     * @param mixed|null $arg2
-     * @param mixed|null $arg3
-     * @param mixed|null $arg4
+     * @param mixed  $arg1
+     * @param ?mixed $arg2
+     * @param ?mixed $arg3
+     * @param ?mixed $arg4
      * @return $this
      */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)

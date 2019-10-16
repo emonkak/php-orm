@@ -27,12 +27,12 @@ class PrecountPaginator extends AbstractPaginator
     private $fetcher;
 
     /**
-     * @var integer
+     * @var int
      */
     private $perPage;
 
     /**
-     * @var integer
+     * @var int
      */
     private $numItems;
 
@@ -40,8 +40,8 @@ class PrecountPaginator extends AbstractPaginator
      * @param SelectBuilder    $builder
      * @param PDOInterface     $pdo
      * @param FetcherInterface $fetcher
-     * @param integer          $perPage
-     * @param integer          $numItems
+     * @param int              $perPage
+     * @param int              $numItems
      */
     public function __construct(SelectBuilder $builder, PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $numItems)
     {

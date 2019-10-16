@@ -8,12 +8,12 @@ use Emonkak\Orm\ResultSet\ColumnResultSet;
 class ColumnFetcher implements FetcherInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $columnNumber;
 
     /**
-     * @param integer $columnNumber
+     * @param int $columnNumber
      */
     public function __construct($columnNumber = 0)
     {

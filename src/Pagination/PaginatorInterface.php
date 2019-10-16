@@ -8,14 +8,14 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 interface PaginatorInterface extends ResultSetInterface
 {
     /**
-     * @param integer $index
+     * @param int $index
      * @return PaginatedResultSet
      */
     public function at($index);
 
     /**
-     * @param integer $index
-     * @return boolean
+     * @param int $index
+     * @return bool
      */
     public function has($index);
 
@@ -30,17 +30,17 @@ interface PaginatorInterface extends ResultSetInterface
     public function lastPage();
 
     /**
-     * @return integer
+     * @return int
      */
     public function getPerPage();
 
     /**
-     * @return integer
+     * @return int
      */
     public function getNumItems();
 
     /**
-     * @return integer
+     * @return int
      */
     public function getNumPages();
 }
