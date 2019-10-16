@@ -4,7 +4,6 @@ namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\InsertBuilder;
-use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
@@ -71,7 +70,7 @@ interface GrammarInterface
 
     /**
      * @param string $operator
-     * @param mixed $rhs
+     * @param Sql    $rhs
      * @return Sql
      */
     public function unaryOperator($operator, Sql $rhs);
@@ -84,16 +83,16 @@ interface GrammarInterface
     public function join(Sql $table, Sql $condition = null, $type);
 
     /**
-     * @param Sql    $value
+     * @param Sql    $expr
      * @param string $ordering
-     * @return QueryInterface
+     * @return Sql
      */
     public function ordering(Sql $expr, $ordering);
 
     /**
      * @param Sql    $query
      * @param string $type
-     * @return QueryInterface
+     * @return Sql
      */
     public function union(Sql $query, $type);
 

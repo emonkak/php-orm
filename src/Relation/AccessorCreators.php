@@ -2,14 +2,11 @@
 
 namespace Emonkak\Orm\Relation;
 
-/**
- * @internal
- */
 final class AccessorCreators
 {
     /**
-     * @param string $key
-     * @param string $class
+     * @param string        $key
+     * @param ?class-string $class
      * @return \Closure
      */
     public static function toKeySelector($key, $class)
@@ -26,8 +23,8 @@ final class AccessorCreators
     }
 
     /**
-     * @param string $key
-     * @param string $class
+     * @param string        $key
+     * @param ?class-string $class
      * @return \Closure
      */
     public static function toPivotKeySelector($key, $class)
@@ -48,8 +45,8 @@ final class AccessorCreators
     }
 
     /**
-     * @param string $key
-     * @param string $class
+     * @param string        $key
+     * @param ?class-string $class
      * @return \Closure
      */
     public static function toKeyEraser($key, $class)
@@ -68,8 +65,8 @@ final class AccessorCreators
     }
 
     /**
-     * @param string $key
-     * @param string $class
+     * @param string        $key
+     * @param ?class-string $class
      * @return \Closure
      */
     public static function toKeyAssignee($key, $class)

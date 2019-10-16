@@ -6,12 +6,13 @@ return [
         'vendor/emonkak/database',
         'vendor/emonkak/enumerable',
         'vendor/ocramius/proxy-manager',
-        'vendor/psr/cache',
+        'vendor/psr/simple-cache',
     ],
-
+    'suppress_issue_types' => [
+        'PhanParamReqAfterOpt'
+    ],
     'exclude_analysis_directory_list' => [
         'vendor/'
     ],
-
     'analyze_signature_compatibility' => false,
 ];

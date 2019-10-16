@@ -12,7 +12,7 @@ interface JoinStrategyInterface
      * @param callable           $outerKeySelector
      * @param callable           $innerKeySelector
      * @param callable           $resultSelector
-     * @return Traversable
+     * @return \Traversable
      */
     public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector);
 }

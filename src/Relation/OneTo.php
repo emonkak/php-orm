@@ -4,7 +4,6 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 class OneTo implements RelationStrategyInterface
@@ -187,7 +186,7 @@ class OneTo implements RelationStrategyInterface
     /**
      * @param SelectBuilder $builder
      * @param string        $table
-     * @param string        $outerKey
+     * @param string[]      $outerKeys
      * @return SelectBuilder
      */
     private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)

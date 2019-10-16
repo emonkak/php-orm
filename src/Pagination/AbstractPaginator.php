@@ -3,7 +3,6 @@
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
-use Emonkak\Orm\ResultSet\PaginatedResultSet;
 
 abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterface
 {

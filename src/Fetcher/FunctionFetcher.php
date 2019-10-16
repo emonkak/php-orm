@@ -13,13 +13,13 @@ class FunctionFetcher implements FetcherInterface
     private $instantiator;
 
     /**
-     * @var string
+     * @var class-string
      */
     private $class;
 
     /**
-     * @param string $class
-     * @return callable
+     * @param class-string $class
+     * @return self
      */
     public static function ofConstructor($class)
     {
@@ -34,8 +34,8 @@ class FunctionFetcher implements FetcherInterface
     }
 
     /**
-     * @param callable $instantiator
-     * @param string   $class
+     * @param callable     $instantiator
+     * @param class-string $class
      */
     public function __construct(callable $instantiator, $class)
     {

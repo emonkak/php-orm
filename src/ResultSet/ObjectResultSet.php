@@ -26,7 +26,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
 
     /**
      * @param PDOStatementInterface $stmt
-     * @param string                $class
+     * @param class-string          $class
      * @param ?mixed[]              $constructorArguments
      */
     public function __construct(PDOStatementInterface $stmt, $class, array $constructorArguments = null)

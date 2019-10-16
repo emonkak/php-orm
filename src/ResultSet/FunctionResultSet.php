@@ -27,7 +27,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * @param PDOStatementInterface $stmt
      * @param callable              $instantiator
-     * @param string                $class
+     * @param class-string          $class
      */
     public function __construct(PDOStatementInterface $stmt, callable $instantiator, $class)
     {

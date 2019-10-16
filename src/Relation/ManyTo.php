@@ -4,9 +4,6 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 class ManyTo implements RelationStrategyInterface
@@ -247,7 +244,7 @@ class ManyTo implements RelationStrategyInterface
     /**
      * @param SelectBuilder $builder
      * @param string        $table
-     * @param string        $outerKey
+     * @param string[]      $outerKeys
      * @return SelectBuilder
      */
     private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)

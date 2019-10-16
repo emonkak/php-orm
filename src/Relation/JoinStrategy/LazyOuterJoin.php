@@ -46,14 +46,14 @@ class LazyOuterJoin implements JoinStrategyInterface
                     $wrappedObject = $cachedElements[$outerKey];
                 } else {
                     // Wraps the dummy object instead of null.
-                    $wrappedObject = (new \ReflectionClass($inner->getClass()))
+                    $wrappedObject = (new \ReflectionClass($inner->getClass()))  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
                         ->newInstanceWithoutConstructor();
                 }
 
                 return true;
             };
             $innerClass = $inner->getClass();
-            $proxy = $proxyFactory->createProxy($innerClass, $initializer);
+            $proxy = $proxyFactory->createProxy($innerClass, $initializer);  // @phan-suppress-current-line PhanTypeMismatchArgumentNullable
             return $resultSelector($outerElement, $proxy);
         });
     }

@@ -19,18 +19,20 @@ class Sql implements QueryBuilderInterface
     private $bindings;
 
     /**
+     * @suppress PhanTypeExpectedObjectPropAccess
+     *
      * @param string $format
-     * @param Sql[]  ...$args
+     * @param Sql[]  ...$sqls
      * @return Sql
      */
-    public static function format($format, ...$args)
+    public static function format($format, ...$sqls)
     {
         $tmpSqls = [];
         $tmpBindings = [];
 
-        foreach ($args as $arg) {
-            $tmpSqls[] = $arg->sql;
-            $tmpBindings[] = $arg->bindings;
+        foreach ($sqls as $sql) {
+            $tmpSqls[] = $sql->sql;
+            $tmpBindings[] = $sql->bindings;
         }
 
         $sql = vsprintf($format, $tmpSqls);

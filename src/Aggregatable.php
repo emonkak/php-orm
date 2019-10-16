@@ -3,7 +3,6 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Orm\Fetcher\FetcherInterface;
 
 trait Aggregatable
 {

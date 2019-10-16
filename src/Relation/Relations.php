@@ -248,9 +248,9 @@ final class Relations
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
      * @param SelectBuilder               $builder
-     * @param CacheInterface              $cache
      * @param array<string,SelectBuilder> $unions
-     * @param callble                     $cacheKeySelector
+     * @param CacheInterface              $cache
+     * @param callable                    $cacheKeySelector
      * @param ?int                        $cacheTtl
      * @return Relation
      */
@@ -349,7 +349,6 @@ final class Relations
      * @param string                      $manyToOneTable
      * @param string                      $manyToOneOuterKey
      * @param string                      $manyToOneInnerKey
-     * @param SelectBuilder               $builder
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
      * @param SelectBuilder               $builder
@@ -395,7 +394,6 @@ final class Relations
      * @param string                      $manyToOneTable
      * @param string                      $manyToOneOuterKey
      * @param string                      $manyToOneInnerKey
-     * @param SelectBuilder               $builder
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
      * @param SelectBuilder               $builder

@@ -3,7 +3,6 @@
 namespace Emonkak\Orm;
 
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Grammar\GrammarProvider;
 
 /**
  * Provides the query building of DELETE statement.

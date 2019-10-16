@@ -17,7 +17,7 @@ trait Fetchable
     private $relations = [];
 
     /**
-     * @param RelationInterface[] ...$relations
+     * @param RelationInterface $relations
      * @return $this
      */
     public function with(RelationInterface ...$relations)

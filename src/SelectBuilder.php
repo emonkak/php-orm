@@ -5,7 +5,6 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Grammar\GrammarProvider;
 use Emonkak\Orm\Pagination\PaginatorInterface;
 use Emonkak\Orm\Pagination\PrecountPaginator;
 
@@ -187,7 +186,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getSuffix()
     {
@@ -328,8 +327,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed  $expr
-     * @param string $ordering
+     * @param mixed $expr
      * @return $this
      */
     public function groupBy($expr)
@@ -387,7 +385,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param int $int
+     * @param int $limit
      * @return $this
      */
     public function limit($limit)
@@ -398,7 +396,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param int $int
+     * @param int $offset
      * @return $this
      */
     public function offset($offset)
@@ -515,7 +513,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $countExpr = 'COUNT(*)')
     {
-        $count = $this->aggregate($pdo, $countExpr);
+        $count = (int) $this->aggregate($pdo, $countExpr);
         return new PrecountPaginator($this, $pdo, $fetcher, $perPage, $count);
     }
 

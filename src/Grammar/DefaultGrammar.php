@@ -3,7 +3,6 @@
 namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\Sql;
-use Emonkak\Orm\QueryBuilderInterface;
 
 class DefaultGrammar extends AbstractGrammar
 {

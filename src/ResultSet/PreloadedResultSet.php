@@ -14,13 +14,13 @@ class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
     private $elements;
 
     /**
-     * @var string
+     * @var ?class-string
      */
     private $class;
 
     /**
-     * @param mixed[] $elements
-     * @param string  $class
+     * @param mixed[]       $elements
+     * @param ?class-string $class
      */
     public function __construct(array $elements, $class)
     {

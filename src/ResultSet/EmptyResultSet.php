@@ -14,7 +14,7 @@ class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
     private $class;
 
     /**
-     * @param string  $class
+     * @param class-string $class
      */
     public function __construct($class)
     {

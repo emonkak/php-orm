@@ -8,7 +8,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 interface FetcherInterface
 {
     /**
-     * @return ?string
+     * @return ?class-string
      */
     public function getClass();
 

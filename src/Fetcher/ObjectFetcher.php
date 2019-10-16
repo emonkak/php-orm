@@ -18,8 +18,8 @@ class ObjectFetcher implements FetcherInterface
     private $constructorArguments;
 
     /**
-     * @param string   $class
-     * @param ?mixed[] $constructorArguments
+     * @param class-string $class
+     * @param ?mixed[]     $constructorArguments
      */
     public function __construct($class, array $constructorArguments = null)
     {

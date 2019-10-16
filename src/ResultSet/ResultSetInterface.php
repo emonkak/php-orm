@@ -7,7 +7,7 @@ use Emonkak\Enumerable\EnumerableInterface;
 interface ResultSetInterface extends EnumerableInterface
 {
     /**
-     * @return ?string
+     * @return ?class-string
      */
     public function getClass();
 }

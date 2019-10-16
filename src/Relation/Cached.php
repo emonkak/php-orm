@@ -3,7 +3,6 @@
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class Cached implements RelationStrategyInterface
