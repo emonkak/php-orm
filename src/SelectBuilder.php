@@ -5,8 +5,8 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Pagination\PaginatorInterface;
-use Emonkak\Orm\Pagination\PrecountPaginator;
+use Emonkak\Orm\Pagination\CountablePaginatorInterface;
+use Emonkak\Orm\Pagination\CountablePaginator;
 
 /**
  * Provides the query building of SELECT statement.
@@ -172,17 +172,17 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @return ?int
      */
-    public function getOffset()
+    public function getLimit()
     {
-        return $this->offset;
+        return $this->limit;
     }
 
     /**
      * @return ?int
      */
-    public function getLimit()
+    public function getOffset()
     {
-        return $this->limit;
+        return $this->offset;
     }
 
     /**
@@ -509,12 +509,23 @@ class SelectBuilder implements QueryBuilderInterface
      * @param FetcherInterface $fetcher
      * @param int              $perPage
      * @param string           $countExpr
-     * @return PaginatorInterface
+     * @return CountablePaginatorInterface
      */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $countExpr = 'COUNT(*)')
     {
+        /**
+         * @param int $offset
+         * @param int $limit
+         * @return \Traversable
+         */
+        $resultFetcher = function($limit, $offset) use ($pdo, $fetcher) {
+            return $this
+                ->limit($limit)
+                ->offset($offset)
+                ->getResult($pdo, $fetcher);
+        };
         $count = (int) $this->aggregate($pdo, $countExpr);
-        return new PrecountPaginator($this, $pdo, $fetcher, $perPage, $count);
+        return new CountablePaginator($resultFetcher, $perPage, $count);
     }
 
     /**

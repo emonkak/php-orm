@@ -6,7 +6,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Pagination\PrecountPaginator;
+use Emonkak\Orm\Pagination\CountablePaginator;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 
@@ -715,27 +715,61 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPaginate()
     {
-        $stmt = $this->createMock(PDOStatementInterface::class);
-        $stmt
+        $perPage = 10;
+        $numItems = 21;
+
+        $result = array_fill(0, 10, new \stdClass());
+
+        $stmt1 = $this->createMock(PDOStatementInterface::class);
+        $stmt1
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $stmt
+        $stmt1
             ->expects($this->once())
             ->method('fetchColumn')
-            ->willReturn(1000);
+            ->willReturn($numItems);
+
+        $stmt2 = $this->createMock(PDOStatementInterface::class);
+        $stmt2
+            ->expects($this->exactly(2))
+            ->method('bindValue')
+            ->withConsecutive(
+                [1, $perPage, \PDO::PARAM_INT],
+                [2, 0, \PDO::PARAM_INT]
+            )
+            ->willReturn(true);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('prepare')
-            ->willReturn($stmt);
+            ->withConsecutive(
+                ['SELECT COUNT(*) FROM t1'],
+                ['SELECT * FROM t1 ORDER BY t1.id LIMIT ? OFFSET ?']
+            )
+            ->will($this->onConsecutiveCalls(
+                $stmt1,
+                $stmt2
+            ));
 
         $fetcher = $this->createMock(FetcherInterface::class);
+        $fetcher
+            ->expects($this->once())
+            ->method('fetch')
+            ->with($this->identicalTo($stmt2))
+            ->willReturn(new \ArrayIterator($result));
 
-        $paginator = $this->getSelectBuilder()->paginate($pdo, $fetcher, 100);
-        $this->assertInstanceOf(PrecountPaginator::class, $paginator);
-        $this->assertSame(100, $paginator->getPerPage());
-        $this->assertSame(1000, $paginator->getNumItems());
+        $paginator = $this->getSelectBuilder()
+            ->from('t1')
+            ->orderBy('t1.id')
+            ->paginate($pdo, $fetcher, $perPage);
+
+        $this->assertInstanceOf(CountablePaginator::class, $paginator);
+
+        $page = $paginator->at(0);
+        $this->assertSame($perPage, $paginator->getPerPage());
+        $this->assertSame($numItems, $paginator->getNumItems());
+        $this->assertSame($result, iterator_to_array($page));
     }
 }

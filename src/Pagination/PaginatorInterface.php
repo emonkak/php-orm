@@ -2,45 +2,18 @@
 
 namespace Emonkak\Orm\Pagination;
 
-use Emonkak\Orm\ResultSet\PaginatedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Enumerable\EnumerableInterface;
 
-interface PaginatorInterface extends ResultSetInterface
+interface PaginatorInterface extends EnumerableInterface
 {
     /**
      * @param int $index
-     * @return PaginatedResultSet
+     * @return PageInterface
      */
     public function at($index);
-
-    /**
-     * @param int $index
-     * @return bool
-     */
-    public function has($index);
-
-    /**
-     * @return PaginatedResultSet
-     */
-    public function firstPage();
-
-    /**
-     * @return PaginatedResultSet
-     */
-    public function lastPage();
 
     /**
      * @return int
      */
     public function getPerPage();
-
-    /**
-     * @return int
-     */
-    public function getNumItems();
-
-    /**
-     * @return int
-     */
-    public function getNumPages();
 }

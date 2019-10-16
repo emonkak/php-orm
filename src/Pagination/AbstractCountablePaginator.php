@@ -4,7 +4,7 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterface
+abstract class AbstractCountablePaginator implements \IteratorAggregate, CountablePaginatorInterface
 {
     use EnumerableExtensions;
 
@@ -14,8 +14,8 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     public function getIterator()
     {
         for ($i = 0, $l = $this->getNumPages(); $i < $l; $i++) {
-            foreach ($this->at($i) as $element) {
-                yield $element;
+            foreach ($this->at($i) as $item) {
+                yield $item;
             }
         }
     }

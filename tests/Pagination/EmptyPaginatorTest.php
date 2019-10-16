@@ -2,9 +2,9 @@
 
 namespace Emonkak\Tests\Orm\Pagination;
 
+use Emonkak\Orm\Pagination\CountablePage;
 use Emonkak\Orm\Pagination\EmptyPaginator;
 use Emonkak\Orm\ResultSet\EmptyResultSet;
-use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 
 /**
@@ -15,7 +15,7 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
     public function testAt()
     {
         $result = (new EmptyPaginator(Model::class, 10))->at(0);
-        $this->assertInstanceOf(PaginatedResultSet::class, $result);
+        $this->assertInstanceOf(CountablePage::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 
@@ -27,14 +27,14 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
     public function testFirstPage()
     {
         $result = (new EmptyPaginator(Model::class, 10))->firstPage();
-        $this->assertInstanceOf(PaginatedResultSet::class, $result);
+        $this->assertInstanceOf(CountablePage::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 
     public function testLastPage()
     {
         $result = (new EmptyPaginator(Model::class, 10))->lastPage();
-        $this->assertInstanceOf(PaginatedResultSet::class, $result);
+        $this->assertInstanceOf(CountablePage::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 
