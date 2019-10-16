@@ -3,9 +3,7 @@
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Enumerable\Enumerable;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PaginatedResultSet;
 use Emonkak\Orm\SelectBuilder;
 
@@ -63,7 +61,7 @@ class PrecountPaginator extends AbstractPaginator
                 ->limit($this->perPage)
                 ->getResult($this->pdo, $this->fetcher);
         } else {
-            $elements = Enumerable::_empty();
+            $elements = new \EmptyIterator();
         }
 
         return new PaginatedResultSet($elements, $this, $index);
