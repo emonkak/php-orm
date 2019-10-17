@@ -518,14 +518,14 @@ class SelectBuilder implements QueryBuilderInterface
          * @param int $limit
          * @return \Traversable
          */
-        $resultFetcher = function($limit, $offset) use ($pdo, $fetcher) {
+        $itemsFetcher = function($limit, $offset) use ($pdo, $fetcher) {
             return $this
                 ->limit($limit)
                 ->offset($offset)
                 ->getResult($pdo, $fetcher);
         };
         $count = (int) $this->aggregate($pdo, $countExpr);
-        return new CountablePaginator($resultFetcher, $perPage, $count);
+        return new CountablePaginator($itemsFetcher, $perPage, $count);
     }
 
     /**

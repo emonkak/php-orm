@@ -12,7 +12,7 @@ class SequentialPage implements \IteratorAggregate, PageInterface
     /**
      * @var array
      */
-    private $result;
+    private $items;
 
     /**
      * @var PaginatorInterface
@@ -25,13 +25,13 @@ class SequentialPage implements \IteratorAggregate, PageInterface
     private $index;
 
     /**
-     * @param array              $result
+     * @param array              $items
      * @param int                $index
      * @param PaginatorInterface $paginator
      */
-    public function __construct(array $result, $index, PaginatorInterface $paginator)
+    public function __construct(array $items, $index, PaginatorInterface $paginator)
     {
-        $this->result = $result;
+        $this->items = $items;
         $this->paginator = $paginator;
         $this->index = $index;
     }
@@ -42,7 +42,7 @@ class SequentialPage implements \IteratorAggregate, PageInterface
     public function getIterator()
     {
         $perPage = $this->paginator->getPerPage();
-        return new \ArrayIterator(array_slice($this->result, 0, $perPage));
+        return new \ArrayIterator(array_slice($this->items, 0, $perPage));
     }
 
     /**
@@ -107,7 +107,7 @@ class SequentialPage implements \IteratorAggregate, PageInterface
     public function hasNext()
     {
         $perPage = $this->paginator->getPerPage();
-        return count($this->result) > $perPage;
+        return count($this->items) > $perPage;
     }
 
     /**

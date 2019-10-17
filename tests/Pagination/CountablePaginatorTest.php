@@ -21,11 +21,11 @@ class CountablePaginatorTest extends \PHPUnit_Framework_TestCase
             array_fill(0, 1, new \stdClass())
         ];
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->any())
             ->method('__invoke')
             ->will($this->returnValueMap([
@@ -34,7 +34,7 @@ class CountablePaginatorTest extends \PHPUnit_Framework_TestCase
                 [10, 20, new \ArrayIterator($results[2])]
             ]));
 
-        $paginator = new CountablePaginator($resultFetcher, $perPage, $numItems);
+        $paginator = new CountablePaginator($itemsFetcher, $perPage, $numItems);
 
         $this->assertSame($results[0], iterator_to_array($paginator->firstPage()));
         $this->assertSame($results[2], iterator_to_array($paginator->lastPage()));

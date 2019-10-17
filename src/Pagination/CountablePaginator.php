@@ -7,7 +7,7 @@ class CountablePaginator extends AbstractCountablePaginator
     /**
      * @var callable
      */
-    private $resultFetcher;
+    private $itemsFetcher;
 
     /**
      * @var int
@@ -20,13 +20,13 @@ class CountablePaginator extends AbstractCountablePaginator
     private $numItems;
 
     /**
-     * @param callable(int,int):\Traversable $resultFetcher
+     * @param callable(int,int):\Traversable $itemsFetcher
      * @param int                            $perPage
      * @param int                            $numItems
      */
-    public function __construct(callable $resultFetcher, $perPage, $numItems)
+    public function __construct(callable $itemsFetcher, $perPage, $numItems)
     {
-        $this->resultFetcher = $resultFetcher;
+        $this->itemsFetcher = $itemsFetcher;
         $this->perPage = $perPage;
         $this->numItems = $numItems;
     }
@@ -37,8 +37,8 @@ class CountablePaginator extends AbstractCountablePaginator
     public function at($index)
     {
         if ($index >= 0 && $index < $this->getNumPages()) {
-            $resultFetcher = $this->resultFetcher;
-            $result = $resultFetcher($this->perPage, $this->perPage * $index);
+            $itemsFetcher = $this->itemsFetcher;
+            $result = $itemsFetcher($this->perPage, $this->perPage * $index);
         } else {
             $result = new \EmptyIterator();
         }

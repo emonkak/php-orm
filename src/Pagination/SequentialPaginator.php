@@ -11,7 +11,7 @@ class SequentialPaginator implements \IteratorAggregate, PaginatorInterface
     /**
      * @var callable(int,int):mixed[]
      */
-    private $resultFetcher;
+    private $itemsFetcher;
 
     /**
      * @var int
@@ -19,12 +19,12 @@ class SequentialPaginator implements \IteratorAggregate, PaginatorInterface
     private $perPage;
 
     /**
-     * @param callable(int,int):mixed[] $resultFetcher
+     * @param callable(int,int):mixed[] $itemsFetcher
      * @param int                       $perPage
      */
-    public function __construct(callable $resultFetcher, $perPage)
+    public function __construct(callable $itemsFetcher, $perPage)
     {
-        $this->resultFetcher = $resultFetcher;
+        $this->itemsFetcher = $itemsFetcher;
         $this->perPage = $perPage;
     }
 
@@ -33,16 +33,27 @@ class SequentialPaginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getIterator()
     {
-        $page = $this->at(0);
+        $itemsFetcher = $this->itemsFetcher;
+        $perPage = $this->perPage;
 
-        foreach ($page as $item) {
+        $index = 0;
+        $newItems = $itemsFetcher($perPage + 1, $index * $perPage);
+        $extraItems = array_splice($newItems, $perPage);
+
+        foreach ($newItems as $item) {
             yield $item;
         }
 
-        while ($page->hasNext()) {
-            $page = $page->next();
+        while (count($extraItems) > 0) {
+            foreach ($extraItems as $item) {
+                yield $item;
+            }
 
-            foreach ($page as $item) {
+            $index++;
+            $newItems = $itemsFetcher($perPage, $index * $perPage + 1);
+            $extraItems = array_splice($newItems, $perPage - 1);
+
+            foreach ($newItems as $item) {
                 yield $item;
             }
         }
@@ -53,9 +64,10 @@ class SequentialPaginator implements \IteratorAggregate, PaginatorInterface
      */
     public function at($index)
     {
-        $resultFetcher = $this->resultFetcher;
-        $result = $resultFetcher($this->perPage + 1, $index * $this->perPage);
-        return new SequentialPage($result, $index, $this);
+        $itemsFetcher = $this->itemsFetcher;
+        $perPage = $this->perPage;
+        $items = $itemsFetcher($perPage + 1, $index * $perPage);
+        return new SequentialPage($items, $index, $this);
     }
 
     /**

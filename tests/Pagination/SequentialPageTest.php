@@ -15,11 +15,11 @@ class SequentialPageTest extends \PHPUnit_Framework_TestCase
         $perPage = 10;
         $result = range(0, 10);
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->never())
             ->method('__invoke');
 
@@ -45,11 +45,11 @@ class SequentialPageTest extends \PHPUnit_Framework_TestCase
             range(10, 19),
         ];
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->never())
             ->method('__invoke');
 
@@ -84,11 +84,11 @@ class SequentialPageTest extends \PHPUnit_Framework_TestCase
             range(10, 19),
         ];
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->never())
             ->method('__invoke');
 

@@ -14,17 +14,37 @@ class SequentialPaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $perPage = 10;
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->never())
             ->method('__invoke');
 
-        $paginator = new SequentialPaginator($resultFetcher, $perPage);
+        $paginator = new SequentialPaginator($itemsFetcher, $perPage);
 
         $this->assertEquals($perPage, $paginator->getPerPage());
+    }
+
+    public function testGetIterator()
+    {
+        $perPage = 10;
+
+        $itemsFetcher = $this
+            ->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+        $itemsFetcher
+            ->expects($this->exactly(3))
+            ->method('__invoke')
+            ->will($this->returnCallback(function($limit, $offset) {
+                return range($offset, min(29, $offset + $limit - 1));
+            }));
+
+        $paginator = new SequentialPaginator($itemsFetcher, $perPage);
+
+        $this->assertEquals(range(0, 29), iterator_to_array($paginator));
     }
 
     public function testAt()
@@ -37,11 +57,11 @@ class SequentialPaginatorTest extends \PHPUnit_Framework_TestCase
             range(20, 29),
         ];
 
-        $resultFetcher = $this
+        $itemsFetcher = $this
             ->getMockBuilder(\stdClass::class)
             ->setMethods(['__invoke'])
             ->getMock();
-        $resultFetcher
+        $itemsFetcher
             ->expects($this->any())
             ->method('__invoke')
             ->will($this->returnValueMap([
@@ -50,7 +70,7 @@ class SequentialPaginatorTest extends \PHPUnit_Framework_TestCase
                 [11, 20, $results[2]]
             ]));
 
-        $paginator = new SequentialPaginator($resultFetcher, $perPage);
+        $paginator = new SequentialPaginator($itemsFetcher, $perPage);
 
         $page = $paginator->at(0);
         $this->assertEquals(array_slice($results[0], 0, $perPage), iterator_to_array($page));
@@ -63,7 +83,5 @@ class SequentialPaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $paginator->at(2);
         $this->assertEquals(array_slice($results[2], 0, $perPage), iterator_to_array($page));
         $this->assertSame(2, $page->getIndex());
-
-        $this->assertEquals(range(0, 29), iterator_to_array($paginator));
     }
 }
