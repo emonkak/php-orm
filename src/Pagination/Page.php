@@ -4,7 +4,7 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class CountablePage implements \IteratorAggregate, PageInterface
+class Page implements \IteratorAggregate, PageInterface
 {
     use EnumerableExtensions;
 
@@ -19,16 +19,16 @@ class CountablePage implements \IteratorAggregate, PageInterface
     private $index;
 
     /**
-     * @var CountablePaginatorInterface
+     * @var PaginatorInterface
      */
     private $paginator;
 
     /**
      * @param \Traversable                $result
      * @param int                         $index
-     * @param CountablePaginatorInterface $paginator
+     * @param PaginatorInterface $paginator
      */
-    public function __construct(\Traversable $result, $index, CountablePaginatorInterface $paginator)
+    public function __construct(\Traversable $result, $index, PaginatorInterface $paginator)
     {
         $this->result = $result;
         $this->index = $index;

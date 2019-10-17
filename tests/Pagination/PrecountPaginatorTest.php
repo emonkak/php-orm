@@ -3,12 +3,12 @@
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\CountablePage;
-use Emonkak\Orm\Pagination\CountablePaginator;
+use Emonkak\Orm\Pagination\PrecountPaginator;
 
 /**
- * @covers Emonkak\Orm\Pagination\CountablePaginator
+ * @covers Emonkak\Orm\Pagination\PrecountPaginator
  */
-class CountablePaginatorTest extends \PHPUnit_Framework_TestCase
+class PrecountPaginatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testAt()
     {
@@ -29,12 +29,12 @@ class CountablePaginatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('__invoke')
             ->will($this->returnValueMap([
-                [10, 0, new \ArrayIterator($results[0])],
+                [0, 10, new \ArrayIterator($results[0])],
                 [10, 10, new \ArrayIterator($results[1])],
-                [10, 20, new \ArrayIterator($results[2])]
+                [20, 10, new \ArrayIterator($results[2])]
             ]));
 
-        $paginator = new CountablePaginator($itemsFetcher, $perPage, $numItems);
+        $paginator = new PrecountPaginator($itemsFetcher, $perPage, $numItems);
 
         $this->assertSame($results[0], iterator_to_array($paginator->firstPage()));
         $this->assertSame($results[2], iterator_to_array($paginator->lastPage()));

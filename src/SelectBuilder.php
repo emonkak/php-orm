@@ -5,8 +5,10 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Pagination\CountablePaginatorInterface;
-use Emonkak\Orm\Pagination\CountablePaginator;
+use Emonkak\Orm\Pagination\PageIteratorInterface;
+use Emonkak\Orm\Pagination\PaginatorInterface;
+use Emonkak\Orm\Pagination\PrecountPaginator;
+use Emonkak\Orm\Pagination\SequentialPageIterator;
 
 /**
  * Provides the query building of SELECT statement.
@@ -509,7 +511,7 @@ class SelectBuilder implements QueryBuilderInterface
      * @param FetcherInterface $fetcher
      * @param int              $perPage
      * @param string           $countExpr
-     * @return CountablePaginatorInterface
+     * @return PaginatorInterface
      */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, $perPage, $countExpr = 'COUNT(*)')
     {
@@ -518,14 +520,38 @@ class SelectBuilder implements QueryBuilderInterface
          * @param int $limit
          * @return \Traversable
          */
-        $itemsFetcher = function($limit, $offset) use ($pdo, $fetcher) {
+        $itemsFetcher = function($offset, $limit) use ($pdo, $fetcher) {
             return $this
                 ->limit($limit)
                 ->offset($offset)
                 ->getResult($pdo, $fetcher);
         };
         $count = (int) $this->aggregate($pdo, $countExpr);
-        return new CountablePaginator($itemsFetcher, $perPage, $count);
+        return new PrecountPaginator($itemsFetcher, $perPage, $count);
+    }
+
+    /**
+     * @param PDOInterface     $pdo
+     * @param FetcherInterface $fetcher
+     * @param int              $index
+     * @param int              $perPage
+     * @return PageIteratorInterface
+     */
+    public function paginateFrom(PDOInterface $pdo, FetcherInterface $fetcher, $index, $perPage)
+    {
+        /**
+         * @param int $offset
+         * @param int $limit
+         * @return \Traversable
+         */
+        $itemsFetcher = function($offset, $limit) use ($pdo, $fetcher) {
+            return $this
+                ->limit($limit)
+                ->offset($offset)
+                ->getResult($pdo, $fetcher)
+                ->toArray();
+        };
+        return SequentialPageIterator::from($index, $perPage, $itemsFetcher);
     }
 
     /**

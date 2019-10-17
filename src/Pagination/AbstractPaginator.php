@@ -4,7 +4,7 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-abstract class AbstractCountablePaginator implements \IteratorAggregate, CountablePaginatorInterface
+abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterface
 {
     use EnumerableExtensions;
 

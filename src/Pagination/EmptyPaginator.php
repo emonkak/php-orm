@@ -4,14 +4,9 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
-class EmptyPaginator extends \EmptyIterator implements CountablePaginatorInterface
+class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
 {
     use EnumerableExtensions;
-
-    /**
-     * @var ?class-string
-     */
-    private $class;
 
     /**
      * @var int
@@ -19,12 +14,10 @@ class EmptyPaginator extends \EmptyIterator implements CountablePaginatorInterfa
     private $perPage;
 
     /**
-     * @param class-string $class
-     * @param int          $perPage
+     * @param int $perPage
      */
-    public function __construct($class, $perPage)
+    public function __construct($perPage)
     {
-        $this->class = $class;
         $this->perPage = $perPage;
     }
 
@@ -33,7 +26,7 @@ class EmptyPaginator extends \EmptyIterator implements CountablePaginatorInterfa
      */
     public function at($index)
     {
-        return new CountablePage(new \EmptyIterator(), $index, $this);
+        return new Page(new \EmptyIterator(), $index, $this);
     }
 
     /**
@@ -82,13 +75,5 @@ class EmptyPaginator extends \EmptyIterator implements CountablePaginatorInterfa
     public function getNumPages()
     {
         return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
-    {
-        return $this->class;
     }
 }

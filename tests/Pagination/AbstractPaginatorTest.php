@@ -2,14 +2,13 @@
 
 namespace Emonkak\Orm\Tests\Pagination;
 
-use Emonkak\Orm\Pagination\AbstractCountablePaginator;
-use Emonkak\Orm\Pagination\CountablePage;
-use Emonkak\Orm\Pagination\PageInterface;
+use Emonkak\Orm\Pagination\AbstractPaginator;
+use Emonkak\Orm\Pagination\Page;
 
 /**
- * @covers Emonkak\Orm\Pagination\AbstractCountablePaginator
+ * @covers Emonkak\Orm\Pagination\AbstractPaginator
  */
-class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
+class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetIterator()
     {
@@ -33,7 +32,7 @@ class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
             ->willReturn(new \ArrayIterator([['baz' => 789]]));
 
         $paginator = $this->getMockForAbstractClass(
-            AbstractCountablePaginator::class,
+            AbstractPaginator::class,
             [],
             '',
             true,
@@ -63,7 +62,7 @@ class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
     public function testHas($index, $numPages, $expectedResult)
     {
         $paginator = $this->getMockForAbstractClass(
-            AbstractCountablePaginator::class,
+            AbstractPaginator::class,
             [],
             '',
             true,
@@ -98,7 +97,7 @@ class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $page = $this->createMock(MockedPage::class);
 
-        $paginator = $this->getMockForAbstractClass(AbstractCountablePaginator::class);
+        $paginator = $this->getMockForAbstractClass(AbstractPaginator::class);
         $paginator
             ->expects($this->once())
             ->method('at')
@@ -113,7 +112,7 @@ class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
         $page = $this->createMock(MockedPage::class);
 
         $paginator = $this->getMockForAbstractClass(
-            AbstractCountablePaginator::class,
+            AbstractPaginator::class,
             [],
             '',
             false,
@@ -140,7 +139,7 @@ class AbstractCountablePaginatorTest extends \PHPUnit_Framework_TestCase
     public function testGetNumPages($numItems, $perPage, $expected)
     {
         $paginator = $this->getMockForAbstractClass(
-            AbstractCountablePaginator::class,
+            AbstractPaginator::class,
             [],
             '',
             true,

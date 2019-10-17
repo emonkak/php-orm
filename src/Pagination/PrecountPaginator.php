@@ -2,7 +2,7 @@
 
 namespace Emonkak\Orm\Pagination;
 
-class CountablePaginator extends AbstractCountablePaginator
+class PrecountPaginator extends AbstractPaginator
 {
     /**
      * @var callable
@@ -38,12 +38,12 @@ class CountablePaginator extends AbstractCountablePaginator
     {
         if ($index >= 0 && $index < $this->getNumPages()) {
             $itemsFetcher = $this->itemsFetcher;
-            $result = $itemsFetcher($this->perPage, $this->perPage * $index);
+            $result = $itemsFetcher($this->perPage * $index, $this->perPage);
         } else {
             $result = new \EmptyIterator();
         }
 
-        return new CountablePage($result, $index, $this);
+        return new Page($result, $index, $this);
     }
 
     /**

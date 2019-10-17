@@ -16,4 +16,30 @@ interface PaginatorInterface extends EnumerableInterface
      * @return int
      */
     public function getPerPage();
+
+    /**
+     * @param int $index
+     * @return bool
+     */
+    public function has($index);
+
+    /**
+     * @return Page
+     */
+    public function firstPage();
+
+    /**
+     * @return Page
+     */
+    public function lastPage();
+
+    /**
+     * @return int
+     */
+    public function getNumItems();
+
+    /**
+     * @return int
+     */
+    public function getNumPages();
 }

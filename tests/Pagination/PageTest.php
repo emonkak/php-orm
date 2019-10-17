@@ -3,22 +3,22 @@
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Enumerable\EnumerableInterface;
-use Emonkak\Orm\Pagination\CountablePage;
-use Emonkak\Orm\Pagination\CountablePaginatorInterface;
+use Emonkak\Orm\Pagination\Page;
+use Emonkak\Orm\Pagination\PaginatorInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @covers Emonkak\Orm\Pagination\CountablePage
+ * @covers Emonkak\Orm\Pagination\Page
  */
-class CountablePageTest extends \PHPUnit_Framework_TestCase
+class PageTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetIterator()
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame($elements, $result->getIterator());
     }
@@ -27,9 +27,9 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame(123, $result->getIndex());
     }
@@ -38,19 +38,19 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->any())
             ->method('getPerPage')
             ->willReturn(10);
 
-        $result = new CountablePage($elements, 0, $paginator);
+        $result = new Page($elements, 0, $paginator);
         $this->assertSame(0, $result->getOffset());
 
-        $result = new CountablePage($elements, 1, $paginator);
+        $result = new Page($elements, 1, $paginator);
         $this->assertSame(10, $result->getOffset());
 
-        $result = new CountablePage($elements, 2, $paginator);
+        $result = new Page($elements, 2, $paginator);
         $this->assertSame(20, $result->getOffset());
     }
 
@@ -58,9 +58,9 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame(123, $result->getIndex());
     }
@@ -69,9 +69,9 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame($paginator, $result->getPaginator());
     }
@@ -80,14 +80,14 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
             ->with(124)
-            ->willReturn($expected = new CountablePage($elements, 124, $paginator));
+            ->willReturn($expected = new Page($elements, 124, $paginator));
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame($expected, $result->next());
     }
@@ -96,14 +96,14 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
             ->with(122)
-            ->willReturn($expected = new CountablePage($elements, 122, $paginator));
+            ->willReturn($expected = new Page($elements, 122, $paginator));
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertSame($expected, $result->previous());
     }
@@ -112,14 +112,14 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('has')
             ->with(124)
             ->willReturn(true);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertTrue($result->hasNext());
     }
@@ -128,14 +128,14 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('has')
             ->with(122)
             ->willReturn(true);
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
 
         $this->assertTrue($result->hasPrevious());
     }
@@ -144,7 +144,7 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->method('has')
             ->will($this->returnValueMap([
@@ -153,13 +153,13 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
                 [998, true]
             ]));
 
-        $result = new CountablePage($elements, 0, $paginator);
+        $result = new Page($elements, 0, $paginator);
         $this->assertTrue($result->isFirst());
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
         $this->assertFalse($result->isFirst());
 
-        $result = new CountablePage($elements, 999, $paginator);
+        $result = new Page($elements, 999, $paginator);
         $this->assertFalse($result->isFirst());
     }
 
@@ -167,7 +167,7 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
     {
         $elements = $this->createMock(EnumerableInterface::class);
 
-        $paginator = $this->createMock(CountablePaginatorInterface::class);
+        $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->method('has')
             ->will($this->returnValueMap([
@@ -176,13 +176,13 @@ class CountablePageTest extends \PHPUnit_Framework_TestCase
                 [1000, false]
             ]));
 
-        $result = new CountablePage($elements, 0, $paginator);
+        $result = new Page($elements, 0, $paginator);
         $this->assertFalse($result->isLast());
 
-        $result = new CountablePage($elements, 123, $paginator);
+        $result = new Page($elements, 123, $paginator);
         $this->assertFalse($result->isLast());
 
-        $result = new CountablePage($elements, 999, $paginator);
+        $result = new Page($elements, 999, $paginator);
         $this->assertTrue($result->isLast());
     }
 }
