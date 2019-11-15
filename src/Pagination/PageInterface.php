@@ -45,9 +45,4 @@ interface PageInterface extends EnumerableInterface
      * @return bool
      */
     public function isLast();
-
-    /**
-     * @return self
-     */
-    public function freeze();
 }

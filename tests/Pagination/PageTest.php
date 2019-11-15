@@ -158,26 +158,4 @@ class PageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($page->isLast());
     }
-
-    public function testFreeze()
-    {
-        $elements = [1, 2, 3];
-        $index = 1;
-
-        $items = $this->createMock(\IteratorAggregate::class);
-        $items
-            ->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator($elements));
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-
-        $page = (new Page($items, $index, $paginator))->freeze();
-
-        $this->assertEquals($elements, iterator_to_array($page));
-        $this->assertEquals($elements, iterator_to_array($page));
-        $this->assertSame($index, $page->getIndex());
-        $this->assertSame($paginator, $page->getPaginator());
-    }
-
 }

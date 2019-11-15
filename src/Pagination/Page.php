@@ -114,16 +114,4 @@ class Page implements \IteratorAggregate, PageInterface
     {
         return !$this->hasNext();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function freeze()
-    {
-        return new Page(
-            new \ArrayIterator(iterator_to_array($this->items)),
-            $this->index,
-            $this->paginator
-        );
-    }
 }
