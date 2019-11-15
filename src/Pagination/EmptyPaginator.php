@@ -64,7 +64,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getNumItems()
+    public function getTotalItems()
     {
         return 0;
     }
@@ -72,7 +72,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getNumPages()
+    public function getTotalPages()
     {
         return 0;
     }

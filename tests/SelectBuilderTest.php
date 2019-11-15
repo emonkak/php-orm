@@ -718,7 +718,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPaginate()
     {
         $perPage = 10;
-        $numItems = 21;
+        $totalItems = 21;
 
         $expectedResult = array_fill(0, 10, new \stdClass());
 
@@ -730,7 +730,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $stmt1
             ->expects($this->once())
             ->method('fetchColumn')
-            ->willReturn($numItems);
+            ->willReturn($totalItems);
 
         $stmt2 = $this->createMock(PDOStatementInterface::class);
         $stmt2
@@ -771,7 +771,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $page = $paginator->at(0);
         $this->assertSame($perPage, $paginator->getPerPage());
-        $this->assertSame($numItems, $paginator->getNumItems());
+        $this->assertSame($totalItems, $paginator->getTotalItems());
         $this->assertSame($expectedResult, iterator_to_array($page));
     }
 

@@ -13,7 +13,7 @@ class PrecountPaginatorTest extends \PHPUnit_Framework_TestCase
     public function testAt()
     {
         $perPage = 10;
-        $numItems = 21;
+        $totalItems = 21;
 
         $results = [
             array_fill(0, 10, new \stdClass()),
@@ -34,7 +34,7 @@ class PrecountPaginatorTest extends \PHPUnit_Framework_TestCase
                 [20, 10, new \ArrayIterator($results[2])]
             ]));
 
-        $paginator = new PrecountPaginator($itemsFetcher, $perPage, $numItems);
+        $paginator = new PrecountPaginator($itemsFetcher, $perPage, $totalItems);
 
         $this->assertSame($results[0], iterator_to_array($paginator->firstPage()));
         $this->assertSame($results[2], iterator_to_array($paginator->lastPage()));

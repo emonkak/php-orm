@@ -38,11 +38,11 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
             true,
             true,
             true,
-            ['getNumPages']
+            ['getTotalPages']
         );
         $paginator
             ->expects($this->once())
-            ->method('getNumPages')
+            ->method('getTotalPages')
             ->willReturn(3);
         $paginator
             ->expects($this->exactly(3))
@@ -59,7 +59,7 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerHas
      */
-    public function testHas($index, $numPages, $expectedResult)
+    public function testHas($index, $totalPages, $expectedResult)
     {
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,
@@ -68,12 +68,12 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
             true,
             true,
             true,
-            ['getNumPages']
+            ['getTotalPages']
         );
         $paginator
             ->expects($this->once())
-            ->method('getNumPages')
-            ->willReturn($numPages);
+            ->method('getTotalPages')
+            ->willReturn($totalPages);
 
         $this->assertSame($expectedResult, $paginator->has($index));
     }
@@ -118,11 +118,11 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
             false,
             false,
             false,
-            ['getNumPages']
+            ['getTotalPages']
         );
         $paginator
             ->expects($this->once())
-            ->method('getNumPages')
+            ->method('getTotalPages')
             ->willReturn(10);
         $paginator
             ->expects($this->once())
@@ -136,7 +136,7 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerGetNumPages
      */
-    public function testGetNumPages($numItems, $perPage, $expected)
+    public function testGetNumPages($totalItems, $perPage, $expected)
     {
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,
@@ -145,18 +145,18 @@ class AbstractPaginatorTest extends \PHPUnit_Framework_TestCase
             true,
             true,
             true,
-            ['getNumItems']
+            ['getTotalItems']
         );
         $paginator
             ->expects($this->once())
-            ->method('getNumItems')
-            ->willReturn($numItems);
+            ->method('getTotalItems')
+            ->willReturn($totalItems);
         $paginator
             ->expects($this->once())
             ->method('getPerPage')
             ->willReturn($perPage);
 
-        $this->assertSame($expected, $paginator->getNumPages());
+        $this->assertSame($expected, $paginator->getTotalPages());
     }
 
     public function providerGetNumPages()

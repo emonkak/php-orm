@@ -11,7 +11,7 @@ class Page implements \IteratorAggregate, PageInterface
     /**
      * @var \Traversable
      */
-    private $result;
+    private $items;
 
     /**
      * @var int
@@ -24,13 +24,13 @@ class Page implements \IteratorAggregate, PageInterface
     private $paginator;
 
     /**
-     * @param \Traversable                $result
-     * @param int                         $index
+     * @param \Traversable       $items
+     * @param int                $index
      * @param PaginatorInterface $paginator
      */
-    public function __construct(\Traversable $result, $index, PaginatorInterface $paginator)
+    public function __construct(\Traversable $items, $index, PaginatorInterface $paginator)
     {
-        $this->result = $result;
+        $this->items = $items;
         $this->index = $index;
         $this->paginator = $paginator;
     }
@@ -40,7 +40,15 @@ class Page implements \IteratorAggregate, PageInterface
      */
     public function getIterator()
     {
-        return $this->result;
+        return $this->items;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPaginator()
+    {
+        return $this->paginator;
     }
 
     /**
@@ -62,9 +70,9 @@ class Page implements \IteratorAggregate, PageInterface
     /**
      * {@inheritDoc}
      */
-    public function getPaginator()
+    public function previous()
     {
-        return $this->paginator;
+        return $this->paginator->at($this->index - 1);
     }
 
     /**
@@ -73,14 +81,6 @@ class Page implements \IteratorAggregate, PageInterface
     public function next()
     {
         return $this->paginator->at($this->index + 1);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function previous()
-    {
-        return $this->paginator->at($this->index - 1);
     }
 
     /**
@@ -113,5 +113,17 @@ class Page implements \IteratorAggregate, PageInterface
     public function isLast()
     {
         return !$this->hasNext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function freeze()
+    {
+        return new Page(
+            new \ArrayIterator(iterator_to_array($this->items)),
+            $this->index,
+            $this->paginator
+        );
     }
 }

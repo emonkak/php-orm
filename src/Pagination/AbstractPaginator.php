@@ -13,7 +13,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
      */
     public function getIterator()
     {
-        for ($i = 0, $l = $this->getNumPages(); $i < $l; $i++) {
+        for ($i = 0, $l = $this->getTotalPages(); $i < $l; $i++) {
             foreach ($this->at($i) as $item) {
                 yield $item;
             }
@@ -25,7 +25,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
      */
     public function has($index)
     {
-        return 0 <= $index && $index < $this->getNumPages();
+        return 0 <= $index && $index < $this->getTotalPages();
     }
 
     /**
@@ -41,15 +41,15 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
      */
     public function lastPage()
     {
-        $numPages = $this->getNumPages();
-        return $this->at($numPages > 0 ? $numPages - 1 : 0);
+        $totalPages = $this->getTotalPages();
+        return $this->at($totalPages > 0 ? $totalPages - 1 : 0);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getNumPages()
+    public function getTotalPages()
     {
-        return (int) ceil($this->getNumItems() / $this->getPerPage());
+        return (int) ceil($this->getTotalItems() / $this->getPerPage());
     }
 }

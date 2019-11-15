@@ -44,11 +44,11 @@ class EmptyPaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetItemCount()
     {
-        $this->assertSame(0, (new EmptyPaginator(10))->getNumItems());
+        $this->assertSame(0, (new EmptyPaginator(10))->getTotalItems());
     }
 
     public function testGetPageCount()
     {
-        $this->assertSame(0, (new EmptyPaginator(10))->getNumPages());
+        $this->assertSame(0, (new EmptyPaginator(10))->getTotalPages());
     }
 }

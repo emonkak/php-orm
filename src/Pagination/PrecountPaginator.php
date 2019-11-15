@@ -17,18 +17,18 @@ class PrecountPaginator extends AbstractPaginator
     /**
      * @var int
      */
-    private $numItems;
+    private $totalItems;
 
     /**
      * @param callable(int,int):\Traversable $itemsFetcher
      * @param int                            $perPage
-     * @param int                            $numItems
+     * @param int                            $totalItems
      */
-    public function __construct(callable $itemsFetcher, $perPage, $numItems)
+    public function __construct(callable $itemsFetcher, $perPage, $totalItems)
     {
         $this->itemsFetcher = $itemsFetcher;
         $this->perPage = $perPage;
-        $this->numItems = $numItems;
+        $this->totalItems = $totalItems;
     }
 
     /**
@@ -36,14 +36,14 @@ class PrecountPaginator extends AbstractPaginator
      */
     public function at($index)
     {
-        if ($index >= 0 && $index < $this->getNumPages()) {
+        if ($index >= 0 && $index < $this->getTotalPages()) {
             $itemsFetcher = $this->itemsFetcher;
-            $result = $itemsFetcher($this->perPage * $index, $this->perPage);
+            $items = $itemsFetcher($this->perPage * $index, $this->perPage);
         } else {
-            $result = new \EmptyIterator();
+            $items = new \EmptyIterator();
         }
 
-        return new Page($result, $index, $this);
+        return new Page($items, $index, $this);
     }
 
     /**
@@ -57,8 +57,8 @@ class PrecountPaginator extends AbstractPaginator
     /**
      * {@inheritDoc}
      */
-    public function getNumItems()
+    public function getTotalItems()
     {
-        return $this->numItems;
+        return $this->totalItems;
     }
 }

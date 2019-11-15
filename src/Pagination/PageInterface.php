@@ -17,19 +17,14 @@ interface PageInterface extends EnumerableInterface
     public function getOffset();
 
     /**
-     * @return PaginatorInterface
+     * @return PageInterface
      */
-    public function getPaginator();
+    public function previous();
 
     /**
      * @return PageInterface
      */
     public function next();
-
-    /**
-     * @return PageInterface
-     */
-    public function previous();
 
     /**
      * @return bool
@@ -50,4 +45,9 @@ interface PageInterface extends EnumerableInterface
      * @return bool
      */
     public function isLast();
+
+    /**
+     * @return self
+     */
+    public function freeze();
 }

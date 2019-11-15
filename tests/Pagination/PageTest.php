@@ -2,187 +2,182 @@
 
 namespace Emonkak\Orm\Tests\Pagination;
 
-use Emonkak\Enumerable\EnumerableInterface;
 use Emonkak\Orm\Pagination\Page;
 use Emonkak\Orm\Pagination\PaginatorInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
  * @covers Emonkak\Orm\Pagination\Page
  */
 class PageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetIterator()
+    public function testConstructor()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 1;
 
         $paginator = $this->createMock(PaginatorInterface::class);
 
-        $result = new Page($elements, 123, $paginator);
+        $page = new Page($items, $index, $paginator);
 
-        $this->assertSame($elements, $result->getIterator());
+        $this->assertSame($items, $page->getIterator());
+        $this->assertSame($index, $page->getIndex());
+        $this->assertSame($paginator, $page->getPaginator());
     }
 
-    public function testGetIndex()
+    /**
+     * @dataProvider prividerGetOffset
+     */
+    public function testGetOffset($index, $perPage, $expectedOffset)
     {
-        $elements = $this->createMock(EnumerableInterface::class);
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-
-        $result = new Page($elements, 123, $paginator);
-
-        $this->assertSame(123, $result->getIndex());
-    }
-
-    public function testGetOffset()
-    {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $totalPages = 10;
+        $perPage = 10;
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('getPerPage')
-            ->willReturn(10);
+            ->willReturn($perPage);
 
-        $result = new Page($elements, 0, $paginator);
-        $this->assertSame(0, $result->getOffset());
+        $page = new Page($items, $index, $paginator);
 
-        $result = new Page($elements, 1, $paginator);
-        $this->assertSame(10, $result->getOffset());
-
-        $result = new Page($elements, 2, $paginator);
-        $this->assertSame(20, $result->getOffset());
+        $this->assertSame($expectedOffset, $page->getOffset());
     }
 
-    public function testGetPageNum()
+    public function prividerGetOffset()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-
-        $result = new Page($elements, 123, $paginator);
-
-        $this->assertSame(123, $result->getIndex());
-    }
-
-    public function testGetPaginator()
-    {
-        $elements = $this->createMock(EnumerableInterface::class);
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-
-        $result = new Page($elements, 123, $paginator);
-
-        $this->assertSame($paginator, $result->getPaginator());
+        return [
+            [0, 10, 0],
+            [1, 10, 10],
+            [2, 10, 20]
+        ];
     }
 
     public function testNext()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 1;
+
+        $nextPage = $this->createMock(MockedPage::class);
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
-            ->with(124)
-            ->willReturn($expected = new Page($elements, 124, $paginator));
+            ->with($index + 1)
+            ->willReturn($nextPage);
 
-        $result = new Page($elements, 123, $paginator);
+        $page = new Page($items, $index, $paginator);
 
-        $this->assertSame($expected, $result->next());
+        $this->assertSame($nextPage, $page->next());
     }
 
     public function testPrevious()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 1;
+
+        $previousPage = $this->createMock(MockedPage::class);
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
-            ->with(122)
-            ->willReturn($expected = new Page($elements, 122, $paginator));
+            ->with($index - 1)
+            ->willReturn($previousPage);
 
-        $result = new Page($elements, 123, $paginator);
+        $page = new Page($items, $index, $paginator);
 
-        $this->assertSame($expected, $result->previous());
-    }
-
-    public function testHasNext()
-    {
-        $elements = $this->createMock(EnumerableInterface::class);
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-        $paginator
-            ->expects($this->once())
-            ->method('has')
-            ->with(124)
-            ->willReturn(true);
-
-        $result = new Page($elements, 123, $paginator);
-
-        $this->assertTrue($result->hasNext());
+        $this->assertSame($previousPage, $page->previous());
     }
 
     public function testHasPrevious()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 1;
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('has')
-            ->with(122)
+            ->with($index - 1)
             ->willReturn(true);
 
-        $result = new Page($elements, 123, $paginator);
+        $page = new Page($items, $index, $paginator);
 
-        $this->assertTrue($result->hasPrevious());
+        $this->assertTrue($page->hasPrevious());
+    }
+
+    public function testHasNext()
+    {
+        $items = new \EmptyIterator();
+        $index = 1;
+
+        $paginator = $this->createMock(PaginatorInterface::class);
+        $paginator
+            ->expects($this->once())
+            ->method('has')
+            ->with($index + 1)
+            ->willReturn(true);
+
+        $page = new Page($items, $index, $paginator);
+
+        $this->assertTrue($page->hasNext());
     }
 
     public function testIsFirst()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 0;
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
+            ->expects($this->once())
             ->method('has')
-            ->will($this->returnValueMap([
-                [-1, false],
-                [122, true],
-                [998, true]
-            ]));
+            ->with($index - 1)
+            ->willReturn(false);
 
-        $result = new Page($elements, 0, $paginator);
-        $this->assertTrue($result->isFirst());
+        $page = new Page($items, $index, $paginator);
 
-        $result = new Page($elements, 123, $paginator);
-        $this->assertFalse($result->isFirst());
-
-        $result = new Page($elements, 999, $paginator);
-        $this->assertFalse($result->isFirst());
+        $this->assertTrue($page->isFirst());
     }
 
     public function testIsLast()
     {
-        $elements = $this->createMock(EnumerableInterface::class);
+        $items = new \EmptyIterator();
+        $index = 1;
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
+            ->expects($this->once())
             ->method('has')
-            ->will($this->returnValueMap([
-                [1, true],
-                [124, true],
-                [1000, false]
-            ]));
+            ->with($index + 1)
+            ->willReturn(false);
 
-        $result = new Page($elements, 0, $paginator);
-        $this->assertFalse($result->isLast());
+        $page = new Page($items, $index, $paginator);
 
-        $result = new Page($elements, 123, $paginator);
-        $this->assertFalse($result->isLast());
-
-        $result = new Page($elements, 999, $paginator);
-        $this->assertTrue($result->isLast());
+        $this->assertTrue($page->isLast());
     }
+
+    public function testFreeze()
+    {
+        $elements = [1, 2, 3];
+        $index = 1;
+
+        $items = $this->createMock(\IteratorAggregate::class);
+        $items
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator($elements));
+
+        $paginator = $this->createMock(PaginatorInterface::class);
+
+        $page = (new Page($items, $index, $paginator))->freeze();
+
+        $this->assertEquals($elements, iterator_to_array($page));
+        $this->assertEquals($elements, iterator_to_array($page));
+        $this->assertSame($index, $page->getIndex());
+        $this->assertSame($paginator, $page->getPaginator());
+    }
+
 }

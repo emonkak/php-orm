@@ -36,10 +36,10 @@ interface PaginatorInterface extends EnumerableInterface
     /**
      * @return int
      */
-    public function getNumItems();
+    public function getTotalItems();
 
     /**
      * @return int
      */
-    public function getNumPages();
+    public function getTotalPages();
 }
