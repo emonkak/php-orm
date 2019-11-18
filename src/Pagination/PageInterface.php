@@ -7,6 +7,11 @@ use Emonkak\Enumerable\EnumerableInterface;
 interface PageInterface extends EnumerableInterface
 {
     /**
+     * @return PaginatorInterface
+     */
+    public function getPaginator();
+
+    /**
      * @return int
      */
     public function getIndex();
