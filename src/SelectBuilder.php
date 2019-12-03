@@ -63,6 +63,11 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @var Sql[]
      */
+    private $window = [];
+
+    /**
+     * @var Sql[]
+     */
     private $orderBy = [];
 
     /**
@@ -166,6 +171,14 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @return Sql[]
      */
+    public function getWindow()
+    {
+        return $this->window;
+    }
+
+    /**
+     * @return Sql[]
+     */
     public function getOrderby()
     {
         return $this->orderBy;
@@ -221,7 +234,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function select($expr, $alias = null)
     {
-        $expr = $this->grammar->expression($expr);
+        $expr = $this->grammar->lift($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -238,7 +251,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = $this->grammar->expression($expr);
+            $expr = $this->grammar->lift($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -256,7 +269,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function from($table, $alias = null)
     {
-        $table = $this->grammar->expression($table);
+        $table = $this->grammar->lift($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -304,13 +317,13 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function join($table, $condition = null, $alias = null, $type = 'JOIN')
     {
-        $table = $this->grammar->expression($table);
+        $table = $this->grammar->lift($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         $join = $this->join;
         if ($condition !== null) {
-            $condition = $this->grammar->expression($condition);
+            $condition = $this->grammar->lift($condition);
         }
         $cloned = clone $this;
         $cloned->join[] = $this->grammar->join($table, $condition, $type);
@@ -334,7 +347,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function groupBy($expr)
     {
-        $expr = $this->grammar->expression($expr);
+        $expr = $this->grammar->lift($expr);
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
         return $cloned;
@@ -371,13 +384,26 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
+     * @param string $name
+     * @param mixed  $specification
+     * @return $this
+     */
+    public function window($name, $specification = '')
+    {
+        $specification = $this->grammar->lift($specification);
+        $cloned = clone $this;
+        $cloned->window[] = $this->grammar->window($name, $specification);
+        return $cloned;
+    }
+
+    /**
      * @param mixed   $expr
      * @param ?string $ordering
      * @return $this
      */
     public function orderBy($expr, $ordering = null)
     {
-        $expr = $this->grammar->expression($expr);
+        $expr = $this->grammar->lift($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -453,7 +479,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function unionWith($query, $type = 'UNION')
     {
-        $query = $this->grammar->expression($query);
+        $query = $this->grammar->lift($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;
@@ -485,6 +511,7 @@ class SelectBuilder implements QueryBuilderInterface
                 $builder->where,
                 $builder->groupBy,
                 $builder->having,
+                $builder->window,
                 $builder->orderBy,
                 $builder->limit,
                 $builder->offset,

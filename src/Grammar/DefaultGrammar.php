@@ -89,6 +89,16 @@ class DefaultGrammar extends AbstractGrammar
     /**
      * {@inheritDoc}
      */
+    public function window($name, Sql $specification)
+    {
+        $sql = $name . ' AS ' . '(' . $specification->getSql() . ')';
+        $bindings = $specification->getBindings();
+        return new Sql($sql, $bindings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function ordering(Sql $expr, $ordering)
     {
         switch (strtoupper($ordering)) {
@@ -132,7 +142,7 @@ class DefaultGrammar extends AbstractGrammar
     /**
      * {@inheritDoc}
      */
-    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union)
+    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union)
     {
         $bindings = [];
 
@@ -143,6 +153,7 @@ class DefaultGrammar extends AbstractGrammar
              . $this->processWhere($where, $bindings)
              . $this->processGroupBy($groupBy, $bindings)
              . $this->processHaving($having, $bindings)
+             . $this->processWindow($window, $bindings)
              . $this->processOrderBy($orderBy, $bindings)
              . $this->processLimit($limit, $bindings)
              . $this->processOffset($offset, $bindings)
@@ -301,6 +312,26 @@ class DefaultGrammar extends AbstractGrammar
         }
         $bindings = array_merge($bindings, $having->getBindings());
         return ' HAVING ' . $having->getSql();
+    }
+
+    /**
+     * @param Sql[]   $window
+     * @param mixed[] &$bindings
+     * @return string
+     */
+    private function processWindow(array $window, array &$bindings)
+    {
+        if (empty($window)) {
+            return '';
+        }
+        $tmpSqls = [];
+        $tmpBindings = [$bindings];
+        foreach ($window as $definition) {
+            $tmpSqls[] = $definition->getSql();
+            $tmpBindings[] = $definition->getBindings();
+        }
+        $bindings = array_merge(...$tmpBindings);
+        return ' WINDOW ' . implode(', ', $tmpSqls);
     }
 
     /**

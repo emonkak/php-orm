@@ -46,7 +46,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function expression($value)
+    public function lift($value)
     {
         if ($value instanceof Sql) {
             return $value;
@@ -58,7 +58,7 @@ abstract class AbstractGrammar implements GrammarInterface
             return new Sql($value);
         }
         $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as an expression, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as a query, got '$type'.");
     }
 
     /**
@@ -92,20 +92,19 @@ abstract class AbstractGrammar implements GrammarInterface
     {
         switch (func_num_args()) {
             case 1:
-                $expression = $this->expression($arg1);
-                return $expression;
+                return $this->lift($arg1);
             case 2:
                 $operator = $arg1;
-                $rhs = $this->expression($arg2);
+                $rhs = $this->lift($arg2);
                 return $this->unaryOperator($arg1, $rhs);
             case 3:
                 $operator = $arg2;
-                $lhs = $this->expression($arg1);
+                $lhs = $this->lift($arg1);
                 $rhs = $this->literal($arg3);
                 return $this->operator($operator, $lhs, $rhs);
             default:
                 $operator = $arg2;
-                $lhs = $this->expression($arg1);
+                $lhs = $this->lift($arg1);
                 $start = $this->literal($arg3);
                 $end = $this->literal($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);

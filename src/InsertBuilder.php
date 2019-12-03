@@ -146,7 +146,7 @@ class InsertBuilder implements QueryBuilderInterface
     public function select($query)
     {
         $cloned = clone $this;
-        $cloned->select = $this->grammar->expression($query);
+        $cloned->select = $this->grammar->lift($query);
         return $cloned;
     }
 

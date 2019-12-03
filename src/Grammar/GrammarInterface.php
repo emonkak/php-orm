@@ -34,7 +34,7 @@ interface GrammarInterface
      * @param mixed $value
      * @return Sql
      */
-    public function expression($value);
+    public function lift($value);
 
     /**
      * @param mixed $value
@@ -83,6 +83,13 @@ interface GrammarInterface
     public function join(Sql $table, Sql $condition = null, $type);
 
     /**
+     * @param string $name
+     * @param Sql    $specification
+     * @return Sql
+     */
+    public function window($name, Sql $specification);
+
+    /**
      * @param Sql    $expr
      * @param string $ordering
      * @return Sql
@@ -117,6 +124,7 @@ interface GrammarInterface
      * @param ?Sql   $where
      * @param Sql[]  $groupBy
      * @param ?Sql   $having
+     * @param Sql[]  $window
      * @param Sql[]  $orderBy
      * @param int    $limit
      * @param int    $offset
@@ -124,7 +132,7 @@ interface GrammarInterface
      * @param Sql[]  $union
      * @return Sql
      */
-    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union);
+    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union);
 
     /**
      * @param string   $prefix

@@ -206,9 +206,9 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCompileSelect
      */
-    public function testCompileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $orderBy, $limit, $offset, $suffix, array $union, $expectedSql, array $expectedBindings)
+    public function testCompileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union, $expectedSql, array $expectedBindings)
     {
-        $query = $this->grammar->selectStatement($prefix, $select, $from, $join, $where, $groupBy, $having, $orderBy, $limit, $offset, $suffix, $union);
+        $query = $this->grammar->selectStatement($prefix, $select, $from, $join, $where, $groupBy, $having, $window, $orderBy, $limit, $offset, $suffix, $union);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
@@ -224,12 +224,13 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
                 new Sql('c1 = ? AND c2 = ?', ['foo', 'bar']),
                 [new Sql('c3'), new Sql('c4')],
                 new Sql('c5 = ?', ['baz']),
+                [new Sql('w AS (PARTITION BY c1)', [])],
                 [new Sql('c6'), new Sql('c7')],
                 100,
                 200,
                 'FOR UPDATE',
                 [new Sql('UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)', ['qux'])],
-                'SELECT c1, c2 FROM t1, t2 JOIN t3 ON t1.c1 = t3.c1 JOIN t4 ON t1.c1 = t4.c1 WHERE c1 = ? AND c2 = ? GROUP BY c3, c4 HAVING c5 = ? ORDER BY c6, c7 LIMIT ? OFFSET ? FOR UPDATE UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)',
+                'SELECT c1, c2 FROM t1, t2 JOIN t3 ON t1.c1 = t3.c1 JOIN t4 ON t1.c1 = t4.c1 WHERE c1 = ? AND c2 = ? GROUP BY c3, c4 HAVING c5 = ? WINDOW w AS (PARTITION BY c1) ORDER BY c6, c7 LIMIT ? OFFSET ? FOR UPDATE UNION ALL (SELECT c1, c2 FROM t5 WHERE c1 = ?)',
                 ['foo', 'bar', 'baz', 100, 200, 'qux'],
             ],
             [
@@ -240,6 +241,7 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
                 new Sql('c1 = ?', ['foo']),
                 [],
                 null,
+                [],
                 [],
                 null,
                 null,
@@ -256,6 +258,7 @@ class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
                 null,
                 [],
                 null,
+                [],
                 [],
                 null,
                 null,

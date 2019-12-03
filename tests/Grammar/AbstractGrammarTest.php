@@ -54,17 +54,17 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerExpression
+     * @dataProvider providerLift
      */
-    public function testExpression($value, $expectedSql, array $expectedBindings)
+    public function testLift($value, $expectedSql, array $expectedBindings)
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $query = $grammar->expression($value);
+        $query = $grammar->lift($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerExpression()
+    public function providerLift()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
@@ -81,7 +81,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testExprThrowsUnexpectedValueException($value)
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $grammar->expression($value);
+        $grammar->lift($value);
     }
 
     public function providerExprThrowsUnexpectedValueException()

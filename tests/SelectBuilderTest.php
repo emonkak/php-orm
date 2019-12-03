@@ -37,6 +37,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->where('t1.c1', '=', 123)
             ->groupBy('t1.c1')
             ->orderBy('t1.c2')
+            ->window('w', 'PARTITION BY c1')
             ->having('t1.c2', '=', 456)
             ->offset(12)
             ->limit(34)
@@ -51,6 +52,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([new Sql('t1.c1')], $builder->getGroupBy());
         $this->assertEquals([new Sql('t1.c2')], $builder->getOrderBy());
         $this->assertQueryIs('(t1.c2 = ?)', [456], $builder->getHaving()->build());
+        $this->assertEquals([new Sql('w AS (PARTITION BY c1)', [])], $builder->getWindow());
         $this->assertSame(12, $builder->getOffset());
         $this->assertSame(34, $builder->getLimit());
         $this->assertSame('FOR UPDATE', $builder->getSuffix());
@@ -522,6 +524,21 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertQueryIs(
             'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 = ?) OR (c3 = ?)) OR (c4 IS NULL))',
             ['foo', 'bar'],
+            $query
+        );
+    }
+
+    public function testWindow()
+    {
+        $query = $this->getSelectBuilder()
+            ->select('ROW_NUMBER() OVER w')
+            ->from('t1')
+            ->window('w1', 'PARTITION BY c1')
+            ->window('w2')
+            ->build();
+        $this->assertQueryIs(
+            'SELECT ROW_NUMBER() OVER w FROM t1 WINDOW w1 AS (PARTITION BY c1), w2 AS ()',
+            [],
             $query
         );
     }
