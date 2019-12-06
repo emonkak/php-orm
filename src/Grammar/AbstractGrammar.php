@@ -75,6 +75,9 @@ abstract class AbstractGrammar implements GrammarInterface
         if ($value instanceof QueryBuilderInterface) {
             return $value->build()->enclosed();
         }
+        if ($value instanceof \JsonSerializable) {
+            return Sql::value($value->jsonSerialize());
+        }
         if (is_scalar($value)) {
             return Sql::value($value);
         }

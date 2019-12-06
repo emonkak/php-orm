@@ -9,6 +9,7 @@ use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
+use Emonkak\Orm\Tests\Fixtures\Id;
 
 /**
  * @covers Emonkak\Orm\Grammar\AbstractGrammar
@@ -113,6 +114,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
             [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [new Id(123), '?', ['123']],
             ['foo', '?', ['foo']],
             [123, '?', [123]],
             [1.23, '?', [1.23]],
