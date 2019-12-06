@@ -41,7 +41,7 @@ class OneTo implements RelationStrategyInterface
     /**
      * @var SelectBuilder
      */
-    private $builder;
+    private $queryBuilder;
 
     /**
      * @var array<string,SelectBuilder>
@@ -55,7 +55,7 @@ class OneTo implements RelationStrategyInterface
      * @param string                      $innerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      */
     public function __construct(
@@ -65,7 +65,7 @@ class OneTo implements RelationStrategyInterface
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions
     ) {
         $this->relationKey = $relationKey;
@@ -74,7 +74,7 @@ class OneTo implements RelationStrategyInterface
         $this->innerKey = $innerKey;
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
-        $this->builder = $builder;
+        $this->queryBuilder = $queryBuilder;
         $this->unions = $unions;
     }
 
@@ -129,9 +129,9 @@ class OneTo implements RelationStrategyInterface
     /**
      * @return SelectBuilder
      */
-    public function getBuilder()
+    public function getQueryBuilder()
     {
-        return $this->builder;
+        return $this->queryBuilder;
     }
 
     /**
@@ -147,15 +147,15 @@ class OneTo implements RelationStrategyInterface
      */
     public function getResult(array $outerKeys)
     {
-        $builder = $this->getBuilderFrom($this->builder, $this->table, $outerKeys);
+        $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->table, $outerKeys);
 
         foreach ($this->unions as $unionTable => $unionBuilder) {
-            $unionBuilder = $this->getBuilderFrom($unionBuilder, $unionTable, $outerKeys);
+            $unionBuilder = $this->createQueryBuilderFrom($unionBuilder, $unionTable, $outerKeys);
 
-            $builder = $builder->unionAllWith($unionBuilder);
+            $queryBuilder = $queryBuilder->unionAllWith($unionBuilder);
         }
 
-        return $builder
+        return $queryBuilder
             ->getResult($this->pdo, $this->fetcher);
     }
 
@@ -184,26 +184,26 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * @param SelectBuilder $builder
+     * @param SelectBuilder $queryBuilder
      * @param string        $table
      * @param string[]      $outerKeys
      * @return SelectBuilder
      */
-    private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)
+    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, $table, $outerKeys)
     {
-        $grammar = $this->builder->getGrammar();
+        $grammar = $this->queryBuilder->getGrammar();
 
-        if (count($builder->getFrom()) === 0) {
-            $builder = $builder->from($grammar->identifier($table));
+        if (count($queryBuilder->getFrom()) === 0) {
+            $queryBuilder = $queryBuilder->from($grammar->identifier($table));
         }
 
-        $builder = $builder
+        $queryBuilder = $queryBuilder
             ->where(
                 $grammar->identifier($table) . '.' . $grammar->identifier($this->innerKey),
                 'IN',
                 $outerKeys
             );
 
-        return $builder;
+        return $queryBuilder;
     }
 }

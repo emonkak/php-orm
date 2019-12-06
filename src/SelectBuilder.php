@@ -499,26 +499,26 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function build()
     {
-        $builder = $this;
+        $queryBuilder = $this;
         $sqls = [];
 
         do {
             $sqls[] = $this->grammar->selectStatement(
-                $builder->prefix,
-                $builder->select,
-                $builder->from,
-                $builder->join,
-                $builder->where,
-                $builder->groupBy,
-                $builder->having,
-                $builder->window,
-                $builder->orderBy,
-                $builder->limit,
-                $builder->offset,
-                $builder->suffix,
-                $builder->union
+                $queryBuilder->prefix,
+                $queryBuilder->select,
+                $queryBuilder->from,
+                $queryBuilder->join,
+                $queryBuilder->where,
+                $queryBuilder->groupBy,
+                $queryBuilder->having,
+                $queryBuilder->window,
+                $queryBuilder->orderBy,
+                $queryBuilder->limit,
+                $queryBuilder->offset,
+                $queryBuilder->suffix,
+                $queryBuilder->union
             );
-        } while ($builder = $builder->parent);
+        } while ($queryBuilder = $queryBuilder->parent);
 
         return count($sqls) > 1 ? Sql::join(' ', array_reverse($sqls)) : $sqls[0];
     }

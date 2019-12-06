@@ -199,13 +199,13 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface $builder
+     * @param QueryBuilderInterface $queryBuilder
      * @param string                $separator
      * @return Sql
      */
-    public function appendBuilder(QueryBuilderInterface $builder, $separator = ' ')
+    public function appendQueryBuilder(QueryBuilderInterface $queryBuilder, $separator = ' ')
     {
-        $query = $builder->build();
+        $query = $queryBuilder->build();
         return $this->append('(' . $query->sql . ')', $query->bindings, $separator);
     }
 
@@ -233,13 +233,13 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param QueryBuilderInterface $builder
+     * @param QueryBuilderInterface $queryBuilder
      * @param string                $separator
      * @return Sql
      */
-    public function prependBuilder(QueryBuilderInterface $builder, $separator = ' ')
+    public function prependQueryBuilder(QueryBuilderInterface $queryBuilder, $separator = ' ')
     {
-        $query = $builder->build();
+        $query = $queryBuilder->build();
         return $this->prepend('(' . $query->sql . ')', $query->bindings, $separator);
     }
 

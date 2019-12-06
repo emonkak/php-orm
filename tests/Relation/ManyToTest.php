@@ -30,7 +30,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
         $unions = [
             'union' => $this->getSelectBuilder()
         ];
@@ -45,7 +45,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             $manyToOneInnerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -58,7 +58,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($manyToOneInnerKey, $relation->getManyToOneInnerKey());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($builder, $relation->getBuilder());
+        $this->assertSame($queryBuilder, $relation->getQueryBuilder());
         $this->assertSame($unions, $relation->getUnions());
     }
 
@@ -92,7 +92,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResult);
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             'friends',
@@ -104,7 +104,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
 
@@ -144,7 +144,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResult);
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             'friends',
@@ -156,7 +156,7 @@ class ManyToTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             [
                 'users2' => $this->getSelectBuilder()
             ]

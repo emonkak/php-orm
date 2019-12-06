@@ -27,7 +27,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
         $unions = [
             'union' => $this->getSelectBuilder()
         ];
@@ -39,7 +39,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -49,7 +49,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -83,7 +83,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResultSet);
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'revisions',
@@ -92,7 +92,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             'revision_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
 
@@ -135,7 +135,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($expectedResultSet);
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'object',
@@ -144,7 +144,7 @@ class OneToTest extends \PHPUnit_Framework_TestCase
             'object_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             [
                 'bar' => $this->getSelectBuilder(),
                 'baz' => $this->getSelectBuilder()

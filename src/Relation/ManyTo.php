@@ -56,7 +56,7 @@ class ManyTo implements RelationStrategyInterface
     /**
      * @var SelectBuilder
      */
-    private $builder;
+    private $queryBuilder;
 
     /**
      * @var array<string,SelectBuilder>
@@ -73,7 +73,7 @@ class ManyTo implements RelationStrategyInterface
      * @param string                      $manyToOneInnerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      */
     public function __construct(
@@ -86,7 +86,7 @@ class ManyTo implements RelationStrategyInterface
         $manyToOneInnerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions
     ) {
         $this->relationKey = $relationKey;
@@ -98,7 +98,7 @@ class ManyTo implements RelationStrategyInterface
         $this->manyToOneInnerKey = $manyToOneInnerKey;
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
-        $this->builder = $builder;
+        $this->queryBuilder = $queryBuilder;
         $this->unions = $unions;
     }
 
@@ -177,9 +177,9 @@ class ManyTo implements RelationStrategyInterface
     /**
      * @return SelectBuilder
      */
-    public function getBuilder()
+    public function getQueryBuilder()
     {
-        return $this->builder;
+        return $this->queryBuilder;
     }
 
     /**
@@ -195,17 +195,17 @@ class ManyTo implements RelationStrategyInterface
      */
     public function getResult(array $outerKeys)
     {
-        $grammar = $this->builder->getGrammar();
+        $grammar = $this->queryBuilder->getGrammar();
 
-        $builder = $this->getBuilderFrom($this->builder, $this->manyToOneTable, $outerKeys);
+        $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->manyToOneTable, $outerKeys);
 
         foreach ($this->unions as $unionTable => $unionBuilder) {
-            $unionBuilder = $this->getBuilderFrom($unionBuilder, $unionTable, $outerKeys);
+            $unionBuilder = $this->createQueryBuilderFrom($unionBuilder, $unionTable, $outerKeys);
 
-            $builder = $builder->unionAllWith($unionBuilder);
+            $queryBuilder = $queryBuilder->unionAllWith($unionBuilder);
         }
 
-        return $builder
+        return $queryBuilder
             ->getResult($this->pdo, $this->fetcher);
     }
 
@@ -242,20 +242,20 @@ class ManyTo implements RelationStrategyInterface
     }
 
     /**
-     * @param SelectBuilder $builder
+     * @param SelectBuilder $queryBuilder
      * @param string        $table
      * @param string[]      $outerKeys
      * @return SelectBuilder
      */
-    private function getBuilderFrom(SelectBuilder $builder, $table, $outerKeys)
+    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, $table, $outerKeys)
     {
-        $grammar = $this->builder->getGrammar();
+        $grammar = $this->queryBuilder->getGrammar();
 
-        if (count($builder->getFrom()) === 0) {
-            $builder = $builder->from($grammar->identifier($table));
+        if (count($queryBuilder->getFrom()) === 0) {
+            $queryBuilder = $queryBuilder->from($grammar->identifier($table));
         }
 
-        $builder = $builder
+        $queryBuilder = $queryBuilder
             ->outerJoin(
                 $grammar->identifier($this->oneToManyTable),
                 sprintf(
@@ -272,12 +272,12 @@ class ManyTo implements RelationStrategyInterface
                 $outerKeys
             );
 
-        if (count($builder->getSelect()) === 0) {
-            $builder = $builder
+        if (count($queryBuilder->getSelect()) === 0) {
+            $queryBuilder = $queryBuilder
                 ->select($grammar->identifier($table) . '.*');
         }
 
-        return $builder
+        return $queryBuilder
             ->select(
                 $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
                 $grammar->identifier($this->getPivotKey())

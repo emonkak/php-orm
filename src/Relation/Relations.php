@@ -23,7 +23,7 @@ final class Relations
      * @param string                      $innerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -34,7 +34,7 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -45,7 +45,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new OuterJoin()
@@ -59,7 +59,7 @@ final class Relations
      * @param string                      $innerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -70,7 +70,7 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -81,7 +81,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new GroupJoin()
@@ -96,7 +96,7 @@ final class Relations
      * @param string                      $throughKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -108,7 +108,7 @@ final class Relations
         $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -119,7 +119,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new ThroughOuterJoin($throughKey)
@@ -134,7 +134,7 @@ final class Relations
      * @param string                      $throughKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -146,7 +146,7 @@ final class Relations
         $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -157,7 +157,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new ThroughGroupJoin($throughKey)
@@ -171,7 +171,7 @@ final class Relations
      * @param string                        $innerKey
      * @param PDOInterface                  $pdo
      * @param FetcherInterface              $fetcher
-     * @param SelectBuilder                 $builder
+     * @param SelectBuilder                 $queryBuilder
      * @param array<string,SelectBuilder>   $unions
      * @param LazyLoadingValueHolderFactory $proxyFactory
      * @return Relation
@@ -183,7 +183,7 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ) {
@@ -195,7 +195,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new LazyOuterJoin($proxyFactory)
@@ -209,7 +209,7 @@ final class Relations
      * @param string                        $innerKey
      * @param PDOInterface                  $pdo
      * @param FetcherInterface              $fetcher
-     * @param SelectBuilder                 $builder
+     * @param SelectBuilder                 $queryBuilder
      * @param array<string,SelectBuilder>   $unions
      * @param LazyLoadingValueHolderFactory $proxyFactory
      * @return Relation
@@ -221,7 +221,7 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ) {
@@ -233,7 +233,7 @@ final class Relations
                 $innerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new LazyGroupJoin($proxyFactory)
@@ -247,7 +247,7 @@ final class Relations
      * @param string                      $innerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @param CacheInterface              $cache
      * @param callable                    $cacheKeySelector
@@ -261,7 +261,7 @@ final class Relations
         $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions,
         CacheInterface $cache,
         callable $cacheKeySelector,
@@ -276,7 +276,7 @@ final class Relations
                     $innerKey,
                     $pdo,
                     $fetcher,
-                    $builder,
+                    $queryBuilder,
                     $unions
                 ),
                 $cache,
@@ -351,7 +351,7 @@ final class Relations
      * @param string                      $manyToOneInnerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -365,7 +365,7 @@ final class Relations
         $manyToOneInnerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -379,7 +379,7 @@ final class Relations
                 $manyToOneInnerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new GroupJoin()
@@ -396,7 +396,7 @@ final class Relations
      * @param string                      $manyToOneInnerKey
      * @param PDOInterface                $pdo
      * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $builder
+     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      * @return Relation
      */
@@ -411,7 +411,7 @@ final class Relations
         $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
-        SelectBuilder $builder,
+        SelectBuilder $queryBuilder,
         array $unions = []
     ) {
         return new Relation(
@@ -425,7 +425,7 @@ final class Relations
                 $manyToOneInnerKey,
                 $pdo,
                 $fetcher,
-                $builder,
+                $queryBuilder,
                 $unions
             ),
             new ThroughGroupJoin($throughKey)

@@ -20,37 +20,37 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testGetSelect()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $builder = $grammar->getSelect();
+        $queryBuilder = $grammar->getSelect();
 
-        $this->assertInstanceOf(SelectBuilder::class, $builder);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $this->assertInstanceOf(SelectBuilder::class, $queryBuilder);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetInsert()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $builder = $grammar->getInsert();
+        $queryBuilder = $grammar->getInsert();
 
-        $this->assertInstanceOf(InsertBuilder::class, $builder);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $this->assertInstanceOf(InsertBuilder::class, $queryBuilder);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetUpdate()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $builder = $grammar->getUpdate();
+        $queryBuilder = $grammar->getUpdate();
 
-        $this->assertInstanceOf(UpdateBuilder::class, $builder);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $this->assertInstanceOf(UpdateBuilder::class, $queryBuilder);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetDelete()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $builder = $grammar->getDelete();
+        $queryBuilder = $grammar->getDelete();
 
-        $this->assertInstanceOf(DeleteBuilder::class, $builder);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $this->assertInstanceOf(DeleteBuilder::class, $queryBuilder);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     /**

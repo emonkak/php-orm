@@ -94,7 +94,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($innerResult))
             ->will($this->returnArgument(0));
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'user',
@@ -103,7 +103,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
         $joinStrategy = new OuterJoin();
@@ -187,7 +187,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($innerResult))
             ->will($this->returnArgument(0));
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'posts',
@@ -196,7 +196,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
         $joinStrategy = new GroupJoin();
@@ -212,7 +212,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'posts',
@@ -221,7 +221,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
         $joinStrategy = new GroupJoin();
@@ -242,7 +242,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
             'jobs',
@@ -251,7 +251,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'job_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
         $joinStrategy = new GroupJoin();
@@ -322,7 +322,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn(new PreloadedResultSet($innerElements, Model::class));
 
-        $builder = $this->getSelectBuilder();
+        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new ManyTo(
             'friends',
@@ -334,7 +334,7 @@ class RelationTest extends \PHPUnit_Framework_TestCase
             'user_id',
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             []
         );
         $joinStrategy = new GroupJoin();

@@ -41,7 +41,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -53,7 +53,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -69,7 +69,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -83,7 +83,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -95,7 +95,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -111,7 +111,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -126,7 +126,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -139,7 +139,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $throughKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -155,7 +155,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -170,7 +170,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -183,7 +183,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $throughKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions
         );
 
@@ -199,7 +199,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -213,7 +213,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -227,7 +227,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions,
             $proxyFactory
         );
@@ -244,7 +244,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -258,7 +258,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -272,7 +272,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions,
             $proxyFactory
         );
@@ -289,7 +289,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -303,7 +303,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -319,7 +319,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $innerKey,
             $pdo,
             $fetcher,
-            $builder,
+            $queryBuilder,
             $unions,
             $cache,
             $cacheKeySelector,
@@ -416,7 +416,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
 
         $relation = Relations::manyToMany(
             $relationKey,
@@ -428,7 +428,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $manyToOneInnerKey,
             $pdo,
             $fetcher,
-            $builder
+            $queryBuilder
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -446,7 +446,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
     }
 
     public function testThroughManyToMany()
@@ -463,7 +463,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new SelectBuilder($grammar);
+        $queryBuilder = new SelectBuilder($grammar);
 
         $relation = Relations::throughManyToMany(
             $relationKey,
@@ -476,7 +476,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
             $throughKey,
             $pdo,
             $fetcher,
-            $builder
+            $queryBuilder
         );
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -494,7 +494,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
         $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($builder, $relationStrategy->getBuilder());
+        $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
     }
 
     public function testPolymorphic()

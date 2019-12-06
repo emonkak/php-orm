@@ -78,8 +78,8 @@ class FetchableTest extends \PHPUnit_Framework_TestCase
                 }
             }));
 
-        $builder = $fetchable->with($relation1, $relation2);
-        $this->assertEquals([$relation1, $relation2], $builder->getRelations());
-        $this->assertEquals($exceptedElements, $builder->getResult($pdo, $fetcher)->toArray());
+        $queryBuilder = $fetchable->with($relation1, $relation2);
+        $this->assertEquals([$relation1, $relation2], $queryBuilder->getRelations());
+        $this->assertEquals($exceptedElements, $queryBuilder->getResult($pdo, $fetcher)->toArray());
     }
 }

@@ -16,20 +16,20 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetGrammar()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new UpdateBuilder($grammar);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $queryBuilder = new UpdateBuilder($grammar);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetters()
     {
-        $builder = $this->getUpdateBuilder()
+        $queryBuilder = $this->getUpdateBuilder()
             ->table('t1')
             ->set('c1', 123)
             ->where('c2', '=', 456);
-        $this->assertSame('UPDATE', $builder->getPrefix());
-        $this->assertSame('t1', $builder->getTable());
-        $this->assertEquals(['c1' => new Sql('?', [123])], $builder->getUpdate());
-        $this->assertQueryIs('(c2 = ?)', [456], $builder->getWhere());
+        $this->assertSame('UPDATE', $queryBuilder->getPrefix());
+        $this->assertSame('t1', $queryBuilder->getTable());
+        $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getUpdate());
+        $this->assertQueryIs('(c2 = ?)', [456], $queryBuilder->getWhere());
     }
 
     public function testPrefix()
@@ -60,10 +60,10 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $queryBuilder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
         $query = $this->getUpdateBuilder()
             ->table('t1')
-            ->set('c1', $builder)
+            ->set('c1', $queryBuilder)
             ->set('c2', 100)
             ->build();
         $this->assertQueryIs(
@@ -85,10 +85,10 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
-        $builder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
+        $queryBuilder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
         $query = $this->getUpdateBuilder()
             ->table('t1')
-            ->setAll(['c1' => $builder, 'c2' => 100])
+            ->setAll(['c1' => $queryBuilder, 'c2' => 100])
             ->build();
         $this->assertQueryIs(
             'UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?',

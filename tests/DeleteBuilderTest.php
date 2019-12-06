@@ -15,18 +15,18 @@ class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetGrammar()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new DeleteBuilder($grammar);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $queryBuilder = new DeleteBuilder($grammar);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetters()
     {
-        $builder = $this->getDeleteBuilder()
+        $queryBuilder = $this->getDeleteBuilder()
             ->from('t1')
             ->where('c1', '=', 123);
-        $this->assertSame('DELETE', $builder->getPrefix());
-        $this->assertSame('t1', $builder->getFrom());
-        $this->assertQueryIs('(c1 = ?)', [123], $builder->getWhere());
+        $this->assertSame('DELETE', $queryBuilder->getPrefix());
+        $this->assertSame('t1', $queryBuilder->getFrom());
+        $this->assertQueryIs('(c1 = ?)', [123], $queryBuilder->getWhere());
     }
 
     public function testPrefix()

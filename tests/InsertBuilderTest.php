@@ -16,37 +16,37 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetGrammar()
     {
         $grammar = $this->createMock(GrammarInterface::class);
-        $builder = new InsertBuilder($grammar);
-        $this->assertSame($grammar, $builder->getGrammar());
+        $queryBuilder = new InsertBuilder($grammar);
+        $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
     public function testGetters()
     {
-        $builder = $this->getInsertBuilder()
+        $queryBuilder = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
             ->values(['foo', 'bar', 'baz']);
-        $this->assertSame('INSERT', $builder->getPrefix());
-        $this->assertSame('t1', $builder->getInto());
-        $this->assertEquals(['c1', 'c2', 'c3'], $builder->getColumns());
+        $this->assertSame('INSERT', $queryBuilder->getPrefix());
+        $this->assertSame('t1', $queryBuilder->getInto());
+        $this->assertEquals(['c1', 'c2', 'c3'], $queryBuilder->getColumns());
         $this->assertEquals([
             [
                 new Sql('?', ['foo']),
                 new Sql('?', ['bar']),
                 new Sql('?', ['baz'])
             ]
-        ], $builder->getValues());
+        ], $queryBuilder->getValues());
 
         $selectQuery = $this->getSelectBuilder()
             ->select('c1')
             ->from('t1')
             ->build();
-        $builder = $this->getInsertBuilder()
+        $queryBuilder = $this->getInsertBuilder()
             ->into('t1', ['c1'])
             ->select($selectQuery);
-        $this->assertSame('INSERT', $builder->getPrefix());
-        $this->assertSame('t1', $builder->getInto());
-        $this->assertEquals(['c1'], $builder->getColumns());
-        $this->assertEquals($selectQuery, $builder->getSelect());
+        $this->assertSame('INSERT', $queryBuilder->getPrefix());
+        $this->assertSame('t1', $queryBuilder->getInto());
+        $this->assertEquals(['c1'], $queryBuilder->getColumns());
+        $this->assertEquals($selectQuery, $queryBuilder->getSelect());
     }
 
     public function testPrefix()

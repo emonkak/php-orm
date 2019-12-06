@@ -130,14 +130,14 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAppendBuilder()
+    public function testAppendQueryBuilder()
     {
         $query = (new Sql('SELECT'))
             ->append('*')
             ->append('FROM')
             ->append('t1')
             ->append('WHERE c1 IN')
-            ->appendBuilder(new Sql('SELECT c1 FROM t2 WHERE c1 = ?', [123]));
+            ->appendQueryBuilder(new Sql('SELECT c1 FROM t2 WHERE c1 = ?', [123]));
         $this->assertQueryIs(
             'SELECT * FROM t1 WHERE c1 IN (SELECT c1 FROM t2 WHERE c1 = ?)',
             [123],
@@ -185,11 +185,11 @@ class SqlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPrependBuilder()
+    public function testPrependQueryBuilder()
     {
         $query = (new Sql('UNION ALL'))
-            ->appendBuilder(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
-            ->prependBuilder(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
+            ->appendQueryBuilder(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
+            ->prependQueryBuilder(new Sql('SELECT * FROM t2 WHERE c1 = ?', [456]));
         $this->assertQueryIs(
             '(SELECT * FROM t2 WHERE c1 = ?) UNION ALL (SELECT * FROM t1 WHERE c1 = ?)',
             [456, 123],
