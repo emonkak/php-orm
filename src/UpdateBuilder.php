@@ -72,7 +72,7 @@ class UpdateBuilder implements QueryBuilderInterface
     /**
      * @return Sql[]
      */
-    public function getUpdate()
+    public function getUpdateBuilder()
     {
         return $this->update;
     }

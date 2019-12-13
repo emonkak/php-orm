@@ -21,7 +21,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testGetSelect()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $queryBuilder = $grammar->getSelect();
+        $queryBuilder = $grammar->getSelectBuilder();
 
         $this->assertInstanceOf(SelectBuilder::class, $queryBuilder);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
@@ -30,7 +30,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testGetInsert()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $queryBuilder = $grammar->getInsert();
+        $queryBuilder = $grammar->getInsertBuilder();
 
         $this->assertInstanceOf(InsertBuilder::class, $queryBuilder);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
@@ -39,7 +39,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testGetUpdate()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $queryBuilder = $grammar->getUpdate();
+        $queryBuilder = $grammar->getUpdateBuilder();
 
         $this->assertInstanceOf(UpdateBuilder::class, $queryBuilder);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
@@ -48,7 +48,7 @@ class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
     public function testGetDelete()
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $queryBuilder = $grammar->getDelete();
+        $queryBuilder = $grammar->getDeleteBuilder();
 
         $this->assertInstanceOf(DeleteBuilder::class, $queryBuilder);
         $this->assertSame($grammar, $queryBuilder->getGrammar());

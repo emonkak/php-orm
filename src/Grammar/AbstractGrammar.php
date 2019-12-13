@@ -14,7 +14,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function getSelect()
+    public function getSelectBuilder()
     {
         return new SelectBuilder($this);
     }
@@ -22,7 +22,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function getInsert()
+    public function getInsertBuilder()
     {
         return new InsertBuilder($this);
     }
@@ -30,7 +30,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function getUpdate()
+    public function getUpdateBuilder()
     {
         return new UpdateBuilder($this);
     }
@@ -38,7 +38,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function getDelete()
+    public function getDeleteBuilder()
     {
         return new DeleteBuilder($this);
     }

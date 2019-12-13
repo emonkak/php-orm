@@ -123,7 +123,7 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @return Sql[]
      */
-    public function getSelect()
+    public function getSelectBuilder()
     {
         return $this->select;
     }

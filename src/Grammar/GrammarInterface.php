@@ -13,22 +13,22 @@ interface GrammarInterface
     /**
      * @return SelectBuilder
      */
-    public function getSelect();
+    public function getSelectBuilder();
 
     /**
      * @return InsertBuilder
      */
-    public function getInsert();
+    public function getInsertBuilder();
 
     /**
      * @return UpdateBuilder
      */
-    public function getUpdate();
+    public function getUpdateBuilder();
 
     /**
      * @return DeleteBuilder
      */
-    public function getDelete();
+    public function getDeleteBuilder();
 
     /**
      * @param mixed $value

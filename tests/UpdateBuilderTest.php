@@ -28,7 +28,7 @@ class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->where('c2', '=', 456);
         $this->assertSame('UPDATE', $queryBuilder->getPrefix());
         $this->assertSame('t1', $queryBuilder->getTable());
-        $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getUpdate());
+        $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getUpdateBuilder());
         $this->assertQueryIs('(c2 = ?)', [456], $queryBuilder->getWhere());
     }
 

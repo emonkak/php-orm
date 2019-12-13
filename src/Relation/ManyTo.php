@@ -272,7 +272,7 @@ class ManyTo implements RelationStrategyInterface
                 $outerKeys
             );
 
-        if (count($queryBuilder->getSelect()) === 0) {
+        if (count($queryBuilder->getSelectBuilder()) === 0) {
             $queryBuilder = $queryBuilder
                 ->select($grammar->identifier($table) . '.*');
         }

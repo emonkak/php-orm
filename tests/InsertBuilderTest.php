@@ -46,7 +46,7 @@ class InsertBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('INSERT', $queryBuilder->getPrefix());
         $this->assertSame('t1', $queryBuilder->getInto());
         $this->assertEquals(['c1'], $queryBuilder->getColumns());
-        $this->assertEquals($selectQuery, $queryBuilder->getSelect());
+        $this->assertEquals($selectQuery, $queryBuilder->getSelectBuilder());
     }
 
     public function testPrefix()

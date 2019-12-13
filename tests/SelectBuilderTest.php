@@ -45,7 +45,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             ->unionWith($unionBuilder);
 
         $this->assertSame('SELECT', $queryBuilder->getPrefix());
-        $this->assertEquals([new Sql('c1')], $queryBuilder->getSelect());
+        $this->assertEquals([new Sql('c1')], $queryBuilder->getSelectBuilder());
         $this->assertEquals([new Sql('t1')], $queryBuilder->getFrom());
         $this->assertEquals([new Sql('JOIN t2 ON t1.id = t2.id', [])], $queryBuilder->getJoin());
         $this->assertQueryIs('(t1.c1 = ?)', [123], $queryBuilder->getWhere());
