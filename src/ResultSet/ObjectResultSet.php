@@ -49,9 +49,12 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function getIterator()
     {
+        // Uses a generator to avoid the enabling of 'strict_types' directive.
         $this->stmt->execute();
         $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
-        return $this->stmt;
+        foreach ($this->stmt as $element) {
+            yield $element;
+        }
     }
 
     /**
