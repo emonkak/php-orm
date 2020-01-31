@@ -343,6 +343,10 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($table, $innerRelationStrategy->getTable());
         $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
         $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
+        $this->assertSame($pdo, $innerRelationStrategy->getPdo());
+        $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
+        $this->assertSame($queryBuilder, $innerRelationStrategy->getQueryBuilder());
+        $this->assertSame($unions, $innerRelationStrategy->getUnions());
     }
 
     public function testPreloadedOneToOne()
