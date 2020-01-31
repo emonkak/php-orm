@@ -9,7 +9,7 @@ final class AccessorCreators
      * @param ?class-string $class
      * @return \Closure
      */
-    public static function toKeySelector($key, $class)
+    public static function createKeySelector($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {
@@ -27,7 +27,7 @@ final class AccessorCreators
      * @param ?class-string $class
      * @return \Closure
      */
-    public static function toPivotKeySelector($key, $class)
+    public static function createPivotKeySelector($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {
@@ -49,7 +49,7 @@ final class AccessorCreators
      * @param ?class-string $class
      * @return \Closure
      */
-    public static function toKeyEraser($key, $class)
+    public static function createKeyEraser($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {
@@ -69,7 +69,7 @@ final class AccessorCreators
      * @param ?class-string $class
      * @return \Closure
      */
-    public static function toKeyAssignee($key, $class)
+    public static function createKeyAssignee($key, $class)
     {
         if ($class !== null) {
             return \Closure::bind(static function($lhs, $rhs) use ($key) {

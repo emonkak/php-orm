@@ -26,7 +26,7 @@ class ThroughGroupJoin implements JoinStrategyInterface
      */
     public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
     {
-        $throughKeySelector = AccessorCreators::toKeySelector($this->throughKey, $inner->getClass());
+        $throughKeySelector = AccessorCreators::createKeySelector($this->throughKey, $inner->getClass());
         return new GroupJoinIterator(
             $outer,
             $inner,

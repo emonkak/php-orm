@@ -14,7 +14,7 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new Entity();
         $entity->setFoo(123);
-        $keySelector = AccessorCreators::toKeySelector('foo', Entity::class);
+        $keySelector = AccessorCreators::createKeySelector('foo', Entity::class);
         $this->assertSame(123, $keySelector($entity));
     }
 
@@ -22,7 +22,7 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new Entity();
         $entity->__pivot_foo = 123;
-        $pivotKeySelector = AccessorCreators::toPivotKeySelector('__pivot_foo', Entity::class);
+        $pivotKeySelector = AccessorCreators::createPivotKeySelector('__pivot_foo', Entity::class);
         $this->assertSame(123, $pivotKeySelector($entity));
         $this->assertFalse(isset($entity->__pivot_foo));
     }
@@ -31,7 +31,7 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new Entity();
         $entity->__foo = 123;
-        $eraser = AccessorCreators::toKeyEraser('__foo', Entity::class);
+        $eraser = AccessorCreators::createKeyEraser('__foo', Entity::class);
         $entity = $eraser($entity);
         $this->assertFalse(isset($entity->_foo));
     }
@@ -39,21 +39,21 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
     public function testToObjectKeyAssignee()
     {
         $entity = new Entity();
-        $keyAssignee = AccessorCreators::toKeyAssignee('foo', Entity::class);
+        $keyAssignee = AccessorCreators::createKeyAssignee('foo', Entity::class);
         $keyAssignee($entity, 123);
         $this->assertSame(123, $entity->getFoo());
     }
 
     public function testToArrayKeySelector()
     {
-        $keySelector = AccessorCreators::toKeySelector('foo', null);
+        $keySelector = AccessorCreators::createKeySelector('foo', null);
         $this->assertSame(123, $keySelector(['foo' => 123]));
     }
 
     public function testToArrayPivotKeySelector()
     {
         $array = ['__pivot_foo' => 123];
-        $pivotKeySelector = AccessorCreators::toPivotKeySelector('__pivot_foo', null);
+        $pivotKeySelector = AccessorCreators::createPivotKeySelector('__pivot_foo', null);
         $this->assertSame(123, $pivotKeySelector($array));
         $this->assertEquals([], $array);
     }
@@ -61,14 +61,14 @@ class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
     public function testToArrayKeyEraser()
     {
         $array = ['__foo' => 123];
-        $eraser = AccessorCreators::toKeyEraser('__foo', null);
+        $eraser = AccessorCreators::createKeyEraser('__foo', null);
         $this->assertEquals([], $eraser($array));
     }
 
     public function testToArrayKeyAssignee()
     {
         $array = [];
-        $keyAssignee = AccessorCreators::toKeyAssignee('foo', null);
+        $keyAssignee = AccessorCreators::createKeyAssignee('foo', null);
         $this->assertEquals(['foo' => 123], $keyAssignee($array, 123));
     }
 }

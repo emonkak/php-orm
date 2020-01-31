@@ -52,8 +52,8 @@ class PolymorphicRelation implements RelationInterface
     public function associate(ResultSetInterface $result)
     {
         $outerClass = $result->getClass();
-        $morphKeySelector = AccessorCreators::toKeySelector($this->morphKey, $outerClass);
-        $sortKeyAssignee = AccessorCreators::toKeyAssignee(self::SORT_KEY, $outerClass);
+        $morphKeySelector = AccessorCreators::createKeySelector($this->morphKey, $outerClass);
+        $sortKeyAssignee = AccessorCreators::createKeyAssignee(self::SORT_KEY, $outerClass);
         $outerElementsByMorphKey = [];
 
         foreach ($result as $index => $element) {
@@ -73,8 +73,8 @@ class PolymorphicRelation implements RelationInterface
             }
         }
 
-        $sortKeySelector = AccessorCreators::toKeySelector(self::SORT_KEY, $outerClass);
-        $sortKeyEraser = AccessorCreators::toKeyEraser(self::SORT_KEY, $outerClass);
+        $sortKeySelector = AccessorCreators::createKeySelector(self::SORT_KEY, $outerClass);
+        $sortKeyEraser = AccessorCreators::createKeyEraser(self::SORT_KEY, $outerClass);
 
         return (new ConcatIterator($outerResults))
             ->orderBy($sortKeySelector)

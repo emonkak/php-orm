@@ -117,7 +117,7 @@ class Preloaded implements RelationStrategyInterface
      */
     public function getOuterKeySelector($outerClass)
     {
-        return AccessorCreators::toKeySelector($this->outerKey, $outerClass);
+        return AccessorCreators::createKeySelector($this->outerKey, $outerClass);
     }
 
     /**
@@ -125,7 +125,7 @@ class Preloaded implements RelationStrategyInterface
      */
     public function getInnerKeySelector($innerClass)
     {
-        return AccessorCreators::toKeySelector($this->innerKey, $innerClass);
+        return AccessorCreators::createKeySelector($this->innerKey, $innerClass);
     }
 
     /**
@@ -133,6 +133,6 @@ class Preloaded implements RelationStrategyInterface
      */
     public function getResultSelector($outerClass, $innerClass)
     {
-        return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
+        return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
     }
 }

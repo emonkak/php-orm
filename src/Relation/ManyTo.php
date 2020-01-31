@@ -214,7 +214,7 @@ class ManyTo implements RelationStrategyInterface
      */
     public function getOuterKeySelector($outerClass)
     {
-        return AccessorCreators::toKeySelector($this->oneToManyOuterKey, $outerClass);
+        return AccessorCreators::createKeySelector($this->oneToManyOuterKey, $outerClass);
     }
 
     /**
@@ -222,7 +222,7 @@ class ManyTo implements RelationStrategyInterface
      */
     public function getInnerKeySelector($innerClass)
     {
-        return AccessorCreators::toPivotKeySelector($this->getPivotKey(), $innerClass);
+        return AccessorCreators::createPivotKeySelector($this->getPivotKey(), $innerClass);
     }
 
     /**
@@ -230,7 +230,7 @@ class ManyTo implements RelationStrategyInterface
      */
     public function getResultSelector($outerClass, $innerClass)
     {
-        return AccessorCreators::toKeyAssignee($this->relationKey, $outerClass);
+        return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
     }
 
     /**
