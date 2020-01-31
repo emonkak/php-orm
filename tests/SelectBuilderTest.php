@@ -126,7 +126,7 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
     public function testSelectAll()
     {
         $query = $this->getSelectBuilder()
-            ->selectAll([
+            ->withSelect([
                 'c1',
                 'c2' => '1',
                 'c3' => new Sql('? + 1', [100]),

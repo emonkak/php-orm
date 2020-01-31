@@ -247,7 +247,7 @@ class SelectBuilder implements QueryBuilderInterface
      * @param array $exprs
      * @return $this
      */
-    public function selectAll(array $exprs)
+    public function withSelect(array $exprs)
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
@@ -543,7 +543,7 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function aggregate(PDOInterface $pdo, $expr)
     {
-        $stmt = $this->selectAll([$expr])->withoutSorting()->prepare($pdo);
+        $stmt = $this->withSelect([$expr])->withoutSorting()->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
