@@ -265,16 +265,23 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @param mixed   $table
      * @param ?string $alias
+     * @param int     $position
      * @return $this
      */
-    public function from($table, $alias = null)
+    public function from($table, $alias = null, $position = -1)
     {
         $table = $this->grammar->lift($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
+        $from = $this->from;
+        if ($position < 0) {
+            $from[] = $table;
+        } else {
+            array_splice($from, $position, 0, [$table]);
+        }
         $cloned = clone $this;
-        $cloned->from[] = $table;
+        $cloned->from = $from;
         return $cloned;
     }
 
@@ -313,20 +320,27 @@ class SelectBuilder implements QueryBuilderInterface
      * @param ?mixed  $condition
      * @param ?string $alias
      * @param string  $type
+     * @param int     $position
      * @return $this
      */
-    public function join($table, $condition = null, $alias = null, $type = 'JOIN')
+    public function join($table, $condition = null, $alias = null, $position = -1, $type = 'JOIN')
     {
         $table = $this->grammar->lift($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
-        $join = $this->join;
         if ($condition !== null) {
             $condition = $this->grammar->lift($condition);
         }
+        $joinedTable = $this->grammar->join($table, $condition, $type);
+        $join = $this->join;
+        if ($position < 0) {
+            $join[] = $joinedTable;
+        } else {
+            array_splice($join, $position, 0, [$joinedTable]);
+        }
         $cloned = clone $this;
-        $cloned->join[] = $this->grammar->join($table, $condition, $type);
+        $cloned->join = $join;
         return $cloned;
     }
 
@@ -334,11 +348,12 @@ class SelectBuilder implements QueryBuilderInterface
      * @param mixed  $table
      * @param mixed  $condition
      * @param string $alias
+     * @param int    $position
      * @return $this
      */
-    public function outerJoin($table, $condition = null, $alias = null)
+    public function outerJoin($table, $condition = null, $alias = null, $position = -1)
     {
-        return $this->join($table, $condition, $alias, 'LEFT OUTER JOIN');
+        return $this->join($table, $condition, $alias, $position, 'LEFT OUTER JOIN');
     }
 
     /**

@@ -251,11 +251,22 @@ class ManyTo implements RelationStrategyInterface
     {
         $grammar = $this->queryBuilder->getGrammar();
 
+        if (count($queryBuilder->getSelectBuilder()) === 0) {
+            $queryBuilder = $queryBuilder
+                ->select($grammar->identifier($table) . '.*');
+        }
+
+        $queryBuilder = $queryBuilder
+            ->select(
+                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
+                $grammar->identifier($this->getPivotKey())
+            );
+
         if (count($queryBuilder->getFrom()) === 0) {
             $queryBuilder = $queryBuilder->from($grammar->identifier($table));
         }
 
-        $queryBuilder = $queryBuilder
+        return $queryBuilder
             ->outerJoin(
                 $grammar->identifier($this->oneToManyTable),
                 sprintf(
@@ -264,23 +275,14 @@ class ManyTo implements RelationStrategyInterface
                     $grammar->identifier($this->manyToOneInnerKey),
                     $grammar->identifier($this->oneToManyTable),
                     $grammar->identifier($this->manyToOneOuterKey)
-                )
+                ),
+                null,
+                0
             )
             ->where(
                 $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
                 'IN',
                 $outerKeys
-            );
-
-        if (count($queryBuilder->getSelectBuilder()) === 0) {
-            $queryBuilder = $queryBuilder
-                ->select($grammar->identifier($table) . '.*');
-        }
-
-        return $queryBuilder
-            ->select(
-                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
-                $grammar->identifier($this->getPivotKey())
             );
     }
 }

@@ -175,6 +175,16 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
             $query
         );
 
+        $query = $this->getSelectBuilder()
+            ->from('t2')
+            ->from('t1', null, 0)
+            ->build();
+        $this->assertQueryIs(
+            'SELECT * FROM t1, t2',
+            [],
+            $query
+        );
+
         $queryBuilder = $this->getSelectBuilder()->from('t1');
         $query = $this->getSelectBuilder()
             ->from($queryBuilder, 'a1')
@@ -201,8 +211,19 @@ class SelectBuilderTest extends \PHPUnit_Framework_TestCase
 
         $query = $this->getSelectBuilder()
             ->from('t1')
+            ->join('t3', 't2.id = t3.id')
+            ->join('t2', 't1.id = t2.id', null, 0)
+            ->build();
+        $this->assertQueryIs(
+            'SELECT * FROM t1 JOIN t2 ON t1.id = t2.id JOIN t3 ON t2.id = t3.id',
+            [],
+            $query
+        );
+
+        $query = $this->getSelectBuilder()
+            ->from('t1')
             ->outerJoin('t2', 't1.id = t2.id')
-            ->join('t3', 't2.id = t3.id', null, 'INNER JOIN')
+            ->join('t3', 't2.id = t3.id', null, -1, 'INNER JOIN')
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.id INNER JOIN t3 ON t2.id = t3.id',
