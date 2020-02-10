@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\ColumnResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class ColumnFetcher implements FetcherInterface
 {
@@ -12,26 +15,17 @@ class ColumnFetcher implements FetcherInterface
      */
     private $columnNumber;
 
-    /**
-     * @param int $columnNumber
-     */
-    public function __construct($columnNumber = 0)
+    public function __construct(int $columnNumber = 0)
     {
         $this->columnNumber = $columnNumber;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function fetch(PDOStatementInterface $stmt)
+    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
     {
         return new ColumnResultSet($stmt, $this->columnNumber);
     }

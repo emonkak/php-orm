@@ -5,6 +5,9 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @template T
+ */
 class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
@@ -15,7 +18,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @var string
+     * @var class-string<T>
      */
     private $class;
 
@@ -25,9 +28,8 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     private $constructorArguments;
 
     /**
-     * @param PDOStatementInterface $stmt
-     * @param class-string          $class
-     * @param ?mixed[]              $constructorArguments
+     * @param class-string<T> $class
+     * @param ?mixed[] $constructorArguments
      */
     public function __construct(PDOStatementInterface $stmt, $class, array $constructorArguments = null)
     {
@@ -36,18 +38,12 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
         $this->constructorArguments = $constructorArguments;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         // Uses a generator to avoid the enabling of 'strict_types' directive.
         $this->stmt->execute();
@@ -57,18 +53,12 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();
@@ -91,9 +81,6 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
         throw new \RuntimeException('Sequence contains no elements.');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {
         $this->stmt->execute();

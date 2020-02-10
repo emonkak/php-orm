@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\Sql;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\InsertBuilder
  */
-class InsertBuilderTest extends \PHPUnit_Framework_TestCase
+class InsertBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

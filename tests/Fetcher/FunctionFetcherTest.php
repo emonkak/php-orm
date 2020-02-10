@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FunctionFetcher;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Tests\Fixtures\Model;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Fetcher\FunctionFetcher
  */
-class FunctionFetcherTest extends \PHPUnit_Framework_TestCase
+class FunctionFetcherTest extends TestCase
 {
     public function testFetch()
     {

@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use PHPUnit\Framework\TestCase;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin
  */
-class LazyGroupJoinTest extends \PHPUnit_Framework_TestCase
+class LazyGroupJoinTest extends TestCase
 {
     public function testJoin()
     {

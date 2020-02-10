@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\ResultSet\RelationResultSet
  */
-class RelationResultSetTest extends \PHPUnit_Framework_TestCase
+class RelationResultSetTest extends TestCase
 {
     private $innerResult;
 

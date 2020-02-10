@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\Grammar\GrammarInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\DeleteBuilder
  */
-class DeleteBuilderTest extends \PHPUnit_Framework_TestCase
+class DeleteBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

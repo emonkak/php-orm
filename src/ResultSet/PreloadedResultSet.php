@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -19,35 +21,26 @@ class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
     private $class;
 
     /**
-     * @param mixed[]       $elements
+     * @param mixed[] $elements
      * @param ?class-string $class
      */
-    public function __construct(array $elements, $class)
+    public function __construct(array $elements, ?string $class)
     {
         $this->elements = $elements;
         $this->class = $class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->elements);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getSource()
+    public function getSource(): iterable
     {
         return $this->elements;
     }

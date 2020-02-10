@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Enumerable\Iterator\ConcatIterator;
@@ -16,40 +18,33 @@ class PolymorphicRelation implements RelationInterface
     private $morphKey;
 
     /**
-     * @var array
+     * @var array<string,RelationInterface> $polymorphics
      */
     private $polymorphics;
 
     /**
-     * @param string $morphKey
-     * @param array  $polymorphics
+     * @param array<string,RelationInterface> $polymorphics
      */
-    public function __construct($morphKey, array $polymorphics)
+    public function __construct(string $morphKey, array $polymorphics)
     {
         $this->morphKey = $morphKey;
         $this->polymorphics = $polymorphics;
     }
 
-    /**
-     * @return string
-     */
-    public function getMorphKey()
+    public function getMorphKey(): string
     {
         return $this->morphKey;
     }
 
     /**
-     * @return array
+     * @return array<string,RelationInterface> $polymorphics
      */
-    public function getPolymorphics()
+    public function getPolymorphics(): array
     {
         return $this->polymorphics;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function associate(ResultSetInterface $result)
+    public function associate(ResultSetInterface $result): \Traversable
     {
         $outerClass = $result->getClass();
         $morphKeySelector = AccessorCreators::createKeySelector($this->morphKey, $outerClass);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 use Emonkak\Orm\Grammar\GrammarInterface;
@@ -42,34 +44,22 @@ class InsertBuilder implements QueryBuilderInterface
      */
     private $select;
 
-    /**
-     * @param GrammarInterface $grammar
-     */
     public function __construct(GrammarInterface $grammar)
     {
         $this->grammar = $grammar;
     }
 
-    /**
-     * @return GrammarInterface
-     */
-    public function getGrammar()
+    public function getGrammar(): GrammarInterface
     {
         return $this->grammar;
     }
 
-    /**
-     * @return string
-     */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getInto()
+    public function getInto(): ?string
     {
         return $this->into;
     }
@@ -77,7 +67,7 @@ class InsertBuilder implements QueryBuilderInterface
     /**
      * @return string[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -85,24 +75,17 @@ class InsertBuilder implements QueryBuilderInterface
     /**
      * @return Sql[][]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }
 
-    /**
-     * @return ?Sql
-     */
-    public function getSelectBuilder()
+    public function getSelectBuilder(): ?Sql
     {
         return $this->select;
     }
 
-    /**
-     * @param mixed $prefix
-     * @return $this
-     */
-    public function prefix($prefix)
+    public function prefix($prefix): self
     {
         $cloned = clone $this;
         $cloned->prefix = $prefix;
@@ -110,11 +93,9 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param string   $table
      * @param string[] $columns
-     * @return $this
      */
-    public function into($table, array $columns)
+    public function into(string $table, array $columns): self
     {
         $cloned = clone $this;
         $cloned->into = $table;
@@ -122,11 +103,7 @@ class InsertBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed[] ...$values
-     * @return $this
-     */
-    public function values(...$values)
+    public function values(...$values): self
     {
         $cloned = clone $this;
         foreach ($values as $row) {
@@ -139,21 +116,14 @@ class InsertBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $query
-     * @return $this
-     */
-    public function select($query)
+    public function select($query): self
     {
         $cloned = clone $this;
         $cloned->select = $this->grammar->lift($query);
         return $cloned;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function build()
+    public function build(): Sql
     {
         return $this->grammar->insertStatement(
             $this->prefix,

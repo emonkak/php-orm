@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class Cached implements RelationStrategyInterface
@@ -28,16 +31,13 @@ class Cached implements RelationStrategyInterface
     private $cacheTtl;
 
     /**
-     * @param RelationStrategyInterface $relationStrategy
-     * @param CacheInterface            $cache
-     * @param callable                  $cacheKeySelector
-     * @param ?int                      $cacheTtl
+     * @param callable(mixed):mixed $cacheKeySelector
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
         CacheInterface $cache,
         callable $cacheKeySelector,
-        $cacheTtl
+        ?int $cacheTtl
     ) {
         $this->relationStrategy = $relationStrategy;
         $this->cache = $cache;
@@ -45,42 +45,30 @@ class Cached implements RelationStrategyInterface
         $this->cacheTtl = $cacheTtl;
     }
 
-    /**
-     * @return RelationStrategyInterface
-     */
-    public function getInnerRelationStrategy()
+    public function getInnerRelationStrategy(): RelationStrategyInterface
     {
         return $this->relationStrategy;
     }
 
-    /**
-     * @return CacheInterface
-     */
-    public function getCache()
+    public function getCache(): CacheInterface
     {
         return $this->cache;
     }
 
     /**
-     * @return callable
+     * @return callable(mixed):mixed
      */
-    public function getCacheKeySelector()
+    public function getCacheKeySelector(): callable
     {
         return $this->cacheKeySelector;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getCacheTtl()
+    public function getCacheTtl(): ?int
     {
         return $this->cacheTtl;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResult(array $outerKeys)
+    public function getResult(array $outerKeys): ResultSetInterface
     {
         $cacheKeyIndexes = [];
         $cacheKeySelector = $this->cacheKeySelector;
@@ -123,26 +111,17 @@ class Cached implements RelationStrategyInterface
         return new PreloadedResultSet($cachedElements, $innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getOuterKeySelector($outerClass)
+    public function getOuterKeySelector(?string $outerClass): callable
     {
         return $this->relationStrategy->getOuterKeySelector($outerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInnerKeySelector($innerClass)
+    public function getInnerKeySelector(?string $innerClass): callable
     {
         return $this->relationStrategy->getInnerKeySelector($innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResultSelector($outerClass, $innerClass)
+    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
     {
         return $this->relationStrategy->getResultSelector($outerClass, $innerClass);
     }

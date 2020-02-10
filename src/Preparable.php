@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
@@ -7,11 +9,7 @@ use Emonkak\Database\PDOStatementInterface;
 
 trait Preparable
 {
-    /**
-     * @param PDOInterface $pdo
-     * @return PDOStatementInterface
-     */
-    public function prepare(PDOInterface $pdo)
+    public function prepare(PDOInterface $pdo): PDOStatementInterface
     {
         $query = $this->build();
 
@@ -44,17 +42,10 @@ trait Preparable
         return $stmt;
     }
 
-    /**
-     * @param PDOInterface $pdo
-     * @return bool
-     */
-    public function execute(PDOInterface $pdo)
+    public function execute(PDOInterface $pdo): bool
     {
         return $this->prepare($pdo)->execute();
     }
 
-    /**
-     * @return Sql
-     */
-    abstract public function build();
+    abstract public function build(): Sql;
 }

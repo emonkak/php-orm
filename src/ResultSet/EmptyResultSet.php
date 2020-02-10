@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -9,22 +11,19 @@ class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
     use EnumerableExtensions;
 
     /**
-     * @var string
+     * @var ?class-string
      */
     private $class;
 
     /**
-     * @param class-string $class
+     * @param ?class-string $class
      */
-    public function __construct($class)
+    public function __construct(?string $class)
     {
         $this->class = $class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }

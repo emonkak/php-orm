@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin
  */
-class ThroughOuterJoinTest extends \PHPUnit_Framework_TestCase
+class ThroughOuterJoinTest extends TestCase
 {
     public function testJoin()
     {

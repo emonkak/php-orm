@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\EmptyResultSet;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\ResultSet\EmptyResultSet
  */
-class EmptyResultSetTest extends \PHPUnit_Framework_TestCase
+class EmptyResultSetTest extends TestCase
 {
     public function testGetClass()
     {

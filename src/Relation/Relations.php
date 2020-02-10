@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
@@ -17,26 +19,18 @@ use Psr\SimpleCache\CacheInterface;
 final class Relations
 {
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @return Relation
      */
     public static function oneToOne(
-        $relationKey,
-        $table,
-        $outerKey,
-        $innerKey,
+        string $relationKey,
+        string $table,
+        string $outerKey,
+        string $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -53,26 +47,18 @@ final class Relations
     }
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @return Relation
      */
     public static function oneToMany(
-        $relationKey,
-        $table,
-        $outerKey,
-        $innerKey,
+        string $relationKey,
+        string $table,
+        string $outerKey,
+        string $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -89,16 +75,7 @@ final class Relations
     }
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param string                      $throughKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @return Relation
      */
     public static function throughOneToOne(
         $relationKey,
@@ -110,7 +87,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -127,16 +104,7 @@ final class Relations
     }
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param string                      $throughKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @return Relation
      */
     public static function throughOneToMany(
         $relationKey,
@@ -148,7 +116,7 @@ final class Relations
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -165,16 +133,7 @@ final class Relations
     }
 
     /**
-     * @param string                        $relationKey
-     * @param string                        $table
-     * @param string                        $outerKey
-     * @param string                        $innerKey
-     * @param PDOInterface                  $pdo
-     * @param FetcherInterface              $fetcher
-     * @param SelectBuilder                 $queryBuilder
-     * @param array<string,SelectBuilder>   $unions
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @return Relation
+     * @param array<string,SelectBuilder> $unions
      */
     public static function lazyOneToOne(
         $relationKey,
@@ -186,7 +145,7 @@ final class Relations
         SelectBuilder $queryBuilder,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -203,16 +162,7 @@ final class Relations
     }
 
     /**
-     * @param string                        $relationKey
-     * @param string                        $table
-     * @param string                        $outerKey
-     * @param string                        $innerKey
-     * @param PDOInterface                  $pdo
-     * @param FetcherInterface              $fetcher
-     * @param SelectBuilder                 $queryBuilder
-     * @param array<string,SelectBuilder>   $unions
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @return Relation
+     * @param array<string,SelectBuilder> $unions
      */
     public static function lazyOneToMany(
         $relationKey,
@@ -224,7 +174,7 @@ final class Relations
         SelectBuilder $queryBuilder,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
-    ) {
+    ): Relation {
         return new Relation(
             new OneTo(
                 $relationKey,
@@ -241,18 +191,7 @@ final class Relations
     }
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @param CacheInterface              $cache
-     * @param callable                    $cacheKeySelector
-     * @param ?int                        $cacheTtl
-     * @return Relation
      */
     public static function cachedOneToOne(
         $relationKey,
@@ -266,7 +205,7 @@ final class Relations
         CacheInterface $cache,
         callable $cacheKeySelector,
         $cacheTtl = null
-    ) {
+    ): Relation {
         return new Relation(
             new Cached(
                 new OneTo(
@@ -288,12 +227,7 @@ final class Relations
     }
 
     /**
-     * @param string  $relationKey
-     * @param string  $outerKey
-     * @param string  $innerKey
-     * @param string  $innerClass
      * @param mixed[] $innerElements
-     * @return Relation
      */
     public static function preloadedOneToOne(
         $relationKey,
@@ -301,7 +235,7 @@ final class Relations
         $innerKey,
         $innerClass,
         array $innerElements
-    ) {
+    ): Relation {
         return new Relation(
             new Preloaded(
                 $relationKey,
@@ -315,12 +249,7 @@ final class Relations
     }
 
     /**
-     * @param string  $relationKey
-     * @param string  $outerKey
-     * @param string  $innerKey
-     * @param string  $innerClass
      * @param mixed[] $innerElements
-     * @return Relation
      */
     public static function preloadedOneToMany(
         $relationKey,
@@ -328,7 +257,7 @@ final class Relations
         $innerKey,
         $innerClass,
         array $innerElements
-    ) {
+    ): Relation {
         return new Relation(
             new Preloaded(
                 $relationKey,
@@ -387,33 +316,22 @@ final class Relations
     }
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $oneToManyTable
-     * @param string                      $oneToManyOuterKey
-     * @param string                      $oneToManyInnerKey
-     * @param string                      $manyToOneTable
-     * @param string                      $manyToOneOuterKey
-     * @param string                      $manyToOneInnerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
-     * @return Relation
      */
     public static function throughManyToMany(
-        $relationKey,
-        $oneToManyTable,
-        $oneToManyOuterKey,
-        $oneToManyInnerKey,
-        $manyToOneTable,
-        $manyToOneOuterKey,
-        $manyToOneInnerKey,
-        $throughKey,
+        string $relationKey,
+        string $oneToManyTable,
+        string $oneToManyOuterKey,
+        string $oneToManyInnerKey,
+        string $manyToOneTable,
+        string $manyToOneOuterKey,
+        string $manyToOneInnerKey,
+        string $throughKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
-    ) {
+    ): Relation {
         return new Relation(
             new ManyTo(
                 $relationKey,
@@ -433,11 +351,10 @@ final class Relations
     }
 
     /**
-     * @param string $morphKey
-     * @param array  $polymorphics
+     * @param array<string,RelationInterface> $polymorphics
      * @return PolymorphicRelation
      */
-    public static function polymorphic($morphKey, array $polymorphics)
+    public static function polymorphic(string $morphKey, array $polymorphics)
     {
         return new PolymorphicRelation($morphKey, $polymorphics);
     }

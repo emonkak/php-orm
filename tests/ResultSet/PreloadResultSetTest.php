@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\ResultSet\PreloadedResultSet
  */
-class PreloadedResultSetTest extends \PHPUnit_Framework_TestCase
+class PreloadedResultSetTest extends TestCase
 {
     public function testGetClass()
     {

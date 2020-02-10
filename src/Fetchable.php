@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
@@ -16,11 +18,7 @@ trait Fetchable
      */
     private $relations = [];
 
-    /**
-     * @param RelationInterface $relations
-     * @return $this
-     */
-    public function with(RelationInterface ...$relations)
+    public function with(RelationInterface ...$relations): self
     {
         $cloned = clone $this;
         foreach ($relations as $relation) {
@@ -32,17 +30,12 @@ trait Fetchable
     /**
      * @return RelationInterface[]
      */
-    public function getRelations()
+    public function getRelations(): array
     {
         return $this->relations;
     }
 
-    /**
-     * @param PDOInterface     $pdo
-     * @param FetcherInterface $fetcher
-     * @return ResultSetInterface
-     */
-    public function getResult(PDOInterface $pdo, FetcherInterface $fetcher)
+    public function getResult(PDOInterface $pdo, FetcherInterface $fetcher): ResultSetInterface
     {
         $stmt = $this->prepare($pdo);
 
@@ -55,9 +48,5 @@ trait Fetchable
         return $result;
     }
 
-    /**
-     * @param PDOInterface $pdo
-     * @return PDOStatementInterface
-     */
-    abstract public function prepare(PDOInterface $pdo);
+    abstract public function prepare(PDOInterface $pdo): PDOStatementInterface;
 }

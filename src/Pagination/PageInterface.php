@@ -1,53 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableInterface;
 
 interface PageInterface extends EnumerableInterface
 {
-    /**
-     * @return PaginatorInterface
-     */
-    public function getPaginator();
+    public function getPaginator(): PaginatorInterface;
 
-    /**
-     * @return int
-     */
-    public function getIndex();
+    public function getIndex(): int;
 
-    /**
-     * @return int
-     */
-    public function getOffset();
+    public function getOffset(): int;
 
-    /**
-     * @return PageInterface
-     */
-    public function previous();
+    public function previous(): PageInterface;
 
-    /**
-     * @return PageInterface
-     */
-    public function next();
+    public function next(): PageInterface;
 
-    /**
-     * @return bool
-     */
-    public function hasPrevious();
+    public function hasPrevious(): bool;
 
-    /**
-     * @return bool
-     */
-    public function hasNext();
+    public function hasNext(): bool;
 
-    /**
-     * @return bool
-     */
-    public function isFirst();
+    public function isFirst(): bool;
 
-    /**
-     * @return bool
-     */
-    public function isLast();
+    public function isLast(): bool;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Database\PDOInterface;
@@ -25,11 +27,12 @@ use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Relation\Relations
  */
-class RelationsTest extends \PHPUnit_Framework_TestCase
+class RelationsTest extends TestCase
 {
     public function testOneToOne()
     {

@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\Enumerable;
 use Emonkak\Enumerable\EnumerableExtensions;
+use Emonkak\Enumerable\EnumerableInterface;
 
-/**
- * @template T
- */
 class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterface
 {
     use EnumerableExtensions;
@@ -23,28 +23,27 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     private $perPage;
 
     /**
-     * @var callable(int,int):T[]
+     * @var callable
      */
     private $itemsFetcher;
 
     /**
-     * @var T[]
+     * @var mixed[]
      */
     private $items;
 
     /**
-     * @var T[]
+     * @var mixed[]
      */
     private $extraItems;
 
     /**
-     * @template T
-     * @param int                   $index
-     * @param int                   $perPage
-     * @param callable(int,int):T[] $itemsFetcher
-     * @return SequentialPageIterator<T>
+     * @param int $index
+     * @param int $perPage
+     * @param callable $itemsFetcher
+     * @return self
      */
-    public static function from($index, $perPage, callable $itemsFetcher)
+    public static function from(int $index, int $perPage, callable $itemsFetcher): self
     {
         $items = $itemsFetcher($index * $perPage, $perPage + 1);
         $extraItems = array_splice($items, $perPage);
@@ -52,13 +51,13 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * @param int                   $index
-     * @param int                   $perPage
-     * @param callable(int,int):T[] $itemsFetcher
-     * @param T[]                   $items
-     * @param T[]                   $extraItems
+     * @param int $index
+     * @param int $perPage
+     * @param callable $itemsFetcher
+     * @param mixed[] $items
+     * @param mixed[] $extraItems
      */
-    private function __construct($index, $perPage, callable $itemsFetcher, array $items, array $extraItems)
+    private function __construct(int $index, int $perPage, callable $itemsFetcher, array $items, array $extraItems)
     {
         $this->index = $index;
         $this->perPage = $perPage;
@@ -67,50 +66,35 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
         $this->extraItems = $extraItems;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->items);
     }
 
-    /**
-     * @return int
-     */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
 
-    /**
-     * @return int
-     */
-    public function getOffset()
+    public function getOffset(): int
     {
         return $this->index * $this->perPage;
     }
 
     /**
-     * @return T[]
+     * @return mixed[]
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function next()
+    public function next(): PageIteratorInterface
     {
         $nextIndex = $this->index + 1;
         $perPage = $this->perPage;
@@ -122,18 +106,12 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
         return new self($nextIndex, $perPage, $itemsFetcher, $nextItems, $nextExtraItems);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasNext()
+    public function hasNext(): bool
     {
         return count($this->extraItems) > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function iterate()
+    public function iterate(): EnumerableInterface
     {
         return Enumerable::defer(function() {
             $page = $this;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
@@ -10,11 +12,12 @@ use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\Tests\Fixtures\IterableResultSetInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Fetchable
  */
-class FetchableTest extends \PHPUnit_Framework_TestCase
+class FetchableTest extends TestCase
 {
     public function testGetResult()
     {

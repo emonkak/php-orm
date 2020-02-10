@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\PolymorphicRelation;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Relation\PolymorphicRelation
  */
-class PolymorphicRelationTest extends \PHPUnit_Framework_TestCase
+class PolymorphicRelationTest extends TestCase
 {
     public function testConstructor()
     {

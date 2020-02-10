@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 class PrecountPaginator extends AbstractPaginator
 {
     /**
-     * @var callable
+     * @var callable(int,int):\Traversable
      */
     private $itemsFetcher;
 
@@ -21,20 +23,17 @@ class PrecountPaginator extends AbstractPaginator
 
     /**
      * @param callable(int,int):\Traversable $itemsFetcher
-     * @param int                            $perPage
-     * @param int                            $totalItems
+     * @param int $perPage
+     * @param int $totalItems
      */
-    public function __construct(callable $itemsFetcher, $perPage, $totalItems)
+    public function __construct(callable $itemsFetcher, int $perPage, int $totalItems)
     {
         $this->itemsFetcher = $itemsFetcher;
         $this->perPage = $perPage;
         $this->totalItems = $totalItems;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function at($index)
+    public function at(int $index): PageInterface
     {
         if ($index >= 0 && $index < $this->getTotalPages()) {
             $itemsFetcher = $this->itemsFetcher;
@@ -46,18 +45,12 @@ class PrecountPaginator extends AbstractPaginator
         return new Page($items, $index, $this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalItems()
+    public function getTotalItems(): int
     {
         return $this->totalItems;
     }

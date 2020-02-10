@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\Iterator\SelectIterator;
@@ -14,18 +16,12 @@ class LazyOuterJoin implements JoinStrategyInterface
      */
     private $proxyFactory;
 
-    /**
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     */
     public function __construct(LazyLoadingValueHolderFactory $proxyFactory)
     {
         $this->proxyFactory = $proxyFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
+    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector): \Traversable
     {
         $proxyFactory = $this->proxyFactory;
         $cachedElements = null;

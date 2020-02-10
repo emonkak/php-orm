@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\SequentialPageIterator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Pagination\SequentialPageIterator
  */
-class SequentialPageIteratorTest extends \PHPUnit_Framework_TestCase
+class SequentialPageIteratorTest extends TestCase
 {
     public function testFrom()
     {

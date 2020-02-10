@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 class Sql implements QueryBuilderInterface
@@ -20,12 +22,8 @@ class Sql implements QueryBuilderInterface
 
     /**
      * @suppress PhanTypeExpectedObjectPropAccess
-     *
-     * @param string $format
-     * @param Sql[]  ...$sqls
-     * @return Sql
      */
-    public static function format($format, ...$sqls)
+    public static function format(string $format, Sql ...$sqls): self
     {
         $tmpSqls = [];
         $tmpBindings = [];
@@ -42,11 +40,9 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param string $separator
-     * @param Sql[]  $queries
-     * @return Sql
+     * @param Sql[] $queries
      */
-    public static function join($separator, array $queries)
+    public static function join(string $separator, array $queries): self
     {
         $tmpSqls = [];
         $tmpBindings = [];
@@ -62,32 +58,19 @@ class Sql implements QueryBuilderInterface
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public static function value($value)
+    public static function value($value): self
     {
         return new Sql('?', [$value]);
     }
 
-    /**
-     * @param mixed[] $values
-     * @return Sql
-     */
-    public static function values(array $values)
+    public static function values(array $values): self
     {
         $placeholders = array_fill(0, count($values), '?');
         $sql = '(' . implode(', ', $placeholders) . ')';
         return new Sql($sql, $values);
     }
 
-    /**
-     * @param Sql $lhs
-     * @param Sql ...$rest
-     * @return Sql
-     */
-    public static function _and(Sql $lhs, Sql ...$rest)
+    public static function _and(Sql $lhs, Sql ...$rest): self
     {
         $tmpSql = $lhs->sql;
         $tmpBindings = [$lhs->bindings];
@@ -102,12 +85,7 @@ class Sql implements QueryBuilderInterface
         return new Sql($tmpSql, $bindings);
     }
 
-    /**
-     * @param Sql $lhs
-     * @param Sql ...$rest
-     * @return Sql
-     */
-    public static function _or(Sql $lhs, Sql ...$rest)
+    public static function _or(Sql $lhs, Sql ...$rest): self
     {
         $tmpSql = $lhs->sql;
         $tmpBindings = [$lhs->bindings];
@@ -122,20 +100,13 @@ class Sql implements QueryBuilderInterface
         return new Sql($tmpSql, $bindings);
     }
 
-    /**
-     * @param string  $sql
-     * @param mixed[] $bindings
-     */
-    public function __construct($sql, array $bindings = [])
+    public function __construct(string $sql, array $bindings = [])
     {
         $this->sql = $sql;
         $this->bindings = $bindings;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         $format = str_replace(['%', '?'], ['%%', '%s'], $this->sql);
         $args = array_map(function($binding) {
@@ -158,10 +129,7 @@ class Sql implements QueryBuilderInterface
         return vsprintf($format, $args);
     }
 
-    /**
-     * @return string
-     */
-    public function getSql()
+    public function getSql(): string
     {
         return $this->sql;
     }
@@ -169,18 +137,12 @@ class Sql implements QueryBuilderInterface
     /**
      * @return mixed[]
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->bindings;
     }
 
-    /**
-     * @param string  $sql
-     * @param mixed[] $bindings
-     * @param string  $separator
-     * @return Sql
-     */
-    public function append($sql, array $bindings = [], $separator = ' ')
+    public function append(string $sql, array $bindings = [], string $separator = ' '): self
     {
         return new Sql(
             $this->sql . $separator . $sql,
@@ -188,33 +150,21 @@ class Sql implements QueryBuilderInterface
         );
     }
 
-    /**
-     * @param Sql    $query
-     * @param string $separator
-     * @return Sql
-     */
-    public function appendQuery(Sql $query, $separator = ' ')
+    public function appendQuery(Sql $query, string $separator = ' '): self
     {
         return $this->append($query->sql, $query->bindings, $separator);
     }
 
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string                $separator
-     * @return Sql
-     */
-    public function appendQueryBuilder(QueryBuilderInterface $queryBuilder, $separator = ' ')
+    public function appendQueryBuilder(QueryBuilderInterface $queryBuilder, string $separator = ' '): self
     {
         $query = $queryBuilder->build();
         return $this->append('(' . $query->sql . ')', $query->bindings, $separator);
     }
 
     /**
-     * @param string  $sql
      * @param mixed[] $bindings
-     * @param string  $separator
      */
-    public function prepend($sql, array $bindings = [], $separator = ' ')
+    public function prepend(string $sql, array $bindings = [], string $separator = ' '): self
     {
         return new Sql(
             $sql . $separator . $this->sql,
@@ -222,31 +172,18 @@ class Sql implements QueryBuilderInterface
         );
     }
 
-    /**
-     * @param Sql    $query
-     * @param string $separator
-     * @return Sql
-     */
-    public function prependQuery(Sql $query, $separator = ' ')
+    public function prependQuery(Sql $query, string $separator = ' '): self
     {
         return $this->prepend($query->sql, $query->bindings, $separator);
     }
 
-    /**
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string                $separator
-     * @return Sql
-     */
-    public function prependQueryBuilder(QueryBuilderInterface $queryBuilder, $separator = ' ')
+    public function prependQueryBuilder(QueryBuilderInterface $queryBuilder, string $separator = ' '): self
     {
         $query = $queryBuilder->build();
         return $this->prepend('(' . $query->sql . ')', $query->bindings, $separator);
     }
 
-    /**
-     * @return Sql
-     */
-    public function enclosed()
+    public function enclosed(): self
     {
         return new Sql(
             '(' . $this->sql . ')',
@@ -254,10 +191,7 @@ class Sql implements QueryBuilderInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function build()
+    public function build(): self
     {
         return $this;
     }

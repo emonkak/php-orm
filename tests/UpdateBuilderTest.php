@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\UpdateBuilder
  */
-class UpdateBuilderTest extends \PHPUnit_Framework_TestCase
+class UpdateBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

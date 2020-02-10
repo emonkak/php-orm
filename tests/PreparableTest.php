@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Preparable;
 use Emonkak\Orm\Sql;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Preparable
  */
-class PreparableTest extends \PHPUnit_Framework_TestCase
+class PreparableTest extends TestCase
 {
     public function testPrepare()
     {

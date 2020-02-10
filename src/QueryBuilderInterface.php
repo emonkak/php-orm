@@ -1,11 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 interface QueryBuilderInterface
 {
-    /**
-     * @return Sql
-     */
-    public function build();
+    public function build(): Sql;
 }

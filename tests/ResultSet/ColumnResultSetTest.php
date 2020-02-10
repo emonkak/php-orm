@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\ColumnResultSet;
 use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\ResultSet\ColumnResultSet
  */
-class ColumnResultSetTest extends \PHPUnit_Framework_TestCase
+class ColumnResultSetTest extends TestCase
 {
     private $stmt;
 

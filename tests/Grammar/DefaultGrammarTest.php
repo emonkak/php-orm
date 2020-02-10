@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Grammar;
 
 use Emonkak\Orm\Grammar\DefaultGrammar;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Grammar\DefaultGrammar
  */
-class DefaultGrammarTest extends \PHPUnit_Framework_TestCase
+class DefaultGrammarTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

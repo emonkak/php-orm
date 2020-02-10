@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\FunctionResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class FunctionFetcher implements FetcherInterface
 {
     /**
-     * @var callable
+     * @var callable(array):mixed
      */
     private $instantiator;
 
@@ -21,7 +24,7 @@ class FunctionFetcher implements FetcherInterface
      * @param class-string $class
      * @return self
      */
-    public static function ofConstructor($class)
+    public static function ofConstructor(string $class): self
     {
         $instantiator = \Closure::bind(
             static function($props) use ($class) {
@@ -34,27 +37,21 @@ class FunctionFetcher implements FetcherInterface
     }
 
     /**
-     * @param callable     $instantiator
+     * @param callable(array):mixed $instantiator
      * @param class-string $class
      */
-    public function __construct(callable $instantiator, $class)
+    public function __construct(callable $instantiator, string $class)
     {
         $this->instantiator = $instantiator;
         $this->class = $class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function fetch(PDOStatementInterface $stmt)
+    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
     {
         return new FunctionResultSet($stmt, $this->instantiator, $this->class);
     }
