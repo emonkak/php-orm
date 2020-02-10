@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 class Preloaded implements RelationStrategyInterface
 {
@@ -22,7 +25,7 @@ class Preloaded implements RelationStrategyInterface
     private $innerKey;
 
     /**
-     * @var string
+     * @var class-string
      */
     private $innerClass;
 
@@ -32,17 +35,14 @@ class Preloaded implements RelationStrategyInterface
     private $innerElements;
 
     /**
-     * @param string  $relationKey
-     * @param string  $outerKey
-     * @param string  $innerKey
-     * @param string  $innerClass
+     * @param class-string $innerClass
      * @param mixed[] $innerElements
      */
     public function __construct(
-        $relationKey,
-        $outerKey,
-        $innerKey,
-        $innerClass,
+        string $relationKey,
+        string $outerKey,
+        string $innerKey,
+        string $innerClass,
         array $innerElements
     ) {
         $this->relationKey = $relationKey;
@@ -52,50 +52,35 @@ class Preloaded implements RelationStrategyInterface
         $this->innerElements = $innerElements;
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationKey()
+    public function getRelationKey(): string
     {
         return $this->relationKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getOuterKey()
+    public function getOuterKey(): string
     {
         return $this->outerKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getInnerKey()
+    public function getInnerKey(): string
     {
         return $this->innerKey;
     }
 
     /**
-     * @return string
+     * @return class-string
      */
-    public function getInnerClass()
+    public function getInnerClass(): string
     {
         return $this->innerClass;
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getInnerElements()
+    public function getInnerElements(): array
     {
         return $this->innerElements;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResult(array $outerKeys)
+    public function getResult(array $outerKeys): ResultSetInterface
     {
         $innerKeySelector = $this->getInnerKeySelector($this->innerClass);
         $outerKeySet = array_flip($outerKeys);
@@ -112,26 +97,17 @@ class Preloaded implements RelationStrategyInterface
         return new PreloadedResultSet($filteredElements, $this->innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getOuterKeySelector($outerClass)
+    public function getOuterKeySelector(?string $outerClass): callable
     {
         return AccessorCreators::createKeySelector($this->outerKey, $outerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInnerKeySelector($innerClass)
+    public function getInnerKeySelector(?string $innerClass): callable
     {
         return AccessorCreators::createKeySelector($this->innerKey, $innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResultSelector($outerClass, $innerClass)
+    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
     {
         return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
     }

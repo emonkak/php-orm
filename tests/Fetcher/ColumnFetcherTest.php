@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\ColumnFetcher;
 use Emonkak\Orm\ResultSet\ColumnResultSet;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Fetcher\ColumnFetcher
  */
-class ColumnFetcherTest extends \PHPUnit_Framework_TestCase
+class ColumnFetcherTest extends TestCase
 {
     public function testFetch()
     {

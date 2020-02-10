@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -8,10 +10,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
 {
     use EnumerableExtensions;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         for ($i = 0, $l = $this->getTotalPages(); $i < $l; $i++) {
             foreach ($this->at($i) as $item) {
@@ -20,35 +19,23 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function has($index)
+    public function has(int $index): bool
     {
         return 0 <= $index && $index < $this->getTotalPages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function firstPage()
+    public function firstPage(): PageInterface
     {
         return $this->at(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function lastPage()
+    public function lastPage(): PageInterface
     {
         $totalPages = $this->getTotalPages();
         return $this->at($totalPages > 0 ? $totalPages - 1 : 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalPages()
+    public function getTotalPages(): int
     {
         return (int) ceil($this->getTotalItems() / $this->getPerPage());
     }

@@ -14,44 +14,29 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
      */
     private $stmt;
 
-    /**
-     * @param PDOStatementInterface $stmt
-     */
     public function __construct(PDOStatementInterface $stmt)
     {
         $this->stmt = $stmt;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->stmt->execute();
         $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
         return $this->stmt;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();
@@ -73,9 +58,6 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         throw new \RuntimeException('Sequence contains no elements.');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {
         $this->stmt->execute();

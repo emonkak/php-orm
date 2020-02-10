@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
@@ -10,11 +12,7 @@ interface FetcherInterface
     /**
      * @return ?class-string
      */
-    public function getClass();
+    public function getClass(): ?string;
 
-    /**
-     * @param PDOStatementInterface $stmt
-     * @return ResultSetInterface
-     */
-    public function fetch(PDOStatementInterface $stmt);
+    public function fetch(PDOStatementInterface $stmt): ResultSetInterface;
 }

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\Page;
 use Emonkak\Orm\Pagination\PaginatorInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Pagination\Page
  */
-class PageTest extends \PHPUnit_Framework_TestCase
+class PageTest extends TestCase
 {
     public function testConstructor()
     {

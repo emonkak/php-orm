@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\AccessorCreators;
 use Emonkak\Orm\Tests\Fixtures\Entity;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @cover Emonkak\Orm\Relation\AccessorCreators
  */
-class AccessorCreatorsTest extends \PHPUnit_Framework_TestCase
+class AccessorCreatorsTest extends TestCase
 {
     public function testToObjectKeySelector()
     {

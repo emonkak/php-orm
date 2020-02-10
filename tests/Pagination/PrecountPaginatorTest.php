@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\CountablePage;
 use Emonkak\Orm\Pagination\PrecountPaginator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Pagination\PrecountPaginator
  */
-class PrecountPaginatorTest extends \PHPUnit_Framework_TestCase
+class PrecountPaginatorTest extends TestCase
 {
     public function testAt()
     {

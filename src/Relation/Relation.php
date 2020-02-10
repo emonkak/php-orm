@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
@@ -25,9 +27,7 @@ class Relation implements RelationInterface
     private $childlen;
 
     /**
-     * @param RelationStrategyInterface $relationStrategy
-     * @param JoinStrategyInterface     $joinStrategy
-     * @param RelationInterface[]       $childlen
+     * @param RelationInterface[] $childlen
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
@@ -39,18 +39,12 @@ class Relation implements RelationInterface
         $this->childlen = $childlen;
     }
 
-    /**
-     * @return RelationStrategyInterface
-     */
-    public function getRelationStrategy()
+    public function getRelationStrategy(): RelationStrategyInterface
     {
         return $this->relationStrategy;
     }
 
-    /**
-     * @return JoinStrategyInterface
-     */
-    public function getJoinStrategy()
+    public function getJoinStrategy(): JoinStrategyInterface
     {
         return $this->joinStrategy;
     }
@@ -58,16 +52,12 @@ class Relation implements RelationInterface
     /**
      * @return RelationInterface[]
      */
-    public function getChildRelations()
+    public function getChildRelations(): array
     {
         return $this->childlen;
     }
 
-    /**
-     * @param RelationInterface $relation
-     * @return Relation
-     */
-    public function with(RelationInterface $relation)
+    public function with(RelationInterface $relation): self
     {
         $childlen = $this->childlen;
         $childlen[] = $relation;
@@ -78,10 +68,7 @@ class Relation implements RelationInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function associate(ResultSetInterface $result)
+    public function associate(ResultSetInterface $result): \Traversable
     {
         $outerClass = $result->getClass();
         $outerKeySelector = $this->relationStrategy->getOuterKeySelector($outerClass);

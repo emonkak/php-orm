@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -16,63 +18,42 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * @param int $perPage
      */
-    public function __construct($perPage)
+    public function __construct(int $perPage)
     {
         $this->perPage = $perPage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function at($index)
+    public function at(int $index): PageInterface
     {
         return new Page(new \EmptyIterator(), $index, $this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function has($index)
+    public function has(int $index): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function firstPage()
+    public function firstPage(): PageInterface
     {
         return $this->at(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function lastPage()
+    public function lastPage(): PageInterface
     {
         return $this->at(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalItems()
+    public function getTotalItems(): int
     {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalPages()
+    public function getTotalPages(): int
     {
         return 0;
     }

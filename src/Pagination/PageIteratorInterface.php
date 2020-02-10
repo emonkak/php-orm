@@ -1,31 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableInterface;
 
-/**
- * @template T
- */
 interface PageIteratorInterface extends EnumerableInterface
 {
-    /**
-     * @return int
-     */
-    public function getPerPage();
+    public function getPerPage(): int;
 
-    /**
-     * @return self<T>
-     */
-    public function next();
+    public function next(): PageIteratorInterface;
 
-    /**
-     * @return bool
-     */
-    public function hasNext();
+    public function hasNext(): bool;
 
-    /**
-     * @return EnumerableInterface
-     */
-    public function iterate();
+    public function iterate(): EnumerableInterface;
 }

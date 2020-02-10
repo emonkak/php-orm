@@ -5,6 +5,9 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @template T
+ */
 class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
@@ -15,39 +18,32 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @var callable
+     * @var callable(array):T
      */
     private $instantiator;
 
     /**
-     * @var string
+     * @var class-string<T>
      */
     private $class;
 
     /**
-     * @param PDOStatementInterface $stmt
-     * @param callable              $instantiator
-     * @param class-string          $class
+     * @param callable(array):T $instantiator
+     * @param class-string<T> $class
      */
-    public function __construct(PDOStatementInterface $stmt, callable $instantiator, $class)
+    public function __construct(PDOStatementInterface $stmt, callable $instantiator, string $class)
     {
         $this->stmt = $stmt;
         $this->instantiator = $instantiator;
         $this->class = $class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->stmt->execute();
         $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
@@ -57,10 +53,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $this->stmt->execute();
         $instantiator = $this->instantiator;
@@ -68,9 +61,6 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         return array_map($instantiator, $rows);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();

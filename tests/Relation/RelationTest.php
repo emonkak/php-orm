@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Database\PDOInterface;
@@ -17,11 +19,12 @@ use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Relation\Relation
  */
-class RelationTest extends \PHPUnit_Framework_TestCase
+class RelationTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

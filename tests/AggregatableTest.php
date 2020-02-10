@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Aggregatable;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Aggregatable
  */
-class AggregatableTest extends \PHPUnit_Framework_TestCase
+class AggregatableTest extends TestCase
 {
     public function testAvg()
     {

@@ -1,24 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 use Emonkak\Database\PDOInterface;
 
 trait Explainable
 {
-    /**
-     * @param PDOInterface $pdo
-     * @return array
-     */
-    public function explain(PDOInterface $pdo)
+    public function explain(PDOInterface $pdo): array
     {
         $stmt = $this->build()->prepend('EXPLAIN')->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * @return Sql
-     */
-    abstract public function build();
+    abstract public function build(): Sql;
 }

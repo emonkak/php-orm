@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -33,7 +35,7 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     /**
      * {@inheritDoc}
      */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->result->getClass();
     }

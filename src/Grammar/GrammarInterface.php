@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\DeleteBuilder;
@@ -10,154 +12,56 @@ use Emonkak\Orm\UpdateBuilder;
 
 interface GrammarInterface
 {
-    /**
-     * @return SelectBuilder
-     */
-    public function getSelectBuilder();
+    public function getSelectBuilder(): SelectBuilder;
+
+    public function getInsertBuilder(): InsertBuilder;
+
+    public function getUpdateBuilder(): UpdateBuilder;
+
+    public function getDeleteBuilder(): DeleteBuilder;
+
+    public function lift($value): Sql;
+
+    public function literal($value): Sql;
+
+    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql;
+
+    public function operator(string $operator, Sql $lhs, Sql $rhs): Sql;
+
+    public function betweenOperator(string $operator, Sql $lhs, Sql $start, Sql $end): Sql;
+
+    public function unaryOperator(string $operator, Sql $rhs): Sql;
+
+    public function join(Sql $table, ?Sql $condition, string $type): Sql;
+
+    public function window(string $name, Sql $specification): Sql;
+
+    public function ordering(Sql $expr, string $ordering): sql;
+
+    public function union(Sql $query, string $type): Sql;
+
+    public function alias(Sql $value, string $alias): Sql;
+
+    public function identifier(string $string): string;
 
     /**
-     * @return InsertBuilder
-     */
-    public function getInsertBuilder();
-
-    /**
-     * @return UpdateBuilder
-     */
-    public function getUpdateBuilder();
-
-    /**
-     * @return DeleteBuilder
-     */
-    public function getDeleteBuilder();
-
-    /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public function lift($value);
-
-    /**
-     * @param mixed $value
-     * @return Sql
-     */
-    public function literal($value);
-
-    /**
-     * @param mixed $arg1
-     * @param ?mixed $arg2
-     * @param ?mixed $arg3
-     * @param ?mixed $arg4
-     * @return Sql
-     */
-    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null);
-
-    /**
-     * @param string $operator
-     * @param Sql    $lhs
-     * @param Sql    $rhs
-     * @return Sql
-     */
-    public function operator($operator, Sql $lhs, Sql $rhs);
-
-    /**
-     * @param string $operator
-     * @param Sql    $lhs
-     * @param Sql    $start
-     * @param Sql    $end
-     * @return Sql
-     */
-    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end);
-
-    /**
-     * @param string $operator
-     * @param Sql    $rhs
-     * @return Sql
-     */
-    public function unaryOperator($operator, Sql $rhs);
-
-    /**
-     * @param Sql    $table
-     * @param ?Sql   $condition
-     * @param string $type
-     */
-    public function join(Sql $table, Sql $condition = null, $type);
-
-    /**
-     * @param string $name
-     * @param Sql    $specification
-     * @return Sql
-     */
-    public function window($name, Sql $specification);
-
-    /**
-     * @param Sql    $expr
-     * @param string $ordering
-     * @return Sql
-     */
-    public function ordering(Sql $expr, $ordering);
-
-    /**
-     * @param Sql    $query
-     * @param string $type
-     * @return Sql
-     */
-    public function union(Sql $query, $type);
-
-    /**
-     * @param Sql    $value
-     * @param string $alias
-     * @return Sql
-     */
-    public function alias(Sql $value, $alias);
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    public function identifier($string);
-
-    /**
-     * @param string $prefix
      * @param Sql[]  $select
      * @param Sql[]  $from
      * @param Sql[]  $join
-     * @param ?Sql   $where
      * @param Sql[]  $groupBy
-     * @param ?Sql   $having
      * @param Sql[]  $window
      * @param Sql[]  $orderBy
-     * @param int    $limit
-     * @param int    $offset
-     * @param string $suffix
      * @param Sql[]  $union
-     * @return Sql
      */
-    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union);
+    public function selectStatement(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, ?string $suffix, array $union): Sql;
 
     /**
-     * @param string   $prefix
-     * @param string   $table
      * @param string[] $columns
-     * @param Sql[][]  $values
-     * @param ?Sql     $select
-     * @return Sql
+     * @param Sql[][] $values
      */
-    public function insertStatement($prefix, $table, array $columns, array $values, Sql $select = null);
+    public function insertStatement(string $prefix, string $table, array $columns, array $values, Sql $select): Sql;
 
-    /**
-     * @param string $prefix
-     * @param string $table
-     * @param Sql[]  $update
-     * @param ?Sql   $where
-     * @return Sql
-     */
-    public function updateStatement($prefix, $table, array $update, Sql $where = null);
+    public function updateStatement(string $prefix, string $table, array $update, ?Sql $where): Sql;
 
-    /**
-     * @param string $prefix
-     * @param string $from
-     * @param ?Sql   $where
-     * @return Sql
-     */
-    public function deleteStatement($prefix, $from, Sql $where = null);
+    public function deleteStatement(string $prefix, string $from, ?Sql $where): Sql;
 }

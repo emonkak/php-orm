@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests\ResultSet;
 
 use Emonkak\Orm\ResultSet\FunctionResultSet;
 use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
 use Emonkak\Orm\Tests\Fixtures\Model;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\ResultSet\FunctionResultSet
  */
-class FunctionResultSetTest extends \PHPUnit_Framework_TestCase
+class FunctionResultSetTest extends TestCase
 {
     private $stmt;
 

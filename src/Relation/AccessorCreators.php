@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 final class AccessorCreators
 {
     /**
-     * @param string        $key
      * @param ?class-string $class
-     * @return \Closure
+     * @return callable(mixed):mixed
      */
-    public static function createKeySelector($key, $class)
+    public static function createKeySelector(string $key, ?string $class): callable
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {
@@ -23,11 +24,10 @@ final class AccessorCreators
     }
 
     /**
-     * @param string        $key
      * @param ?class-string $class
-     * @return \Closure
+     * @return callable(mixed):mixed|callable(mixed&):mixed
      */
-    public static function createPivotKeySelector($key, $class)
+    public static function createPivotKeySelector(string $key, ?string $class): callable
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {
@@ -45,11 +45,10 @@ final class AccessorCreators
     }
 
     /**
-     * @param string        $key
      * @param ?class-string $class
-     * @return \Closure
+     * @return callable(mixed):mixed
      */
-    public static function createKeyEraser($key, $class)
+    public static function createKeyEraser(string $key, ?string $class): callable
     {
         if ($class !== null) {
             return \Closure::bind(static function($obj) use ($key) {

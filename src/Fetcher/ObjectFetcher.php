@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Fetcher;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\ObjectResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template T
+ */
 class ObjectFetcher implements FetcherInterface
 {
     /**
-     * @var string
+     * @var class-string<T>
      */
     private $class;
 
@@ -18,8 +24,7 @@ class ObjectFetcher implements FetcherInterface
     private $constructorArguments;
 
     /**
-     * @param class-string $class
-     * @param ?mixed[]     $constructorArguments
+     * @param class-string<T> $class
      */
     public function __construct($class, array $constructorArguments = null)
     {
@@ -27,18 +32,12 @@ class ObjectFetcher implements FetcherInterface
         $this->constructorArguments = $constructorArguments;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function fetch(PDOStatementInterface $stmt)
+    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
     {
         return new ObjectResultSet($stmt, $this->class, $this->constructorArguments);
     }

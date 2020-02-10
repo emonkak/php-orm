@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\DeleteBuilder;
@@ -11,42 +13,27 @@ use Emonkak\Orm\UpdateBuilder;
 
 abstract class AbstractGrammar implements GrammarInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getSelectBuilder()
+    public function getSelectBuilder(): SelectBuilder
     {
         return new SelectBuilder($this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInsertBuilder()
+    public function getInsertBuilder(): InsertBuilder
     {
         return new InsertBuilder($this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getUpdateBuilder()
+    public function getUpdateBuilder(): UpdateBuilder
     {
         return new UpdateBuilder($this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeleteBuilder()
+    public function getDeleteBuilder(): DeleteBuilder
     {
         return new DeleteBuilder($this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function lift($value)
+    public function lift($value): Sql
     {
         if ($value instanceof Sql) {
             return $value;
@@ -61,10 +48,7 @@ abstract class AbstractGrammar implements GrammarInterface
         throw new \UnexpectedValueException("The value can not be lifted as a query, got '$type'.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function literal($value)
+    public function literal($value): Sql
     {
         if ($value === null) {
             return new Sql('NULL');
@@ -88,10 +72,7 @@ abstract class AbstractGrammar implements GrammarInterface
         throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
+    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql
     {
         switch (func_num_args()) {
             case 1:

@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Explainable;
 use Emonkak\Orm\Sql;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Explainable
  */
-class ExplainableTest extends \PHPUnit_Framework_TestCase
+class ExplainableTest extends TestCase
 {
     public function testExplain()
     {

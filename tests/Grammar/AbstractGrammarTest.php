@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
@@ -10,11 +12,12 @@ use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
 use Emonkak\Orm\Tests\Fixtures\Id;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Grammar\AbstractGrammar
  */
-class AbstractGrammarTest extends \PHPUnit_Framework_TestCase
+class AbstractGrammarTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 class ManyTo implements RelationStrategyInterface
@@ -64,26 +67,19 @@ class ManyTo implements RelationStrategyInterface
     private $unions;
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $oneToManyTable
-     * @param string                      $oneToManyOuterKey
-     * @param string                      $oneToManyInnerKey
-     * @param string                      $manyToOneTable
-     * @param string                      $manyToOneOuterKey
-     * @param string                      $manyToOneInnerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
+     * @param PDOInterface $pdo
+     * @param FetcherInterface $fetcher
+     * @param SelectBuilder $queryBuilder
      * @param array<string,SelectBuilder> $unions
      */
     public function __construct(
-        $relationKey,
-        $oneToManyTable,
-        $oneToManyOuterKey,
-        $oneToManyInnerKey,
-        $manyToOneTable,
-        $manyToOneOuterKey,
-        $manyToOneInnerKey,
+        string $relationKey,
+        string $oneToManyTable,
+        string $oneToManyOuterKey,
+        string $oneToManyInnerKey,
+        string $manyToOneTable,
+        string $manyToOneOuterKey,
+        string $manyToOneInnerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
@@ -102,82 +98,52 @@ class ManyTo implements RelationStrategyInterface
         $this->unions = $unions;
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationKey()
+    public function getRelationKey(): string
     {
         return $this->relationKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getOneToManyTable()
+    public function getOneToManyTable(): string
     {
         return $this->oneToManyTable;
     }
 
-    /**
-     * @return string
-     */
-    public function getOneToManyOuterKey()
+    public function getOneToManyOuterKey(): string
     {
         return $this->oneToManyOuterKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getOneToManyInnerKey()
+    public function getOneToManyInnerKey(): string
     {
         return $this->oneToManyInnerKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getManyToOneTable()
+    public function getManyToOneTable(): string
     {
         return $this->manyToOneTable;
     }
 
-    /**
-     * @return string
-     */
-    public function getManyToOneOuterKey()
+    public function getManyToOneOuterKey(): string
     {
         return $this->manyToOneOuterKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getManyToOneInnerKey()
+    public function getManyToOneInnerKey(): string
     {
         return $this->manyToOneInnerKey;
     }
 
-    /**
-     * @return PDOInterface
-     */
-    public function getPdo()
+    public function getPdo(): PDOInterface
     {
         return $this->pdo;
     }
 
-    /**
-     * @return FetcherInterface
-     */
-    public function getFetcher()
+    public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
     }
 
-    /**
-     * @return SelectBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): SelectBuilder
     {
         return $this->queryBuilder;
     }
@@ -185,15 +151,12 @@ class ManyTo implements RelationStrategyInterface
     /**
      * @return array<string,SelectBuilder>
      */
-    public function getUnions()
+    public function getUnions(): array
     {
         return $this->unions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResult(array $outerKeys)
+    public function getResult(array $outerKeys): ResultSetInterface
     {
         $grammar = $this->queryBuilder->getGrammar();
 
@@ -209,45 +172,30 @@ class ManyTo implements RelationStrategyInterface
             ->getResult($this->pdo, $this->fetcher);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getOuterKeySelector($outerClass)
+    public function getOuterKeySelector(?string $outerClass): callable
     {
         return AccessorCreators::createKeySelector($this->oneToManyOuterKey, $outerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInnerKeySelector($innerClass)
+    public function getInnerKeySelector(?string $innerClass): callable
     {
         return AccessorCreators::createPivotKeySelector($this->getPivotKey(), $innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResultSelector($outerClass, $innerClass)
+    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
     {
         return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
     }
 
-    /**
-     * @return string
-     */
-    private function getPivotKey()
+    private function getPivotKey(): string
     {
         return '__pivot_' . $this->oneToManyInnerKey;
     }
 
     /**
-     * @param SelectBuilder $queryBuilder
-     * @param string        $table
-     * @param string[]      $outerKeys
-     * @return SelectBuilder
+     * @param mixed[] $outerKeys
      */
-    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, $table, $outerKeys)
+    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, string $table, array $outerKeys): SelectBuilder
     {
         $grammar = $this->queryBuilder->getGrammar();
 

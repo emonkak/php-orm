@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm;
 
 use Emonkak\Orm\Grammar\GrammarInterface;
@@ -37,34 +39,22 @@ class UpdateBuilder implements QueryBuilderInterface
      */
     private $where;
 
-    /**
-     * @param GrammarInterface $grammar
-     */
     public function __construct(GrammarInterface $grammar)
     {
         $this->grammar = $grammar;
     }
 
-    /**
-     * @return GrammarInterface
-     */
-    public function getGrammar()
+    public function getGrammar(): GrammarInterface
     {
         return $this->grammar;
     }
 
-    /**
-     * @return string
-     */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getTable()
+    public function getTable(): ?string
     {
         return $this->table;
     }
@@ -72,47 +62,31 @@ class UpdateBuilder implements QueryBuilderInterface
     /**
      * @return Sql[]
      */
-    public function getUpdateBuilder()
+    public function getUpdateBuilder(): array
     {
         return $this->update;
     }
 
-    /**
-     * @return ?Sql
-     */
-    public function getWhere()
+    public function getWhere(): ?Sql
     {
         return $this->where;
     }
 
-    /**
-     * @param mixed $prefix
-     * @return $this
-     */
-    public function prefix($prefix)
+    public function prefix(string $prefix): self
     {
         $cloned = clone $this;
         $cloned->prefix = $prefix;
         return $cloned;
     }
 
-    /**
-     * @param string $table
-     * @return $this
-     */
-    public function table($table)
+    public function table(string $table): self
     {
         $cloned = clone $this;
         $cloned->table = $table;
         return $cloned;
     }
 
-    /**
-     * @param string $column
-     * @param mixed  $expr
-     * @return $this
-     */
-    public function set($column, $expr)
+    public function set(string $column, $expr): self
     {
         $cloned = clone $this;
         $cloned->update[$column] = $this->grammar->literal($expr);
@@ -121,23 +95,15 @@ class UpdateBuilder implements QueryBuilderInterface
 
     /**
      * @param mixed[] $update
-     * @return $this
      */
-    public function setAll(array $update)
+    public function setAll(array $update): self
     {
         $cloned = clone $this;
         $cloned->update = array_map([$this->grammar, 'literal'], $update);
         return $cloned;
     }
 
-    /**
-     * @param mixed  $arg1
-     * @param ?mixed $arg2
-     * @param ?mixed $arg3
-     * @param ?mixed $arg4
-     * @return $this
-     */
-    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
+    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -145,14 +111,7 @@ class UpdateBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed  $arg1
-     * @param ?mixed $arg2
-     * @param ?mixed $arg3
-     * @param ?mixed $arg4
-     * @return $this
-     */
-    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null)
+    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -160,10 +119,7 @@ class UpdateBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function build()
+    public function build(): Sql
     {
         return $this->grammar->updateStatement(
             $this->prefix,

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 class OneTo implements RelationStrategyInterface
@@ -49,20 +52,13 @@ class OneTo implements RelationStrategyInterface
     private $unions;
 
     /**
-     * @param string                      $relationKey
-     * @param string                      $table
-     * @param string                      $outerKey
-     * @param string                      $innerKey
-     * @param PDOInterface                $pdo
-     * @param FetcherInterface            $fetcher
-     * @param SelectBuilder               $queryBuilder
      * @param array<string,SelectBuilder> $unions
      */
     public function __construct(
-        $relationKey,
-        $table,
-        $outerKey,
-        $innerKey,
+        string $relationKey,
+        string $table,
+        string $outerKey,
+        string $innerKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
@@ -78,58 +74,37 @@ class OneTo implements RelationStrategyInterface
         $this->unions = $unions;
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationKey()
+    public function getRelationKey(): string
     {
         return $this->relationKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getTable()
+    public function getTable(): string
     {
         return $this->table;
     }
 
-    /**
-     * @return string
-     */
-    public function getOuterKey()
+    public function getOuterKey(): string
     {
         return $this->outerKey;
     }
 
-    /**
-     * @return string
-     */
-    public function getInnerKey()
+    public function getInnerKey(): string
     {
         return $this->innerKey;
     }
 
-    /**
-     * @return PDOInterface
-     */
-    public function getPdo()
+    public function getPdo(): PDOInterface
     {
         return $this->pdo;
     }
 
-    /**
-     * @return FetcherInterface
-     */
-    public function getFetcher()
+    public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
     }
 
-    /**
-     * @return SelectBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): SelectBuilder
     {
         return $this->queryBuilder;
     }
@@ -137,15 +112,12 @@ class OneTo implements RelationStrategyInterface
     /**
      * @return array<string,SelectBuilder>
      */
-    public function getUnions()
+    public function getUnions(): array
     {
         return $this->unions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResult(array $outerKeys)
+    public function getResult(array $outerKeys): ResultSetInterface
     {
         $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->table, $outerKeys);
 
@@ -159,37 +131,25 @@ class OneTo implements RelationStrategyInterface
             ->getResult($this->pdo, $this->fetcher);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getOuterKeySelector($outerClass)
+    public function getOuterKeySelector(?string $outerClass): callable
     {
         return AccessorCreators::createKeySelector($this->outerKey, $outerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInnerKeySelector($innerClass)
+    public function getInnerKeySelector(?string $innerClass): callable
     {
         return AccessorCreators::createKeySelector($this->innerKey, $innerClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getResultSelector($outerClass, $innerClass)
+    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
     {
         return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
     }
 
     /**
-     * @param SelectBuilder $queryBuilder
-     * @param string        $table
-     * @param string[]      $outerKeys
-     * @return SelectBuilder
+     * @param mixed[] $outerKeys
      */
-    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, $table, $outerKeys)
+    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, string $table, array $outerKeys): SelectBuilder
     {
         $grammar = $this->queryBuilder->getGrammar();
 

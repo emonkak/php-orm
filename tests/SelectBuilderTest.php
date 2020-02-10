@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
@@ -11,11 +13,12 @@ use Emonkak\Orm\Pagination\SequentialPageIterator;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\SelectBuilder
  */
-class SelectBuilderTest extends \PHPUnit_Framework_TestCase
+class SelectBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 

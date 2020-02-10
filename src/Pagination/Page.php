@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
@@ -23,94 +25,59 @@ class Page implements \IteratorAggregate, PageInterface
      */
     private $paginator;
 
-    /**
-     * @param \Traversable       $items
-     * @param int                $index
-     * @param PaginatorInterface $paginator
-     */
-    public function __construct(\Traversable $items, $index, PaginatorInterface $paginator)
+    public function __construct(\Traversable $items, int $index, PaginatorInterface $paginator)
     {
         $this->items = $items;
         $this->index = $index;
         $this->paginator = $paginator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return $this->items;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPaginator()
+    public function getPaginator(): PaginatorInterface
     {
         return $this->paginator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getOffset()
+    public function getOffset(): int
     {
         return $this->index * $this->paginator->getPerPage();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function previous()
+    public function previous(): PageInterface
     {
         return $this->paginator->at($this->index - 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function next()
+    public function next(): PageInterface
     {
         return $this->paginator->at($this->index + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasPrevious()
+    public function hasPrevious(): bool
     {
         return $this->paginator->has($this->index - 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasNext()
+    public function hasNext(): bool
     {
         return $this->paginator->has($this->index + 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isFirst()
+    public function isFirst(): bool
     {
         return !$this->hasPrevious();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isLast()
+    public function isLast(): bool
     {
         return !$this->hasNext();
     }

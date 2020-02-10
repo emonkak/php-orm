@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\Sql;
 
 class DefaultGrammar extends AbstractGrammar
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function operator($operator, Sql $lhs, Sql $rhs)
+    public function operator(string $operator, Sql $lhs, Sql $rhs): Sql
     {
         switch (strtoupper($operator)) {
             case '=':
@@ -34,10 +33,7 @@ class DefaultGrammar extends AbstractGrammar
         throw new \UnexpectedValueException("Unexpected operator, got '$operator'.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function betweenOperator($operator, Sql $lhs, Sql $start, Sql $end)
+    public function betweenOperator(string $operator, Sql $lhs, Sql $start, Sql $end): Sql
     {
         switch (strtoupper($operator)) {
             case 'BETWEEN':
@@ -49,10 +45,7 @@ class DefaultGrammar extends AbstractGrammar
         throw new \UnexpectedValueException("Unexpected between operator, got '$operator'.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function unaryOperator($operator, Sql $rhs)
+    public function unaryOperator(string $operator, Sql $rhs): Sql
     {
         switch (strtoupper($operator)) {
             case 'NOT':
@@ -71,10 +64,7 @@ class DefaultGrammar extends AbstractGrammar
         throw new \UnexpectedValueException("Unexpected unary operator, got '$operator'.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function join(Sql $table, Sql $condition = null, $type)
+    public function join(Sql $table, ?Sql $condition, string $type): Sql
     {
         if ($condition !== null) {
             $sql = $type . ' ' . $table->getSql() . ' ON ' . $condition->getSql();
@@ -86,20 +76,14 @@ class DefaultGrammar extends AbstractGrammar
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function window($name, Sql $specification)
+    public function window(string $name, Sql $specification): Sql
     {
         $sql = $name . ' AS ' . '(' . $specification->getSql() . ')';
         $bindings = $specification->getBindings();
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function ordering(Sql $expr, $ordering)
+    public function ordering(Sql $expr, string $ordering): Sql
     {
         switch (strtoupper($ordering)) {
             case 'ASC':
@@ -111,38 +95,26 @@ class DefaultGrammar extends AbstractGrammar
         throw new \UnexpectedValueException("Unexpected ordering literal, got '$ordering'");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function union(Sql $query, $type)
+    public function union(Sql $query, string $type): Sql
     {
         $sql = $type . ' ' . $query->getSql();
         $bindings = $query->getBindings();
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function alias(Sql $value, $alias)
+    public function alias(Sql $value, string $alias): Sql
     {
         $sql = $value->getSql() . ' AS ' . $alias;
         $bindings = $value->getBindings();
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function identifier($string)
+    public function identifier(string $string): string
     {
         return '`' . str_replace('`', '``', $string) . '`';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function selectStatement($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union)
+    public function selectStatement(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, ?string $suffix, array $union): Sql
     {
         $bindings = [];
 
@@ -164,10 +136,7 @@ class DefaultGrammar extends AbstractGrammar
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function insertStatement($prefix, $into, array $columns, array $values, Sql $select = null)
+    public function insertStatement(string $prefix, string $into, array $columns, array $values, ?Sql $select): Sql
     {
         $bindings = [];
 
@@ -179,10 +148,7 @@ class DefaultGrammar extends AbstractGrammar
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function updateStatement($prefix, $table, array $update, Sql $where = null)
+    public function updateStatement(string $prefix, string $table, array $update, ?Sql $where): Sql
     {
         $bindings = [];
 
@@ -193,10 +159,7 @@ class DefaultGrammar extends AbstractGrammar
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function deleteStatement($prefix, $from, Sql $where = null)
+    public function deleteStatement(string $prefix, string $from, Sql $where = null): Sql
     {
         $bindings = [];
 
@@ -208,10 +171,9 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[]   $select
-     * @param mixed[] &$bindings
-     * @return string
+     * @param mixed[] $bindings
      */
-    private function processSelect(array $select, array &$bindings)
+    private function processSelect(array $select, array &$bindings): string
     {
         if (empty($select)) {
             return ' *';
@@ -227,11 +189,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $from
-     * @param mixed[] &$bindings
-     * @return string
+     * @param Sql[] $from
+     * @param mixed[] $bindings
      */
-    private function processFrom(array $from, array &$bindings)
+    private function processFrom(array $from, array &$bindings): string
     {
         if (empty($from)) {
             return '';
@@ -247,11 +208,11 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]    $join
-     * @param mixed[]  &$bindings
+     * @param Sql[] $join
+     * @param mixed[] $bindings
      * @return string
      */
-    private function processJoin(array $join, array &$bindings)
+    private function processJoin(array $join, array &$bindings): string
     {
         if (empty($join)) {
             return '';
@@ -267,11 +228,11 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param ?Sql    $where
-     * @param mixed[] &$bindings
+     * @param ?Sql $where
+     * @param mixed[] $bindings
      * @return string
      */
-    private function processWhere(Sql $where = null, array &$bindings)
+    private function processWhere(?Sql $where, array &$bindings): string
     {
         if ($where === null) {
             return '';
@@ -281,11 +242,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $groupBy
-     * @param mixed[] &$bindings
-     * @return string
+     * @param Sql[] $groupBy
+     * @param mixed[] $bindings
      */
-    private function processGroupBy(array $groupBy, array &$bindings)
+    private function processGroupBy(array $groupBy, array &$bindings): string
     {
         if (empty($groupBy)) {
             return '';
@@ -301,11 +261,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param ?Sql    $having
-     * @param mixed[] &$bindings
-     * @return string
+     * @param ?Sql $having
+     * @param mixed[] $bindings
      */
-    private function processHaving(Sql $having = null, array &$bindings)
+    private function processHaving(?Sql $having, array &$bindings): string
     {
         if ($having === null) {
             return '';
@@ -315,11 +274,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $window
-     * @param mixed[] &$bindings
-     * @return string
+     * @param Sql[] $window
+     * @param mixed[] $bindings
      */
-    private function processWindow(array $window, array &$bindings)
+    private function processWindow(array $window, array &$bindings): string
     {
         if (empty($window)) {
             return '';
@@ -335,11 +293,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $orderBy
-     * @param mixed[] &$bindings
-     * @return string
+     * @param Sql[] $orderBy
+     * @param mixed[] $bindings
      */
-    private function processOrderBy(array $orderBy, array &$bindings)
+    private function processOrderBy(array $orderBy, array &$bindings): string
     {
         if (empty($orderBy)) {
             return '';
@@ -355,11 +312,9 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param int     $limit
-     * @param mixed[] &$bindings
-     * @return string
+     * @param mixed[] $bindings
      */
-    private function processLimit($limit, array &$bindings)
+    private function processLimit(?int $limit, array &$bindings): string
     {
         if ($limit === null) {
             return '';
@@ -369,11 +324,9 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param int     $offset
-     * @param mixed[] &$bindings
-     * @return string
+     * @param mixed[] $bindings
      */
-    private function processOffset($offset, array &$bindings)
+    private function processOffset(?int $offset, array &$bindings): string
     {
         if ($offset === null) {
             return '';
@@ -383,11 +336,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $union
-     * @param mixed[] &$bindings
-     * @return string
+     * @param Sql[] $union
+     * @param mixed[] $bindings
      */
-    private function processUnion(array $union, array &$bindings)
+    private function processUnion(array $union, array &$bindings): string
     {
         if (empty($union)) {
             return '';
@@ -403,11 +355,9 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param string   $table
      * @param string[] $columns
-     * @return string
      */
-    private function processInto($table, array $columns)
+    private function processInto(string $table, array $columns): string
     {
         $sql = ' INTO ' . $table;
         if (!empty($columns)) {
@@ -418,10 +368,9 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[][] $values
-     * @param mixed[] &$bindings
-     * @return string
+     * @param mixed[] $bindings
      */
-    private function processValues(array $values, array &$bindings)
+    private function processValues(array $values, array &$bindings): string
     {
         if (empty($values)) {
             return '';
@@ -441,11 +390,11 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param ?Sql    $select
+     * @param ?Sql $select
      * @param mixed[] &$bindings
      * @return string
      */
-    private function processInsertSelect(Sql $select = null, array &$bindings)
+    private function processInsertSelect(?Sql $select, array &$bindings): string
     {
         if ($select === null) {
             return '';
@@ -455,11 +404,10 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $update
+     * @param Sql[] $update
      * @param mixed[] &$bindings
-     * @return string
      */
-    private function processSet(array $update, array &$bindings)
+    private function processSet(array $update, array &$bindings): string
     {
         if (empty($update)) {
             return '';

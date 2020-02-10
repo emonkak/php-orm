@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\Sql;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Emonkak\Orm\Sql
  */
-class SqlTest extends \PHPUnit_Framework_TestCase
+class SqlTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
