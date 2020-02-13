@@ -18,7 +18,7 @@ class FunctionResultSetTest extends TestCase
 
     private $result;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
         $this->result = new FunctionResultSet($this->stmt, function($props) {
@@ -26,12 +26,12 @@ class FunctionResultSetTest extends TestCase
         }, Model::class);
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $this->assertSame(Model::class, $this->result->getClass());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $this->stmt
             ->expects($this->once())
@@ -62,7 +62,7 @@ class FunctionResultSetTest extends TestCase
         $this->assertEquals($expected, iterator_to_array($this->result));
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->stmt
             ->expects($this->once())
@@ -79,14 +79,14 @@ class FunctionResultSetTest extends TestCase
         $this->assertEquals($expected, $this->result->toArray());
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('fetch')
             ->with(\PDO::FETCH_ASSOC)
             ->willReturn(['foo' => 123, 'bar' => 345]);
@@ -94,13 +94,13 @@ class FunctionResultSetTest extends TestCase
         $expected = new Model(['foo' => 123, 'bar' => 345]);
 
         $this->assertEquals($expected, $this->result->first());
+        $this->assertEquals($expected, $this->result->firstOrDefault());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testFirstThrowsRuntimeException()
+    public function testFirstThrowsRuntimeException(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->stmt
             ->expects($this->once())
             ->method('execute')
@@ -114,7 +114,7 @@ class FunctionResultSetTest extends TestCase
         $this->result->first();
     }
 
-    public function testFirstWithPredicate()
+    public function testFirstOrDefaultReturnsDefaultValue(): void
     {
         $this->stmt
             ->expects($this->once())
@@ -122,11 +122,26 @@ class FunctionResultSetTest extends TestCase
             ->willReturn(true);
         $this->stmt
             ->expects($this->once())
+            ->method('fetch')
+            ->with(\PDO::FETCH_ASSOC)
+            ->willReturn(false);
+
+        $this->assertNull($this->result->firstOrDefault());
+    }
+
+    public function testFirstWithPredicate(): void
+    {
+        $this->stmt
+            ->expects($this->exactly(2))
+            ->method('execute')
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->exactly(2))
             ->method('setFetchMode')
             ->with(\PDO::FETCH_ASSOC)
             ->willReturn(true);
         $this->stmt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
                 ['foo' => 1],
@@ -146,13 +161,13 @@ class FunctionResultSetTest extends TestCase
         };
 
         $this->assertEquals(new Model(['foo' => 2]), $this->result->first($predicate));
+        $this->assertEquals(new Model(['foo' => 2]), $this->result->firstOrDefault($predicate));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testFirstWithPredicateThrowsRuntimeException()
+    public function testFirstWithPredicateThrowsRuntimeException(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->stmt
             ->expects($this->once())
             ->method('execute')
@@ -177,5 +192,33 @@ class FunctionResultSetTest extends TestCase
         };
 
         $this->result->first($predicate);
+    }
+
+    public function testFirstWithPredicateReturnsDefaultValue(): void
+    {
+        $this->stmt
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->once())
+            ->method('setFetchMode')
+            ->with(\PDO::FETCH_ASSOC)
+            ->willReturn(true);
+        $this->stmt
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([
+                ['foo' => 1],
+                ['foo' => 2],
+                ['foo' => 3],
+                ['foo' => 4],
+            ]));
+
+        $predicate = function($value) {
+            return false;
+        };
+
+        $this->assertNull($this->result->firstOrDefault($predicate));
     }
 }

@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AggregatableTest extends TestCase
 {
-    public function testAvg()
+    public function testAvg(): void
     {
         $pdo = $this->createMock(PDOInterface::class);
 
@@ -27,7 +27,7 @@ class AggregatableTest extends TestCase
         $this->assertSame(123, $aggregatable->avg($pdo, 'c1'));
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $pdo = $this->createMock(PDOInterface::class);
 
@@ -41,7 +41,7 @@ class AggregatableTest extends TestCase
         $this->assertSame(123, $aggregatable->count($pdo, '*'));
     }
 
-    public function testMax()
+    public function testMax(): void
     {
         $pdo = $this->createMock(PDOInterface::class);
 
@@ -55,7 +55,7 @@ class AggregatableTest extends TestCase
         $this->assertSame(123, $aggregatable->max($pdo, 'c1'));
     }
 
-    public function testMin()
+    public function testMin(): void
     {
         $pdo = $this->createMock(PDOInterface::class);
 
@@ -69,7 +69,7 @@ class AggregatableTest extends TestCase
         $this->assertSame(123, $aggregatable->min($pdo, 'c1'));
     }
 
-    public function testSum()
+    public function testSum(): void
     {
         $pdo = $this->createMock(PDOInterface::class);
 

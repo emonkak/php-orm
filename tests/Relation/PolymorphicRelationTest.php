@@ -14,23 +14,29 @@ use PHPUnit\Framework\TestCase;
  */
 class PolymorphicRelationTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
-        $polymorphics = [
+        $resultClass = \stdClass::class;
+        $morphKeySelector = function($object) {
+            return $object->morph_key;
+        };
+        $relations = [
             'morph_key1' => $this->createMock(RelationInterface::class),
             'morph_key2' => $this->createMock(RelationInterface::class),
         ];
 
         $relation = new PolymorphicRelation(
-            'morph_key',
-            $polymorphics
+            \stdClass::class,
+            $morphKeySelector,
+            $relations
         );
 
-        $this->assertSame('morph_key', $relation->getMorphKey());
-        $this->assertSame($polymorphics, $relation->getPolymorphics());
+        $this->assertSame(\stdClass::class, $relation->getResultClass());
+        $this->assertSame($morphKeySelector, $relation->getMorphKeySelector());
+        $this->assertSame($relations, $relation->getRelations());
     }
 
-    public function testAssociate()
+    public function testAssociate(): void
     {
         $comments = [
             ['comment_id' => 1, 'commentable_id' => 1, 'commentable_type' => 'posts', 'body' => 'foo'],
@@ -91,14 +97,10 @@ class PolymorphicRelationTest extends TestCase
         $hasPost
             ->expects($this->once())
             ->method('associate')
-            ->with(new PreloadedResultSet([
-                $comments[0] + ['__sort' => 0],
-                $comments[2] + ['__sort' => 2]
-            ], null))
             ->will($this->returnCallback(function($result) use ($posts) {
                 return new \ArrayIterator([
-                     $result->elementAt(0) + ['commentable' => $posts[0]],
-                     $result->elementAt(1) + ['commentable' => $posts[2]],
+                     $result[0] + ['commentable' => $posts[0]],
+                     $result[1] + ['commentable' => $posts[2]],
                 ]);
             }));
 
@@ -106,26 +108,25 @@ class PolymorphicRelationTest extends TestCase
         $hasVideo
             ->expects($this->once())
             ->method('associate')
-            ->with(new PreloadedResultSet([
-                 $comments[1] + ['__sort' => 1]
-            ], null))
             ->will($this->returnCallback(function($result) use ($videos) {
                 return new \ArrayIterator([
-                     $result->elementAt(0) + ['commentable' => $videos[1]],
+                     $result[0] + ['commentable' => $videos[1]],
                 ]);
             }));
 
-        $polymorphics = [
-            'videos' => $hasVideo,
-            'posts' => $hasPost,
-        ];
-
         $relation = new PolymorphicRelation(
-            'commentable_type',
-            $polymorphics
+            null,
+            function($row) {
+                return $row['commentable_type'];
+            },
+            [
+                'videos' => $hasVideo,
+                'posts' => $hasPost,
+            ]
         );
 
-        $result = $relation->associate(new PreloadedResultSet($comments, null));
+        $result = $relation->associate(new PreloadedResultSet($comments), null);
+
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }
 }

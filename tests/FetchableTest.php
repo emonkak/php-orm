@@ -19,29 +19,9 @@ use PHPUnit\Framework\TestCase;
  */
 class FetchableTest extends TestCase
 {
-    public function testGetResult()
+    public function testGetResult(): void
     {
-        $result = $this->createMock(IterableResultSetInterface::class);
-        $result
-            ->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator([
-                ['foo' => 1],
-                ['foo' => 2],
-            ]));
-
-        $relationElements1 = [
-             ['bar' => 3],
-             ['bar' => 4],
-        ];
-        $relationElements2 = [
-            ['baz' => 5],
-            ['baz' => 6],
-        ];
-        $exceptedElements = [
-            ['foo' => 1, 'bar' => 3, 'baz' => 5],
-            ['foo' => 2, 'bar' => 4, 'baz' => 6],
-        ];
+        $result = $this->createMock(ResultSetInterface::class);
 
         $pdo = $this->createMock(PDOInterface::class);
 
@@ -61,28 +41,6 @@ class FetchableTest extends TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($result);
 
-        $relation1 = $this->createMock(RelationInterface::class);
-        $relation1
-            ->expects($this->once())
-            ->method('associate')
-            ->will($this->returnCallback(function($result) use ($relationElements1) {
-                foreach ($result as $i => $element) {
-                    yield $element + $relationElements1[$i];
-                }
-            }));
-
-        $relation2 = $this->createMock(RelationInterface::class);
-        $relation2
-            ->expects($this->once())
-            ->method('associate')
-            ->will($this->returnCallback(function($result) use ($relationElements2) {
-                foreach ($result as $i => $element) {
-                    yield $element + $relationElements2[$i];
-                }
-            }));
-
-        $queryBuilder = $fetchable->with($relation1, $relation2);
-        $this->assertEquals([$relation1, $relation2], $queryBuilder->getRelations());
-        $this->assertEquals($exceptedElements, $queryBuilder->getResult($pdo, $fetcher)->toArray());
+        $this->assertSame($result, $fetchable->getResult($pdo, $fetcher));
     }
 }

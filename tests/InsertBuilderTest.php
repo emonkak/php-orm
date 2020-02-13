@@ -16,14 +16,14 @@ class InsertBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testGetGrammar()
+    public function testGetGrammar(): void
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new InsertBuilder($grammar);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $queryBuilder = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])
@@ -52,7 +52,7 @@ class InsertBuilderTest extends TestCase
         $this->assertEquals($selectQuery, $queryBuilder->getSelectBuilder());
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $query = $this->getInsertBuilder()
             ->prefix('INSERT IGNORE')
@@ -66,7 +66,7 @@ class InsertBuilderTest extends TestCase
         );
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $selectQuery = $this->getSelectBuilder()
             ->select('c1')
@@ -86,7 +86,7 @@ class InsertBuilderTest extends TestCase
         );
     }
 
-    public function testValues()
+    public function testValues(): void
     {
         $query = $this->getInsertBuilder()
             ->into('t1', ['c1', 'c2', 'c3'])

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ColumnFetcherTest extends TestCase
 {
-    public function testFetch()
+    public function testFetch(): void
     {
         $fetcher = new ColumnFetcher();
 
@@ -22,10 +22,9 @@ class ColumnFetcherTest extends TestCase
 
         $result = $fetcher->fetch($stmt);
         $this->assertInstanceOf(ColumnResultSet::class, $result);
-        $this->assertNull($result->getClass());
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $fetcher = new ColumnFetcher();
         $this->assertNull($fetcher->getClass());

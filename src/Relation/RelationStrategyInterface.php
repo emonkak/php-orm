@@ -5,30 +5,20 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 
+/**
+ * @template TInner
+ * @template TKey
+ */
 interface RelationStrategyInterface
 {
     /**
-     * @param mixed[] $outerKeys
+     * @template TOuter
+     * @template TResult
+     * @psalm-param TKey[] $outerKeys
+     * @psalm-param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
+     * @psalm-return ResultSetInterface<TInner>
      */
-    public function getResult(array $outerKeys): ResultSetInterface;
-
-    /**
-     * @param ?class-string $outerClass
-     * @return callable(mixed):mixed
-     */
-    public function getOuterKeySelector(?string $outerClass): callable;
-
-    /**
-     * @param ?class-string $innerClass
-     * @return callable(mixed):mixed
-     */
-    public function getInnerKeySelector(?string $innerClass): callable;
-
-    /**
-     * @param ?class-string $outerClass
-     * @param ?class-string $innerClass
-     * @return callable(mixed,mixed):mixed
-     */
-    public function getResultSelector(?string $outerClass, ?string $innerClass): callable;
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface;
 }

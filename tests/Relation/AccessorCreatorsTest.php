@@ -13,65 +13,65 @@ use PHPUnit\Framework\TestCase;
  */
 class AccessorCreatorsTest extends TestCase
 {
-    public function testToObjectKeySelector()
+    public function testToObjectKeySelector(): void
     {
         $entity = new Entity();
         $entity->setFoo(123);
-        $keySelector = AccessorCreators::createKeySelector('foo', Entity::class);
+        $keySelector = AccessorCreators::createKeySelector(Entity::class, 'foo');
         $this->assertSame(123, $keySelector($entity));
     }
 
-    public function testToObjectPivotKeySelector()
+    public function testToObjectPivotKeySelector(): void
     {
         $entity = new Entity();
         $entity->__pivot_foo = 123;
-        $pivotKeySelector = AccessorCreators::createPivotKeySelector('__pivot_foo', Entity::class);
+        $pivotKeySelector = AccessorCreators::createPivotKeySelector(Entity::class, '__pivot_foo');
         $this->assertSame(123, $pivotKeySelector($entity));
         $this->assertFalse(isset($entity->__pivot_foo));
     }
 
-    public function testToObjectKeyEraser()
+    public function testToObjectKeyEraser(): void
     {
         $entity = new Entity();
         $entity->__foo = 123;
-        $eraser = AccessorCreators::createKeyEraser('__foo', Entity::class);
+        $eraser = AccessorCreators::createKeyEraser(Entity::class, '__foo');
         $entity = $eraser($entity);
         $this->assertFalse(isset($entity->_foo));
     }
 
-    public function testToObjectKeyAssignee()
+    public function testToObjectKeyAssignee(): void
     {
         $entity = new Entity();
-        $keyAssignee = AccessorCreators::createKeyAssignee('foo', Entity::class);
+        $keyAssignee = AccessorCreators::createKeyAssignee(Entity::class, 'foo');
         $keyAssignee($entity, 123);
         $this->assertSame(123, $entity->getFoo());
     }
 
-    public function testToArrayKeySelector()
+    public function testToArrayKeySelector(): void
     {
-        $keySelector = AccessorCreators::createKeySelector('foo', null);
+        $keySelector = AccessorCreators::createKeySelector(null, 'foo');
         $this->assertSame(123, $keySelector(['foo' => 123]));
     }
 
-    public function testToArrayPivotKeySelector()
+    public function testToArrayPivotKeySelector(): void
     {
         $array = ['__pivot_foo' => 123];
-        $pivotKeySelector = AccessorCreators::createPivotKeySelector('__pivot_foo', null);
+        $pivotKeySelector = AccessorCreators::createPivotKeySelector(null, '__pivot_foo');
         $this->assertSame(123, $pivotKeySelector($array));
         $this->assertEquals([], $array);
     }
 
-    public function testToArrayKeyEraser()
+    public function testToArrayKeyEraser(): void
     {
         $array = ['__foo' => 123];
-        $eraser = AccessorCreators::createKeyEraser('__foo', null);
+        $eraser = AccessorCreators::createKeyEraser(null, '__foo');
         $this->assertEquals([], $eraser($array));
     }
 
-    public function testToArrayKeyAssignee()
+    public function testToArrayKeyAssignee(): void
     {
         $array = [];
-        $keyAssignee = AccessorCreators::createKeyAssignee('foo', null);
+        $keyAssignee = AccessorCreators::createKeyAssignee(null, 'foo');
         $this->assertEquals(['foo' => 123], $keyAssignee($array, 123));
     }
 }

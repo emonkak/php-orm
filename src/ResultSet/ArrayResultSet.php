@@ -4,7 +4,12 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
+use Emonkak\Enumerable\Exception\NoSuchElementException;
 
+/**
+ * @implements \IteratorAggregate<array<string,mixed>>
+ * @implements ResultSetInterface<array<string,mixed>>
+ */
 class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
@@ -19,11 +24,9 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         $this->stmt = $stmt;
     }
 
-    public function getClass(): ?string
-    {
-        return null;
-    }
-
+    /**
+     * @psalm-return \Traversable<array<string,mixed>>
+     */
     public function getIterator(): \Traversable
     {
         $this->stmt->execute();
@@ -31,12 +34,18 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         return $this->stmt;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();
@@ -55,9 +64,12 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        throw new \RuntimeException('Sequence contains no elements.');
+        throw new NoSuchElementException('Sequence contains no elements');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {
         $this->stmt->execute();
@@ -76,6 +88,7 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
+        /** @psalm-var TDefault $defaultValue */
         return $defaultValue;
     }
 }

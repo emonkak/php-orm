@@ -85,7 +85,7 @@ class InsertBuilder implements QueryBuilderInterface
         return $this->select;
     }
 
-    public function prefix($prefix): self
+    public function prefix(string $prefix): self
     {
         $cloned = clone $this;
         $cloned->prefix = $prefix;
@@ -103,6 +103,9 @@ class InsertBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param array<int,?scalar|array<int,?scalar>> ...$values
+     */
     public function values(...$values): self
     {
         $cloned = clone $this;
@@ -116,6 +119,9 @@ class InsertBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $query
+     */
     public function select($query): self
     {
         $cloned = clone $this;
@@ -127,7 +133,7 @@ class InsertBuilder implements QueryBuilderInterface
     {
         return $this->grammar->insertStatement(
             $this->prefix,
-            $this->into,
+            $this->into ?: '',
             $this->columns,
             $this->values,
             $this->select

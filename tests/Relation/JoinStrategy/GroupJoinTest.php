@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
+use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class GroupJoinTest extends TestCase
 {
-    public function testJoin()
+    public function testJoin(): void
     {
         $talents = [
             ['talent_id' => 1, 'name' => 'Sumire Uesaka'],
@@ -30,7 +31,7 @@ class GroupJoinTest extends TestCase
             ['program_id' => 5, 'talent_id' => 4],
             ['program_id' => 6, 'talent_id' => 5],
         ];
-        $expected = [
+        $expectedResult = [
             $talents[0] + ['programs' => [$programs[0], $programs[1]]],
             $talents[1] + ['programs' => [$programs[2], $programs[3]]],
             $talents[2] + ['programs' => []],
@@ -38,17 +39,30 @@ class GroupJoinTest extends TestCase
             $talents[4] + ['programs' => [$programs[5]]],
         ];
 
-        $result = (new GroupJoin())
-            ->join(
-                new PreloadedResultSet($talents, null),
-                new PreloadedResultSet($programs, null),
-                function($talent) { return $talent['talent_id']; },
-                function($program) { return $program['talent_id']; },
-                function($talent, $programs) {
-                    $talent['programs'] = $programs;
-                    return $talent;
-                }
-            );
-        $this->assertEquals($expected, iterator_to_array($result));
+        $outerKeySelector = function($talent) { return $talent['talent_id']; };
+        $innerKeySelector = function($program) { return $program['talent_id']; };
+        $resultSelector = function($talent, $programs) {
+            $talent['programs'] = $programs;
+            return $talent;
+        };
+        $comparer = EqualityComparer::getInstance();
+        $groupJoin = new GroupJoin(
+            $outerKeySelector,
+            $innerKeySelector,
+            $resultSelector,
+            $comparer
+        );
+
+        $this->assertSame($outerKeySelector, $groupJoin->getOuterKeySelector());
+        $this->assertSame($innerKeySelector, $groupJoin->getInnerKeySelector());
+        $this->assertSame($resultSelector, $groupJoin->getResultSelector());
+        $this->assertSame($comparer, $groupJoin->getComparer());
+
+        $result = $groupJoin->join(
+            new PreloadedResultSet($talents),
+            new PreloadedResultSet($programs)
+        );
+        $result = iterator_to_array($result);
+        $this->assertEquals($expectedResult, $result);
     }
 }

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayFetcherTest extends TestCase
 {
-    public function testFetch()
+    public function testFetch(): void
     {
         $fetcher = new ArrayFetcher();
 
@@ -22,10 +22,9 @@ class ArrayFetcherTest extends TestCase
 
         $result = $fetcher->fetch($stmt);
         $this->assertInstanceOf(ArrayResultSet::class, $result);
-        $this->assertNull($result->getClass());
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $fetcher = new ArrayFetcher();
         $this->assertNull($fetcher->getClass());

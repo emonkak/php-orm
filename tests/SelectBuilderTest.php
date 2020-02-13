@@ -22,14 +22,14 @@ class SelectBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testGetGrammar()
+    public function testGetGrammar(): void
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetAccesors()
+    public function testGetAccesors(): void
     {
         $unionBuilder = $this->getSelectBuilder()->select('c1')->from('t1');
 
@@ -62,7 +62,7 @@ class SelectBuilderTest extends TestCase
         $this->assertEquals([new Sql('UNION (SELECT c1 FROM t1)')], $queryBuilder->getUnion());
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -126,7 +126,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testSelectAll()
+    public function testSelectAll(): void
     {
         $query = $this->getSelectBuilder()
             ->withSelect([
@@ -143,7 +143,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $query = $this->getSelectBuilder()
             ->prefix('SELECT SQL_CALC_FOUND_ROWS')
@@ -156,7 +156,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testFrom()
+    public function testFrom(): void
     {
         $query = $this->getSelectBuilder()
             ->select('c1')
@@ -199,7 +199,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testJoin()
+    public function testJoin(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -246,7 +246,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereEqual()
+    public function testWhereEqual(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -315,7 +315,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereComparing()
+    public function testWhereComparing(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -331,7 +331,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereLike()
+    public function testWhereLike(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -345,7 +345,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereBetween()
+    public function testWhereBetween(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -370,7 +370,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereIn()
+    public function testWhereIn(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -406,7 +406,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereSql()
+    public function testWhereSql(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -420,7 +420,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereExists()
+    public function testWhereExists(): void
     {
         $queryBuilder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
         $query = $this->getSelectBuilder()
@@ -444,7 +444,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWhereIsNull()
+    public function testWhereIsNull(): void
     {
         $queryBuilder = $this->getSelectBuilder()->select('c1')->from('t2')->where('c2', '=', 'foo')->limit(1);
         $query = $this->getSelectBuilder()
@@ -469,7 +469,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testOrWhere()
+    public function testOrWhere(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -483,7 +483,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testGroupBy()
+    public function testGroupBy(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -507,7 +507,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testHaving()
+    public function testHaving(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -536,7 +536,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testOrHaving()
+    public function testOrHaving(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -552,7 +552,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testWindow()
+    public function testWindow(): void
     {
         $query = $this->getSelectBuilder()
             ->select('ROW_NUMBER() OVER w')
@@ -567,7 +567,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testOrderBy()
+    public function testOrderBy(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -611,7 +611,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testLimit()
+    public function testLimit(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -624,7 +624,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testOffset()
+    public function testOffset(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -638,7 +638,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testSuffix()
+    public function testSuffix(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -651,7 +651,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testForUpdate()
+    public function testForUpdate(): void
     {
         $query = $this->getSelectBuilder()
             ->from('t1')
@@ -664,7 +664,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testUnion()
+    public function testUnion(): void
     {
         $query = $this->getSelectBuilder()
             ->select('c1')
@@ -683,7 +683,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testUnionWith()
+    public function testUnionWith(): void
     {
         $queryBuilder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
         $queryBuilder2 = $this->getSelectBuilder()->select('c2')->from('t2')->where('c2', '=', 'bar');
@@ -696,7 +696,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testUnionAll()
+    public function testUnionAll(): void
     {
         $query = $this->getSelectBuilder()
             ->select('c1')
@@ -719,7 +719,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testUnionAllWith()
+    public function testUnionAllWith(): void
     {
         $queryBuilder1 = $this->getSelectBuilder()->select('c1')->from('t1')->where('c1', '=', 'foo');
         $queryBuilder2 = $this->getSelectBuilder()->select('c2')->from('t2')->where('c2', '=', 'bar');
@@ -733,7 +733,7 @@ class SelectBuilderTest extends TestCase
         );
     }
 
-    public function testAggregate()
+    public function testAggregate(): void
     {
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -756,7 +756,7 @@ class SelectBuilderTest extends TestCase
         $this->assertSame(123, $queryBuilder->aggregate($pdo, 'COUNT(*)'));
     }
 
-    public function testPaginate()
+    public function testPaginate(): void
     {
         $perPage = 10;
         $totalItems = 21;
@@ -801,7 +801,7 @@ class SelectBuilderTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt2))
-            ->willReturn(new PreloadedResultSet($expectedResult, \stdClass::class));
+            ->willReturn(new PreloadedResultSet($expectedResult));
 
         $paginator = $this->getSelectBuilder()
             ->from('t1')
@@ -816,7 +816,7 @@ class SelectBuilderTest extends TestCase
         $this->assertSame($expectedResult, iterator_to_array($page));
     }
 
-    public function testPaginateFrom()
+    public function testPaginateFrom(): void
     {
         $index = 1;
         $perPage = 10;
@@ -846,7 +846,7 @@ class SelectBuilderTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadedResultSet($result, \stdClass::class));
+            ->willReturn(new PreloadedResultSet($result));
 
         $sequentialPageIterator = $this->getSelectBuilder()
             ->from('t1')

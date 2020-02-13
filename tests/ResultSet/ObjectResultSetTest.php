@@ -17,18 +17,23 @@ class ObjectResultSetTest extends TestCase
 
     private $result;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
         $this->result = new ObjectResultSet($this->stmt, \stdClass::class, ['foo']);
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $this->assertSame(\stdClass::class, $this->result->getClass());
     }
 
-    public function testGetIterator()
+    public function testGetConstructorArguments(): void
+    {
+        $this->assertSame(['foo'], $this->result->getConstructorArguments());
+    }
+
+    public function testGetIterator(): void
     {
         $expected = [(object) ['foo' => 123], (object) ['foo' => 345]];
 
@@ -49,7 +54,7 @@ class ObjectResultSetTest extends TestCase
         $this->assertSame($expected, iterator_to_array($this->result));
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $expected = [(object) ['foo' => 123], (object) ['foo' => 345]];
 
@@ -66,7 +71,7 @@ class ObjectResultSetTest extends TestCase
         $this->assertSame($expected, $this->result->toArray());
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $expected = ['foo' => 123, 'bar' => 345];
 
@@ -89,11 +94,10 @@ class ObjectResultSetTest extends TestCase
         $this->assertSame($expected, $this->result->firstOrDefault());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testFirstThrowsRuntimeException()
+    public function testFirstThrowsRuntimeException(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->stmt
             ->expects($this->once())
             ->method('execute')
@@ -112,7 +116,7 @@ class ObjectResultSetTest extends TestCase
         $this->result->first();
     }
 
-    public function testFirstOrDefaultReturnsDefaultValue()
+    public function testFirstOrDefaultReturnsDefaultValue(): void
     {
         $this->stmt
             ->expects($this->once())
@@ -132,7 +136,7 @@ class ObjectResultSetTest extends TestCase
         $this->assertNull($this->result->firstOrDefault());
     }
 
-    public function testFirstWithPredicate()
+    public function testFirstWithPredicate(): void
     {
         $this->stmt
             ->expects($this->exactly(2))
@@ -161,11 +165,10 @@ class ObjectResultSetTest extends TestCase
         $this->assertEquals((object) ['foo' => 2], $this->result->firstOrDefault($predicate));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testFirstWithPredicateThrowsRuntimeException()
+    public function testFirstWithPredicateThrowsRuntimeException(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->stmt
             ->expects($this->once())
             ->method('execute')
@@ -192,7 +195,7 @@ class ObjectResultSetTest extends TestCase
         $this->result->first($predicate);
     }
 
-    public function testFirstOrDefaultWithPredicateReturnsDefaultValue()
+    public function testFirstOrDefaultWithPredicateReturnsDefaultValue(): void
     {
         $this->stmt
             ->expects($this->once())

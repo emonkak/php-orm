@@ -22,7 +22,7 @@ class DefaultGrammarTest extends TestCase
      */
     private $grammar;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->grammar = new DefaultGrammar();
     }
@@ -30,7 +30,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerOperator
      */
-    public function testOperator($operator, $lhsSql, array $lhsBindings, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings)
+    public function testOperator($operator, $lhsSql, array $lhsBindings, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $rhs = new Sql($rhsSql, $rhsBindings);
@@ -65,18 +65,17 @@ class DefaultGrammarTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testInvalidOperatorThrowsException()
+    public function testInvalidOperatorThrowsException(): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $this->grammar->operator('==', new Sql('c1'), new Sql('?', [123]));
     }
 
     /**
      * @dataProvider providerUnaryOperator
      */
-    public function testUnaryOperator($operator, $lhsSql, array $lhsBindings, $expectedSql, array $expectedBindings)
+    public function testUnaryOperator($operator, $lhsSql, array $lhsBindings, $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
 
@@ -104,18 +103,17 @@ class DefaultGrammarTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testInvalidUnaryOperatorThrowsException()
+    public function testInvalidUnaryOperatorThrowsException(): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $this->grammar->unaryOperator('AND', new Sql('c1'));
     }
 
     /**
      * @dataProvider providerBetweenOperator
      */
-    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings)
+    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $start = new Sql($startSql, $startBindings);
@@ -138,15 +136,14 @@ class DefaultGrammarTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testInvalidBetweenOperatorThrowsException()
+    public function testInvalidBetweenOperatorThrowsException(): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $this->grammar->betweenOperator('=', new Sql('c1'), new Sql('?', [123]), new Sql('?', [456]));
     }
 
-    public function testJoin()
+    public function testJoin(): void
     {
         $query = $this->grammar->join(new Sql('t2'), new Sql('t1.c1 = t2.c1 AND t2.c2 = ?', ['foo']), 'LEFT INNER JOIN');
         $this->assertQueryIs(
@@ -163,7 +160,16 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function testOrdering()
+    public function testWindow(): void
+    {
+        $query = $this->grammar->window('w', new Sql(''));
+        $this->assertQueryIs('w AS ()', [], $query);
+
+        $query = $this->grammar->window('w', new Sql('PARTITION BY c1'));
+        $this->assertQueryIs('w AS (PARTITION BY c1)', [], $query);
+    }
+
+    public function testOrdering(): void
     {
         $query = $this->grammar->ordering(new Sql('c1 + ?', [1]), 'ASC');
         $this->assertQueryIs('c1 + ? ASC', [1], $query);
@@ -172,15 +178,14 @@ class DefaultGrammarTest extends TestCase
         $this->assertQueryIs('c1 + ? DESC', [1], $query);
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testOrderingThrowsException()
+    public function testOrderingThrowsException(): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $this->grammar->ordering(new Sql('c1 + ?', [1]), '');
     }
 
-    public function testUnion()
+    public function testUnion(): void
     {
         $query = $this->grammar->union(new Sql('SELECT * FROM t1 WHERE c1 = ?', ['foo']), 'UNION ALL');
         $this->assertQueryIs(
@@ -190,7 +195,7 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
         $query = $this->grammar->alias(new Sql('c1 + ?', [1]), 'a1');
         $this->assertQueryIs(
@@ -200,7 +205,7 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function testIdentifier()
+    public function testIdentifier(): void
     {
         $this->assertEquals('`foo`', $this->grammar->identifier('foo'));
         $this->assertEquals('```foo```', $this->grammar->identifier('`foo`'));
@@ -209,7 +214,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileSelect
      */
-    public function testCompileSelect($prefix, array $select, array $from, array $join, Sql $where = null, array $groupBy, Sql $having = null, array $window, array $orderBy, $limit, $offset, $suffix, array $union, $expectedSql, array $expectedBindings)
+    public function testCompileSelect(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, string $suffix, array $union, string $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->selectStatement($prefix, $select, $from, $join, $where, $groupBy, $having, $window, $orderBy, $limit, $offset, $suffix, $union);
         $this->assertEquals($expectedSql, $query->getSql());
@@ -248,7 +253,7 @@ class DefaultGrammarTest extends TestCase
                 [],
                 null,
                 null,
-                null,
+                '',
                 [],
                 'SELECT * FROM t1 WHERE c1 = ?',
                 ['foo'],
@@ -265,7 +270,7 @@ class DefaultGrammarTest extends TestCase
                 [],
                 null,
                 null,
-                null,
+                '',
                 [],
                 'SELECT 1',
                 [],
@@ -276,7 +281,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileInsert
      */
-    public function testCompileInsert($prefix, $table, array $columns, array $values, Sql $select = null, $expectedSql, array $expectedBindings)
+    public function testCompileInsert($prefix, $table, array $columns, array $values, Sql $select = null, $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->insertStatement($prefix, $table, $columns, $values, $select);
         $this->assertEquals($expectedSql, $query->getSql());
@@ -310,7 +315,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileUpdate
      */
-    public function testCompileUpdate($prefix, $table, array $update, Sql $where = null, $expectedSql, array $expectedBindings)
+    public function testCompileUpdate($prefix, $table, array $update, Sql $where = null, $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->updateStatement($prefix, $table, $update, $where);
         $this->assertEquals($expectedSql, $query->getSql());
@@ -342,7 +347,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileDelete
      */
-    public function testCompileDelete($prefix, $from, Sql $where = null, $expectedSql, array $expectedBindings)
+    public function testCompileDelete($prefix, $from, Sql $where = null, $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->deleteStatement($prefix, $from, $where);
         $this->assertEquals($expectedSql, $query->getSql());

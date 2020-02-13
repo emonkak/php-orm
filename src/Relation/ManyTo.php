@@ -6,9 +6,15 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
+/**
+ * @template TInner
+ * @template TKey
+ * @implements RelationStrategyInterface<TInner,TKey>
+ */
 class ManyTo implements RelationStrategyInterface
 {
     /**
@@ -47,11 +53,17 @@ class ManyTo implements RelationStrategyInterface
     private $manyToOneInnerKey;
 
     /**
+     * @var string
+     */
+    private $pivotKey;
+
+    /**
      * @var PDOInterface
      */
     private $pdo;
 
     /**
+     * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
     private $fetcher;
@@ -67,10 +79,8 @@ class ManyTo implements RelationStrategyInterface
     private $unions;
 
     /**
-     * @param PDOInterface $pdo
-     * @param FetcherInterface $fetcher
-     * @param SelectBuilder $queryBuilder
-     * @param array<string,SelectBuilder> $unions
+     * @psalm-param FetcherInterface<TInner> $fetcher
+     * @psalm-param array<string,SelectBuilder> $unions
      */
     public function __construct(
         string $relationKey,
@@ -80,6 +90,7 @@ class ManyTo implements RelationStrategyInterface
         string $manyToOneTable,
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
+        string $pivotKey,
         PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
@@ -92,6 +103,7 @@ class ManyTo implements RelationStrategyInterface
         $this->manyToOneTable = $manyToOneTable;
         $this->manyToOneOuterKey = $manyToOneOuterKey;
         $this->manyToOneInnerKey = $manyToOneInnerKey;
+        $this->pivotKey = $pivotKey;
         $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->queryBuilder = $queryBuilder;
@@ -133,11 +145,19 @@ class ManyTo implements RelationStrategyInterface
         return $this->manyToOneInnerKey;
     }
 
+    public function getPivotKey(): string
+    {
+        return $this->pivotKey;
+    }
+
     public function getPdo(): PDOInterface
     {
         return $this->pdo;
     }
 
+    /**
+     * @psalm-return FetcherInterface<TInner>
+     */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
@@ -149,17 +169,18 @@ class ManyTo implements RelationStrategyInterface
     }
 
     /**
-     * @return array<string,SelectBuilder>
+     * @psalm-return array<string,SelectBuilder>
      */
     public function getUnions(): array
     {
         return $this->unions;
     }
 
-    public function getResult(array $outerKeys): ResultSetInterface
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
     {
-        $grammar = $this->queryBuilder->getGrammar();
-
         $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->manyToOneTable, $outerKeys);
 
         foreach ($this->unions as $unionTable => $unionBuilder) {
@@ -172,28 +193,8 @@ class ManyTo implements RelationStrategyInterface
             ->getResult($this->pdo, $this->fetcher);
     }
 
-    public function getOuterKeySelector(?string $outerClass): callable
-    {
-        return AccessorCreators::createKeySelector($this->oneToManyOuterKey, $outerClass);
-    }
-
-    public function getInnerKeySelector(?string $innerClass): callable
-    {
-        return AccessorCreators::createPivotKeySelector($this->getPivotKey(), $innerClass);
-    }
-
-    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
-    {
-        return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
-    }
-
-    private function getPivotKey(): string
-    {
-        return '__pivot_' . $this->oneToManyInnerKey;
-    }
-
     /**
-     * @param mixed[] $outerKeys
+     * @psalm-param TKey[] $outerKeys
      */
     private function createQueryBuilderFrom(SelectBuilder $queryBuilder, string $table, array $outerKeys): SelectBuilder
     {

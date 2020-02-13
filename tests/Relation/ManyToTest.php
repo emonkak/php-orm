@@ -7,6 +7,7 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -21,7 +22,7 @@ class ManyToTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $relationKey = 'relation_key';
         $oneToManyTable = 'one_to_many_table';
@@ -30,6 +31,7 @@ class ManyToTest extends TestCase
         $manyToOneTable = 'many_to_one_table';
         $manyToOneOuterKey = 'many_to_one_outer_key';
         $manyToOneInnerKey = 'many_to_one_inner_key';
+        $pivotKey = 'pivot_key';
 
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -46,6 +48,7 @@ class ManyToTest extends TestCase
             $manyToOneTable,
             $manyToOneOuterKey,
             $manyToOneInnerKey,
+            $pivotKey,
             $pdo,
             $fetcher,
             $queryBuilder,
@@ -59,13 +62,14 @@ class ManyToTest extends TestCase
         $this->assertSame($manyToOneTable, $relation->getManyToOneTable());
         $this->assertSame($manyToOneOuterKey, $relation->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relation->getManyToOneInnerKey());
+        $this->assertSame($pivotKey, $relation->getPivotKey());
         $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($queryBuilder, $relation->getQueryBuilder());
         $this->assertSame($unions, $relation->getUnions());
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = $this->createMock(ResultSetInterface::class);
@@ -85,7 +89,7 @@ class ManyToTest extends TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
-            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
+            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -105,16 +109,19 @@ class ManyToTest extends TestCase
             'users',
             'friend_id',
             'user_id',
+            '__pivot_key',
             $pdo,
             $fetcher,
             $queryBuilder,
             []
         );
 
-        $this->assertSame($expectedResult, $relation->getResult($outerKeys));
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+
+        $this->assertSame($expectedResult, $relation->getResult($outerKeys, $joinStrategy));
     }
 
-    public function testGetResultWithUnion()
+    public function testGetResultWithUnion(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = $this->createMock(ResultSetInterface::class);
@@ -137,7 +144,7 @@ class ManyToTest extends TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
-            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)) UNION ALL (SELECT `users2`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users2` LEFT OUTER JOIN `friendships` ON `users2`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)))')
+            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)) UNION ALL (SELECT `users2`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users2` LEFT OUTER JOIN `friendships` ON `users2`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)))')
             ->willReturn($stmt);
 
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -157,6 +164,7 @@ class ManyToTest extends TestCase
             'users',
             'friend_id',
             'user_id',
+            '__pivot_key',
             $pdo,
             $fetcher,
             $queryBuilder,
@@ -165,46 +173,8 @@ class ManyToTest extends TestCase
             ]
         );
 
-        $this->assertSame($expectedResult, $relation->getResult($outerKeys));
-    }
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-    public function testSelectorResolvings()
-    {
-        $relationStrategy = new ManyTo(
-            'friends',
-            'friendships',
-            'user_id',
-            'user_id',
-            'users',
-            'friend_id',
-            'user_id',
-            $this->createMock(PDOInterface::class),
-            $this->createMock(FetcherInterface::class),
-            $this->getSelectBuilder(),
-            []
-        );
-
-        $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);
-        $innerKeySelector = $relationStrategy->getInnerKeySelector(Model::class);
-        $resultSelector = $relationStrategy->getResultSelector(Model::class, Model::class);
-
-        $outer = new Model(['user_id' => 123]);
-        $inner = [
-            new Model(['__pivot_user_id' => 123, 'user_id' => 456]),
-            new Model(['__pivot_user_id' => 123, 'user_id' => 789]),
-        ];
-
-        $expectedResult = new Model([
-            'user_id' => 123,
-            'friends' => [
-                new Model(['user_id' => 456]),
-                new Model(['user_id' => 789]),
-            ],
-        ]);
-
-        $this->assertSame(123, $outerKeySelector($outer));
-        $this->assertSame(123, $innerKeySelector($inner[0]));
-        $this->assertSame(123, $innerKeySelector($inner[1]));
-        $this->assertEquals($expectedResult, $resultSelector($outer, $inner));
+        $this->assertSame($expectedResult, $relation->getResult($outerKeys, $joinStrategy));
     }
 }

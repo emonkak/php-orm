@@ -6,9 +6,15 @@ namespace Emonkak\Orm\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
+/**
+ * @template TInner
+ * @template TKey
+ * @implements RelationStrategyInterface<TInner,TKey>
+ */
 class OneTo implements RelationStrategyInterface
 {
     /**
@@ -37,6 +43,7 @@ class OneTo implements RelationStrategyInterface
     private $pdo;
 
     /**
+     * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
     private $fetcher;
@@ -52,7 +59,8 @@ class OneTo implements RelationStrategyInterface
     private $unions;
 
     /**
-     * @param array<string,SelectBuilder> $unions
+     * @psalm-param FetcherInterface<TInner> $fetcher
+     * @psalm-param array<string,SelectBuilder> $unions
      */
     public function __construct(
         string $relationKey,
@@ -99,6 +107,9 @@ class OneTo implements RelationStrategyInterface
         return $this->pdo;
     }
 
+    /**
+     * @psalm-return FetcherInterface<TInner>
+     */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
@@ -110,14 +121,17 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * @return array<string,SelectBuilder>
+     * @psalm-return array<string,SelectBuilder>
      */
     public function getUnions(): array
     {
         return $this->unions;
     }
 
-    public function getResult(array $outerKeys): ResultSetInterface
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
     {
         $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->table, $outerKeys);
 
@@ -131,23 +145,8 @@ class OneTo implements RelationStrategyInterface
             ->getResult($this->pdo, $this->fetcher);
     }
 
-    public function getOuterKeySelector(?string $outerClass): callable
-    {
-        return AccessorCreators::createKeySelector($this->outerKey, $outerClass);
-    }
-
-    public function getInnerKeySelector(?string $innerClass): callable
-    {
-        return AccessorCreators::createKeySelector($this->innerKey, $innerClass);
-    }
-
-    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
-    {
-        return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
-    }
-
     /**
-     * @param mixed[] $outerKeys
+     * @psalm-param TKey[] $outerKeys
      */
     private function createQueryBuilderFrom(SelectBuilder $queryBuilder, string $table, array $outerKeys): SelectBuilder
     {

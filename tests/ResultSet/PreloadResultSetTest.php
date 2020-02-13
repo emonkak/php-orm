@@ -12,22 +12,16 @@ use PHPUnit\Framework\TestCase;
  */
 class PreloadedResultSetTest extends TestCase
 {
-    public function testGetClass()
+    public function testGetIterator(): void
     {
-        $result = new PreloadedResultSet([], \stdClass::class);
-        $this->assertSame(\stdClass::class, $result->getClass());
-    }
-
-    public function testGetIterator()
-    {
-        $result = new PreloadedResultSet(['foo', 'bar'], \stdClass::class);
+        $result = new PreloadedResultSet(['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], iterator_to_array($result));
     }
 
-    public function testGetSource()
+    public function testGetSource(): void
     {
         $source = ['foo', 'bar'];
-        $result = new PreloadedResultSet($source, \stdClass::class);
+        $result = new PreloadedResultSet($source);
         $this->assertSame($source, $result->getSource());
     }
 }

@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template TInner
+ * @template TKey
+ * @implements RelationStrategyInterface<TInner,TKey>
+ */
 class Preloaded implements RelationStrategyInterface
 {
     /**
@@ -25,30 +31,23 @@ class Preloaded implements RelationStrategyInterface
     private $innerKey;
 
     /**
-     * @var class-string
-     */
-    private $innerClass;
-
-    /**
+     * @psalm-var TInner[]
      * @var mixed[]
      */
     private $innerElements;
 
     /**
-     * @param class-string $innerClass
-     * @param mixed[] $innerElements
+     * @psalm-param TInner[] $innerElements
      */
     public function __construct(
         string $relationKey,
         string $outerKey,
         string $innerKey,
-        string $innerClass,
         array $innerElements
     ) {
         $this->relationKey = $relationKey;
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
-        $this->innerClass = $innerClass;
         $this->innerElements = $innerElements;
     }
 
@@ -68,47 +67,30 @@ class Preloaded implements RelationStrategyInterface
     }
 
     /**
-     * @return class-string
+     * @psalm-return TInner[]
      */
-    public function getInnerClass(): string
-    {
-        return $this->innerClass;
-    }
-
     public function getInnerElements(): array
     {
         return $this->innerElements;
     }
 
-    public function getResult(array $outerKeys): ResultSetInterface
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
     {
-        $innerKeySelector = $this->getInnerKeySelector($this->innerClass);
-        $outerKeySet = array_flip($outerKeys);
+        $innerKeySelector = $joinStrategy->getInnerKeySelector();
+        $reversedOuterKeys = array_flip($outerKeys);
 
         $filteredElements = [];
 
-        foreach ($this->innerElements as $element) {
-            $innerKey = $innerKeySelector($element);
-            if (isset($outerKeySet[$innerKey])) {
-                $filteredElements[] = $element;
+        foreach ($this->innerElements as $innerElement) {
+            $innerKey = $innerKeySelector($innerElement);
+            if (isset($reversedOuterKeys[$innerKey])) {
+                $filteredElements[] = $innerElement;
             }
         }
 
-        return new PreloadedResultSet($filteredElements, $this->innerClass);
-    }
-
-    public function getOuterKeySelector(?string $outerClass): callable
-    {
-        return AccessorCreators::createKeySelector($this->outerKey, $outerClass);
-    }
-
-    public function getInnerKeySelector(?string $innerClass): callable
-    {
-        return AccessorCreators::createKeySelector($this->innerKey, $innerClass);
-    }
-
-    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
-    {
-        return AccessorCreators::createKeyAssignee($this->relationKey, $outerClass);
+        return new PreloadedResultSet($filteredElements);
     }
 }

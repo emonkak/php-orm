@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractPaginatorTest extends TestCase
 {
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $pages = [
             $this->createMock(MockedPage::class),
@@ -62,7 +62,7 @@ class AbstractPaginatorTest extends TestCase
     /**
      * @dataProvider providerHas
      */
-    public function testHas($index, $totalPages, $expectedResult)
+    public function testHas($index, $totalPages, $expectedResult): void
     {
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,
@@ -96,7 +96,7 @@ class AbstractPaginatorTest extends TestCase
         ];
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $page = $this->createMock(MockedPage::class);
 
@@ -110,7 +110,7 @@ class AbstractPaginatorTest extends TestCase
         $this->assertSame($page, $paginator->firstPage());
     }
 
-    public function testLast()
+    public function testLast(): void
     {
         $page = $this->createMock(MockedPage::class);
 
@@ -139,7 +139,7 @@ class AbstractPaginatorTest extends TestCase
     /**
      * @dataProvider providerGetNumPages
      */
-    public function testGetNumPages($totalItems, $perPage, $expected)
+    public function testGetNumPages($totalItems, $perPage, $expected): void
     {
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,

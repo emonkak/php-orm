@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Database\PDOStatementInterface;;
+use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
@@ -28,8 +29,9 @@ class RelationTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testOneToOne()
+    public function testOneToOne(): void
     {
+        $outerClass = Model::class;
         $outerElements = [
             new Model(['post_id' => 1, 'user_id' => 1]),
             new Model(['post_id' => 2, 'user_id' => 1]),
@@ -59,12 +61,13 @@ class RelationTest extends TestCase
             ]),
             new Model([
                 'post_id' => 4,
-                'user_id' => null
+                'user_id' => null,
+                'user' => null
             ]),
         ];
 
-        $outerResult = new PreloadedResultSet($outerElements, Model::class);
-        $innerResult = new PreloadedResultSet($innerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements);
+        $innerResult = new PreloadedResultSet($innerElements);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -90,13 +93,6 @@ class RelationTest extends TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($innerResult);
 
-        $childRelation = $this->createMock(RelationInterface::class);
-        $childRelation
-            ->expects($this->once())
-            ->method('associate')
-            ->with($this->identicalTo($innerResult))
-            ->will($this->returnArgument(0));
-
         $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
@@ -109,16 +105,30 @@ class RelationTest extends TestCase
             $queryBuilder,
             []
         );
-        $joinStrategy = new OuterJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy, [$childRelation]);
+        $joinStrategy = new OuterJoin(
+            function($outerElement) {
+                return $outerElement->user_id;
+            },
+            function($innerElement) {
+                return $innerElement->user_id;
+            },
+            function($outerElement, $innerElement) {
+                $outerElement->user = $innerElement;
+                return $outerElement;
+            },
+            EqualityComparer::getInstance()
+        );
+        $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
+        $this->assertSame($outerClass, $relation->getResultClass());
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult)));
+        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult, $outerClass)));
     }
 
-    public function testOneToMany()
+    public function testOneToMany(): void
     {
+        $outerClass = Model::class;
         $outerElements = [
             new Model(['user_id' => 1]),
             new Model(['user_id' => 2]),
@@ -155,8 +165,8 @@ class RelationTest extends TestCase
             ]),
         ];
 
-        $outerResult = new PreloadedResultSet($outerElements, Model::class);
-        $innerResult = new PreloadedResultSet($innerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements);
+        $innerResult = new PreloadedResultSet($innerElements);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -183,13 +193,6 @@ class RelationTest extends TestCase
             ->with($this->identicalTo($stmt))
             ->willReturn($innerResult);
 
-        $childRelation = $this->createMock(RelationInterface::class);
-        $childRelation
-            ->expects($this->once())
-            ->method('associate')
-            ->with($this->identicalTo($innerResult))
-            ->will($this->returnArgument(0));
-
         $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new OneTo(
@@ -202,16 +205,31 @@ class RelationTest extends TestCase
             $queryBuilder,
             []
         );
-        $joinStrategy = new GroupJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy, [$childRelation]);
+        $joinStrategy = new GroupJoin(
+            function($outerElement) {
+                return $outerElement->user_id;
+            },
+            function($innerElement) {
+                return $innerElement->user_id;
+            },
+            function($outerElement, $innerElements) {
+                $outerElement->posts = $innerElements;
+                return $outerElement;
+            },
+            EqualityComparer::getInstance()
+        );
+        $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
+        $this->assertSame($outerClass, $relation->getResultClass());
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult)));
+        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult, $outerClass)));
     }
 
-    public function testOneToManyIfResultIsEmpty()
+    public function testOneToManyIfResultIsEmpty(): void
     {
+        $outerClass = Model::class;
+
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -227,20 +245,33 @@ class RelationTest extends TestCase
             $queryBuilder,
             []
         );
-        $joinStrategy = new GroupJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy);
+        $joinStrategy = new GroupJoin(
+            function($outerElement) {
+                return $outerElement->user_id;
+            },
+            function($innerElement) {
+                return $innerElement->user_id;
+            },
+            function($outerElement, $innerElements) {
+                $outerElement->posts = $innerElements;
+                return $outerElement;
+            },
+            EqualityComparer::getInstance()
+        );
+        $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
-        $outerResult = new EmptyResultSet(Model::class);
+        $outerResult = new EmptyResultSet();
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertEmpty(iterator_to_array($relation->associate($outerResult)));
+        $this->assertEmpty(iterator_to_array($relation->associate($outerResult, $outerClass)));
     }
 
-    public function testOneToManyIfOuterKeysIsEmpty()
+    public function testOneToManyIfOuterKeysIsEmpty(): void
     {
+        $outerClass = Model::class;
         $outerElements = [new Model(['job_id' => null])];
-        $outerResult = new PreloadedResultSet($outerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
@@ -257,45 +288,58 @@ class RelationTest extends TestCase
             $queryBuilder,
             []
         );
-        $joinStrategy = new GroupJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy);
+        $joinStrategy = new GroupJoin(
+            function($outerElement) {
+                return $outerElement->job_id;
+            },
+            function($innerElement) {
+                return $innerElement->job_id;
+            },
+            function($outerElement, $innerElements) {
+                $outerElement->jobs = $innerElements;
+                return $outerElement;
+            },
+            EqualityComparer::getInstance()
+        );
+        $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertSame($outerElements, iterator_to_array($relation->associate($outerResult)));
+        $this->assertSame($outerElements, iterator_to_array($relation->associate($outerResult, $outerClass)));
     }
 
-    public function testManyTo()
+    public function testManyTo(): void
     {
+        $outerClass = Model::class;
         $outerElements = [
             new Model(['user_id' => 1]),
             new Model(['user_id' => 2]),
             new Model(['user_id' => 3]),
         ];
         $innerElements = [
-            new Model(['__pivot_user_id' => 1, 'user_id' => 2]),
-            new Model(['__pivot_user_id' => 1, 'user_id' => 3]),
-            new Model(['__pivot_user_id' => 2, 'user_id' => 1]),
-            new Model(['__pivot_user_id' => 3, 'user_id' => 2]),
+            new Model(['user_id' => 2, '__pivot_key' => 1]),
+            new Model(['user_id' => 3, '__pivot_key' => 1]),
+            new Model(['user_id' => 1, '__pivot_key' => 2]),
+            new Model(['user_id' => 2, '__pivot_key' => 3]),
         ];
         $expectedResult = [
             new Model([
                 'user_id' => 1,
                 'friends' => [
-                    new Model(['user_id' => 2]),
-                    new Model(['user_id' => 3]),
+                    new Model(['user_id' => 2, '__pivot_key' => 1]),
+                    new Model(['user_id' => 3, '__pivot_key' => 1]),
                 ],
             ]),
             new Model([
                 'user_id' => 2,
                 'friends' => [
-                    new Model(['user_id' => 1]),
+                    new Model(['user_id' => 1, '__pivot_key' => 2]),
                 ],
             ]),
             new Model([
                 'user_id' => 3,
                 'friends' => [
-                    new Model(['user_id' => 2]),
+                    new Model(['user_id' => 2, '__pivot_key' => 3]),
                 ],
             ]),
         ];
@@ -315,7 +359,7 @@ class RelationTest extends TestCase
         $pdo
             ->expects($this->once())
             ->method('prepare')
-            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_user_id` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
+            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
         $fetcher = $this->createMock(FetcherInterface::class);
@@ -323,7 +367,7 @@ class RelationTest extends TestCase
             ->expects($this->once())
             ->method('fetch')
             ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadedResultSet($innerElements, Model::class));
+            ->willReturn(new PreloadedResultSet($innerElements));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -335,31 +379,31 @@ class RelationTest extends TestCase
             'users',
             'friend_id',
             'user_id',
+            '__pivot_key',
             $pdo,
             $fetcher,
             $queryBuilder,
             []
         );
-        $joinStrategy = new GroupJoin();
-        $relation = new Relation($relationStrategy, $joinStrategy);
+        $joinStrategy = new GroupJoin(
+            function($outerElement) {
+                return $outerElement->user_id;
+            },
+            function($innerElement) {
+                return $innerElement->__pivot_key;
+            },
+            function($outerElement, $innerElements) {
+                $outerElement->friends = $innerElements;
+                return $outerElement;
+            },
+            EqualityComparer::getInstance()
+        );
+        $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
-        $outerResult = new PreloadedResultSet($outerElements, Model::class);
+        $outerResult = new PreloadedResultSet($outerElements);
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult)));
-    }
-
-    public function testWith()
-    {
-        $relationStrategy = $this->createMock(RelationStrategyInterface::class);
-        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
-        $childRelation = $this->createMock(RelationInterface::class);
-
-        $relation = new Relation($relationStrategy, $joinStrategy);
-        $newRelation = $relation->with($childRelation);
-
-        $this->assertNotSame($relation, $newRelation);
-        $this->assertSame([$childRelation], $newRelation->getChildRelations());
+        $this->assertEquals($expectedResult, iterator_to_array($relation->associate($outerResult, $outerClass)));
     }
 }

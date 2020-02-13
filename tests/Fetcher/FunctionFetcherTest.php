@@ -15,24 +15,23 @@ use PHPUnit\Framework\TestCase;
  */
 class FunctionFetcherTest extends TestCase
 {
-    public function testFetch()
+    public function testFetch(): void
     {
         $fetcher = FunctionFetcher::ofConstructor(Model::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->once())
-            ->method('fetch')
-            ->willReturn([]);
+            ->method('fetchAll')
+            ->willReturn([['foo' => 'bar']]);
 
         $result = $fetcher->fetch($stmt);
 
         $this->assertInstanceOf(ResultSetInterface::class, $result);
-        $this->assertSame(Model::class, $result->getClass());
-        $this->assertInstanceOf(Model::class, $result->first());
+        $this->assertEquals([new Model(['foo' => 'bar'])], $result->toArray());
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $fetcher = FunctionFetcher::ofConstructor(Model::class);
         $this->assertSame(Model::class, $fetcher->getClass());

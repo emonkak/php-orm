@@ -27,7 +27,7 @@ class DeleteBuilder implements QueryBuilderInterface
     /**
      * @var string
      */
-    private $from;
+    private $from = '';
 
     /**
      * @var ?Sql
@@ -73,6 +73,12 @@ class DeleteBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
@@ -81,6 +87,12 @@ class DeleteBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());

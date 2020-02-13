@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PageTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $items = new \EmptyIterator();
         $index = 1;
@@ -30,7 +30,7 @@ class PageTest extends TestCase
     /**
      * @dataProvider prividerGetOffset
      */
-    public function testGetOffset($index, $perPage, $expectedOffset)
+    public function testGetOffset($index, $perPage, $expectedOffset): void
     {
         $items = new \EmptyIterator();
         $totalPages = 10;
@@ -56,7 +56,7 @@ class PageTest extends TestCase
         ];
     }
 
-    public function testNext()
+    public function testNext(): void
     {
         $items = new \EmptyIterator();
         $index = 1;
@@ -75,7 +75,7 @@ class PageTest extends TestCase
         $this->assertSame($nextPage, $page->next());
     }
 
-    public function testPrevious()
+    public function testPrevious(): void
     {
         $items = new \EmptyIterator();
         $index = 1;
@@ -94,7 +94,7 @@ class PageTest extends TestCase
         $this->assertSame($previousPage, $page->previous());
     }
 
-    public function testHasPrevious()
+    public function testHasPrevious(): void
     {
         $items = new \EmptyIterator();
         $index = 1;
@@ -111,7 +111,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasPrevious());
     }
 
-    public function testHasNext()
+    public function testHasNext(): void
     {
         $items = new \EmptyIterator();
         $index = 1;
@@ -128,7 +128,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->hasNext());
     }
 
-    public function testIsFirst()
+    public function testIsFirst(): void
     {
         $items = new \EmptyIterator();
         $index = 0;
@@ -145,7 +145,7 @@ class PageTest extends TestCase
         $this->assertTrue($page->isFirst());
     }
 
-    public function testIsLast()
+    public function testIsLast(): void
     {
         $items = new \EmptyIterator();
         $index = 1;

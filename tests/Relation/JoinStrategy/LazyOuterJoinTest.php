@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
+use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
@@ -15,7 +16,7 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
  */
 class LazyOuterJoinTest extends TestCase
 {
-    public function testJoin()
+    public function testJoin(): void
     {
         $talents = [
             new Model(['talent_id' => 1, 'name' => 'Sumire Uesaka']),
@@ -30,26 +31,47 @@ class LazyOuterJoinTest extends TestCase
             new Model(['program_id' => 5, 'talent_id' => 4]),
             new Model(['program_id' => 6, 'talent_id' => 5]),
         ];
-        $expected = [
+        $expectedResult = [
             new Model($talents[0]->toArray() + ['program' => $programs[0]]),
             new Model($talents[1]->toArray() + ['program' => $programs[1]]),
-            new Model($talents[2]->toArray() + ['program' => new Model([])]),
+            new Model($talents[2]->toArray() + ['program' => null]),
             new Model($talents[3]->toArray() + ['program' => $programs[2]]),
             new Model($talents[4]->toArray() + ['program' => $programs[3]]),
         ];
 
+        $outerKeySelector = function($talent) { return $talent->talent_id; };
+        $innerKeySelector = function($program) { return $program->talent_id; };
+        $resultSelector = function($talent, $program) {
+            $talent->program = $program;
+            return $talent;
+        };
+        $comparer = EqualityComparer::getInstance();
         $proxyFactory = new LazyLoadingValueHolderFactory();
-        $result = (new LazyOuterJoin($proxyFactory))
+
+        $lazyOuterJoin = new LazyOuterJoin(
+            $outerKeySelector,
+            $innerKeySelector,
+            $resultSelector,
+            $comparer,
+            $proxyFactory
+        );
+
+        $this->assertSame($outerKeySelector, $lazyOuterJoin->getOuterKeySelector());
+        $this->assertSame($innerKeySelector, $lazyOuterJoin->getInnerKeySelector());
+        $this->assertSame($resultSelector, $lazyOuterJoin->getResultSelector());
+        $this->assertSame($comparer, $lazyOuterJoin->getComparer());
+        $this->assertSame($proxyFactory, $lazyOuterJoin->getProxyFactory());
+
+        $result = $lazyOuterJoin
             ->join(
-                new PreloadedResultSet($talents, Model::class),
-                new PreloadedResultSet($programs, Model::class),
-                function($talent) { return $talent->talent_id; },
-                function($program) { return $program->talent_id; },
-                function($talent, $program) {
-                    $talent->program = new Model($program->toArray());
-                    return $talent;
-                }
+                new PreloadedResultSet($talents),
+                new PreloadedResultSet($programs)
             );
-        $this->assertEquals($expected, iterator_to_array($result));
+        $result = iterator_to_array($result, false);
+        $result = array_map(function($talent) {
+            $talent->program = $talent->program->get();
+            return $talent;
+        }, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 }

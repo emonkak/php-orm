@@ -4,35 +4,129 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\EqualityComparerInterface;
 use Emonkak\Enumerable\Iterator\GroupJoinIterator;
-use Emonkak\Orm\Relation\AccessorCreators;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template TOuter
+ * @template TInner
+ * @template TKey
+ * @template TThroughKey
+ * @template TResult
+ * @implements JoinStrategyInterface<TOuter,TInner,TKey,TResult>
+ */
 class ThroughGroupJoin implements JoinStrategyInterface
 {
     /**
-     * @var string
+     * @psalm-var callable(TOuter):TKey
+     * @var callable
      */
-    private $throughKey;
+    private $outerKeySelector;
 
-    public function __construct(string $throughKey)
-    {
-        $this->throughKey = $throughKey;
+    /**
+     * @psalm-var callable(TInner):TKey
+     * @var callable
+     */
+    private $innerKeySelector;
+
+    /**
+     * @psalm-var callable(TInner):TThroughKey
+     * @var callable
+     */
+    private $throughKeySelector;
+
+    /**
+     * @psalm-var callable(TOuter,TThroughKey[]):TResult $resultSelector
+     * @var callable
+     */
+    private $resultSelector;
+
+    /**
+     * @psalm-var EqualityComparerInterface<TKey>
+     * @var EqualityComparerInterface
+     */
+    private $comparer;
+
+    /**
+     * @psalm-param callable(TOuter):TKey $outerKeySelector
+     * @psalm-param callable(TInner):TKey $innerKeySelector
+     * @psalm-param callable(TInner):TThroughKey $throughKeySelector
+     * @psalm-param callable(TOuter,TThroughKey[]):TResult $resultSelector
+     * @psalm-param EqualityComparerInterface<TKey> $comparer
+     */
+    public function __construct(
+        callable $outerKeySelector,
+        callable $innerKeySelector,
+        callable $throughKeySelector,
+        callable $resultSelector,
+        EqualityComparerInterface $comparer
+    ) {
+        $this->outerKeySelector = $outerKeySelector;
+        $this->innerKeySelector = $innerKeySelector;
+        $this->throughKeySelector = $throughKeySelector;
+        $this->resultSelector = $resultSelector;
+        $this->comparer = $comparer;
     }
 
-    public function join(ResultSetInterface $outer, ResultSetInterface $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector): \Traversable
+    /**
+     * {@inheritDoc}
+     */
+    public function getOuterKeySelector(): callable
     {
-        $throughKeySelector = AccessorCreators::createKeySelector($this->throughKey, $inner->getClass());
+        return $this->outerKeySelector;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInnerKeySelector(): callable
+    {
+        return $this->innerKeySelector;
+    }
+
+    /**
+     * @psalm-return callable(TInner):TThroughKey
+     */
+    public function getThroughKeySelector(): callable
+    {
+        return $this->throughKeySelector;
+    }
+
+    /**
+     * @psalm-return callable(TOuter,TInner[]):TResult
+     */
+    public function getResultSelector(): callable
+    {
+        return $this->resultSelector;
+    }
+
+    public function getComparer(): EqualityComparerInterface
+    {
+        return $this->comparer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function join(iterable $outer, iterable $inner): \Traversable
+    {
+        $throughKeySelector = $this->throughKeySelector;
+        $resultSelector = $this->resultSelector;
         return new GroupJoinIterator(
             $outer,
             $inner,
-            $outerKeySelector,
-            $innerKeySelector,
+            $this->outerKeySelector,
+            $this->innerKeySelector,
+            /**
+             * @psalm-param TOuter $lhs
+             * @psalm-param TInner[] $rhs
+             * @psalm-return TResult
+             */
             static function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
-                return $resultSelector($lhs, array_map($throughKeySelector, $rhs));
+                $throughKeys = array_map($throughKeySelector, $rhs);
+                return $resultSelector($lhs, $throughKeys);
             },
-            EqualityComparer::getInstance()
+            $this->comparer
         );
     }
 }

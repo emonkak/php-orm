@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\Preloaded;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -18,12 +19,11 @@ class PreloadedTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $relationKey = 'relation_key';
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
-        $innerClass = Model::class;
         $innerElements = [
             new Model([])
         ];
@@ -32,18 +32,16 @@ class PreloadedTest extends TestCase
             $relationKey,
             $outerKey,
             $innerKey,
-            $innerClass,
             $innerElements
         );
 
         $this->assertSame($relationKey, $relationStrategy->getRelationKey());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($innerClass, $relationStrategy->getInnerClass());
         $this->assertSame($innerElements, $relationStrategy->getInnerElements());
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         $outerKeys = [1, 2, 3];
         $items = [
@@ -58,7 +56,6 @@ class PreloadedTest extends TestCase
             'items',
             'item_id',
             'item_id',
-            Model::class,
             $items
         );
 
@@ -68,33 +65,14 @@ class PreloadedTest extends TestCase
             $items[2]
         ];
 
-        $this->assertSame($expectedResultSet, iterator_to_array($relationStrategy->getResult($outerKeys), false));
-    }
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+        $joinStrategy
+            ->expects($this->once())
+            ->method('getInnerKeySelector')
+            ->willReturn(function($model) {
+                return $model->item_id;
+            });
 
-    public function testResolveSelectors()
-    {
-        $relationStrategy = new Preloaded(
-            'revision',
-            'revision_id',
-            'id',
-            Model::class,
-            []
-        );
-
-        $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);
-        $innerKeySelector = $relationStrategy->getInnerKeySelector(Model::class);
-        $resultSelector = $relationStrategy->getResultSelector(Model::class, Model::class);
-
-        $outer = new Model(['revision_id' => 123]);
-        $inner = new Model(['id' => 123]);
-
-        $expectedResult = new Model([
-            'revision_id' => 123,
-            'revision' => new Model(['id' => 123])
-        ]);
-
-        $this->assertSame(123, $outerKeySelector($outer));
-        $this->assertSame(123, $innerKeySelector($inner));
-        $this->assertEquals($expectedResult, $resultSelector($outer, $inner));
+        $this->assertSame($expectedResultSet, iterator_to_array($relationStrategy->getResult($outerKeys, $joinStrategy), false));
     }
 }

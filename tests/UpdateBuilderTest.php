@@ -16,14 +16,14 @@ class UpdateBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testGetGrammar()
+    public function testGetGrammar(): void
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new UpdateBuilder($grammar);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $queryBuilder = $this->getUpdateBuilder()
             ->table('t1')
@@ -31,11 +31,11 @@ class UpdateBuilderTest extends TestCase
             ->where('c2', '=', 456);
         $this->assertSame('UPDATE', $queryBuilder->getPrefix());
         $this->assertSame('t1', $queryBuilder->getTable());
-        $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getUpdateBuilder());
+        $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getSet());
         $this->assertQueryIs('(c2 = ?)', [456], $queryBuilder->getWhere());
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $query = $this->getUpdateBuilder()
             ->prefix('UPDATE IGNORE')
@@ -50,7 +50,7 @@ class UpdateBuilderTest extends TestCase
         );
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $query = $this->getUpdateBuilder()
             ->table('t1')
@@ -76,11 +76,11 @@ class UpdateBuilderTest extends TestCase
         );
     }
 
-    public function testSetAll()
+    public function testWithSet(): void
     {
         $query = $this->getUpdateBuilder()
             ->table('t1')
-            ->setAll(['c1' => new Sql('c1 + ?', [1]), 'c2' => 100])
+            ->withSet(['c1' => new Sql('c1 + ?', [1]), 'c2' => 100])
             ->build();
         $this->assertQueryIs(
             'UPDATE t1 SET c1 = c1 + ?, c2 = ?',
@@ -91,7 +91,7 @@ class UpdateBuilderTest extends TestCase
         $queryBuilder = $this->getSelectBuilder()->select('c1')->from('t2')->limit(1);
         $query = $this->getUpdateBuilder()
             ->table('t1')
-            ->setAll(['c1' => $queryBuilder, 'c2' => 100])
+            ->withSet(['c1' => $queryBuilder, 'c2' => 100])
             ->build();
         $this->assertQueryIs(
             'UPDATE t1 SET c1 = (SELECT c1 FROM t2 LIMIT ?), c2 = ?',
@@ -100,7 +100,7 @@ class UpdateBuilderTest extends TestCase
         );
     }
 
-    public function testWhere()
+    public function testWhere(): void
     {
         $query = $this->getUpdateBuilder()
             ->table('t1')
@@ -115,7 +115,7 @@ class UpdateBuilderTest extends TestCase
         );
     }
 
-    public function testOrWhere()
+    public function testOrWhere(): void
     {
         $query = $this->getUpdateBuilder()
             ->table('t1')

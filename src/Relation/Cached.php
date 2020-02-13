@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
+/**
+ * @template TInner
+ * @template TKey
+ * @implements RelationStrategyInterface<TInner,TKey>
+ */
 class Cached implements RelationStrategyInterface
 {
     /**
+     * @psalm-var RelationStrategyInterface<TInner,TKey>
      * @var RelationStrategyInterface
      */
     private $relationStrategy;
@@ -21,7 +28,7 @@ class Cached implements RelationStrategyInterface
     private $cache;
 
     /**
-     * @var callable
+     * @psalm-var callable(TKey):string
      */
     private $cacheKeySelector;
 
@@ -31,7 +38,8 @@ class Cached implements RelationStrategyInterface
     private $cacheTtl;
 
     /**
-     * @param callable(mixed):mixed $cacheKeySelector
+     * @psalm-param RelationStrategyInterface<TInner,TKey> $relationStrategy
+     * @psalm-param callable(TKey):string $cacheKeySelector
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
@@ -45,7 +53,10 @@ class Cached implements RelationStrategyInterface
         $this->cacheTtl = $cacheTtl;
     }
 
-    public function getInnerRelationStrategy(): RelationStrategyInterface
+    /**
+     * @psalm-return RelationStrategyInterface<TInner,TKey>
+     */
+    public function getRelationStrategy(): RelationStrategyInterface
     {
         return $this->relationStrategy;
     }
@@ -56,7 +67,7 @@ class Cached implements RelationStrategyInterface
     }
 
     /**
-     * @return callable(mixed):mixed
+     * @psalm-return callable(TKey):string
      */
     public function getCacheKeySelector(): callable
     {
@@ -68,13 +79,17 @@ class Cached implements RelationStrategyInterface
         return $this->cacheTtl;
     }
 
-    public function getResult(array $outerKeys): ResultSetInterface
+    /**
+     * {@inheritDoc}
+     */
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
     {
         $cacheKeyIndexes = [];
         $cacheKeySelector = $this->cacheKeySelector;
 
         foreach ($outerKeys as $outerKey) {
-            $cacheKeyIndexes[$cacheKeySelector($outerKey)] = $outerKey;
+            $cacheKey = $cacheKeySelector($outerKey);
+            $cacheKeyIndexes[$cacheKey] = $outerKey;
         }
 
         $cacheItems = $this->cache->getMultiple(array_keys($cacheKeyIndexes));
@@ -89,40 +104,21 @@ class Cached implements RelationStrategyInterface
             }
         }
 
-        if (!empty($uncachedOuterKeys)) {
-            $result = $this->relationStrategy->getResult($uncachedOuterKeys);
-            $innerClass = $result->getClass();
-            $innerKeySelector = $this->relationStrategy->getInnerKeySelector($innerClass);
+        if (count($uncachedOuterKeys) > 0) {
+            $result = $this->relationStrategy->getResult($uncachedOuterKeys, $joinStrategy);
+            $innerKeySelector = $joinStrategy->getInnerKeySelector();
             $freshCacheItems = [];
 
-            foreach ($result as $element) {
-                $cacheKey = $cacheKeySelector($innerKeySelector($element));
-
-                $freshCacheItems[$cacheKey] = $element;
-
-                $cachedElements[] = $element;
+            foreach ($result as $innerElement) {
+                $innerKey = $innerKeySelector($innerElement);
+                $cacheKey = $cacheKeySelector($innerKey);
+                $freshCacheItems[$cacheKey] = $innerElement;
+                $cachedElements[] = $innerElement;
             }
 
             $this->cache->setMultiple($freshCacheItems, $this->cacheTtl);
-        } else {
-            $innerClass = get_class($cachedElements[0]);
         }
 
-        return new PreloadedResultSet($cachedElements, $innerClass);
-    }
-
-    public function getOuterKeySelector(?string $outerClass): callable
-    {
-        return $this->relationStrategy->getOuterKeySelector($outerClass);
-    }
-
-    public function getInnerKeySelector(?string $innerClass): callable
-    {
-        return $this->relationStrategy->getInnerKeySelector($innerClass);
-    }
-
-    public function getResultSelector(?string $outerClass, ?string $innerClass): callable
-    {
-        return $this->relationStrategy->getResultSelector($outerClass, $innerClass);
+        return new PreloadedResultSet($cachedElements);
     }
 }

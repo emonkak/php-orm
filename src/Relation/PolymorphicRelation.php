@@ -5,71 +5,99 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Enumerable\Iterator\ConcatIterator;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template TOuter
+ * @implements RelationInterface<TOuter,TOuter>
+ */
 class PolymorphicRelation implements RelationInterface
 {
     const SORT_KEY = '__sort';
 
     /**
-     * @var string
+     * @psalm-var ?class-string<TOuter>
+     * @var ?class-string
      */
-    private $morphKey;
+    private $resultClass;
 
     /**
-     * @var array<string,RelationInterface> $polymorphics
+     * @psalm-var callable(TOuter):string
      */
-    private $polymorphics;
+    private $morphKeySelector;
 
     /**
-     * @param array<string,RelationInterface> $polymorphics
+     * @psalm-var array<string,RelationInterface<TOuter,TOuter>>
+     * @var array<string,RelationInterface>
      */
-    public function __construct(string $morphKey, array $polymorphics)
-    {
-        $this->morphKey = $morphKey;
-        $this->polymorphics = $polymorphics;
-    }
+    private $relations;
 
-    public function getMorphKey(): string
+    /**
+     * @psalm-param ?class-string<TOuter> $resultClass
+     * @psalm-param callable(TOuter):string $morphKeySelector
+     * @psalm-param array<string,RelationInterface<TOuter,TOuter>> $relations
+     */
+    public function __construct(?string $resultClass, callable $morphKeySelector, array $relations)
     {
-        return $this->morphKey;
+        $this->resultClass = $resultClass;
+        $this->morphKeySelector = $morphKeySelector;
+        $this->relations = $relations;
     }
 
     /**
-     * @return array<string,RelationInterface> $polymorphics
+     * {@inheritDoc}
      */
-    public function getPolymorphics(): array
+    public function getResultClass(): ?string
     {
-        return $this->polymorphics;
+        return $this->resultClass;
     }
 
-    public function associate(ResultSetInterface $result): \Traversable
+    /**
+     * @psalm-return callable(TOuter):string
+     */
+    public function getMorphKeySelector(): callable
     {
-        $outerClass = $result->getClass();
-        $morphKeySelector = AccessorCreators::createKeySelector($this->morphKey, $outerClass);
-        $sortKeyAssignee = AccessorCreators::createKeyAssignee(self::SORT_KEY, $outerClass);
+        return $this->morphKeySelector;
+    }
+
+    /**
+     * @psalm-return array<string,RelationInterface<TOuter,TOuter>> $relations
+     */
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function associate(iterable $outerResult, ?string $outerClass): \Traversable
+    {
+        $morphKeySelector = $this->morphKeySelector;
+        /** @psalm-var callable(TOuter,int):TOuter */
+        $sortKeyAssignee = AccessorCreators::createKeyAssignee($outerClass, self::SORT_KEY);
         $outerElementsByMorphKey = [];
 
-        foreach ($result as $index => $element) {
-            $morphKey = $morphKeySelector($element);
-            $element = $sortKeyAssignee($element, $index);
-            $outerElementsByMorphKey[$morphKey][] = $element;
+        foreach ($outerResult as $index => $outerElement) {
+            $morphKey = $morphKeySelector($outerElement);
+            $outerElement = $sortKeyAssignee($outerElement, $index);
+            $outerElementsByMorphKey[$morphKey][] = $outerElement;
         }
 
         $outerResults = [];
+
         foreach ($outerElementsByMorphKey as $morphKey => $outerElements) {
-            if (isset($this->polymorphics[$morphKey])) {
-                $relation = $this->polymorphics[$morphKey];
-                $outerResult = new PreloadedResultSet($outerElements, $outerClass);
-                $outerResults[] = $relation->associate($outerResult);
+            if (isset($this->relations[$morphKey])) {
+                $relation = $this->relations[$morphKey];
+                $outerResults[] = $relation->associate($outerElements, $outerClass);
             } else {
                 $outerResults[] = $outerElements;
             }
         }
 
-        $sortKeySelector = AccessorCreators::createKeySelector(self::SORT_KEY, $outerClass);
-        $sortKeyEraser = AccessorCreators::createKeyEraser(self::SORT_KEY, $outerClass);
+        /** @psalm-var callable(TOuter):int */
+        $sortKeySelector = AccessorCreators::createKeySelector($outerClass, self::SORT_KEY);
+        /** @psalm-var callable(TOuter):TOuter */
+        $sortKeyEraser = AccessorCreators::createKeyEraser($outerClass, self::SORT_KEY);
 
         return (new ConcatIterator($outerResults))
             ->orderBy($sortKeySelector)

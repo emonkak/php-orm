@@ -6,6 +6,9 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @implements PaginatorInterface<mixed>
+ */
 class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
 {
     use EnumerableExtensions;
@@ -16,13 +19,16 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     private $perPage;
 
     /**
-     * @param int $perPage
+     * @psalm-param int $perPage
      */
     public function __construct(int $perPage)
     {
         $this->perPage = $perPage;
     }
 
+    /**
+     * @psalm-return PageInterface<mixed>
+     */
     public function at(int $index): PageInterface
     {
         return new Page(new \EmptyIterator(), $index, $this);
@@ -33,11 +39,17 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
         return false;
     }
 
+    /**
+     * @psalm-return PageInterface<mixed>
+     */
     public function firstPage(): PageInterface
     {
         return $this->at(0);
     }
 
+    /**
+     * @psalm-return PageInterface<mixed>
+     */
     public function lastPage(): PageInterface
     {
         return $this->at(0);

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExplainableTest extends TestCase
 {
-    public function testExplain()
+    public function testExplain(): void
     {
         $explainable = $this->getMockForTrait(Explainable::class);
         $explainable
