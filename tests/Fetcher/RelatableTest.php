@@ -46,6 +46,26 @@ class RelatableTest extends TestCase
         $this->assertSame($relatableFetcher, $relationFetcher->getFetcher());
         $this->assertSame($relation, $relationFetcher->getRelation());
     }
+
+    public function testWithRelation(): void
+    {
+        $class = \stdClass::class;
+
+        $relatableFetcher = $this->getMockBuilder(RelatableMock::class)
+            ->setMethods(['getClass', 'fetch'])
+            ->getMock();
+        $relatableFetcher
+            ->expects($this->never())
+            ->method('fetch');
+
+        $relation = $this->createMock(RelationInterface::class);
+
+        $relationFetcher = $relatableFetcher->withRelation($relation);
+
+        $this->assertInstanceOf(RelationFetcher::class, $relationFetcher);
+        $this->assertSame($relatableFetcher, $relationFetcher->getFetcher());
+        $this->assertSame($relation, $relationFetcher->getRelation());
+    }
 }
 
 abstract class RelatableMock implements FetcherInterface

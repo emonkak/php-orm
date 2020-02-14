@@ -28,4 +28,15 @@ trait Relatable
         '@phan-var FetcherInterface $this';
         return new RelationFetcher($this, $relation);
     }
+
+    /**
+     * @template TResult
+     * @psalm-param RelationInterface<TOuter,TResult> $relation
+     * @psalm-return RelationFetcher<TOuter,TResult>
+     */
+    public function withRelation(RelationInterface $relation): RelationFetcher
+    {
+        '@phan-var FetcherInterface $this';
+        return new RelationFetcher($this, $relation);
+    }
 }
