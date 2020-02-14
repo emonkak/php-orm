@@ -33,6 +33,7 @@ final class AccessorCreators
                  * @psalm-return TKey
                  */
                 static function($array) use ($key) {
+                    /** @phan-suppress-next-line PhanTypeArraySuspicious */
                     return $array[$key];
                 };
         }
@@ -67,7 +68,9 @@ final class AccessorCreators
                  * @psalm-return TKey
                  */
                 static function(&$array) use ($key) {
+                    /** @phan-suppress-next-line PhanTypeArraySuspicious */
                     $pivot = $array[$key];
+                    /** @phan-suppress-next-line PhanTypeArrayUnsetSuspicious */
                     unset($array[$key]);
                     return $pivot;
                 };
@@ -101,6 +104,7 @@ final class AccessorCreators
                  * @psalm-return T
                  */
                 static function($array) use ($key) {
+                    /** @phan-suppress-next-line PhanTypeArrayUnsetSuspicious */
                     unset($array[$key]);
                     return $array;
                 };
@@ -143,6 +147,7 @@ final class AccessorCreators
                 static function($lhs, $rhs) use ($key) {
                     /** @psalm-suppress RedundantConditionGivenDocblockType */
                     if ($rhs !== null) {
+                        /** @phan-suppress-next-line PhanTypeArraySuspicious */
                         $lhs[$key] = $rhs;
                     }
                     return $lhs;

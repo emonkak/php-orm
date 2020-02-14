@@ -33,7 +33,7 @@ trait Preparable
                 break;
             default:
                 /** @psalm-var mixed $binding */
-                $typeOrClass = $type === 'object' ? get_class($binding) : $type;
+                $typeOrClass = $type === 'object' ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
                 throw new \UnexpectedValueException(
                     "The value should be a bindable type. but got '$typeOrClass'."
                 );

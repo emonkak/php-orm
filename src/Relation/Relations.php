@@ -10,7 +10,7 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
-use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
+use Emonkak\Orm\Relation\JoinStrategy\LazyValue;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;

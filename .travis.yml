@@ -15,6 +15,7 @@ install:
   - composer install
 
 script:
+  - php ./vendor/bin/phan
   - php ./vendor/bin/psalm
   - mkdir -p build/logs
   - php ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
