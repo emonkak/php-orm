@@ -6,40 +6,40 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @template T
+ * @implements \IteratorAggregate<T>
+ * @implements ResultSetInterface<T>
+ */
 class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
 {
     use EnumerableExtensions;
 
     /**
+     * @psalm-var T[]
      * @var mixed[]
      */
     private $elements;
 
     /**
-     * @var ?class-string
+     * @psalm-param T[] $elements
      */
-    private $class;
-
-    /**
-     * @param mixed[] $elements
-     * @param ?class-string $class
-     */
-    public function __construct(array $elements, ?string $class)
+    public function __construct(array $elements)
     {
         $this->elements = $elements;
-        $this->class = $class;
     }
 
+    /**
+     * @psalm-return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->elements);
     }
 
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public function getSource(): iterable
     {
         return $this->elements;

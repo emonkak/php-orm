@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SequentialPageIteratorTest extends TestCase
 {
-    public function testFrom()
+    public function testFrom(): void
     {
         $index = 1;
         $perPage = 10;
@@ -39,7 +39,7 @@ class SequentialPageIteratorTest extends TestCase
         $this->assertEquals($expectedItems, iterator_to_array($iterator));
     }
 
-    public function testIterate()
+    public function testIterate(): void
     {
         $index = 0;
         $perPage = 10;
@@ -62,7 +62,7 @@ class SequentialPageIteratorTest extends TestCase
         $this->assertEquals(range(0, 29), iterator_to_array($iterator->iterate()->take(30)));
     }
 
-    public function testNext()
+    public function testNext(): void
     {
         $index = 0;
         $perPage = 10;

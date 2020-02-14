@@ -8,6 +8,7 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\Cached;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\RelationStrategyInterface;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
@@ -23,7 +24,7 @@ class CachedTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $outerKeySelector = function() {};
         $innerKeySelector = function() {};
@@ -42,13 +43,13 @@ class CachedTest extends TestCase
             $cacheTtl
         );
 
-        $this->assertSame($innerRelationStrategy, $relationStrategy->getInnerRelationStrategy());
+        $this->assertSame($innerRelationStrategy, $relationStrategy->getRelationStrategy());
         $this->assertSame($cache, $relationStrategy->getCache());
         $this->assertSame($cacheKeySelector, $relationStrategy->getCacheKeySelector());
         $this->assertSame($cacheTtl, $relationStrategy->getCacheTtl());
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = [
@@ -92,16 +93,8 @@ class CachedTest extends TestCase
                 [
                     $expectedResult[1],
                     $expectedResult[2]
-                ],
-                Model::class
+                ]
             ));
-        $innerRelationStrategy
-            ->expects($this->once())
-            ->method('getInnerKeySelector')
-            ->with(Model::class)
-            ->willReturn(function($model) {
-                return $model->id;
-            });
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -112,13 +105,21 @@ class CachedTest extends TestCase
             $cacheTtl
         );
 
-        $result = $relationStrategy->getResult($outerKeys);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+        $joinStrategy
+            ->expects($this->once())
+            ->method('getInnerKeySelector')
+            ->with()
+            ->willReturn(function($model) {
+                return $model->id;
+            });
+
+        $result = $relationStrategy->getResult($outerKeys, $joinStrategy);
 
         $this->assertEquals($expectedResult, $result->toArray());
-        $this->assertSame(Model::class, $result->getClass());
     }
 
-    public function testGetResultFromOnlyCache()
+    public function testGetResultFromOnlyCache(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = [
@@ -162,55 +163,10 @@ class CachedTest extends TestCase
             $cacheTtl
         );
 
-        $result = $relationStrategy->getResult($outerKeys);
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+
+        $result = $relationStrategy->getResult($outerKeys, $joinStrategy);
 
         $this->assertEquals($expectedResult, $result->toArray());
-        $this->assertSame(Model::class, $result->getClass());
-    }
-
-    public function testSelectorResolvings()
-    {
-        $pdo = $this->createMock(PDOInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
-        $queryBuilder = $this->getSelectBuilder();
-
-        $outerClass = 'OuterClass';
-        $innerClass = 'InnerClass';
-
-        $outerKeySelector = function() {};
-        $innerKeySelector = function() {};
-        $resultSelector = function() {};
-
-        $innerRelationStrategy = $this->createMock(RelationStrategyInterface::class);
-        $innerRelationStrategy
-            ->expects($this->once())
-            ->method('getOuterKeySelector')
-            ->with($outerClass)
-            ->willReturn($outerKeySelector);
-        $innerRelationStrategy
-            ->expects($this->once())
-            ->method('getInnerKeySelector')
-            ->with($innerClass)
-            ->willReturn($innerKeySelector);
-        $innerRelationStrategy
-            ->expects($this->once())
-            ->method('getResultSelector')
-            ->with($outerClass, $innerClass)
-            ->willReturn($resultSelector);
-
-        $cache = $this->createMock(CacheInterface::class);
-        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
-        $cacheTtl = 3600;
-
-        $relationStrategy = new Cached(
-            $innerRelationStrategy,
-            $cache,
-            $cacheKeySelector,
-            $cacheTtl
-        );
-
-        $this->assertSame($outerKeySelector, $relationStrategy->getOuterKeySelector($outerClass));
-        $this->assertSame($innerKeySelector, $relationStrategy->getInnerKeySelector($innerClass));
-        $this->assertSame($resultSelector, $relationStrategy->getResultSelector($outerClass, $innerClass));
     }
 }

@@ -14,7 +14,7 @@ class SqlTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $query = Sql::format('SELECT * FROM t1 WHERE c1 = %s AND c2 IN %s', Sql::value(123), Sql::values(['foo', 'bar', 'baz']));
         $this->assertQueryIs(
@@ -24,7 +24,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testJoin()
+    public function testJoin(): void
     {
         $query = Sql::join(
             ' AND ',
@@ -42,7 +42,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $query = Sql::value(123);
         $this->assertQueryIs(
@@ -52,7 +52,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testValues()
+    public function testValues(): void
     {
         $query = Sql::values([1, 2, 3]);
         $this->assertQueryIs(
@@ -62,7 +62,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testAnd()
+    public function testAnd(): void
     {
         $query = Sql::_and(
             Sql::_or(
@@ -80,7 +80,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $sql = 'SELECT * FROM t1 WHERE (((((c1 IN (?, ?, ?)) AND (c2 = ?)) AND (c3 IS NOT ?)) AND (c4 = ?)) AND (c5 = ?)) ORDER BY c1';
         $bindings = [1, 2, 3, "'foo'", null, true, false];
@@ -91,9 +91,14 @@ class SqlTest extends TestCase
         $bindings = [hex2bin('ff')];
         $expected = "SELECT * FROM t1 WHERE (c1 = x'ff')";
         $this->assertEquals($expected, (string) new Sql($sql, $bindings));
+
+        $sql = 'SELECT * FROM t1 WHERE (c1 = ?)';
+        $bindings = [new \stdClass()];
+        $expected = "SELECT * FROM t1 WHERE (c1 = '<stdClass>')";
+        $this->assertEquals($expected, (string) new Sql($sql, $bindings));
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         $query = (new Sql('SELECT'))
             ->append('*')
@@ -108,7 +113,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testAppendQuery()
+    public function testAppendQuery(): void
     {
         $query = (new Sql('SELECT'))
             ->append('*')
@@ -133,7 +138,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testAppendQueryBuilder()
+    public function testAppendQueryBuilder(): void
     {
         $query = (new Sql('SELECT'))
             ->append('*')
@@ -148,7 +153,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $query = (new Sql('SELECT'))
             ->append('*')
@@ -164,7 +169,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testPrependQuery()
+    public function testPrependQuery(): void
     {
         $query = (new Sql('UNION ALL'))
             ->appendQuery(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
@@ -188,7 +193,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testPrependQueryBuilder()
+    public function testPrependQueryBuilder(): void
     {
         $query = (new Sql('UNION ALL'))
             ->appendQueryBuilder(new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
@@ -200,7 +205,7 @@ class SqlTest extends TestCase
         );
     }
 
-    public function testEnclosed()
+    public function testEnclosed(): void
     {
         $query = (new Sql('SELECT * FROM t1 WHERE c1 = ?', [123]))
             ->enclosed()

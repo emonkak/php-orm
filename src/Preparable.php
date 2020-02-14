@@ -32,7 +32,8 @@ trait Preparable
                 $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
                 break;
             default:
-                $typeOrClass = $type === 'object' ? get_class($binding) : $type;
+                /** @psalm-var mixed $binding */
+                $typeOrClass = $type === 'object' ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
                 throw new \UnexpectedValueException(
                     "The value should be a bindable type. but got '$typeOrClass'."
                 );
@@ -49,3 +50,4 @@ trait Preparable
 
     abstract public function build(): Sql;
 }
+

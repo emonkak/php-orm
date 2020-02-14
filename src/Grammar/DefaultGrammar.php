@@ -114,7 +114,7 @@ class DefaultGrammar extends AbstractGrammar
         return '`' . str_replace('`', '``', $string) . '`';
     }
 
-    public function selectStatement(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, ?string $suffix, array $union): Sql
+    public function selectStatement(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, string $suffix, array $union): Sql
     {
         $bindings = [];
 
@@ -129,7 +129,7 @@ class DefaultGrammar extends AbstractGrammar
              . $this->processOrderBy($orderBy, $bindings)
              . $this->processLimit($limit, $bindings)
              . $this->processOffset($offset, $bindings)
-             . ($suffix !== null ? ' ' . $suffix : '');
+             . ($suffix !== '' ? ' ' . $suffix : '');
 
         $sql .= $this->processUnion($union, $bindings);
 
@@ -148,12 +148,15 @@ class DefaultGrammar extends AbstractGrammar
         return new Sql($sql, $bindings);
     }
 
-    public function updateStatement(string $prefix, string $table, array $update, ?Sql $where): Sql
+    /**
+     * @param Sql[] $set
+     */
+    public function updateStatement(string $prefix, string $table, array $set, ?Sql $where): Sql
     {
         $bindings = [];
 
         $sql = $prefix . ' ' . $table
-             . $this->processSet($update, $bindings)
+             . $this->processSet($set, $bindings)
              . $this->processWhere($where, $bindings);
 
         return new Sql($sql, $bindings);
@@ -171,7 +174,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[]   $select
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processSelect(array $select, array &$bindings): string
     {
@@ -190,7 +193,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $from
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processFrom(array $from, array &$bindings): string
     {
@@ -209,7 +212,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $join
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      * @return string
      */
     private function processJoin(array $join, array &$bindings): string
@@ -229,7 +232,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param ?Sql $where
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      * @return string
      */
     private function processWhere(?Sql $where, array &$bindings): string
@@ -243,7 +246,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $groupBy
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processGroupBy(array $groupBy, array &$bindings): string
     {
@@ -262,7 +265,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param ?Sql $having
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processHaving(?Sql $having, array &$bindings): string
     {
@@ -275,7 +278,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $window
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processWindow(array $window, array &$bindings): string
     {
@@ -294,7 +297,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $orderBy
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processOrderBy(array $orderBy, array &$bindings): string
     {
@@ -312,7 +315,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processLimit(?int $limit, array &$bindings): string
     {
@@ -324,7 +327,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processOffset(?int $offset, array &$bindings): string
     {
@@ -337,7 +340,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $union
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processUnion(array $union, array &$bindings): string
     {
@@ -368,7 +371,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[][] $values
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processValues(array $values, array &$bindings): string
     {
@@ -391,7 +394,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param ?Sql $select
-     * @param mixed[] &$bindings
+     * @param array<int,?scalar> $bindings
      * @return string
      */
     private function processInsertSelect(?Sql $select, array &$bindings): string
@@ -405,7 +408,7 @@ class DefaultGrammar extends AbstractGrammar
 
     /**
      * @param Sql[] $update
-     * @param mixed[] &$bindings
+     * @param array<int,?scalar> $bindings
      */
     private function processSet(array $update, array &$bindings): string
     {

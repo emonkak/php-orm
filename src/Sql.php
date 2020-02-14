@@ -16,7 +16,7 @@ class Sql implements QueryBuilderInterface
     private $sql;
 
     /**
-     * @var mixed
+     * @var array<int,?scalar>
      */
     private $bindings;
 
@@ -58,11 +58,17 @@ class Sql implements QueryBuilderInterface
         return new Sql($sql, $bindings);
     }
 
+    /**
+     * @param ?scalar $value
+     */
     public static function value($value): self
     {
         return new Sql('?', [$value]);
     }
 
+    /**
+     * @param array<int,?scalar> $values
+     */
     public static function values(array $values): self
     {
         $placeholders = array_fill(0, count($values), '?');
@@ -100,6 +106,9 @@ class Sql implements QueryBuilderInterface
         return new Sql($tmpSql, $bindings);
     }
 
+    /**
+     * @param array<int,?scalar> $bindings
+     */
     public function __construct(string $sql, array $bindings = [])
     {
         $this->sql = $sql;
@@ -110,7 +119,7 @@ class Sql implements QueryBuilderInterface
     {
         $format = str_replace(['%', '?'], ['%%', '%s'], $this->sql);
         $args = array_map(function($binding) {
-            switch (gettype($binding)) {
+            switch ($type = gettype($binding)) {
             case 'integer':
             case 'double':
                 return $binding;
@@ -118,12 +127,18 @@ class Sql implements QueryBuilderInterface
                 return $binding ? 1 : 0;
             case 'NULL':
                 return 'NULL';
-            default:
-                if (mb_check_encoding($binding, 'utf-8')) {
-                    return "'" . addslashes($binding) . "'";
+            case 'string':
+                /** @psalm-var string $binding */
+                $isText = mb_check_encoding($binding, 'utf-8');  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
+                if ($isText) {
+                    return "'" . addslashes($binding) . "'";  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
                 } else {  // binary string
-                    return "x'" . bin2hex($binding) . "'";
+                    return "x'" . bin2hex($binding) . "'";  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
                 }
+            default:
+                /** @psalm-var mixed $binding */
+                $typeOrClass = $type === 'object' ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
+                return "'<" . $typeOrClass . ">'";
             }
         }, $this->bindings);
         return vsprintf($format, $args);
@@ -135,13 +150,16 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @return mixed[]
+     * @return array<int,?scalar>
      */
     public function getBindings(): array
     {
         return $this->bindings;
     }
 
+    /**
+     * @param array<int,?scalar> $bindings
+     */
     public function append(string $sql, array $bindings = [], string $separator = ' '): self
     {
         return new Sql(
@@ -162,7 +180,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed[] $bindings
+     * @param array<int,?scalar> $bindings
      */
     public function prepend(string $sql, array $bindings = [], string $separator = ' '): self
     {

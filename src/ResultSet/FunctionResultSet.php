@@ -4,9 +4,12 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
+use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
  * @template T
+ * @implements \IteratorAggregate<T>
+ * @implements ResultSetInterface<T>
  */
 class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -18,18 +21,20 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @var callable(array):T
+     * @psalm-var callable(array<string,mixed>):T
+     * @var callable
      */
     private $instantiator;
 
     /**
-     * @var class-string<T>
+     * @psalm-var class-string<T>
+     * @var class-string
      */
     private $class;
 
     /**
-     * @param callable(array):T $instantiator
-     * @param class-string<T> $class
+     * @psalm-param callable(array<string,mixed>):T $instantiator
+     * @psalm-param class-string<T> $class
      */
     public function __construct(PDOStatementInterface $stmt, callable $instantiator, string $class)
     {
@@ -38,11 +43,17 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         $this->class = $class;
     }
 
-    public function getClass(): ?string
+    /**
+     * @psalm-return class-string<T>
+     */
+    public function getClass(): string
     {
         return $this->class;
     }
 
+    /**
+     * @psalm-return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         $this->stmt->execute();
@@ -53,6 +64,9 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toArray(): array
     {
         $this->stmt->execute();
@@ -61,6 +75,9 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         return array_map($instantiator, $rows);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();
@@ -82,6 +99,34 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        throw new \RuntimeException('Sequence contains no elements.');
+        throw new NoSuchElementException('Sequence contains no elements');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    {
+        $this->stmt->execute();
+
+        $instantiator = $this->instantiator;
+
+        if ($predicate) {
+            $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+            foreach ($this->stmt as $row) {
+                $instance = $instantiator($row);
+                if ($predicate($instance)) {
+                    return $instance;
+                }
+            }
+        } else {
+            $row = $this->stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($row !== false) {
+                return $instantiator($row);
+            }
+        }
+
+        /** @psalm-var TDefault $defaultValue */
+        return $defaultValue;
     }
 }

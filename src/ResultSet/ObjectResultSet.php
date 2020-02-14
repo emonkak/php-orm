@@ -4,9 +4,12 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EnumerableExtensions;
+use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
- * @template T
+ * @template T of object
+ * @implements \IteratorAggregate<T>
+ * @implements ResultSetInterface<T>
  */
 class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -18,7 +21,8 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @var class-string<T>
+     * @psalm-var class-string<T>
+     * @var class-string
      */
     private $class;
 
@@ -28,21 +32,35 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     private $constructorArguments;
 
     /**
-     * @param class-string<T> $class
-     * @param ?mixed[] $constructorArguments
+     * @psalm-param class-string<T> $class
+     * @psalm-param ?mixed[] $constructorArguments
      */
-    public function __construct(PDOStatementInterface $stmt, $class, array $constructorArguments = null)
+    public function __construct(PDOStatementInterface $stmt, string $class, array $constructorArguments = null)
     {
         $this->stmt = $stmt;
         $this->class = $class;
         $this->constructorArguments = $constructorArguments;
     }
 
-    public function getClass(): ?string
+    /**
+     * @psalm-return class-string<T>
+     */
+    public function getClass(): string
     {
         return $this->class;
     }
 
+    /**
+     * @psalm-return ?mixed[]
+     */
+    public function getConstructorArguments(): ?array
+    {
+        return $this->constructorArguments;
+    }
+
+    /**
+     * @psalm-return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         // Uses a generator to avoid the enabling of 'strict_types' directive.
@@ -53,12 +71,18 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function first(callable $predicate = null)
     {
         $this->stmt->execute();
@@ -72,15 +96,19 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
                 }
             }
         } else {
+            /** @psalm-var T|false */
             $element = $this->stmt->fetch();
             if ($element !== false) {
                 return $element;
             }
         }
 
-        throw new \RuntimeException('Sequence contains no elements.');
+        throw new NoSuchElementException('Sequence contains no elements');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {
         $this->stmt->execute();
@@ -100,6 +128,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
+        /** @psalm-var TDefault $defaultValue */
         return $defaultValue;
     }
 }

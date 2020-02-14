@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PreparableTest extends TestCase
 {
-    public function testPrepare()
+    public function testPrepare(): void
     {
         $query = new Sql(
             'SELECT * FROM t1 WHERE c1 = ? AND c2 = ? AND c3 = ?',
@@ -50,11 +50,10 @@ class PreparableTest extends TestCase
         $this->assertSame($stmt, $preparable->prepare($pdo));
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testPrepareThrowsUnexpectedValueException()
+    public function testPrepareThrowsUnexpectedValueException(): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $query = new Sql(
             'SELECT * FROM t1 WHERE c1 = ?',
             [new \stdClass()]
@@ -78,7 +77,7 @@ class PreparableTest extends TestCase
         $this->assertSame($stmt, $preparable->prepare($pdo));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $query = new Sql(
             'SELECT * FROM t1 WHERE c1 = ? AND c2 = ? AND c3 = ?',

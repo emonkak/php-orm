@@ -21,7 +21,7 @@ class AbstractGrammarTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testGetSelect()
+    public function testGetSelect(): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $queryBuilder = $grammar->getSelectBuilder();
@@ -30,7 +30,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetInsert()
+    public function testGetInsert(): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $queryBuilder = $grammar->getInsertBuilder();
@@ -39,7 +39,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetUpdate()
+    public function testGetUpdate(): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $queryBuilder = $grammar->getUpdateBuilder();
@@ -48,7 +48,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetDelete()
+    public function testGetDelete(): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $queryBuilder = $grammar->getDeleteBuilder();
@@ -60,7 +60,7 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerLift
      */
-    public function testLift($value, $expectedSql, array $expectedBindings)
+    public function testLift($value, $expectedSql, array $expectedBindings): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $query = $grammar->lift($value);
@@ -79,11 +79,11 @@ class AbstractGrammarTest extends TestCase
 
     /**
      * @dataProvider providerExprThrowsUnexpectedValueException
-     *
-     * @expectedException UnexpectedValueException
      */
-    public function testExprThrowsUnexpectedValueException($value)
+    public function testExprThrowsUnexpectedValueException($value): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $grammar->lift($value);
     }
@@ -104,7 +104,7 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerLiteral
      */
-    public function testLiteral($value, $expectedSql, array $expectedBindings)
+    public function testLiteral($value, $expectedSql, array $expectedBindings): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $query = $grammar->literal($value);
@@ -130,11 +130,11 @@ class AbstractGrammarTest extends TestCase
 
     /**
      * @dataProvider providerLiteralThrowsUnexpectedValueException
-     *
-     * @expectedException UnexpectedValueException
      */
-    public function testLiteralThrowsUnexpectedValueException($value)
+    public function testLiteralThrowsUnexpectedValueException($value): void
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
         $grammar->literal($value);
     }
@@ -146,7 +146,7 @@ class AbstractGrammarTest extends TestCase
         ];
     }
 
-    public function testConditionWithOneArgument()
+    public function testConditionWithOneArgument(): void
     {
         $expr = 'SELECT 1';
         $expectedQuery = new Sql('SELECT 1');
@@ -156,7 +156,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertEquals($expectedQuery, $grammar->condition($expr));
     }
 
-    public function testConditionWithTwoArgument()
+    public function testConditionWithTwoArgument(): void
     {
         $operator = 'EXISTS';
         $lhsExpr = '(SELECT 1)';
@@ -173,7 +173,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertEquals($expectedQuery, $grammar->condition($operator, $lhsExpr));
     }
 
-    public function testConditionWithThreeArgument()
+    public function testConditionWithThreeArgument(): void
     {
         $lhsExpr = 'c1';
         $lhs = new Sql($lhsExpr);
@@ -192,7 +192,7 @@ class AbstractGrammarTest extends TestCase
         $this->assertEquals($expectedQuery, $grammar->condition($lhsExpr, $operator, $rhsExpr));
     }
 
-    public function testConditionWithFourArgument()
+    public function testConditionWithFourArgument(): void
     {
         $lhsExpr = 'c1';
         $lhs = new Sql($lhsExpr);

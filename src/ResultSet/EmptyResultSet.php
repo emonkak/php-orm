@@ -6,25 +6,10 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @implements ResultSetInterface<mixed>
+ */
 class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
 {
     use EnumerableExtensions;
-
-    /**
-     * @var ?class-string
-     */
-    private $class;
-
-    /**
-     * @param ?class-string $class
-     */
-    public function __construct(?string $class)
-    {
-        $this->class = $class;
-    }
-
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
 }

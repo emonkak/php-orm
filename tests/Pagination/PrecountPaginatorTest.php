@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PrecountPaginatorTest extends TestCase
 {
-    public function testAt()
+    public function testAt(): void
     {
         $perPage = 10;
         $totalItems = 21;

@@ -33,6 +33,10 @@ abstract class AbstractGrammar implements GrammarInterface
         return new DeleteBuilder($this);
     }
 
+    /**
+     * @psalm-suppress RedundantConditionGivenDocblockType
+     * @param QueryBuilderInterface|Sql|string $value
+     */
     public function lift($value): Sql
     {
         if ($value instanceof Sql) {
@@ -48,6 +52,10 @@ abstract class AbstractGrammar implements GrammarInterface
         throw new \UnexpectedValueException("The value can not be lifted as a query, got '$type'.");
     }
 
+    /**
+     * @psalm-suppress RedundantConditionGivenDocblockType
+     * @param ?scalar|array<int,?scalar> $value
+     */
     public function literal($value): Sql
     {
         if ($value === null) {
@@ -72,24 +80,43 @@ abstract class AbstractGrammar implements GrammarInterface
         throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql
     {
         switch (func_num_args()) {
-            case 1:
+            case 1: {
+                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 return $this->lift($arg1);
-            case 2:
+            }
+            case 2: {
+                /** @psalm-var string */
                 $operator = $arg1;
+                /** @psalm-var QueryBuilderInterface|Sql|string $arg2 */
                 $rhs = $this->lift($arg2);
                 return $this->unaryOperator($arg1, $rhs);
-            case 3:
+            }
+            case 3: {
+                /** @psalm-var string */
                 $operator = $arg2;
+                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
+                /** @psalm-var scalar|scalar[]|null $arg3 */
                 $rhs = $this->literal($arg3);
                 return $this->operator($operator, $lhs, $rhs);
+            }
             default:
+                /** @psalm-var string */
                 $operator = $arg2;
+                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
+                /** @psalm-var scalar|scalar[]|null $arg3 */
                 $start = $this->literal($arg3);
+                /** @psalm-var scalar|scalar[]|null $arg4 */
                 $end = $this->literal($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);
         }

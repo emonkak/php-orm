@@ -7,6 +7,7 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -21,7 +22,7 @@ class OneToTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $relationKey = 'relation_key';
         $table = 'table';
@@ -56,7 +57,7 @@ class OneToTest extends TestCase
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResultSet = $this->createMock(ResultSetInterface::class);
@@ -99,10 +100,12 @@ class OneToTest extends TestCase
             []
         );
 
-        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys));
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
+
+        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys, $joinStrategy));
     }
 
-    public function testGetResultWithUnion()
+    public function testGetResultWithUnion(): void
     {
         $outerKeys = [1, 2, 3];
         $expectedResultSet = $this->createMock(ResultSetInterface::class);
@@ -154,36 +157,8 @@ class OneToTest extends TestCase
             ]
         );
 
-        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys));
-    }
+        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-    public function testResolveSelectors()
-    {
-        $relationStrategy = new OneTo(
-            'revision',
-            'revisions',
-            'revision_id',
-            'id',
-            $this->createMock(PDOInterface::class),
-            $this->createMock(FetcherInterface::class),
-            $this->getSelectBuilder(),
-            []
-        );
-
-        $outerKeySelector = $relationStrategy->getOuterKeySelector(Model::class);
-        $innerKeySelector = $relationStrategy->getInnerKeySelector(Model::class);
-        $resultSelector = $relationStrategy->getResultSelector(Model::class, Model::class);
-
-        $outer = new Model(['revision_id' => 123]);
-        $inner = new Model(['id' => 123]);
-
-        $expectedResult = new Model([
-            'revision_id' => 123,
-            'revision' => new Model(['id' => 123])
-        ]);
-
-        $this->assertSame(123, $outerKeySelector($outer));
-        $this->assertSame(123, $innerKeySelector($inner));
-        $this->assertEquals($expectedResult, $resultSelector($outer, $inner));
+        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys, $joinStrategy));
     }
 }

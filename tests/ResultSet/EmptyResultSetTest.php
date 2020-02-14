@@ -12,15 +12,9 @@ use PHPUnit\Framework\TestCase;
  */
 class EmptyResultSetTest extends TestCase
 {
-    public function testGetClass()
+    public function testGetIterator(): void
     {
-        $result = new EmptyResultSet(\stdClass::class);
-        $this->assertSame(\stdClass::class, $result->getClass());
-    }
-
-    public function testGetIterator()
-    {
-        $result = new EmptyResultSet(\stdClass::class);
+        $result = new EmptyResultSet();
         $this->assertEquals([], iterator_to_array($result));
     }
 }

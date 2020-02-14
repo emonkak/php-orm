@@ -14,30 +14,30 @@ use PHPUnit\Framework\TestCase;
  */
 class RelationResultSetTest extends TestCase
 {
-    private $innerResult;
+    private $outerResult;
 
     private $relation;
 
     private $result;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->innerResult = $this->createMock(ResultSetInterface::class);
+        $this->outerResult = $this->createMock(ResultSetInterface::class);
         $this->relation = $this->createMock(RelationInterface::class);
-        $this->result = new RelationResultSet($this->innerResult, $this->relation);
+        $this->result = new RelationResultSet($this->outerResult, \stdClass::class, $this->relation);
     }
 
-    public function testGetClass()
+    public function testGetOuterResult(): void
     {
-        $this->innerResult
-            ->expects($this->once())
-            ->method('getClass')
-            ->willReturn(\stdClass::class);
-
-        $this->assertSame(\stdClass::class, $this->result->getClass());
+        $this->assertSame($this->outerResult, $this->result->getOuterResult());
     }
 
-    public function testGetIterator()
+    public function testGetOuterClass(): void
+    {
+        $this->assertSame(\stdClass::class, $this->result->getOuterClass());
+    }
+
+    public function testGetIterator(): void
     {
         $expected = new \ArrayIterator([
             ['foo' => 123],
@@ -47,7 +47,7 @@ class RelationResultSetTest extends TestCase
         $this->relation
             ->expects($this->once())
             ->method('associate')
-            ->with($this->identicalTo($this->innerResult))
+            ->with($this->identicalTo($this->outerResult))
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->result->getIterator());

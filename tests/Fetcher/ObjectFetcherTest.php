@@ -14,21 +14,22 @@ use PHPUnit\Framework\TestCase;
  */
 class ObjectFetcherTest extends TestCase
 {
-    public function testFetch()
+    public function testFetch(): void
     {
-        $fetcher = new ObjectFetcher('stdClass', ['foo']);
+        $fetcher = new ObjectFetcher(\stdClass::class, ['foo']);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
 
         $result = $fetcher->fetch($stmt);
 
         $this->assertInstanceOf(ObjectResultSet::class, $result);
-        $this->assertSame('stdClass', $result->getClass());
+        $this->assertSame(\stdClass::class, $result->getClass());
+        $this->assertEquals(['foo'], $result->getConstructorArguments());
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
-        $fetcher = new ObjectFetcher('stdClass');
-        $this->assertSame('stdClass', $fetcher->getClass());
+        $fetcher = new ObjectFetcher(\stdClass::class);
+        $this->assertSame(\stdClass::class, $fetcher->getClass());
     }
 }

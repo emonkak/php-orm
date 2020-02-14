@@ -7,12 +7,18 @@ namespace Emonkak\Orm\Fetcher;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template T
+ */
 interface FetcherInterface
 {
     /**
-     * @return ?class-string
+     * @psalm-return ?class-string<T>
      */
     public function getClass(): ?string;
 
+    /**
+     * @psalm-return ResultSetInterface<T>
+     */
     public function fetch(PDOStatementInterface $stmt): ResultSetInterface;
 }

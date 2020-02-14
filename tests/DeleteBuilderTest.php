@@ -15,14 +15,14 @@ class DeleteBuilderTest extends TestCase
 {
     use QueryBuilderTestTrait;
 
-    public function testGetGrammar()
+    public function testGetGrammar(): void
     {
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new DeleteBuilder($grammar);
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $queryBuilder = $this->getDeleteBuilder()
             ->from('t1')
@@ -32,7 +32,7 @@ class DeleteBuilderTest extends TestCase
         $this->assertQueryIs('(c1 = ?)', [123], $queryBuilder->getWhere());
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $query = $this->getDeleteBuilder()
             ->prefix('DELETE IGNORE')
@@ -47,7 +47,7 @@ class DeleteBuilderTest extends TestCase
         );
     }
 
-    public function testWhere()
+    public function testWhere(): void
     {
         $query = $this->getDeleteBuilder()
             ->from('t1')
@@ -61,7 +61,7 @@ class DeleteBuilderTest extends TestCase
         );
     }
 
-    public function testOrWhere()
+    public function testOrWhere(): void
     {
         $query = $this->getDeleteBuilder()
             ->from('t1')

@@ -4,12 +4,23 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Orm\ResultSet\ResultSetInterface;
-
+/**
+ * @template TOuter
+ * @template TResult
+ */
 interface RelationInterface
 {
     /**
-     * Associates between the outer result and the relation result.
+     * @psalm-return ?class-string<TResult>
      */
-    public function associate(ResultSetInterface $result): \Traversable;
+    public function getResultClass(): ?string;
+
+    /**
+     * Associates between the outer result and the relation result.
+     *
+     * @psalm-param iterable<TOuter> $outerResult
+     * @psalm-param ?class-string<TOuter> $outerClass
+     * @psalm-return \Traversable<TResult>
+     */
+    public function associate(iterable $outerResult, ?string $outerClass): \Traversable;
 }

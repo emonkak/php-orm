@@ -8,6 +8,9 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\ResultSet\ColumnResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @implements FetcherInterface<?scalar>
+ */
 class ColumnFetcher implements FetcherInterface
 {
     /**
@@ -20,11 +23,17 @@ class ColumnFetcher implements FetcherInterface
         $this->columnNumber = $columnNumber;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getClass(): ?string
     {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function fetch(PDOStatementInterface $stmt): ResultSetInterface
     {
         return new ColumnResultSet($stmt, $this->columnNumber);

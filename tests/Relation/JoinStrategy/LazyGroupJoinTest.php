@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
+use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,7 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
  */
 class LazyGroupJoinTest extends TestCase
 {
-    public function testJoin()
+    public function testJoin(): void
     {
         $users = [
             ['user_id' => 1, 'name' => 'Sumire Uesaka'],
@@ -31,7 +32,7 @@ class LazyGroupJoinTest extends TestCase
             ['user_id' => 3, 'body' => 'fuga'],
             ['user_id' => 5, 'body' => 'piyo'],
         ];
-        $expected = [
+        $expectedResult = [
             [
                 'user_id' => 1,
                 'name' => 'Sumire Uesaka',
@@ -59,24 +60,38 @@ class LazyGroupJoinTest extends TestCase
             ],
         ];
 
+        $outerKeySelector = function($user) { return $user['user_id']; };
+        $innerKeySelector = function($user) { return $user['user_id']; };
+        $resultSelector = function($user, $tweets) {
+            $user['tweets'] = $tweets;
+            return $user;
+        };
+        $comparer = EqualityComparer::getInstance();
         $proxyFactory = new LazyLoadingValueHolderFactory();
-        $result = (new LazyGroupJoin($proxyFactory))
+        $lazyGroupJoin = new LazyGroupJoin(
+            $outerKeySelector,
+            $innerKeySelector,
+            $resultSelector,
+            $comparer,
+            $proxyFactory
+        );
+
+        $this->assertSame($outerKeySelector, $lazyGroupJoin->getOuterKeySelector());
+        $this->assertSame($innerKeySelector, $lazyGroupJoin->getInnerKeySelector());
+        $this->assertSame($resultSelector, $lazyGroupJoin->getResultSelector());
+        $this->assertSame($comparer, $lazyGroupJoin->getComparer());
+        $this->assertSame($proxyFactory, $lazyGroupJoin->getProxyFactory());
+
+        $result = $lazyGroupJoin
             ->join(
-                new PreloadedResultSet($users, null),
-                new PreloadedResultSet($tweets, null),
-                function($user) { return $user['user_id']; },
-                function($user) { return $user['user_id']; },
-                function($user, $tweets) {
-                    $user['tweets'] = $tweets;
-                    return $user;
-                }
+                new PreloadedResultSet($users),
+                new PreloadedResultSet($tweets)
             );
         $result = iterator_to_array($result, false);
         $result = array_map(function($user) {
             $user['tweets'] = $user['tweets']->getArrayCopy();
             return $user;
         }, $result);
-
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 }

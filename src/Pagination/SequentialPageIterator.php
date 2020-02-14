@@ -8,6 +8,11 @@ use Emonkak\Enumerable\Enumerable;
 use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Enumerable\EnumerableInterface;
 
+/**
+ * @template T
+ * @implements \IteratorAggregate<T>
+ * @implements PageIteratorInterface<T>
+ */
 class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterface
 {
     use EnumerableExtensions;
@@ -23,25 +28,29 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     private $perPage;
 
     /**
+     * @psalm-var callable(int,int):T[]
      * @var callable
      */
     private $itemsFetcher;
 
     /**
+     * @psalm-var T[]
      * @var mixed[]
      */
     private $items;
 
     /**
+     * @psalm-var T[]
      * @var mixed[]
      */
     private $extraItems;
 
     /**
-     * @param int $index
-     * @param int $perPage
-     * @param callable $itemsFetcher
-     * @return self
+     * @template TStatic
+     * @psalm-param int $index
+     * @psalm-param int $perPage
+     * @psalm-param callable(int,int):TStatic[] $itemsFetcher
+     * @psalm-return self<TStatic>
      */
     public static function from(int $index, int $perPage, callable $itemsFetcher): self
     {
@@ -51,11 +60,11 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * @param int $index
-     * @param int $perPage
-     * @param callable $itemsFetcher
-     * @param mixed[] $items
-     * @param mixed[] $extraItems
+     * @psalm-param int $index
+     * @psalm-param int $perPage
+     * @psalm-param callable(int,int):T[] $itemsFetcher
+     * @psalm-param T[] $items
+     * @psalm-param T[] $extraItems
      */
     private function __construct(int $index, int $perPage, callable $itemsFetcher, array $items, array $extraItems)
     {
@@ -66,6 +75,9 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
         $this->extraItems = $extraItems;
     }
 
+    /**
+     * @psalm-return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->items);
@@ -87,13 +99,16 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * @return mixed[]
+     * @psalm-return T[]
      */
     public function getItems(): array
     {
         return $this->items;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function next(): PageIteratorInterface
     {
         $nextIndex = $this->index + 1;
@@ -111,9 +126,12 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
         return count($this->extraItems) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function iterate(): EnumerableInterface
     {
-        return Enumerable::defer(function() {
+        return Enumerable::defer(function(): iterable {
             $page = $this;
 
             foreach ($page->items as $item) {
@@ -123,7 +141,7 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
             while ($page->hasNext()) {
                 $page = $page->next();
 
-                foreach ($page->items as $item) {
+                foreach ($page as $item) {
                     yield $item;
                 }
             }

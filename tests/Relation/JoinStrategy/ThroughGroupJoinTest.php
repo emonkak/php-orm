@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
+use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ThroughGroupJoinTest extends TestCase
 {
-    public function testJoin()
+    public function testJoin(): void
     {
         $talents = [
             ['talent_id' => 1, 'name' => 'Sumire Uesaka'],
@@ -30,7 +31,7 @@ class ThroughGroupJoinTest extends TestCase
             ['program_id' => 5, 'talent_id' => 4],
             ['program_id' => 6, 'talent_id' => 5],
         ];
-        $expected = [
+        $expectedResult = [
             $talents[0] + ['programs' => [$programs[0]['program_id'], $programs[1]['program_id']]],
             $talents[1] + ['programs' => [$programs[2]['program_id'], $programs[3]['program_id']]],
             $talents[2] + ['programs' => []],
@@ -38,17 +39,33 @@ class ThroughGroupJoinTest extends TestCase
             $talents[4] + ['programs' => [$programs[5]['program_id']]],
         ];
 
-        $result = (new ThroughGroupJoin('program_id'))
-            ->join(
-                new PreloadedResultSet($talents, null),
-                new PreloadedResultSet($programs, null),
-                function($talent) { return $talent['talent_id']; },
-                function($program) { return $program['talent_id']; },
-                function($talent, $programs) {
-                    $talent['programs'] = $programs;
-                    return $talent;
-                }
-            );
-        $this->assertEquals($expected, iterator_to_array($result));
+        $outerKeySelector = function($talent) { return $talent['talent_id']; };
+        $innerKeySelector = function($program) { return $program['talent_id']; };
+        $throughKeySelector = function($program) { return $program['program_id']; };
+        $resultSelector = function($talent, $programs) {
+            $talent['programs'] = $programs;
+            return $talent;
+        };
+        $comparer = EqualityComparer::getInstance();
+        $throughGroupJoin = new ThroughGroupJoin(
+            $outerKeySelector,
+            $innerKeySelector,
+            $throughKeySelector,
+            $resultSelector,
+            $comparer
+        );
+
+        $this->assertSame($outerKeySelector, $throughGroupJoin->getOuterKeySelector());
+        $this->assertSame($innerKeySelector, $throughGroupJoin->getInnerKeySelector());
+        $this->assertSame($throughKeySelector, $throughGroupJoin->getThroughKeySelector());
+        $this->assertSame($resultSelector, $throughGroupJoin->getResultSelector());
+        $this->assertSame($comparer, $throughGroupJoin->getComparer());
+
+        $result = $throughGroupJoin->join(
+            new PreloadedResultSet($talents),
+            new PreloadedResultSet($programs)
+        );
+        $result = iterator_to_array($result);
+        $this->assertEquals($expectedResult, $result);
     }
 }

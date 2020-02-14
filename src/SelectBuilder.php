@@ -83,9 +83,9 @@ class SelectBuilder implements QueryBuilderInterface
     private $limit;
 
     /**
-     * @var ?string
+     * @var string
      */
-    private $suffix;
+    private $suffix = '';
 
     /**
      * @var Sql[]
@@ -194,9 +194,9 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return ?string
+     * @return string
      */
-    public function getSuffix(): ?string
+    public function getSuffix(): string
     {
         return $this->suffix;
     }
@@ -216,6 +216,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $expr
+     */
     public function select($expr, ?string $alias = null): self
     {
         $expr = $this->grammar->lift($expr);
@@ -227,6 +230,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param (QueryBuilderInterface|Sql|string)[] $exprs
+     */
     public function withSelect(array $exprs): self
     {
         $select = [];
@@ -242,6 +248,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $table
+     */
     public function from($table, ?string $alias = null, int $position = -1): self
     {
         $table = $this->grammar->lift($table);
@@ -259,6 +268,12 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
@@ -267,6 +282,12 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
@@ -275,6 +296,10 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $table
+     * @param QueryBuilderInterface|Sql|string|null $condition
+     */
     public function join($table, $condition = null, string $alias = null, int $position = -1, string $type = 'JOIN'): self
     {
         $table = $this->grammar->lift($table);
@@ -296,11 +321,18 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $table
+     * @param QueryBuilderInterface|Sql|string|null $condition
+     */
     public function outerJoin($table, $condition = null, string $alias = null, int $position = -1): self
     {
         return $this->join($table, $condition, $alias, $position, 'LEFT OUTER JOIN');
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $expr
+     */
     public function groupBy($expr): self
     {
         $expr = $this->grammar->lift($expr);
@@ -309,6 +341,12 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
@@ -317,6 +355,12 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @param mixed $arg3
+     * @param mixed $arg4
+     */
     public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
@@ -327,6 +371,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     /**
      * @param string $name
+     * @param QueryBuilderInterface|Sql|string $specification
      */
     public function window(string $name, $specification = ''): self
     {
@@ -336,6 +381,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $expr
+     */
     public function orderBy($expr, ?string $ordering = null): self
     {
         $expr = $this->grammar->lift($expr);
@@ -385,6 +433,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $this->union('UNION ALL');
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $query
+     */
     public function unionWith($query, string $type = 'UNION'): self
     {
         $query = $this->grammar->lift($query);
@@ -393,6 +444,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
+    /**
+     * @param QueryBuilderInterface|Sql|string $query
+     */
     public function unionAllWith($query): self
     {
         return $this->unionWith($query, 'UNION ALL');
@@ -424,21 +478,27 @@ class SelectBuilder implements QueryBuilderInterface
         return count($sqls) > 1 ? Sql::join(' ', array_reverse($sqls)) : $sqls[0];
     }
 
-    public function aggregate(PDOInterface $pdo, $expr)
+    /**
+     * @return ?scalar
+     */
+    public function aggregate(PDOInterface $pdo, string $expr)
     {
         $stmt = $this->withSelect([$expr])->withoutSorting()->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
+    /**
+     * @template T
+     * @psalm-param FetcherInterface<T> $fetcher
+     * @psalm-return PaginatorInterface<T>
+     */
     public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, int $perPage, string $countExpr = 'COUNT(*)'): PaginatorInterface
     {
         /**
-         * @param int $offset
-         * @param int $limit
-         * @return \Traversable
+         * @psalm-return \Traversable<T>
          */
-        $itemsFetcher = function($offset, $limit) use ($pdo, $fetcher) {
+        $itemsFetcher = function(int $offset, int $limit) use ($pdo, $fetcher): \Traversable {
             return $this
                 ->limit($limit)
                 ->offset($offset)
@@ -448,15 +508,21 @@ class SelectBuilder implements QueryBuilderInterface
         return new PrecountPaginator($itemsFetcher, $perPage, $count);
     }
 
+    /**
+     * @template T
+     * @psalm-param FetcherInterface<T> $fetcher
+     * @psalm-return PageIteratorInterface<T>
+     */
     public function paginateFrom(PDOInterface $pdo, FetcherInterface $fetcher, int $index, int $perPage): PageIteratorInterface
     {
-        return SequentialPageIterator::from($index, $perPage, function($offset, $limit) use ($pdo, $fetcher) {
+        $itemsFetcher = function(int $offset, int $limit) use ($pdo, $fetcher): array {
             return $this
                 ->limit($limit)
                 ->offset($offset)
                 ->getResult($pdo, $fetcher)
                 ->toArray();
-        });
+        };
+        return SequentialPageIterator::from($index, $perPage, $itemsFetcher);
     }
 
     private function withoutSorting(): self

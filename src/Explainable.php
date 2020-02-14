@@ -8,6 +8,9 @@ use Emonkak\Database\PDOInterface;
 
 trait Explainable
 {
+    /**
+     * @return array<string,?scalar>
+     */
     public function explain(PDOInterface $pdo): array
     {
         $stmt = $this->build()->prepend('EXPLAIN')->prepare($pdo);

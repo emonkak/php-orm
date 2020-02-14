@@ -5,79 +5,88 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\RelationResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @template TOuter
+ * @template TInner
+ * @template TKey
+ * @template TResult
+ * @implements RelationInterface<TOuter,TResult>
+ */
 class Relation implements RelationInterface
 {
     /**
+     * @psalm-var ?class-string<TResult>
+     * @var ?class-string
+     */
+    private $resultClass;
+
+    /**
+     * @psalm-var RelationStrategyInterface<TInner,TKey>
      * @var RelationStrategyInterface
      */
     private $relationStrategy;
 
     /**
+     * @psalm-var JoinStrategyInterface<TOuter,TInner,TKey,TResult>
      * @var JoinStrategyInterface
      */
     private $joinStrategy;
 
     /**
-     * @var RelationInterface[]
-     */
-    private $childlen;
-
-    /**
-     * @param RelationInterface[] $childlen
+     * @psalm-param ?class-string<TResult> $resultClass
+     * @psalm-param RelationStrategyInterface<TInner,TKey> $relationStrategy
+     * @psalm-param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
      */
     public function __construct(
+        ?string $resultClass,
         RelationStrategyInterface $relationStrategy,
-        JoinStrategyInterface $joinStrategy,
-        array $childlen = []
+        JoinStrategyInterface $joinStrategy
     ) {
+        $this->resultClass = $resultClass;
         $this->relationStrategy = $relationStrategy;
         $this->joinStrategy = $joinStrategy;
-        $this->childlen = $childlen;
     }
 
+    /**
+     * @psalm-return RelationStrategyInterface<TInner,TKey>
+     */
     public function getRelationStrategy(): RelationStrategyInterface
     {
         return $this->relationStrategy;
     }
 
+    /**
+     * @psalm-return JoinStrategyInterface<TOuter,TInner,TKey,TResult>
+     */
     public function getJoinStrategy(): JoinStrategyInterface
     {
         return $this->joinStrategy;
     }
 
     /**
-     * @return RelationInterface[]
+     * {@inheritDoc}
      */
-    public function getChildRelations(): array
+    public function getResultClass(): ?string
     {
-        return $this->childlen;
+        return $this->resultClass;
     }
 
-    public function with(RelationInterface $relation): self
+    /**
+     * {@inheritDoc}
+     */
+    public function associate(iterable $outerResult, ?string $outerClass): \Traversable
     {
-        $childlen = $this->childlen;
-        $childlen[] = $relation;
-        return new Relation(
-            $this->relationStrategy,
-            $this->joinStrategy,
-            $childlen
-        );
-    }
+        $joinStrategy = $this->joinStrategy;
 
-    public function associate(ResultSetInterface $result): \Traversable
-    {
-        $outerClass = $result->getClass();
-        $outerKeySelector = $this->relationStrategy->getOuterKeySelector($outerClass);
+        $outerKeySelector = $joinStrategy->getOuterKeySelector();
         $outerElements = [];
         $outerKeys = [];
 
-        foreach ($result as $element) {
-            $outerElements[] = $element;
-            $outerKey = $outerKeySelector($element);
+        foreach ($outerResult as $outerElement) {
+            $outerElements[] = $outerElement;
+            $outerKey = $outerKeySelector($outerElement);
+            /** @psalm-suppress RedundantConditionGivenDocblockType */
             if ($outerKey !== null) {
                 $outerKeys[] = $outerKey;
             }
@@ -91,23 +100,8 @@ class Relation implements RelationInterface
             return new \ArrayIterator($outerElements);
         }
 
-        $outerResult = new PreloadedResultSet($outerElements, $outerClass);
-        $innerResult = $this->relationStrategy->getResult(array_unique($outerKeys));
+        $innerResult = $this->relationStrategy->getResult(array_unique($outerKeys), $joinStrategy);
 
-        foreach ($this->childlen as $child) {
-            $innerResult = new RelationResultSet($innerResult, $child);
-        }
-
-        $innerClass = $innerResult->getClass();
-        $innerKeySelector = $this->relationStrategy->getInnerKeySelector($innerClass);
-        $resultSelector = $this->relationStrategy->getResultSelector($outerClass, $innerClass);
-
-        return $this->joinStrategy->join(
-            $outerResult,
-            $innerResult,
-            $outerKeySelector,
-            $innerKeySelector,
-            $resultSelector
-        );
+        return $joinStrategy->join($outerElements, $innerResult);
     }
 }

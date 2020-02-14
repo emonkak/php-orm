@@ -6,11 +6,17 @@ namespace Emonkak\Orm\Pagination;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 
+/**
+ * @template T
+ * @implements \IteratorAggregate<T>
+ * @implements PageInterface<T>
+ */
 class Page implements \IteratorAggregate, PageInterface
 {
     use EnumerableExtensions;
 
     /**
+     * @psalm-var \Traversable<T>
      * @var \Traversable
      */
     private $items;
@@ -21,10 +27,15 @@ class Page implements \IteratorAggregate, PageInterface
     private $index;
 
     /**
+     * @psalm-var PaginatorInterface<T>
      * @var PaginatorInterface
      */
     private $paginator;
 
+    /**
+     * @psalm-param \Traversable<T> $items
+     * @psalm-param PaginatorInterface<T> $paginator
+     */
     public function __construct(\Traversable $items, int $index, PaginatorInterface $paginator)
     {
         $this->items = $items;
@@ -32,11 +43,17 @@ class Page implements \IteratorAggregate, PageInterface
         $this->paginator = $paginator;
     }
 
+    /**
+     * @psalm-return \Traversable<T>
+     */
     public function getIterator(): \Traversable
     {
         return $this->items;
     }
 
+    /**
+     * @psalm-return PaginatorInterface<T>
+     */
     public function getPaginator(): PaginatorInterface
     {
         return $this->paginator;
@@ -52,11 +69,17 @@ class Page implements \IteratorAggregate, PageInterface
         return $this->index * $this->paginator->getPerPage();
     }
 
+    /**
+     * @psalm-return PageInterface<T>
+     */
     public function previous(): PageInterface
     {
         return $this->paginator->at($this->index - 1);
     }
 
+    /**
+     * @psalm-return PageInterface<T>
+     */
     public function next(): PageInterface
     {
         return $this->paginator->at($this->index + 1);
