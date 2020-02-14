@@ -39,7 +39,7 @@ class PrecountPaginator extends AbstractPaginator
     }
 
     /**
-     * @psalm-return PageInterface<T>
+     * {@inheritDoc}
      */
     public function at(int $index): PageInterface
     {

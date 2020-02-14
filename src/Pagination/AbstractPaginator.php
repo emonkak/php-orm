@@ -33,7 +33,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     }
 
     /**
-     * @psalm-return PageInterface<T>
+     * {@inheritDoc}
      */
     public function firstPage(): PageInterface
     {
@@ -41,7 +41,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     }
 
     /**
-     * @psalm-return PageInterface<T>
+     * {@inheritDoc}
      */
     public function lastPage(): PageInterface
     {

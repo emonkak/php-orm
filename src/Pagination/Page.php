@@ -52,7 +52,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * @psalm-return PaginatorInterface<T>
+     * {@inheritDoc}
      */
     public function getPaginator(): PaginatorInterface
     {
@@ -70,7 +70,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * @psalm-return PageInterface<T>
+     * {@inheritDoc}
      */
     public function previous(): PageInterface
     {
@@ -78,7 +78,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * @psalm-return PageInterface<T>
+     * {@inheritDoc}
      */
     public function next(): PageInterface
     {

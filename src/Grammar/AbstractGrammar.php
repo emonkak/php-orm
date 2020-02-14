@@ -35,7 +35,7 @@ abstract class AbstractGrammar implements GrammarInterface
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param QueryBuilderInterface|Sql|string $value
+     * {@inheritDoc}
      */
     public function lift($value): Sql
     {
@@ -54,7 +54,7 @@ abstract class AbstractGrammar implements GrammarInterface
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param ?scalar|array<int,?scalar> $value
+     * {@inheritDoc}
      */
     public function literal($value): Sql
     {
@@ -81,10 +81,7 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
+     * {@inheritDoc}
      */
     public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql
     {

@@ -27,7 +27,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * @psalm-return PageInterface<mixed>
+     * {@inheritDoc}
      */
     public function at(int $index): PageInterface
     {
@@ -40,7 +40,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * @psalm-return PageInterface<mixed>
+     * {@inheritDoc}
      */
     public function firstPage(): PageInterface
     {
@@ -48,7 +48,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * @psalm-return PageInterface<mixed>
+     * {@inheritDoc}
      */
     public function lastPage(): PageInterface
     {

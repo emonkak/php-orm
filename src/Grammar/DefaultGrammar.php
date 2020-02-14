@@ -149,7 +149,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[] $set
+     * {@inheritDoc}
      */
     public function updateStatement(string $prefix, string $table, array $set, ?Sql $where): Sql
     {

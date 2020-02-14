@@ -42,7 +42,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @return FetcherInterface<T>
+     * @psalm-return FetcherInterface<T>
      */
     public function getFetcher(): FetcherInterface
     {
@@ -50,7 +50,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @return RelationInterface<T,TResult>
+     * @psalm-return RelationInterface<T,TResult>
      */
     public function getRelation(): RelationInterface
     {
