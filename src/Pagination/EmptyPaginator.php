@@ -8,6 +8,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @implements PaginatorInterface<mixed>
+ * @use EnumerableExtensions<T>
  */
 class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
 {

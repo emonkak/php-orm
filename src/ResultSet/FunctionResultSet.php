@@ -10,6 +10,7 @@ use Emonkak\Enumerable\Exception\NoSuchElementException;
  * @template T
  * @implements \IteratorAggregate<T>
  * @implements ResultSetInterface<T>
+ * @use EnumerableExtensions<T>
  */
 class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -21,8 +22,8 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @psalm-var class-string<T>
-     * @var class-string
+     * @psalm-var ?class-string<T>
+     * @var ?class-string
      */
     private $class;
 
@@ -33,10 +34,10 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     private $instantiator;
 
     /**
-     * @psalm-param class-string<T> $class
+     * @psalm-param ?class-string<T> $class
      * @psalm-param callable(array<string,mixed>):T $instantiator
      */
-    public function __construct(PDOStatementInterface $stmt, string $class, callable $instantiator)
+    public function __construct(PDOStatementInterface $stmt, ?string $class, callable $instantiator)
     {
         $this->stmt = $stmt;
         $this->class = $class;
@@ -44,9 +45,9 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return class-string<T>
+     * @psalm-return ?class-string<T>
      */
-    public function getClass(): string
+    public function getClass(): ?string
     {
         return $this->class;
     }

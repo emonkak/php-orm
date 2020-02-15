@@ -7,8 +7,9 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
- * @implements \IteratorAggregate<mixed>
- * @implements ResultSetInterface<mixed>
+ * @implements \IteratorAggregate<?scalar>
+ * @implements ResultSetInterface<?scalar>
+ * @use EnumerableExtensions<?scalar>
  */
 class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -31,7 +32,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return \Traversable<mixed>
+     * @psalm-return \Traversable<?scalar>
      */
     public function getIterator(): \Traversable
     {

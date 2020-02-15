@@ -9,6 +9,7 @@ use Emonkak\Enumerable\Exception\NoSuchElementException;
 /**
  * @implements \IteratorAggregate<array<string,mixed>>
  * @implements ResultSetInterface<array<string,mixed>>
+ * @use EnumerableExtensions<array<string,mixed>>
  */
 class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
 {

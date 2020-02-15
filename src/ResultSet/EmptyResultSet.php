@@ -8,6 +8,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @implements ResultSetInterface<mixed>
+ * @use EnumerableExtensions<mixed>
  */
 class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
 {

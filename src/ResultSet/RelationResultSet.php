@@ -13,6 +13,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
  * @template TResult
  * @implements \IteratorAggregate<TResult>
  * @implements ResultSetInterface<TResult>
+ * @use EnumerableExtensions<T>
  */
 class RelationResultSet implements \IteratorAggregate, ResultSetInterface
 {

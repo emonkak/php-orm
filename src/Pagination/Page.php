@@ -10,6 +10,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
  * @template T
  * @implements \IteratorAggregate<T>
  * @implements PageInterface<T>
+ * @use EnumerableExtensions<T>
  */
 class Page implements \IteratorAggregate, PageInterface
 {

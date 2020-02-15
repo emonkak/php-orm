@@ -397,6 +397,7 @@ final class Relations
      * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
+     * @psalm-param callable(TKey):string $cacheKeySelector
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function cachedOneToOne(

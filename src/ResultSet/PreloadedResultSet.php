@@ -10,6 +10,7 @@ use Emonkak\Enumerable\EnumerableExtensions;
  * @template T
  * @implements \IteratorAggregate<T>
  * @implements ResultSetInterface<T>
+ * @use EnumerableExtensions<T>
  */
 class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
 {
