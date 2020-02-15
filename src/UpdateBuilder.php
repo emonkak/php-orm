@@ -87,7 +87,7 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param ?scalar|array<int,?scalar> $expr
+     * @param mixed $expr
      */
     public function set(string $column, $expr): self
     {
@@ -97,7 +97,7 @@ class UpdateBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param array<int,?scalar|array<int,?scalar>> $set
+     * @param mixed[] $set
      */
     public function withSet(array $set): self
     {

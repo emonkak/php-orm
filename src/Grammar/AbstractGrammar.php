@@ -53,7 +53,6 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * @psalm-suppress RedundantConditionGivenDocblockType
      * {@inheritDoc}
      */
     public function literal($value): Sql

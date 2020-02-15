@@ -27,7 +27,7 @@ interface GrammarInterface
     public function lift($value): Sql;
 
     /**
-     * @param ?scalar|array<int,?scalar> $value
+     * @param mixed $value
      */
     public function literal($value): Sql;
 

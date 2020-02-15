@@ -104,7 +104,7 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param array<int,?scalar|array<int,?scalar>> ...$values
+     * @param mixed[] ...$values
      */
     public function values(...$values): self
     {
