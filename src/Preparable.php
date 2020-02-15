@@ -50,4 +50,3 @@ trait Preparable
 
     abstract public function build(): Sql;
 }
-
