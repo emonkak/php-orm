@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 /**
@@ -38,11 +36,6 @@ class OneTo implements RelationStrategyInterface
     private $innerKey;
 
     /**
-     * @var PDOInterface
-     */
-    private $pdo;
-
-    /**
      * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
@@ -67,7 +60,6 @@ class OneTo implements RelationStrategyInterface
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions
@@ -76,7 +68,6 @@ class OneTo implements RelationStrategyInterface
         $this->table = $table;
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
-        $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->queryBuilder = $queryBuilder;
         $this->unions = $unions;
@@ -100,11 +91,6 @@ class OneTo implements RelationStrategyInterface
     public function getInnerKey(): string
     {
         return $this->innerKey;
-    }
-
-    public function getPdo(): PDOInterface
-    {
-        return $this->pdo;
     }
 
     /**
@@ -131,7 +117,7 @@ class OneTo implements RelationStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->table, $outerKeys);
 
@@ -142,7 +128,7 @@ class OneTo implements RelationStrategyInterface
         }
 
         return $queryBuilder
-            ->getResult($this->pdo, $this->fetcher);
+            ->getResult($this->fetcher);
     }
 
     /**

@@ -20,13 +20,10 @@ class RelatableTest extends TestCase
     {
         $class = \stdClass::class;
 
-        $relatableFetcher = $this->getMockBuilder(RelatableMock::class)
-            ->setMethods(['getClass', 'fetch'])
+        $relatable = $this->getMockBuilder(RelatableMock::class)
+            ->setMethodsExcept(['with'])
             ->getMock();
-        $relatableFetcher
-            ->expects($this->never())
-            ->method('fetch');
-        $relatableFetcher
+        $relatable
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($class);
@@ -40,10 +37,10 @@ class RelatableTest extends TestCase
             ->with($this->identicalTo($class))
             ->willReturn($relation);
 
-        $relationFetcher = $relatableFetcher->with($relationFactory);
+        $relationFetcher = $relatable->with($relationFactory);
 
         $this->assertInstanceOf(RelationFetcher::class, $relationFetcher);
-        $this->assertSame($relatableFetcher, $relationFetcher->getFetcher());
+        $this->assertSame($relatable, $relationFetcher->getFetcher());
         $this->assertSame($relation, $relationFetcher->getRelation());
     }
 
@@ -51,19 +48,16 @@ class RelatableTest extends TestCase
     {
         $class = \stdClass::class;
 
-        $relatableFetcher = $this->getMockBuilder(RelatableMock::class)
-            ->setMethods(['getClass', 'fetch'])
-            ->getMock();
-        $relatableFetcher
-            ->expects($this->never())
-            ->method('fetch');
-
         $relation = $this->createMock(RelationInterface::class);
 
-        $relationFetcher = $relatableFetcher->withRelation($relation);
+        $relatable = $this->getMockBuilder(RelatableMock::class)
+            ->setMethodsExcept(['withRelation'])
+            ->getMock();
+
+        $relationFetcher = $relatable->withRelation($relation);
 
         $this->assertInstanceOf(RelationFetcher::class, $relationFetcher);
-        $this->assertSame($relatableFetcher, $relationFetcher->getFetcher());
+        $this->assertSame($relatable, $relationFetcher->getFetcher());
         $this->assertSame($relation, $relationFetcher->getRelation());
     }
 }

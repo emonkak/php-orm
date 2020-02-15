@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\PolymorphicRelation;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -125,7 +124,7 @@ class PolymorphicRelationTest extends TestCase
             ]
         );
 
-        $result = $relation->associate(new PreloadedResultSet($comments), null);
+        $result = $relation->associate($comments, null);
 
         $this->assertEquals($expectedResult, iterator_to_array($result));
     }

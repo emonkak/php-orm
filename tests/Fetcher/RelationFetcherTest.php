@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Fetcher;
 
-use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Fetcher\RelationFetcher;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -54,11 +54,11 @@ class RelationFetcherTest extends TestCase
 
         $relation = $this->createMock(RelationInterface::class);
 
-        $stmt = $this->createMock(PDOStatementInterface::class);
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
 
         $relationFetcher = new RelationFetcher($fetcher, $relation);
 
-        $relationResult = $relationFetcher->fetch($stmt);
+        $relationResult = $relationFetcher->fetch($queryBuilder);
 
         $this->assertInstanceOf(RelationResultSet::class, $relationResult);
         $this->assertSame($outerResult, $relationResult->getOuterResult());

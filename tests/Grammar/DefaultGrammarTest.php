@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Grammar;
 
 use Emonkak\Orm\Grammar\DefaultGrammar;
-use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;

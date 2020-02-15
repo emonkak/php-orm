@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
 use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
@@ -33,7 +32,6 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -48,7 +46,6 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -67,7 +64,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -95,7 +91,6 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -110,7 +105,6 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -129,7 +123,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -159,7 +152,6 @@ final class Relations
         string $outerKey,
         string $innerKey,
         string $throughKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -175,7 +167,6 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $throughKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -196,7 +187,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -227,7 +217,6 @@ final class Relations
         string $outerKey,
         string $innerKey,
         string $throughKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -243,7 +232,6 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $throughKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -264,7 +252,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -293,7 +280,6 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions,
@@ -309,7 +295,6 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions,
@@ -329,7 +314,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -358,7 +342,6 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions,
@@ -374,7 +357,6 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions,
@@ -394,7 +376,6 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -423,7 +404,6 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions,
@@ -441,7 +421,6 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions,
@@ -464,7 +443,6 @@ final class Relations
                             $table,
                             $outerKey,
                             $innerKey,
-                            $pdo,
                             $fetcher,
                             $queryBuilder,
                             $unions
@@ -601,7 +579,6 @@ final class Relations
         string $manyToOneTable,
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -619,7 +596,6 @@ final class Relations
                 $manyToOneTable,
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -643,7 +619,6 @@ final class Relations
                         $manyToOneOuterKey,
                         $manyToOneInnerKey,
                         $pivotKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions
@@ -676,7 +651,6 @@ final class Relations
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         string $throughKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions = []
@@ -695,7 +669,6 @@ final class Relations
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
                 $throughKey,
-                $pdo,
                 $fetcher,
                 $queryBuilder,
                 $unions
@@ -721,7 +694,6 @@ final class Relations
                         $manyToOneOuterKey,
                         $manyToOneInnerKey,
                         $pivotKey,
-                        $pdo,
                         $fetcher,
                         $queryBuilder,
                         $unions

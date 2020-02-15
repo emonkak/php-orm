@@ -9,14 +9,10 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
-use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\Relation;
-use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\Relation\RelationStrategyInterface;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
@@ -32,13 +28,13 @@ class RelationTest extends TestCase
     public function testOneToOne(): void
     {
         $outerClass = Model::class;
-        $outerElements = [
+        $outerResult = [
             new Model(['post_id' => 1, 'user_id' => 1]),
             new Model(['post_id' => 2, 'user_id' => 1]),
             new Model(['post_id' => 3, 'user_id' => 3]),
             new Model(['post_id' => 4, 'user_id' => null]),
         ];
-        $innerElements = [
+        $innerResult = [
             new Model(['user_id' => 1]),
             new Model(['user_id' => 2]),
             new Model(['user_id' => 3]),
@@ -66,9 +62,6 @@ class RelationTest extends TestCase
             ]),
         ];
 
-        $outerResult = new PreloadedResultSet($outerElements);
-        $innerResult = new PreloadedResultSet($innerElements);
-
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
@@ -90,8 +83,10 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($innerResult);
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+                $queryBuilder->prepare($pdo);
+                return new PreloadedResultSet($innerResult);
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -100,7 +95,6 @@ class RelationTest extends TestCase
             'users',
             'user_id',
             'user_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -129,13 +123,13 @@ class RelationTest extends TestCase
     public function testOneToMany(): void
     {
         $outerClass = Model::class;
-        $outerElements = [
+        $outerResult = [
             new Model(['user_id' => 1]),
             new Model(['user_id' => 2]),
             new Model(['user_id' => 3]),
             new Model(['user_id' => null]),
         ];
-        $innerElements = [
+        $innerResult = [
             new Model(['post_id' => 1, 'user_id' => 1]),
             new Model(['post_id' => 2, 'user_id' => 1]),
             new Model(['post_id' => 3, 'user_id' => 3]),
@@ -165,9 +159,6 @@ class RelationTest extends TestCase
             ]),
         ];
 
-        $outerResult = new PreloadedResultSet($outerElements);
-        $innerResult = new PreloadedResultSet($innerElements);
-
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(3))
@@ -190,8 +181,10 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($innerResult);
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+                $queryBuilder->prepare($pdo);
+                return new PreloadedResultSet($innerResult);
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -200,7 +193,6 @@ class RelationTest extends TestCase
             'posts',
             'user_id',
             'user_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -240,7 +232,6 @@ class RelationTest extends TestCase
             'posts',
             'user_id',
             'user_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -260,7 +251,7 @@ class RelationTest extends TestCase
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
-        $outerResult = new EmptyResultSet();
+        $outerResult = [];
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
@@ -271,10 +262,9 @@ class RelationTest extends TestCase
     {
         $outerClass = Model::class;
         $outerElements = [new Model(['job_id' => null])];
-        $outerResult = new PreloadedResultSet($outerElements);
+        $outerResult = $outerElements;
 
         $stmt = $this->createMock(PDOStatementInterface::class);
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
 
@@ -283,7 +273,6 @@ class RelationTest extends TestCase
             'jobs',
             'job_id',
             'job_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -311,12 +300,12 @@ class RelationTest extends TestCase
     public function testManyTo(): void
     {
         $outerClass = Model::class;
-        $outerElements = [
+        $outerResult = [
             new Model(['user_id' => 1]),
             new Model(['user_id' => 2]),
             new Model(['user_id' => 3]),
         ];
-        $innerElements = [
+        $innerResult = [
             new Model(['user_id' => 2, '__pivot_key' => 1]),
             new Model(['user_id' => 3, '__pivot_key' => 1]),
             new Model(['user_id' => 1, '__pivot_key' => 2]),
@@ -366,8 +355,10 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadedResultSet($innerElements));
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+                $queryBuilder->prepare($pdo);
+                return new PreloadedResultSet($innerResult);
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -380,7 +371,6 @@ class RelationTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -399,8 +389,6 @@ class RelationTest extends TestCase
             EqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
-
-        $outerResult = new PreloadedResultSet($outerElements);
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());

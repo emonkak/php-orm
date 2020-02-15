@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Relation\Cached;
-use Emonkak\Orm\Relation\CachedRelationStrategy;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
-use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
@@ -22,7 +19,6 @@ use Emonkak\Orm\Relation\PolymorphicRelation;
 use Emonkak\Orm\Relation\Preloaded;
 use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\Relation\RelationStrategyInterface;
 use Emonkak\Orm\Relation\Relations;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Tests\Fixtures\Model;
@@ -46,7 +42,6 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -63,7 +58,6 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -79,7 +73,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -106,7 +99,6 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -123,7 +115,6 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -139,7 +130,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -167,7 +157,6 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $throughKey = 'through_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -185,7 +174,6 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $throughKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -201,7 +189,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -230,7 +217,6 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $throughKey = 'through_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -248,7 +234,6 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $throughKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -264,7 +249,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -292,7 +276,6 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -311,7 +294,6 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions,
@@ -328,7 +310,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -356,7 +337,6 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -375,7 +355,6 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions,
@@ -392,7 +371,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -420,7 +398,6 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $table = 'table';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -441,7 +418,6 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions,
@@ -466,7 +442,6 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $innerRelationStrategy->getTable());
         $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
         $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
-        $this->assertSame($pdo, $innerRelationStrategy->getPdo());
         $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $innerRelationStrategy->getQueryBuilder());
         $this->assertSame($unions, $innerRelationStrategy->getUnions());
@@ -578,7 +553,6 @@ class RelationsTest extends TestCase
         $manyToOneOuterKey = 'many_to_one_outer_key';
         $manyToOneInnerKey = 'many_to_one_inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -595,7 +569,6 @@ class RelationsTest extends TestCase
             $manyToOneTable,
             $manyToOneOuterKey,
             $manyToOneInnerKey,
-            $pdo,
             $fetcher,
             $queryBuilder
         )($outerClass);
@@ -613,7 +586,6 @@ class RelationsTest extends TestCase
         $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
         $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
 
@@ -643,7 +615,6 @@ class RelationsTest extends TestCase
         $manyToOneInnerKey = 'many_to_one_inner_key';
         $throughKey = 'through_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -661,7 +632,6 @@ class RelationsTest extends TestCase
             $manyToOneOuterKey,
             $manyToOneInnerKey,
             $throughKey,
-            $pdo,
             $fetcher,
             $queryBuilder
         )($outerClass);
@@ -679,7 +649,6 @@ class RelationsTest extends TestCase
         $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
         $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
 

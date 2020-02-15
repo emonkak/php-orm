@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Fetcher;
 
+use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FunctionFetcher;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
+use Emonkak\Orm\QueryBuilderInterface;
+use Emonkak\Orm\ResultSet\FunctionResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -15,25 +17,51 @@ use PHPUnit\Framework\TestCase;
  */
 class FunctionFetcherTest extends TestCase
 {
-    public function testFetch(): void
+    public function testConstructor(): void
     {
-        $fetcher = FunctionFetcher::ofConstructor(Model::class);
+        $pdo = $this->createMock(PDOInterface::class);
+        $class = Model::class;
+        $instantiator = function($props) { return new Model($props); };
 
-        $stmt = $this->createMock(PDOStatementInterface::class);
-        $stmt
-            ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([['foo' => 'bar']]);
+        $fetcher = new FunctionFetcher($pdo, $class, $instantiator);
 
-        $result = $fetcher->fetch($stmt);
-
-        $this->assertInstanceOf(ResultSetInterface::class, $result);
-        $this->assertEquals([new Model(['foo' => 'bar'])], $result->toArray());
+        $this->assertSame($pdo, $fetcher->getPdo());
+        $this->assertSame($class, $fetcher->getClass());
+        $this->assertSame($instantiator, $fetcher->getInstantiator());
     }
 
-    public function testGetClass(): void
+    public function testOfConstructor(): void
     {
-        $fetcher = FunctionFetcher::ofConstructor(Model::class);
-        $this->assertSame(Model::class, $fetcher->getClass());
+        $pdo = $this->createMock(PDOInterface::class);
+        $class = Model::class;
+
+        $fetcher = FunctionFetcher::ofConstructor($pdo, $class);
+        $instantiator = $fetcher->getInstantiator();
+
+        $this->assertEquals(new Model(['foo' => 'bar']), $instantiator(['foo' => 'bar']));
+    }
+
+    public function testFetch(): void
+    {
+        $pdo = $this->createMock(PDOInterface::class);
+        $class = Model::class;
+        $instantiator = function($props) { return new Model($props); };
+
+        $stmt = $this->createMock(PDOStatementInterface::class);
+
+        $queryBuilder = $this->createMock(QueryBuilderInterface::class);
+        $queryBuilder
+            ->expects($this->once())
+            ->method('prepare')
+            ->with($this->identicalTo($pdo))
+            ->willReturn($stmt);
+
+        $fetcher = new FunctionFetcher($pdo, $class, $instantiator);
+
+        $result = $fetcher->fetch($queryBuilder);
+
+        $this->assertInstanceOf(FunctionResultSet::class, $result);
+        $this->assertEquals($class, $result->getClass());
+        $this->assertEquals($instantiator, $result->getInstantiator());
     }
 }

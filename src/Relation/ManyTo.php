@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 
 /**
@@ -58,11 +56,6 @@ class ManyTo implements RelationStrategyInterface
     private $pivotKey;
 
     /**
-     * @var PDOInterface
-     */
-    private $pdo;
-
-    /**
      * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
@@ -91,7 +84,6 @@ class ManyTo implements RelationStrategyInterface
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         string $pivotKey,
-        PDOInterface $pdo,
         FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
         array $unions
@@ -104,7 +96,6 @@ class ManyTo implements RelationStrategyInterface
         $this->manyToOneOuterKey = $manyToOneOuterKey;
         $this->manyToOneInnerKey = $manyToOneInnerKey;
         $this->pivotKey = $pivotKey;
-        $this->pdo = $pdo;
         $this->fetcher = $fetcher;
         $this->queryBuilder = $queryBuilder;
         $this->unions = $unions;
@@ -150,11 +141,6 @@ class ManyTo implements RelationStrategyInterface
         return $this->pivotKey;
     }
 
-    public function getPdo(): PDOInterface
-    {
-        return $this->pdo;
-    }
-
     /**
      * @psalm-return FetcherInterface<TInner>
      */
@@ -179,7 +165,7 @@ class ManyTo implements RelationStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->manyToOneTable, $outerKeys);
 
@@ -190,7 +176,7 @@ class ManyTo implements RelationStrategyInterface
         }
 
         return $queryBuilder
-            ->getResult($this->pdo, $this->fetcher);
+            ->getResult($this->fetcher);
     }
 
     /**

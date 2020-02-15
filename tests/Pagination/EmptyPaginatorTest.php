@@ -6,7 +6,6 @@ namespace Emonkak\Tests\Orm\Pagination;
 
 use Emonkak\Orm\Pagination\Page;
 use Emonkak\Orm\Pagination\EmptyPaginator;
-use Emonkak\Orm\ResultSet\EmptyResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**

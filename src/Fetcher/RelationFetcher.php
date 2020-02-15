@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Fetcher;
 
-use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -57,6 +58,11 @@ class RelationFetcher implements FetcherInterface
         return $this->relation;
     }
 
+    public function getPdo(): PDOInterface
+    {
+        return $this->fetcher->getPdo();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -68,9 +74,9 @@ class RelationFetcher implements FetcherInterface
     /**
      * {@inheritDoc}
      */
-    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
+    public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
-        $result = $this->fetcher->fetch($stmt);
+        $result = $this->fetcher->fetch($queryBuilder);
         $class = $this->fetcher->getClass();
         return new RelationResultSet($result, $class, $this->relation);
     }

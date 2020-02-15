@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Fetcher;
 
-use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\ArrayResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
@@ -17,6 +18,21 @@ class ArrayFetcher implements FetcherInterface
     use Relatable;
 
     /**
+     * @var PDOInterface
+     */
+    private $pdo;
+
+    public function __construct(PDOInterface $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    public function getPdo(): PDOInterface
+    {
+        return $this->pdo;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getClass(): ?string
@@ -27,8 +43,9 @@ class ArrayFetcher implements FetcherInterface
     /**
      * {@inheritDoc}
      */
-    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
+    public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
+        $stmt = $queryBuilder->prepare($this->pdo);
         return new ArrayResultSet($stmt);
     }
 }

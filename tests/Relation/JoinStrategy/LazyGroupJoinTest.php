@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
@@ -83,10 +82,7 @@ class LazyGroupJoinTest extends TestCase
         $this->assertSame($proxyFactory, $lazyGroupJoin->getProxyFactory());
 
         $result = $lazyGroupJoin
-            ->join(
-                new PreloadedResultSet($users),
-                new PreloadedResultSet($tweets)
-            );
+            ->join($users, $tweets);
         $result = iterator_to_array($result, false);
         $result = array_map(function($user) {
             $user['tweets'] = $user['tweets']->getArrayCopy();

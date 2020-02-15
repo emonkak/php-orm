@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Pagination;
 
-use Emonkak\Orm\Pagination\CountablePage;
 use Emonkak\Orm\Pagination\PrecountPaginator;
 use PHPUnit\Framework\TestCase;
 

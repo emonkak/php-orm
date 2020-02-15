@@ -9,9 +9,7 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyTo;
-use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +31,6 @@ class ManyToTest extends TestCase
         $manyToOneInnerKey = 'many_to_one_inner_key';
         $pivotKey = 'pivot_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
         $unions = [
@@ -49,7 +46,6 @@ class ManyToTest extends TestCase
             $manyToOneOuterKey,
             $manyToOneInnerKey,
             $pivotKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -63,7 +59,6 @@ class ManyToTest extends TestCase
         $this->assertSame($manyToOneOuterKey, $relation->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relation->getManyToOneInnerKey());
         $this->assertSame($pivotKey, $relation->getPivotKey());
-        $this->assertSame($pdo, $relation->getPdo());
         $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($queryBuilder, $relation->getQueryBuilder());
         $this->assertSame($unions, $relation->getUnions());
@@ -96,8 +91,10 @@ class ManyToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($expectedResult);
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+                $queryBuilder->prepare($pdo);
+                return $expectedResult;
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -110,7 +107,6 @@ class ManyToTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -151,8 +147,10 @@ class ManyToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($expectedResult);
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+                $queryBuilder->prepare($pdo);
+                return $expectedResult;
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -165,7 +163,6 @@ class ManyToTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $pdo,
             $fetcher,
             $queryBuilder,
             [

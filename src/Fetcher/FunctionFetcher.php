@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Fetcher;
 
-use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\FunctionResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
@@ -18,10 +19,9 @@ class FunctionFetcher implements FetcherInterface
     use Relatable;
 
     /**
-     * @psalm-var callable(array<string,?scalar>):T
-     * @var callable
+     * @var PDOInterface
      */
-    private $instantiator;
+    private $pdo;
 
     /**
      * @psalm-var class-string<T>
@@ -30,11 +30,17 @@ class FunctionFetcher implements FetcherInterface
     private $class;
 
     /**
+     * @psalm-var callable(array<string,?scalar>):T
+     * @var callable
+     */
+    private $instantiator;
+
+    /**
      * @template TStatic
      * @psalm-param class-string<TStatic> $class
      * @psalm-return self<TStatic>
      */
-    public static function ofConstructor(string $class): self
+    public static function ofConstructor(PDOInterface $pdo, string $class): self
     {
         $instantiator = \Closure::bind(
             /**
@@ -47,17 +53,23 @@ class FunctionFetcher implements FetcherInterface
             null,
             $class
         );
-        return new self($instantiator, $class);
+        return new self($pdo, $class, $instantiator);
     }
 
     /**
-     * @psalm-param callable(array<string,mixed>):T $instantiator
      * @psalm-param class-string<T> $class
+     * @psalm-param callable(array<string,mixed>):T $instantiator
      */
-    public function __construct(callable $instantiator, string $class)
+    public function __construct(PDOInterface $pdo, string $class, callable $instantiator)
     {
-        $this->instantiator = $instantiator;
+        $this->pdo = $pdo;
         $this->class = $class;
+        $this->instantiator = $instantiator;
+    }
+
+    public function getPdo(): PDOInterface
+    {
+        return $this->pdo;
     }
 
     /**
@@ -69,10 +81,19 @@ class FunctionFetcher implements FetcherInterface
     }
 
     /**
+     * @psalm-return callable(array<string,mixed>):T
+     */
+    public function getInstantiator(): callable
+    {
+        return $this->instantiator;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function fetch(PDOStatementInterface $stmt): ResultSetInterface
+    public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
-        return new FunctionResultSet($stmt, $this->instantiator, $this->class);
+        $stmt = $queryBuilder->prepare($this->pdo);
+        return new FunctionResultSet($stmt, $this->class, $this->instantiator);
     }
 }

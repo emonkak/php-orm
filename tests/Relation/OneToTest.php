@@ -9,9 +9,7 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\OneTo;
-use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +27,6 @@ class OneToTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $pdo = $this->createMock(PDOInterface::class);
         $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
         $unions = [
@@ -41,7 +38,6 @@ class OneToTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $pdo,
             $fetcher,
             $queryBuilder,
             $unions
@@ -51,7 +47,6 @@ class OneToTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($pdo, $relationStrategy->getPdo());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($unions, $relationStrategy->getUnions());
@@ -60,7 +55,7 @@ class OneToTest extends TestCase
     public function testGetResult(): void
     {
         $outerKeys = [1, 2, 3];
-        $expectedResultSet = $this->createMock(ResultSetInterface::class);
+        $expectedResult = $this->createMock(ResultSetInterface::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -84,8 +79,10 @@ class OneToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($expectedResultSet);
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+                $queryBuilder->prepare($pdo);
+                return $expectedResult;
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -94,7 +91,6 @@ class OneToTest extends TestCase
             'revisions',
             'revision_id',
             'revision_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             []
@@ -102,13 +98,13 @@ class OneToTest extends TestCase
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys, $joinStrategy));
+        $this->assertSame($expectedResult, $relationStrategy->getResult($outerKeys, $joinStrategy));
     }
 
     public function testGetResultWithUnion(): void
     {
         $outerKeys = [1, 2, 3];
-        $expectedResultSet = $this->createMock(ResultSetInterface::class);
+        $expectedResult = $this->createMock(ResultSetInterface::class);
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
@@ -138,8 +134,10 @@ class OneToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn($expectedResultSet);
+            ->will($this->returnCallback(function($query) use ($pdo, $expectedResult) {
+                $query->prepare($pdo);
+                return $expectedResult;
+            }));
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -148,7 +146,6 @@ class OneToTest extends TestCase
             'foo',
             'object_id',
             'object_id',
-            $pdo,
             $fetcher,
             $queryBuilder,
             [
@@ -159,6 +156,6 @@ class OneToTest extends TestCase
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);
 
-        $this->assertSame($expectedResultSet, $relationStrategy->getResult($outerKeys, $joinStrategy));
+        $this->assertSame($expectedResult, $relationStrategy->getResult($outerKeys, $joinStrategy));
     }
 }

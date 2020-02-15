@@ -6,8 +6,6 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\Preloaded;
-use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -59,7 +57,7 @@ class PreloadedTest extends TestCase
             $items
         );
 
-        $expectedResultSet = [
+        $expectedResult = [
             $items[0],
             $items[1],
             $items[2]
@@ -73,6 +71,6 @@ class PreloadedTest extends TestCase
                 return $model->item_id;
             });
 
-        $this->assertSame($expectedResultSet, iterator_to_array($relationStrategy->getResult($outerKeys, $joinStrategy), false));
+        $this->assertEquals($expectedResult, $relationStrategy->getResult($outerKeys, $joinStrategy));
     }
 }

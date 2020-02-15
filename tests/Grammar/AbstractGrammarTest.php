@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\Grammar\AbstractGrammar;
-use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;

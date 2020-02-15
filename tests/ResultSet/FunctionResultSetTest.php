@@ -21,14 +21,21 @@ class FunctionResultSetTest extends TestCase
     public function setUp(): void
     {
         $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
-        $this->result = new FunctionResultSet($this->stmt, function($props) {
+        $this->class = Model::class;
+        $this->instantiator = function($props) {
             return new Model($props);
-        }, Model::class);
+        };
+        $this->result = new FunctionResultSet($this->stmt, $this->class, $this->instantiator);
     }
 
     public function testGetClass(): void
     {
-        $this->assertSame(Model::class, $this->result->getClass());
+        $this->assertSame($this->class, $this->result->getClass());
+    }
+
+    public function testGetInstantiator(): void
+    {
+        $this->assertSame($this->instantiator, $this->result->getInstantiator());
     }
 
     public function testGetIterator(): void

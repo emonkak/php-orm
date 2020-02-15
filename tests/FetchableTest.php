@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests;
 
 use Emonkak\Database\PDOInterface;
-use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetchable;
 use Emonkak\Orm\Fetcher\FetcherInterface;
-use Emonkak\Orm\Relation\RelationInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
-use Emonkak\Orm\Sql;
-use Emonkak\Orm\Tests\Fixtures\IterableResultSetInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,22 +22,22 @@ class FetchableTest extends TestCase
 
         $pdo = $this->createMock(PDOInterface::class);
 
-        $stmt = $this->createMock(PDOStatementInterface::class);
-
-        $fetchable = $this->getMockForTrait(Fetchable::class);
-        $fetchable
-            ->expects($this->once())
-            ->method('prepare')
-            ->with($this->identicalTo($pdo))
-            ->willReturn($stmt);
+        $fetchable = $this->getMockBuilder(FetchableMock::class)
+            ->setMethodsExcept(['getResult'])
+            ->getMock();
 
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
+            ->with($this->identicalTo($fetchable))
             ->willReturn($result);
 
-        $this->assertSame($result, $fetchable->getResult($pdo, $fetcher));
+        $this->assertSame($result, $fetchable->getResult($fetcher));
     }
+}
+
+abstract class FetchableMock implements QueryBuilderInterface
+{
+    use Fetchable;
 }

@@ -799,14 +799,20 @@ class SelectBuilderTest extends TestCase
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
+            ->method('getPdo')
+            ->willReturn($pdo);
+        $fetcher
+            ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt2))
-            ->willReturn(new PreloadedResultSet($expectedResult));
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+                $queryBuilder->prepare($pdo);
+                return new PreloadedResultSet($expectedResult);
+            }));
 
         $paginator = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy('t1.id')
-            ->paginate($pdo, $fetcher, $perPage);
+            ->paginate($fetcher, $perPage);
 
         $this->assertInstanceOf(PrecountPaginator::class, $paginator);
 
@@ -845,13 +851,15 @@ class SelectBuilderTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->with($this->identicalTo($stmt))
-            ->willReturn(new PreloadedResultSet($result));
+            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $result) {
+                $queryBuilder->prepare($pdo);
+                return new PreloadedResultSet($result);
+            }));
 
         $sequentialPageIterator = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy('t1.id')
-            ->paginateFrom($pdo, $fetcher, $index, $perPage);
+            ->paginateFrom($fetcher, $index, $perPage);
 
         $this->assertInstanceOf(SequentialPageIterator::class, $sequentialPageIterator);
 

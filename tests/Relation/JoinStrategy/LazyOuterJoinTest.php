@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -63,10 +62,7 @@ class LazyOuterJoinTest extends TestCase
         $this->assertSame($proxyFactory, $lazyOuterJoin->getProxyFactory());
 
         $result = $lazyOuterJoin
-            ->join(
-                new PreloadedResultSet($talents),
-                new PreloadedResultSet($programs)
-            );
+            ->join($talents, $programs);
         $result = iterator_to_array($result, false);
         $result = array_map(function($talent) {
             $talent->program = $talent->program->get();

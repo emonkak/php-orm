@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\EqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,10 +60,7 @@ class ThroughGroupJoinTest extends TestCase
         $this->assertSame($resultSelector, $throughGroupJoin->getResultSelector());
         $this->assertSame($comparer, $throughGroupJoin->getComparer());
 
-        $result = $throughGroupJoin->join(
-            new PreloadedResultSet($talents),
-            new PreloadedResultSet($programs)
-        );
+        $result = $throughGroupJoin->join($talents, $programs);
         $result = iterator_to_array($result);
         $this->assertEquals($expectedResult, $result);
     }

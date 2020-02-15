@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -82,7 +80,7 @@ class Cached implements RelationStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $cacheKeyIndexes = [];
         $cacheKeySelector = $this->cacheKeySelector;
@@ -119,6 +117,6 @@ class Cached implements RelationStrategyInterface
             $this->cache->setMultiple($freshCacheItems, $this->cacheTtl);
         }
 
-        return new PreloadedResultSet($cachedElements);
+        return $cachedElements;
     }
 }

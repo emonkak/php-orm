@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
  * @template TInner
@@ -77,7 +75,7 @@ class Preloaded implements RelationStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): ResultSetInterface
+    public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $innerKeySelector = $joinStrategy->getInnerKeySelector();
         $reversedOuterKeys = array_flip($outerKeys);
@@ -91,6 +89,6 @@ class Preloaded implements RelationStrategyInterface
             }
         }
 
-        return new PreloadedResultSet($filteredElements);
+        return $filteredElements;
     }
 }

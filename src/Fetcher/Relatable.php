@@ -23,9 +23,9 @@ trait Relatable
      */
     public function with(callable $relationFactory): RelationFetcher
     {
+        '@phan-var FetcherInterface $this';
         $class = $this->getClass();
         $relation = $relationFactory($class);
-        '@phan-var FetcherInterface $this';
         return new RelationFetcher($this, $relation);
     }
 

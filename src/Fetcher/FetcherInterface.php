@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Fetcher;
 
-use Emonkak\Database\PDOStatementInterface;
+use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
@@ -12,6 +13,8 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
  */
 interface FetcherInterface
 {
+    public function getPdo(): PDOInterface;
+
     /**
      * @psalm-return ?class-string<T>
      */
@@ -20,5 +23,5 @@ interface FetcherInterface
     /**
      * @psalm-return ResultSetInterface<T>
      */
-    public function fetch(PDOStatementInterface $stmt): ResultSetInterface;
+    public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface;
 }

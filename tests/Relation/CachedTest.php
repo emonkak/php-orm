@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Database\PDOInterface;
-use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\Cached;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
-use Emonkak\Orm\Relation\RelationInterface;
 use Emonkak\Orm\Relation\RelationStrategyInterface;
-use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -89,12 +84,10 @@ class CachedTest extends TestCase
             ->expects($this->once())
             ->method('getResult')
             ->with([2, 3])
-            ->willReturn(new PreloadedResultSet(
-                [
-                    $expectedResult[1],
-                    $expectedResult[2]
-                ]
-            ));
+            ->willReturn([
+                $expectedResult[1],
+                $expectedResult[2]
+            ]);
 
         $queryBuilder = $this->getSelectBuilder();
 
@@ -116,7 +109,7 @@ class CachedTest extends TestCase
 
         $result = $relationStrategy->getResult($outerKeys, $joinStrategy);
 
-        $this->assertEquals($expectedResult, $result->toArray());
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function testGetResultFromOnlyCache(): void
@@ -167,6 +160,6 @@ class CachedTest extends TestCase
 
         $result = $relationStrategy->getResult($outerKeys, $joinStrategy);
 
-        $this->assertEquals($expectedResult, $result->toArray());
+        $this->assertEquals($expectedResult, $result);
     }
 }

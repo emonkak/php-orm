@@ -493,17 +493,15 @@ class SelectBuilder implements QueryBuilderInterface
      * @psalm-param FetcherInterface<T> $fetcher
      * @psalm-return PaginatorInterface<T>
      */
-    public function paginate(PDOInterface $pdo, FetcherInterface $fetcher, int $perPage, string $countExpr = 'COUNT(*)'): PaginatorInterface
+    public function paginate(FetcherInterface $fetcher, int $perPage, string $countExpr = 'COUNT(*)'): PaginatorInterface
     {
-        /**
-         * @psalm-return \Traversable<T>
-         */
-        $itemsFetcher = function(int $offset, int $limit) use ($pdo, $fetcher): \Traversable {
+        $itemsFetcher = function(int $offset, int $limit) use ($fetcher): \Traversable {
             return $this
                 ->limit($limit)
                 ->offset($offset)
-                ->getResult($pdo, $fetcher);
+                ->getResult($fetcher);
         };
+        $pdo = $fetcher->getPdo();
         $count = (int) $this->aggregate($pdo, $countExpr);
         return new PrecountPaginator($itemsFetcher, $perPage, $count);
     }
@@ -513,13 +511,13 @@ class SelectBuilder implements QueryBuilderInterface
      * @psalm-param FetcherInterface<T> $fetcher
      * @psalm-return PageIteratorInterface<T>
      */
-    public function paginateFrom(PDOInterface $pdo, FetcherInterface $fetcher, int $index, int $perPage): PageIteratorInterface
+    public function paginateFrom(FetcherInterface $fetcher, int $index, int $perPage): PageIteratorInterface
     {
-        $itemsFetcher = function(int $offset, int $limit) use ($pdo, $fetcher): array {
+        $itemsFetcher = function(int $offset, int $limit) use ($fetcher): array {
             return $this
                 ->limit($limit)
                 ->offset($offset)
-                ->getResult($pdo, $fetcher)
+                ->getResult($fetcher)
                 ->toArray();
         };
         return SequentialPageIterator::from($index, $perPage, $itemsFetcher);
