@@ -82,15 +82,15 @@ class Cached implements RelationStrategyInterface
      */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
-        $cacheKeyIndexes = [];
+        $outerKeysByCacheKey = [];
         $cacheKeySelector = $this->cacheKeySelector;
 
         foreach ($outerKeys as $outerKey) {
             $cacheKey = $cacheKeySelector($outerKey);
-            $cacheKeyIndexes[$cacheKey] = $outerKey;
+            $outerKeysByCacheKey[$cacheKey] = $outerKey;
         }
 
-        $cacheItems = $this->cache->getMultiple(array_keys($cacheKeyIndexes));
+        $cacheItems = $this->cache->getMultiple(array_keys($outerKeysByCacheKey));
         $cachedElements = [];
         $uncachedOuterKeys = [];
 
@@ -98,23 +98,23 @@ class Cached implements RelationStrategyInterface
             if ($value !== null) {
                 $cachedElements[] = $value;
             } else {
-                $uncachedOuterKeys[] = $cacheKeyIndexes[$key];
+                $uncachedOuterKeys[] = $outerKeysByCacheKey[$key];
             }
         }
 
         if (count($uncachedOuterKeys) > 0) {
             $result = $this->relationStrategy->getResult($uncachedOuterKeys, $joinStrategy);
             $innerKeySelector = $joinStrategy->getInnerKeySelector();
-            $freshCacheItems = [];
+            $cachingItems = [];
 
             foreach ($result as $innerElement) {
                 $innerKey = $innerKeySelector($innerElement);
                 $cacheKey = $cacheKeySelector($innerKey);
-                $freshCacheItems[$cacheKey] = $innerElement;
+                $cachingItems[$cacheKey] = $innerElement;
                 $cachedElements[] = $innerElement;
             }
 
-            $this->cache->setMultiple($freshCacheItems, $this->cacheTtl);
+            $this->cache->setMultiple($cachingItems, $this->cacheTtl);
         }
 
         return $cachedElements;
