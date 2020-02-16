@@ -7,9 +7,10 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
- * @implements \IteratorAggregate<array<string,mixed>>
- * @implements ResultSetInterface<array<string,mixed>>
- * @use EnumerableExtensions<array<string,mixed>>
+ * @template T of array
+ * @implements \IteratorAggregate<T>
+ * @implements ResultSetInterface<T>
+ * @use EnumerableExtensions<T>
  */
 class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
 {
@@ -26,7 +27,7 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return \Traversable<array<string,mixed>>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

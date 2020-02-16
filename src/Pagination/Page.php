@@ -45,7 +45,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * @psalm-return \Traversable<T>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

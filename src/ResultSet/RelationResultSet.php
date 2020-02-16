@@ -66,7 +66,7 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return \Traversable<TResult>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

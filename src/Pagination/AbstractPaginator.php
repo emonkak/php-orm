@@ -17,7 +17,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     use EnumerableExtensions;
 
     /**
-     * @psalm-return \Traversable<T>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

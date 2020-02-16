@@ -77,7 +77,7 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * @psalm-return \Traversable<T>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

@@ -31,7 +31,7 @@ class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return \Traversable<T>
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

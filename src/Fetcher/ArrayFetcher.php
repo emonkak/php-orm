@@ -10,8 +10,9 @@ use Emonkak\Orm\ResultSet\ArrayResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @implements FetcherInterface<array<string,?scalar>>
- * @use Relatable<array<string,?scalar>>
+ * @template T of array
+ * @implements FetcherInterface<T>
+ * @use Relatable<T>
  */
 class ArrayFetcher implements FetcherInterface
 {
