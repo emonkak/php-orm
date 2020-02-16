@@ -55,7 +55,7 @@ abstract class AbstractGrammar implements GrammarInterface
     /**
      * {@inheritDoc}
      */
-    public function literal($value): Sql
+    public function value($value): Sql
     {
         if ($value === null) {
             return new Sql('NULL');
@@ -73,10 +73,19 @@ abstract class AbstractGrammar implements GrammarInterface
             return Sql::value($value);
         }
         if (is_array($value)) {
-            return Sql::join(', ', array_map([$this, 'literal'], $value))->enclosed();
+            $tmpSqls = [];
+            $tmpBindings = [];
+            foreach ($value as $v) {
+                $liftedValue = $this->value($v);
+                $tmpSqls[] = $liftedValue->getSql();
+                $tmpBindings[] = $liftedValue->getBindings();
+            }
+            $sql = '(' . implode(', ', $tmpSqls) . ')';
+            $bindings = array_merge(...$tmpBindings);
+            return new Sql($sql, $bindings);
         }
         $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as a literal, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as a value, got '$type'.");
     }
 
     /**
@@ -102,7 +111,7 @@ abstract class AbstractGrammar implements GrammarInterface
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
                 /** @psalm-var scalar|scalar[]|null $arg3 */
-                $rhs = $this->literal($arg3);
+                $rhs = $this->value($arg3);
                 return $this->operator($operator, $lhs, $rhs);
             }
             default:
@@ -111,9 +120,9 @@ abstract class AbstractGrammar implements GrammarInterface
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
                 /** @psalm-var scalar|scalar[]|null $arg3 */
-                $start = $this->literal($arg3);
+                $start = $this->value($arg3);
                 /** @psalm-var scalar|scalar[]|null $arg4 */
-                $end = $this->literal($arg4);
+                $end = $this->value($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);
         }
     }

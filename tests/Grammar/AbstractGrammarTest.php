@@ -101,17 +101,17 @@ class AbstractGrammarTest extends TestCase
     }
 
     /**
-     * @dataProvider providerLiteral
+     * @dataProvider providerValue
      */
-    public function testLiteral($value, $expectedSql, array $expectedBindings): void
+    public function testValue($value, $expectedSql, array $expectedBindings): void
     {
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $query = $grammar->literal($value);
+        $query = $grammar->value($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerLiteral()
+    public function providerValue()
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
@@ -128,17 +128,17 @@ class AbstractGrammarTest extends TestCase
     }
 
     /**
-     * @dataProvider providerLiteralThrowsUnexpectedValueException
+     * @dataProvider providerValueThrowsUnexpectedValueException
      */
-    public function testLiteralThrowsUnexpectedValueException($value): void
+    public function testValueThrowsUnexpectedValueException($value): void
     {
         $this->expectException(\UnexpectedValueException::class);
 
         $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
-        $grammar->literal($value);
+        $grammar->value($value);
     }
 
-    public function providerLiteralThrowsUnexpectedValueException()
+    public function providerValueThrowsUnexpectedValueException()
     {
         return [
             [new \stdClass()],

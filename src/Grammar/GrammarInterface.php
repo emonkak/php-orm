@@ -29,7 +29,7 @@ interface GrammarInterface
     /**
      * @param mixed $value
      */
-    public function literal($value): Sql;
+    public function value($value): Sql;
 
     /**
      * @param mixed $arg1

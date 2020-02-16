@@ -92,7 +92,7 @@ class DefaultGrammar extends AbstractGrammar
                 $bindings = $expr->getBindings();
                 return new Sql($sql, $bindings);
         }
-        throw new \UnexpectedValueException("Unexpected ordering literal, got '$ordering'");
+        throw new \UnexpectedValueException("Unexpected ordering value, got '$ordering'");
     }
 
     public function union(Sql $query, string $type): Sql
