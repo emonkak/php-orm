@@ -12,8 +12,9 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 trait Fetchable
 {
     /**
-     * @template T
-     * @psalm-return ResultSetInterface<T>
+     * @template TResult
+     * @psalm-param FetcherInterface<TResult> $fetcher
+     * @psalm-return ResultSetInterface<TResult>
      */
     public function getResult(FetcherInterface $fetcher): ResultSetInterface
     {
