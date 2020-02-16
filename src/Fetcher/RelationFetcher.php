@@ -11,30 +11,30 @@ use Emonkak\Orm\ResultSet\RelationResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @template T
+ * @template TOuter
  * @template TResult
  * @implements FetcherInterface<TResult>
- * @use Relatable<T>
+ * @use Relatable<TResult>
  */
 class RelationFetcher implements FetcherInterface
 {
     use Relatable;
 
     /**
-     * @psalm-var FetcherInterface<T>
+     * @psalm-var FetcherInterface<TOuter>
      * @var FetcherInterface
      */
     private $fetcher;
 
     /**
-     * @psalm-var RelationInterface<T,TResult>
+     * @psalm-var RelationInterface<TOuter,TResult>
      * @var RelationInterface
      */
     private $relation;
 
     /**
-     * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-param RelationInterface<T,TResult> $relation
+     * @psalm-param FetcherInterface<TOuter> $fetcher
+     * @psalm-param RelationInterface<TOuter,TResult> $relation
      */
     public function __construct(FetcherInterface $fetcher, RelationInterface $relation)
     {
@@ -43,7 +43,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-return FetcherInterface<T>
+     * @psalm-return FetcherInterface<TOuter>
      */
     public function getFetcher(): FetcherInterface
     {
@@ -51,7 +51,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-return RelationInterface<T,TResult>
+     * @psalm-return RelationInterface<TOuter,TResult>
      */
     public function getRelation(): RelationInterface
     {

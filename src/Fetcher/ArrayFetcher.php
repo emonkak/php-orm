@@ -11,7 +11,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
  * @implements FetcherInterface<array<string,?scalar>>
- * @use Relatable<array<string,mixed>>
+ * @use Relatable<array<string,?scalar>>
  */
 class ArrayFetcher implements FetcherInterface
 {

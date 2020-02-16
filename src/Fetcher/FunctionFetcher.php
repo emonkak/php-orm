@@ -12,7 +12,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 /**
  * @template T
  * @implements FetcherInterface<T>
- * @use Relatable<array<string,mixed>>
+ * @use Relatable<T>
  */
 class FunctionFetcher implements FetcherInterface
 {
