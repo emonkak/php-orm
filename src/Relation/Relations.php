@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
@@ -22,7 +22,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -72,7 +72,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -81,7 +81,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -131,7 +131,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -140,7 +140,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
@@ -196,7 +196,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -205,7 +205,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
@@ -261,7 +261,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -270,7 +270,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -322,7 +322,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance(),
+                        LooseEqualityComparer::getInstance(),
                         $proxyFactory
                     )
                 );
@@ -332,7 +332,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -384,7 +384,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance(),
+                        LooseEqualityComparer::getInstance(),
                         $proxyFactory
                     )
                 );
@@ -394,7 +394,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-param callable(TKey):string $cacheKeySelector
@@ -456,7 +456,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -465,7 +465,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param ?class-string<TInner> $innerClass
      * @psalm-param TInner[] $innerElements
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -507,7 +507,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -516,7 +516,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param ?class-string<TInner> $innerClass
      * @psalm-param TInner[] $innerElements
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -558,7 +558,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -567,7 +567,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -628,7 +628,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };
@@ -637,7 +637,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey
+     * @template TKey of ?scalar
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
@@ -704,7 +704,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        EqualityComparer::getInstance()
+                        LooseEqualityComparer::getInstance()
                     )
                 );
             };

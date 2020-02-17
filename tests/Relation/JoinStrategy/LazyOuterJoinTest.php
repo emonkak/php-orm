@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
@@ -25,10 +25,10 @@ class LazyOuterJoinTest extends TestCase
             new Model(['talent_id' => 5, 'name' => 'Shiori Mikami']),
         ];
         $programs = [
-            new Model(['program_id' => 1, 'talent_id' => 1]),
-            new Model(['program_id' => 3, 'talent_id' => 2]),
-            new Model(['program_id' => 5, 'talent_id' => 4]),
-            new Model(['program_id' => 6, 'talent_id' => 5]),
+            new Model(['program_id' => 1, 'talent_id' => '1']),
+            new Model(['program_id' => 3, 'talent_id' => '2']),
+            new Model(['program_id' => 5, 'talent_id' => '4']),
+            new Model(['program_id' => 6, 'talent_id' => '5']),
         ];
         $expectedResult = [
             new Model($talents[0]->toArray() + ['program' => $programs[0]]),
@@ -44,7 +44,7 @@ class LazyOuterJoinTest extends TestCase
             $talent->program = $program;
             return $talent;
         };
-        $comparer = EqualityComparer::getInstance();
+        $comparer = LooseEqualityComparer::getInstance();
         $proxyFactory = new LazyLoadingValueHolderFactory();
 
         $lazyOuterJoin = new LazyOuterJoin(

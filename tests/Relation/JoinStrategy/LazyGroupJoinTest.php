@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -65,7 +65,7 @@ class LazyGroupJoinTest extends TestCase
             $user['tweets'] = $tweets;
             return $user;
         };
-        $comparer = EqualityComparer::getInstance();
+        $comparer = LooseEqualityComparer::getInstance();
         $proxyFactory = new LazyLoadingValueHolderFactory();
         $lazyGroupJoin = new LazyGroupJoin(
             $outerKeySelector,

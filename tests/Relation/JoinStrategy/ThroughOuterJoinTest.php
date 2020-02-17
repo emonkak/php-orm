@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Relation;
 
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use PHPUnit\Framework\TestCase;
 
@@ -23,10 +23,10 @@ class ThroughOuterJoinTest extends TestCase
             ['talent_id' => 5, 'name' => 'Shiori Mikami'],
         ];
         $programs = [
-            ['program_id' => 1, 'talent_id' => 1],
-            ['program_id' => 3, 'talent_id' => 2],
-            ['program_id' => 5, 'talent_id' => 4],
-            ['program_id' => 6, 'talent_id' => 5],
+            ['program_id' => 1, 'talent_id' => '1'],
+            ['program_id' => 3, 'talent_id' => '2'],
+            ['program_id' => 5, 'talent_id' => '4'],
+            ['program_id' => 6, 'talent_id' => '5'],
         ];
         $expectedResult = [
             $talents[0] + ['program' => $programs[0]['program_id']],
@@ -43,7 +43,7 @@ class ThroughOuterJoinTest extends TestCase
             $talent['program'] = $program;
             return $talent;
         };
-        $comparer = EqualityComparer::getInstance();
+        $comparer = LooseEqualityComparer::getInstance();
         $throughOuterJoin = new ThroughOuterJoin(
             $outerKeySelector,
             $innerKeySelector,

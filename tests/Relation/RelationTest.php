@@ -6,7 +6,7 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
-use Emonkak\Enumerable\EqualityComparer;
+use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
@@ -35,9 +35,9 @@ class RelationTest extends TestCase
             new Model(['post_id' => 4, 'user_id' => null]),
         ];
         $innerResult = [
-            new Model(['user_id' => 1]),
-            new Model(['user_id' => 2]),
-            new Model(['user_id' => 3]),
+            new Model(['user_id' => '1']),
+            new Model(['user_id' => '2']),
+            new Model(['user_id' => '3']),
         ];
         $expectedResult = [
             new Model([
@@ -110,7 +110,7 @@ class RelationTest extends TestCase
                 $outerElement->user = $innerElement;
                 return $outerElement;
             },
-            EqualityComparer::getInstance()
+            LooseEqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -130,9 +130,9 @@ class RelationTest extends TestCase
             new Model(['user_id' => null]),
         ];
         $innerResult = [
-            new Model(['post_id' => 1, 'user_id' => 1]),
-            new Model(['post_id' => 2, 'user_id' => 1]),
-            new Model(['post_id' => 3, 'user_id' => 3]),
+            new Model(['post_id' => 1, 'user_id' => '1']),
+            new Model(['post_id' => 2, 'user_id' => '1']),
+            new Model(['post_id' => 3, 'user_id' => '3']),
         ];
         $expectedResult = [
             new Model([
@@ -208,7 +208,7 @@ class RelationTest extends TestCase
                 $outerElement->posts = $innerElements;
                 return $outerElement;
             },
-            EqualityComparer::getInstance()
+            LooseEqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -247,7 +247,7 @@ class RelationTest extends TestCase
                 $outerElement->posts = $innerElements;
                 return $outerElement;
             },
-            EqualityComparer::getInstance()
+            LooseEqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -288,7 +288,7 @@ class RelationTest extends TestCase
                 $outerElement->jobs = $innerElements;
                 return $outerElement;
             },
-            EqualityComparer::getInstance()
+            LooseEqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -386,7 +386,7 @@ class RelationTest extends TestCase
                 $outerElement->friends = $innerElements;
                 return $outerElement;
             },
-            EqualityComparer::getInstance()
+            LooseEqualityComparer::getInstance()
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
