@@ -32,8 +32,8 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -46,8 +46,8 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -64,8 +64,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new OuterJoin(
@@ -91,8 +91,8 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -105,8 +105,8 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -123,8 +123,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new GroupJoin(
@@ -152,8 +152,8 @@ final class Relations
         string $outerKey,
         string $innerKey,
         string $throughKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -167,8 +167,8 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $throughKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -187,8 +187,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new ThroughOuterJoin(
@@ -207,8 +207,8 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @template TThroughKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param array<string,SelectBuilder> $unions
+     * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function throughOneToMany(
@@ -217,8 +217,8 @@ final class Relations
         string $outerKey,
         string $innerKey,
         string $throughKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -232,8 +232,8 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $throughKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -252,8 +252,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new ThroughGroupJoin(
@@ -280,8 +280,8 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ): callable {
@@ -295,8 +295,8 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions,
                 $proxyFactory
             ): RelationInterface {
@@ -314,8 +314,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new LazyOuterJoin(
@@ -342,8 +342,8 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ): callable {
@@ -357,8 +357,8 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions,
                 $proxyFactory
             ): RelationInterface {
@@ -376,8 +376,8 @@ final class Relations
                         $table,
                         $outerKey,
                         $innerKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new LazyGroupJoin(
@@ -405,8 +405,8 @@ final class Relations
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions,
         CacheInterface $cache,
         callable $cacheKeySelector,
@@ -422,8 +422,8 @@ final class Relations
                 $table,
                 $outerKey,
                 $innerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions,
                 $cache,
                 $cacheKeySelector,
@@ -444,8 +444,8 @@ final class Relations
                             $table,
                             $outerKey,
                             $innerKey,
-                            $fetcher,
                             $queryBuilder,
+                            $fetcher,
                             $unions
                         ),
                         $cache,
@@ -580,8 +580,8 @@ final class Relations
         string $manyToOneTable,
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -597,8 +597,8 @@ final class Relations
                 $manyToOneTable,
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -620,8 +620,8 @@ final class Relations
                         $manyToOneOuterKey,
                         $manyToOneInnerKey,
                         $pivotKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new GroupJoin(
@@ -652,8 +652,8 @@ final class Relations
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         string $throughKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions = []
     ): callable {
         return
@@ -670,8 +670,8 @@ final class Relations
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
                 $throughKey,
-                $fetcher,
                 $queryBuilder,
+                $fetcher,
                 $unions
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -695,8 +695,8 @@ final class Relations
                         $manyToOneOuterKey,
                         $manyToOneInnerKey,
                         $pivotKey,
-                        $fetcher,
                         $queryBuilder,
+                        $fetcher,
                         $unions
                     ),
                     new ThroughGroupJoin(

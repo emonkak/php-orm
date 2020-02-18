@@ -27,8 +27,8 @@ class OneToTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
-        $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
+        $fetcher = $this->createMock(FetcherInterface::class);
         $unions = [
             'union' => $this->getSelectBuilder()
         ];
@@ -38,8 +38,8 @@ class OneToTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         );
 
@@ -47,8 +47,8 @@ class OneToTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
     }
 
@@ -75,6 +75,8 @@ class OneToTest extends TestCase
             ->with('SELECT * FROM `revisions` WHERE (`revisions`.`revision_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -84,15 +86,13 @@ class OneToTest extends TestCase
                 return $expectedResult;
             }));
 
-        $queryBuilder = $this->getSelectBuilder();
-
         $relationStrategy = new OneTo(
             'revisions',
             'revisions',
             'revision_id',
             'revision_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
 
@@ -130,6 +130,8 @@ class OneToTest extends TestCase
             ->with('SELECT * FROM `foo` WHERE (`foo`.`object_id` IN (?, ?, ?)) UNION ALL (SELECT * FROM `bar` WHERE (`bar`.`object_id` IN (?, ?, ?))) UNION ALL (SELECT * FROM `baz` WHERE (`baz`.`object_id` IN (?, ?, ?)))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -139,15 +141,13 @@ class OneToTest extends TestCase
                 return $expectedResult;
             }));
 
-        $queryBuilder = $this->getSelectBuilder();
-
         $relationStrategy = new OneTo(
             'object',
             'foo',
             'object_id',
             'object_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             [
                 'bar' => $this->getSelectBuilder(),
                 'baz' => $this->getSelectBuilder()

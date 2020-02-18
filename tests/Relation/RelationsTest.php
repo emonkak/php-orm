@@ -42,13 +42,13 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -58,8 +58,8 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -73,8 +73,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
@@ -99,13 +99,13 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -115,8 +115,8 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -130,8 +130,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
@@ -157,13 +157,13 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $throughKey = 'through_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -174,8 +174,8 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $throughKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -189,8 +189,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(ThroughOuterJoin::class, $joinStrategy);
@@ -217,13 +217,13 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $throughKey = 'through_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -234,8 +234,8 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $throughKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -249,8 +249,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(ThroughGroupJoin::class, $joinStrategy);
@@ -276,13 +276,13 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -294,8 +294,8 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions,
             $proxyFactory
         )($outerClass);
@@ -310,8 +310,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(LazyOuterJoin::class, $joinStrategy);
@@ -337,13 +337,13 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -355,8 +355,8 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions,
             $proxyFactory
         )($outerClass);
@@ -371,8 +371,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $relationStrategy->getTable());
         $this->assertSame($outerKey, $relationStrategy->getOuterKey());
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(LazyGroupJoin::class, $joinStrategy);
@@ -398,13 +398,13 @@ class RelationsTest extends TestCase
         $innerKey = 'inner_key';
         $table = 'table';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
         $unions = [
             'union' => new SelectBuilder($grammar)
         ];
@@ -418,8 +418,8 @@ class RelationsTest extends TestCase
             $table,
             $outerKey,
             $innerKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions,
             $cache,
             $cacheKeySelector,
@@ -442,8 +442,8 @@ class RelationsTest extends TestCase
         $this->assertSame($table, $innerRelationStrategy->getTable());
         $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
         $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
-        $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $innerRelationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
         $this->assertSame($unions, $innerRelationStrategy->getUnions());
 
         $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
@@ -553,13 +553,13 @@ class RelationsTest extends TestCase
         $manyToOneOuterKey = 'many_to_one_outer_key';
         $manyToOneInnerKey = 'many_to_one_inner_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
 
         $relation = Relations::manyToMany(
             $relationKey,
@@ -569,8 +569,8 @@ class RelationsTest extends TestCase
             $manyToOneTable,
             $manyToOneOuterKey,
             $manyToOneInnerKey,
-            $fetcher,
-            $queryBuilder
+            $queryBuilder,
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -586,8 +586,8 @@ class RelationsTest extends TestCase
         $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
         $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
         $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['one_to_many_outer_key' => 123])));
@@ -615,13 +615,13 @@ class RelationsTest extends TestCase
         $manyToOneInnerKey = 'many_to_one_inner_key';
         $throughKey = 'through_key';
 
+        $grammar = $this->createMock(GrammarInterface::class);
+        $queryBuilder = new SelectBuilder($grammar);
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $grammar = $this->createMock(GrammarInterface::class);
-        $queryBuilder = new SelectBuilder($grammar);
 
         $relation = Relations::throughManyToMany(
             $relationKey,
@@ -632,8 +632,8 @@ class RelationsTest extends TestCase
             $manyToOneOuterKey,
             $manyToOneInnerKey,
             $throughKey,
-            $fetcher,
-            $queryBuilder
+            $queryBuilder,
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -649,8 +649,8 @@ class RelationsTest extends TestCase
         $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
         $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
-        $this->assertSame($fetcher, $relationStrategy->getFetcher());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
+        $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
         $this->assertInstanceOf(ThroughGroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['one_to_many_outer_key' => 123])));

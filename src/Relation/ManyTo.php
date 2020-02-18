@@ -56,15 +56,15 @@ class ManyTo implements RelationStrategyInterface
     private $pivotKey;
 
     /**
+     * @var SelectBuilder
+     */
+    private $queryBuilder;
+
+    /**
      * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
     private $fetcher;
-
-    /**
-     * @var SelectBuilder
-     */
-    private $queryBuilder;
 
     /**
      * @var array<string,SelectBuilder>
@@ -84,8 +84,8 @@ class ManyTo implements RelationStrategyInterface
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         string $pivotKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions
     ) {
         $this->relationKey = $relationKey;
@@ -96,8 +96,8 @@ class ManyTo implements RelationStrategyInterface
         $this->manyToOneOuterKey = $manyToOneOuterKey;
         $this->manyToOneInnerKey = $manyToOneInnerKey;
         $this->pivotKey = $pivotKey;
-        $this->fetcher = $fetcher;
         $this->queryBuilder = $queryBuilder;
+        $this->fetcher = $fetcher;
         $this->unions = $unions;
     }
 
@@ -141,17 +141,17 @@ class ManyTo implements RelationStrategyInterface
         return $this->pivotKey;
     }
 
+    public function getQueryBuilder(): SelectBuilder
+    {
+        return $this->queryBuilder;
+    }
+
     /**
      * @psalm-return FetcherInterface<TInner>
      */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
-    }
-
-    public function getQueryBuilder(): SelectBuilder
-    {
-        return $this->queryBuilder;
     }
 
     /**

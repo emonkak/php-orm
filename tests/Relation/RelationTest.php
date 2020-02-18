@@ -79,6 +79,8 @@ class RelationTest extends TestCase
             ->with('SELECT * FROM `users` WHERE (`users`.`user_id` IN (?, ?))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -88,15 +90,13 @@ class RelationTest extends TestCase
                 return new PreloadedResultSet($innerResult);
             }));
 
-        $queryBuilder = $this->getSelectBuilder();
-
         $relationStrategy = new OneTo(
             'user',
             'users',
             'user_id',
             'user_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
         $joinStrategy = new OuterJoin(
@@ -177,6 +177,8 @@ class RelationTest extends TestCase
             ->with('SELECT * FROM `posts` WHERE (`posts`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -186,15 +188,13 @@ class RelationTest extends TestCase
                 return new PreloadedResultSet($innerResult);
             }));
 
-        $queryBuilder = $this->getSelectBuilder();
-
         $relationStrategy = new OneTo(
             'posts',
             'posts',
             'user_id',
             'user_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
         $joinStrategy = new GroupJoin(
@@ -224,16 +224,16 @@ class RelationTest extends TestCase
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $pdo = $this->createMock(PDOInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
+        $fetcher = $this->createMock(FetcherInterface::class);
 
         $relationStrategy = new OneTo(
             'posts',
             'posts',
             'user_id',
             'user_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
         $joinStrategy = new GroupJoin(
@@ -265,16 +265,16 @@ class RelationTest extends TestCase
         $outerResult = $outerElements;
 
         $stmt = $this->createMock(PDOStatementInterface::class);
-        $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
+        $fetcher = $this->createMock(FetcherInterface::class);
 
         $relationStrategy = new OneTo(
             'jobs',
             'jobs',
             'job_id',
             'job_id',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
         $joinStrategy = new GroupJoin(
@@ -351,6 +351,8 @@ class RelationTest extends TestCase
             ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -359,8 +361,6 @@ class RelationTest extends TestCase
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($innerResult);
             }));
-
-        $queryBuilder = $this->getSelectBuilder();
 
         $relationStrategy = new ManyTo(
             'friends',
@@ -371,8 +371,8 @@ class RelationTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
         $joinStrategy = new GroupJoin(

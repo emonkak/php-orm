@@ -31,8 +31,8 @@ class ManyToTest extends TestCase
         $manyToOneInnerKey = 'many_to_one_inner_key';
         $pivotKey = 'pivot_key';
 
-        $fetcher = $this->createMock(FetcherInterface::class);
         $queryBuilder = $this->getSelectBuilder();
+        $fetcher = $this->createMock(FetcherInterface::class);
         $unions = [
             'union' => $this->getSelectBuilder()
         ];
@@ -46,8 +46,8 @@ class ManyToTest extends TestCase
             $manyToOneOuterKey,
             $manyToOneInnerKey,
             $pivotKey,
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             $unions
         );
 
@@ -59,8 +59,8 @@ class ManyToTest extends TestCase
         $this->assertSame($manyToOneOuterKey, $relation->getManyToOneOuterKey());
         $this->assertSame($manyToOneInnerKey, $relation->getManyToOneInnerKey());
         $this->assertSame($pivotKey, $relation->getPivotKey());
-        $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($queryBuilder, $relation->getQueryBuilder());
+        $this->assertSame($fetcher, $relation->getFetcher());
         $this->assertSame($unions, $relation->getUnions());
     }
 
@@ -87,6 +87,8 @@ class ManyToTest extends TestCase
             ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -95,8 +97,6 @@ class ManyToTest extends TestCase
                 $queryBuilder->prepare($pdo);
                 return $expectedResult;
             }));
-
-        $queryBuilder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             'friends',
@@ -107,8 +107,8 @@ class ManyToTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             []
         );
 
@@ -143,6 +143,8 @@ class ManyToTest extends TestCase
             ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)) UNION ALL (SELECT `users2`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users2` LEFT OUTER JOIN `friendships` ON `users2`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)))')
             ->willReturn($stmt);
 
+        $queryBuilder = $this->getSelectBuilder();
+
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
             ->expects($this->once())
@@ -151,8 +153,6 @@ class ManyToTest extends TestCase
                 $queryBuilder->prepare($pdo);
                 return $expectedResult;
             }));
-
-        $queryBuilder = $this->getSelectBuilder();
 
         $relation = new ManyTo(
             'friends',
@@ -163,8 +163,8 @@ class ManyToTest extends TestCase
             'friend_id',
             'user_id',
             '__pivot_key',
-            $fetcher,
             $queryBuilder,
+            $fetcher,
             [
                 'users2' => $this->getSelectBuilder()
             ]

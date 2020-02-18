@@ -36,15 +36,15 @@ class OneTo implements RelationStrategyInterface
     private $innerKey;
 
     /**
+     * @var SelectBuilder
+     */
+    private $queryBuilder;
+
+    /**
      * @psalm-var FetcherInterface<TInner>
      * @var FetcherInterface
      */
     private $fetcher;
-
-    /**
-     * @var SelectBuilder
-     */
-    private $queryBuilder;
 
     /**
      * @var array<string,SelectBuilder>
@@ -60,16 +60,16 @@ class OneTo implements RelationStrategyInterface
         string $table,
         string $outerKey,
         string $innerKey,
-        FetcherInterface $fetcher,
         SelectBuilder $queryBuilder,
+        FetcherInterface $fetcher,
         array $unions
     ) {
         $this->relationKey = $relationKey;
         $this->table = $table;
         $this->outerKey = $outerKey;
         $this->innerKey = $innerKey;
-        $this->fetcher = $fetcher;
         $this->queryBuilder = $queryBuilder;
+        $this->fetcher = $fetcher;
         $this->unions = $unions;
     }
 
@@ -93,17 +93,17 @@ class OneTo implements RelationStrategyInterface
         return $this->innerKey;
     }
 
+    public function getQueryBuilder(): SelectBuilder
+    {
+        return $this->queryBuilder;
+    }
+
     /**
      * @psalm-return FetcherInterface<TInner>
      */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
-    }
-
-    public function getQueryBuilder(): SelectBuilder
-    {
-        return $this->queryBuilder;
     }
 
     /**
