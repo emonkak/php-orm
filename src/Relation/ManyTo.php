@@ -67,13 +67,7 @@ class ManyTo implements RelationStrategyInterface
     private $fetcher;
 
     /**
-     * @var array<string,SelectBuilder>
-     */
-    private $unions;
-
-    /**
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      */
     public function __construct(
         string $relationKey,
@@ -85,8 +79,7 @@ class ManyTo implements RelationStrategyInterface
         string $manyToOneInnerKey,
         string $pivotKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions
+        FetcherInterface $fetcher
     ) {
         $this->relationKey = $relationKey;
         $this->oneToManyTable = $oneToManyTable;
@@ -98,7 +91,6 @@ class ManyTo implements RelationStrategyInterface
         $this->pivotKey = $pivotKey;
         $this->queryBuilder = $queryBuilder;
         $this->fetcher = $fetcher;
-        $this->unions = $unions;
     }
 
     public function getRelationKey(): string
@@ -155,40 +147,16 @@ class ManyTo implements RelationStrategyInterface
     }
 
     /**
-     * @psalm-return array<string,SelectBuilder>
-     */
-    public function getUnions(): array
-    {
-        return $this->unions;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
-        $queryBuilder = $this->createQueryBuilderFrom($this->queryBuilder, $this->manyToOneTable, $outerKeys);
-
-        foreach ($this->unions as $unionTable => $unionBuilder) {
-            $unionBuilder = $this->createQueryBuilderFrom($unionBuilder, $unionTable, $outerKeys);
-
-            $queryBuilder = $queryBuilder->unionAllWith($unionBuilder);
-        }
-
-        return $queryBuilder
-            ->getResult($this->fetcher);
-    }
-
-    /**
-     * @psalm-param TKey[] $outerKeys
-     */
-    private function createQueryBuilderFrom(SelectBuilder $queryBuilder, string $table, array $outerKeys): SelectBuilder
-    {
-        $grammar = $this->queryBuilder->getGrammar();
+        $queryBuilder = $this->queryBuilder;
+        $grammar = $queryBuilder->getGrammar();
 
         if (count($queryBuilder->getSelectBuilder()) === 0) {
             $queryBuilder = $queryBuilder
-                ->select($grammar->identifier($table) . '.*');
+                ->select($grammar->identifier($this->manyToOneTable) . '.*');
         }
 
         $queryBuilder = $queryBuilder
@@ -198,7 +166,7 @@ class ManyTo implements RelationStrategyInterface
             );
 
         if (count($queryBuilder->getFrom()) === 0) {
-            $queryBuilder = $queryBuilder->from($grammar->identifier($table));
+            $queryBuilder = $queryBuilder->from($grammar->identifier($this->manyToOneTable));
         }
 
         return $queryBuilder
@@ -206,7 +174,7 @@ class ManyTo implements RelationStrategyInterface
                 $grammar->identifier($this->oneToManyTable),
                 sprintf(
                     '%s.%s = %s.%s',
-                    $grammar->identifier($table),
+                    $grammar->identifier($this->manyToOneTable),
                     $grammar->identifier($this->manyToOneInnerKey),
                     $grammar->identifier($this->oneToManyTable),
                     $grammar->identifier($this->manyToOneOuterKey)
@@ -218,6 +186,7 @@ class ManyTo implements RelationStrategyInterface
                 $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
                 'IN',
                 $outerKeys
-            );
+            )
+            ->getResult($this->fetcher);
     }
 }

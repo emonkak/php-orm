@@ -33,9 +33,6 @@ class ManyToTest extends TestCase
 
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
-        $unions = [
-            'union' => $this->getSelectBuilder()
-        ];
 
         $relation = new ManyTo(
             $relationKey,
@@ -47,8 +44,7 @@ class ManyToTest extends TestCase
             $manyToOneInnerKey,
             $pivotKey,
             $queryBuilder,
-            $fetcher,
-            $unions
+            $fetcher
         );
 
         $this->assertSame($relationKey, $relation->getRelationKey());
@@ -61,7 +57,6 @@ class ManyToTest extends TestCase
         $this->assertSame($pivotKey, $relation->getPivotKey());
         $this->assertSame($queryBuilder, $relation->getQueryBuilder());
         $this->assertSame($fetcher, $relation->getFetcher());
-        $this->assertSame($unions, $relation->getUnions());
     }
 
     public function testGetResult(): void
@@ -110,64 +105,6 @@ class ManyToTest extends TestCase
             $queryBuilder,
             $fetcher,
             []
-        );
-
-        $joinStrategy = $this->createMock(JoinStrategyInterface::class);
-
-        $this->assertSame($expectedResult, $relation->getResult($outerKeys, $joinStrategy));
-    }
-
-    public function testGetResultWithUnion(): void
-    {
-        $outerKeys = [1, 2, 3];
-        $expectedResult = $this->createMock(ResultSetInterface::class);
-
-        $stmt = $this->createMock(PDOStatementInterface::class);
-        $stmt
-            ->expects($this->exactly(6))
-            ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 2, \PDO::PARAM_INT],
-                [3, 3, \PDO::PARAM_INT],
-                [4, 1, \PDO::PARAM_INT],
-                [5, 2, \PDO::PARAM_INT],
-                [6, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
-
-        $pdo = $this->createMock(PDOInterface::class);
-        $pdo
-            ->expects($this->once())
-            ->method('prepare')
-            ->with('SELECT `users`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users` LEFT OUTER JOIN `friendships` ON `users`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)) UNION ALL (SELECT `users2`.*, `friendships`.`user_id` AS `__pivot_key` FROM `users2` LEFT OUTER JOIN `friendships` ON `users2`.`user_id` = `friendships`.`friend_id` WHERE (`friendships`.`user_id` IN (?, ?, ?)))')
-            ->willReturn($stmt);
-
-        $queryBuilder = $this->getSelectBuilder();
-
-        $fetcher = $this->createMock(FetcherInterface::class);
-        $fetcher
-            ->expects($this->once())
-            ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
-                $queryBuilder->prepare($pdo);
-                return $expectedResult;
-            }));
-
-        $relation = new ManyTo(
-            'friends',
-            'friendships',
-            'user_id',
-            'user_id',
-            'users',
-            'friend_id',
-            'user_id',
-            '__pivot_key',
-            $queryBuilder,
-            $fetcher,
-            [
-                'users2' => $this->getSelectBuilder()
-            ]
         );
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);

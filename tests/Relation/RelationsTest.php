@@ -49,9 +49,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $relation = Relations::oneToOne(
             $relationKey,
@@ -59,8 +56,7 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $queryBuilder,
-            $fetcher,
-            $unions
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -75,7 +71,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -106,9 +101,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $relation = Relations::oneToMany(
             $relationKey,
@@ -116,8 +108,7 @@ class RelationsTest extends TestCase
             $outerKey,
             $innerKey,
             $queryBuilder,
-            $fetcher,
-            $unions
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -132,7 +123,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -164,9 +154,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $relation = Relations::throughOneToOne(
             $relationKey,
@@ -175,8 +162,7 @@ class RelationsTest extends TestCase
             $innerKey,
             $throughKey,
             $queryBuilder,
-            $fetcher,
-            $unions
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -191,7 +177,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(ThroughOuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -224,9 +209,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $relation = Relations::throughOneToMany(
             $relationKey,
@@ -235,8 +217,7 @@ class RelationsTest extends TestCase
             $innerKey,
             $throughKey,
             $queryBuilder,
-            $fetcher,
-            $unions
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -251,7 +232,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(ThroughGroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -283,9 +263,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $proxyFactory = new LazyLoadingValueHolderFactory();
 
@@ -296,7 +273,6 @@ class RelationsTest extends TestCase
             $innerKey,
             $queryBuilder,
             $fetcher,
-            $unions,
             $proxyFactory
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -312,7 +288,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(LazyOuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -344,9 +319,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $proxyFactory = new LazyLoadingValueHolderFactory();
 
@@ -357,7 +329,6 @@ class RelationsTest extends TestCase
             $innerKey,
             $queryBuilder,
             $fetcher,
-            $unions,
             $proxyFactory
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
@@ -373,7 +344,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $relationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
-        $this->assertSame($unions, $relationStrategy->getUnions());
 
         $this->assertInstanceOf(LazyGroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
@@ -405,9 +375,6 @@ class RelationsTest extends TestCase
             ->expects($this->once())
             ->method('getClass')
             ->willReturn($innerClass);
-        $unions = [
-            'union' => new SelectBuilder($grammar)
-        ];
 
         $cache = $this->createMock(CacheInterface::class);
         $cacheKeySelector = function($key) { return 'prefix.' . $key; };
@@ -420,7 +387,6 @@ class RelationsTest extends TestCase
             $innerKey,
             $queryBuilder,
             $fetcher,
-            $unions,
             $cache,
             $cacheKeySelector,
             $cacheTtl
@@ -444,7 +410,6 @@ class RelationsTest extends TestCase
         $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
         $this->assertSame($queryBuilder, $innerRelationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
-        $this->assertSame($unions, $innerRelationStrategy->getUnions());
 
         $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));

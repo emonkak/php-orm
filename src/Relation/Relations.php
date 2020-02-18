@@ -24,7 +24,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function oneToOne(
@@ -33,8 +32,7 @@ final class Relations
         string $outerKey,
         string $innerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -47,8 +45,7 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
@@ -65,8 +62,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new OuterJoin(
                         $outerKeySelector,
@@ -83,7 +79,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function oneToMany(
@@ -92,8 +87,7 @@ final class Relations
         string $outerKey,
         string $innerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -106,8 +100,7 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
@@ -124,8 +117,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new GroupJoin(
                         $outerKeySelector,
@@ -143,7 +135,6 @@ final class Relations
      * @template TKey of ?scalar
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function throughOneToOne(
@@ -153,8 +144,7 @@ final class Relations
         string $innerKey,
         string $throughKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -168,8 +158,7 @@ final class Relations
                 $innerKey,
                 $throughKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
@@ -188,8 +177,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new ThroughOuterJoin(
                         $outerKeySelector,
@@ -207,7 +195,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @template TThroughKey
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
@@ -218,8 +205,7 @@ final class Relations
         string $innerKey,
         string $throughKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -233,8 +219,7 @@ final class Relations
                 $innerKey,
                 $throughKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
@@ -253,8 +238,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new ThroughGroupJoin(
                         $outerKeySelector,
@@ -272,7 +256,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function lazyOneToOne(
@@ -282,7 +265,6 @@ final class Relations
         string $innerKey,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
-        array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ): callable {
         return
@@ -297,7 +279,6 @@ final class Relations
                 $innerKey,
                 $queryBuilder,
                 $fetcher,
-                $unions,
                 $proxyFactory
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -315,8 +296,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new LazyOuterJoin(
                         $outerKeySelector,
@@ -334,7 +314,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function lazyOneToMany(
@@ -344,7 +323,6 @@ final class Relations
         string $innerKey,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
-        array $unions,
         LazyLoadingValueHolderFactory $proxyFactory
     ): callable {
         return
@@ -359,7 +337,6 @@ final class Relations
                 $innerKey,
                 $queryBuilder,
                 $fetcher,
-                $unions,
                 $proxyFactory
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
@@ -377,8 +354,7 @@ final class Relations
                         $outerKey,
                         $innerKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new LazyGroupJoin(
                         $outerKeySelector,
@@ -396,7 +372,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-param callable(TKey):string $cacheKeySelector
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
@@ -407,7 +382,6 @@ final class Relations
         string $innerKey,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
-        array $unions,
         CacheInterface $cache,
         callable $cacheKeySelector,
         ?int $cacheTtl = null
@@ -424,7 +398,6 @@ final class Relations
                 $innerKey,
                 $queryBuilder,
                 $fetcher,
-                $unions,
                 $cache,
                 $cacheKeySelector,
                 $cacheTtl
@@ -445,8 +418,7 @@ final class Relations
                             $outerKey,
                             $innerKey,
                             $queryBuilder,
-                            $fetcher,
-                            $unions
+                            $fetcher
                         ),
                         $cache,
                         $cacheKeySelector,
@@ -569,7 +541,6 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function manyToMany(
@@ -581,8 +552,7 @@ final class Relations
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -598,8 +568,7 @@ final class Relations
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 $pivotKey = '__pivot_' . $oneToManyInnerKey;
@@ -621,8 +590,7 @@ final class Relations
                         $manyToOneInnerKey,
                         $pivotKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new GroupJoin(
                         $outerKeySelector,
@@ -640,7 +608,6 @@ final class Relations
      * @template TKey of ?scalar
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param array<string,SelectBuilder> $unions
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function throughManyToMany(
@@ -653,8 +620,7 @@ final class Relations
         string $manyToOneInnerKey,
         string $throughKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        array $unions = []
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -671,8 +637,7 @@ final class Relations
                 $manyToOneInnerKey,
                 $throughKey,
                 $queryBuilder,
-                $fetcher,
-                $unions
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 $pivotKey = '__pivot_' . $oneToManyInnerKey;
@@ -696,8 +661,7 @@ final class Relations
                         $manyToOneInnerKey,
                         $pivotKey,
                         $queryBuilder,
-                        $fetcher,
-                        $unions
+                        $fetcher
                     ),
                     new ThroughGroupJoin(
                         $outerKeySelector,
