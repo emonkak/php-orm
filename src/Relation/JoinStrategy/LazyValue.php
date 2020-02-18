@@ -53,12 +53,18 @@ class LazyValue implements \Serializable
         return $this->value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function serialize()
     {
         $value = $this->get();
         return serialize($value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function unserialize($data)
     {
         $this->value = unserialize($data);

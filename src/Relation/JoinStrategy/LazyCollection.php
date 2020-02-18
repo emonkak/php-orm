@@ -56,12 +56,18 @@ class LazyCollection implements \ArrayAccess, \Countable, \IteratorAggregate, \S
         return $this->source;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function offsetExists($offset)
     {
         $source = $this->get();
         return isset($source[$offset]);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function offsetGet($offset)
     {
         $source = $this->get();
@@ -77,6 +83,9 @@ class LazyCollection implements \ArrayAccess, \Countable, \IteratorAggregate, \S
         return $this->source[$offset] = $value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function offsetUnset($offset)
     {
         $this->get();
@@ -92,18 +101,27 @@ class LazyCollection implements \ArrayAccess, \Countable, \IteratorAggregate, \S
         return new \ArrayIterator($source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function count()
     {
         $source = $this->get();
         return count($source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function serialize()
     {
         $source = $this->get();
         return serialize($source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function unserialize($data)
     {
         $this->source = unserialize($data);
