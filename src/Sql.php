@@ -137,7 +137,7 @@ class Sql implements QueryBuilderInterface
                 }
             default:
                 /** @psalm-var mixed $binding */
-                $typeOrClass = $type === 'object' ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
+                $typeOrClass = is_object($binding) ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
                 return "'<" . $typeOrClass . ">'";
             }
         }, $this->bindings);

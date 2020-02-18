@@ -7,11 +7,14 @@ namespace Emonkak\Orm\Pagination;
 use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
- * @implements PaginatorInterface<mixed>
- * @use EnumerableExtensions<T>
+ * @template T
+ * @implements PaginatorInterface<T>
  */
 class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 
     /**

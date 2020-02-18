@@ -10,12 +10,14 @@ use Emonkak\Orm\ResultSet\FunctionResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @template T
+ * @template T of object
  * @implements FetcherInterface<T>
- * @use Relatable<T>
  */
 class FunctionFetcher implements FetcherInterface
 {
+    /**
+     * @use Relatable<T>
+     */
     use Relatable;
 
     /**
@@ -30,13 +32,13 @@ class FunctionFetcher implements FetcherInterface
     private $class;
 
     /**
-     * @psalm-var callable(array<string,?scalar>):T
+     * @psalm-var callable(array<string,mixed>):T
      * @var callable
      */
     private $instantiator;
 
     /**
-     * @template TStatic
+     * @template TStatic of object
      * @psalm-param class-string<TStatic> $class
      * @psalm-return self<TStatic>
      */

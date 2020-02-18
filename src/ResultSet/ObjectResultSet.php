@@ -10,10 +10,12 @@ use Emonkak\Enumerable\Exception\NoSuchElementException;
  * @template T of object
  * @implements \IteratorAggregate<T>
  * @implements ResultSetInterface<T>
- * @use EnumerableExtensions<T>
  */
 class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 
     /**

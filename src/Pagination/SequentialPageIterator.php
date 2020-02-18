@@ -12,10 +12,12 @@ use Emonkak\Enumerable\EnumerableInterface;
  * @template T
  * @implements \IteratorAggregate<T>
  * @implements PageIteratorInterface<T>
- * @use EnumerableExtensions<T>
  */
 class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 
     /**

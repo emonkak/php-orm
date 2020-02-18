@@ -7,10 +7,13 @@ namespace Emonkak\Orm\ResultSet;
 use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
- * @implements ResultSetInterface<mixed>
- * @use EnumerableExtensions<mixed>
+ * @template T
+ * @implements ResultSetInterface<T>
  */
 class EmptyResultSet extends \EmptyIterator implements ResultSetInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 }

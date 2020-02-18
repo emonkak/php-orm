@@ -103,7 +103,7 @@ abstract class AbstractGrammar implements GrammarInterface
                 $operator = $arg1;
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg2 */
                 $rhs = $this->lift($arg2);
-                return $this->unaryOperator($arg1, $rhs);
+                return $this->unaryOperator($operator, $rhs);
             }
             case 3: {
                 /** @psalm-var string */

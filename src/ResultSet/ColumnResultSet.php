@@ -9,10 +9,12 @@ use Emonkak\Enumerable\Exception\NoSuchElementException;
 /**
  * @implements \IteratorAggregate<mixed>
  * @implements ResultSetInterface<mixed>
- * @use EnumerableExtensions<mixed>
  */
 class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
 {
+    /**
+     * @use EnumerableExtensions<mixed>
+     */
     use EnumerableExtensions;
 
     /**

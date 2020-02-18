@@ -10,10 +10,12 @@ use Emonkak\Enumerable\EnumerableExtensions;
  * @template T
  * @implements \IteratorAggregate<T>
  * @implements PaginatorInterface<T>
- * @use EnumerableExtensions<T>
  */
 abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 
     /**

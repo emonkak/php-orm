@@ -14,10 +14,12 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
  * @template TOuter
  * @template TResult
  * @implements FetcherInterface<TResult>
- * @use Relatable<TResult>
  */
 class RelationFetcher implements FetcherInterface
 {
+    /**
+     * @use Relatable<TResult>
+     */
     use Relatable;
 
     /**

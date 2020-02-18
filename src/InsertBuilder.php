@@ -120,7 +120,7 @@ class InsertBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param mixed $query
+     * @param QueryBuilderInterface|Sql|string $query
      */
     public function select($query): self
     {

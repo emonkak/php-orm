@@ -9,7 +9,7 @@ use Emonkak\Database\PDOInterface;
 trait Explainable
 {
     /**
-     * @return array<string,?scalar>
+     * @return array<string,mixed>
      */
     public function explain(PDOInterface $pdo): array
     {

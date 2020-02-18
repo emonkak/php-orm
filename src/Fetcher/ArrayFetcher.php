@@ -12,10 +12,12 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 /**
  * @template T of array
  * @implements FetcherInterface<T>
- * @use Relatable<T>
  */
 class ArrayFetcher implements FetcherInterface
 {
+    /**
+     * @use Relatable<T>
+     */
     use Relatable;
 
     /**

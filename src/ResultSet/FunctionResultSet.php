@@ -7,13 +7,15 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
- * @template T
+ * @template T of object
  * @implements \IteratorAggregate<T>
  * @implements ResultSetInterface<T>
- * @use EnumerableExtensions<T>
  */
 class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
 {
+    /**
+     * @use EnumerableExtensions<T>
+     */
     use EnumerableExtensions;
 
     /**
