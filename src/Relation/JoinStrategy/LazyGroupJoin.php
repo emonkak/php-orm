@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\EqualityComparerInterface;
 use Emonkak\Enumerable\Iterator\SelectIterator;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * @template TOuter
@@ -30,7 +29,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     private $innerKeySelector;
 
     /**
-     * @psalm-var callable(TOuter,\ArrayObject<int,TInner>):TResult $resultSelector
+     * @psalm-var callable(TOuter,LazyCollection<int,TInner>):TResult $resultSelector
      * @var callable
      */
     private $resultSelector;
@@ -42,28 +41,21 @@ class LazyGroupJoin implements JoinStrategyInterface
     private $comparer;
 
     /**
-     * @var LazyLoadingValueHolderFactory
-     */
-    private $proxyFactory;
-
-    /**
      * @psalm-param callable(TOuter):TKey $outerKeySelector
      * @psalm-param callable(TInner):TKey $innerKeySelector
-     * @psalm-param callable(TOuter,\ArrayObject<int,TInner>):TResult $resultSelector
+     * @psalm-param callable(TOuter,LazyCollection<int,TInner>):TResult $resultSelector
      * @psalm-param EqualityComparerInterface<TKey> $comparer
      */
     public function __construct(
         callable $outerKeySelector,
         callable $innerKeySelector,
         callable $resultSelector,
-        EqualityComparerInterface $comparer,
-        LazyLoadingValueHolderFactory $proxyFactory
+        EqualityComparerInterface $comparer
     ) {
         $this->outerKeySelector = $outerKeySelector;
         $this->innerKeySelector = $innerKeySelector;
         $this->resultSelector = $resultSelector;
         $this->comparer = $comparer;
-        $this->proxyFactory = $proxyFactory;
     }
 
     /**
@@ -83,21 +75,19 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter,\ArrayObject<int,TInner>):TResult
+     * @psalm-return callable(TOuter,LazyCollection<int,TInner>):TResult
      */
     public function getResultSelector(): callable
     {
         return $this->resultSelector;
     }
 
+    /**
+     * @psalm-return EqualityComparerInterface<TKey>
+     */
     public function getComparer(): EqualityComparerInterface
     {
         return $this->comparer;
-    }
-
-    public function getProxyFactory(): LazyLoadingValueHolderFactory
-    {
-        return $this->proxyFactory;
     }
 
     /**
@@ -105,8 +95,54 @@ class LazyGroupJoin implements JoinStrategyInterface
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
-        /** @psalm-var ?array<string,TInner[]> */
-        $cachedElements = null;
+        /** @psalm-var ?TInner[] */
+        $cachedInner = null;
+
+        $innerKeySelector = $this->innerKeySelector;
+        $outerKeySelector = $this->outerKeySelector;
+        $resultSelector = $this->resultSelector;
+        $comparer = $this->comparer;
+
+        $fetchCachedItems =
+            /**
+             * @psalm-return array<string,TInner[]>
+             */
+            static function() use (
+                $inner,
+                $innerKeySelector,
+                $comparer
+            ) {
+                $cachedInner = [];
+
+                foreach ($inner as $innerElement) {
+                    $innerKey = $innerKeySelector($innerElement);
+                    $innerHash = $comparer->hash($innerKey);
+                    $cachedInner[$innerHash][] = $innerElement;
+                }
+
+                return $cachedInner;
+            };
+
+        $evaluator =
+            /**
+             * @psalm-param TKey $outerKey
+             * @psalm-return TInner[]
+             */
+            static function($outerKey) use (
+                &$cachedInner,
+                &$fetchCachedItems,
+                $comparer
+            ) {
+                if ($cachedInner === null) {
+                    /** @var callable():array<string,TInner[]> $fetchCachedItems */
+                    $cachedInner = $fetchCachedItems();
+                    $fetchCachedItems = null;
+                }
+
+                $outerHash = $comparer->hash($outerKey);
+
+                return $cachedInner[$outerHash] ?? [];
+            };
 
         return new SelectIterator(
             $outer,
@@ -114,54 +150,15 @@ class LazyGroupJoin implements JoinStrategyInterface
              * @psalm-param TOuter $outerElement
              * @psalm-return TResult
              */
-            function($outerElement) use (
-                    &$cachedElements,
-                    $inner
-                ) {
-                    $outerKeySelector = $this->outerKeySelector;
-                    $innerKeySelector = $this->innerKeySelector;
-                    $resultSelector = $this->resultSelector;
-                    $comparer = $this->comparer;
-
-                    /** @psalm-var \ArrayObject<int,TInner> */
-                    $proxy = $this->proxyFactory->createProxy(
-                        \ArrayObject::class,
-                        static function(?object &$wrappedObject, object $proxy, string $method, array $parameters, ?\Closure &$initializer) use (
-                            &$cachedElements,
-                            $outerElement,
-                            $inner,
-                            $outerKeySelector,
-                            $innerKeySelector,
-                            $comparer
-                        ): bool {
-                            $initializer = null;
-
-                            if ($cachedElements === null) {
-                                $cachedElements = [];
-
-                                foreach ($inner as $innerElement) {
-                                    $innerKey = $innerKeySelector($innerElement);
-                                    $innerHash = $comparer->hash($innerKey);
-                                    if (!isset($cachedElements[$innerHash])) {
-                                        $cachedElements[$innerHash] = [];
-                                    }
-                                    $cachedElements[$innerHash][] = $innerElement;
-                                }
-                            }
-
-                            $outerKey = $outerKeySelector($outerElement);
-                            $outerHash = $comparer->hash($outerKey);
-                            $joinedElements = isset($cachedElements[$outerHash]) ? $cachedElements[$outerHash] : [];
-
-                            /** @psalm-var \ArrayObject<int,TInner> */
-                            $wrappedObject = new \ArrayObject($joinedElements);
-
-                            return true;
-                        }
-                    );
-
-                    return $resultSelector($outerElement, $proxy);
-                }
+            static function($outerElement) use (
+                $outerKeySelector,
+                $resultSelector,
+                $evaluator
+            ) {
+                $outerKey = $outerKeySelector($outerElement);
+                $innerProxy = new LazyCollection($outerKey, $evaluator);
+                return $resultSelector($outerElement, $innerProxy);
+            }
         );
     }
 }

@@ -82,6 +82,9 @@ class GroupJoin implements JoinStrategyInterface
         return $this->resultSelector;
     }
 
+    /**
+     * @psalm-return EqualityComparerInterface<TKey>
+     */
     public function getComparer(): EqualityComparerInterface
     {
         return $this->comparer;

@@ -12,7 +12,6 @@
         "php": ">=7.2",
         "emonkak/enumerable": "^0.6",
         "emonkak/database": "^0.7",
-        "ocramius/proxy-manager": "^2.0",
         "psr/simple-cache": "^1.0"
     },
     "require-dev": {

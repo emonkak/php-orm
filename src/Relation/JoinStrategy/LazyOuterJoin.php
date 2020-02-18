@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 
 use Emonkak\Enumerable\EqualityComparerInterface;
 use Emonkak\Enumerable\Iterator\SelectIterator;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * @template TOuter
@@ -30,7 +29,7 @@ class LazyOuterJoin implements JoinStrategyInterface
     private $innerKeySelector;
 
     /**
-     * @psalm-var callable(TOuter,LazyValue<?TInner>):TResult $resultSelector
+     * @psalm-var callable(TOuter,LazyValue<?TInner,TKey>):TResult $resultSelector
      * @var callable
      */
     private $resultSelector;
@@ -42,28 +41,21 @@ class LazyOuterJoin implements JoinStrategyInterface
     private $comparer;
 
     /**
-     * @var LazyLoadingValueHolderFactory
-     */
-    private $proxyFactory;
-
-    /**
      * @psalm-param callable(TOuter):TKey $outerKeySelector
      * @psalm-param callable(TInner):TKey $innerKeySelector
-     * @psalm-param callable(TOuter,LazyValue<?TInner>):TResult $resultSelector
+     * @psalm-param callable(TOuter,LazyValue<?TInner,TKey>):TResult $resultSelector
      * @psalm-param EqualityComparerInterface<TKey> $comparer
      */
     public function __construct(
         callable $outerKeySelector,
         callable $innerKeySelector,
         callable $resultSelector,
-        EqualityComparerInterface $comparer,
-        LazyLoadingValueHolderFactory $proxyFactory
+        EqualityComparerInterface $comparer
     ) {
         $this->outerKeySelector = $outerKeySelector;
         $this->innerKeySelector = $innerKeySelector;
         $this->resultSelector = $resultSelector;
         $this->comparer = $comparer;
-        $this->proxyFactory = $proxyFactory;
     }
 
     /**
@@ -83,21 +75,19 @@ class LazyOuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter,LazyValue<?TInner>):TResult
+     * @psalm-return callable(TOuter,LazyValue<?TInner,TKey>):TResult
      */
     public function getResultSelector(): callable
     {
         return $this->resultSelector;
     }
 
+    /**
+     * @psalm-return EqualityComparerInterface<TKey>
+     */
     public function getComparer(): EqualityComparerInterface
     {
         return $this->comparer;
-    }
-
-    public function getProxyFactory(): LazyLoadingValueHolderFactory
-    {
-        return $this->proxyFactory;
     }
 
     /**
@@ -105,7 +95,54 @@ class LazyOuterJoin implements JoinStrategyInterface
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
-        $cachedElements = null;
+        /** @psalm-var ?TInner[] */
+        $cachedInner = null;
+
+        $innerKeySelector = $this->innerKeySelector;
+        $outerKeySelector = $this->outerKeySelector;
+        $resultSelector = $this->resultSelector;
+        $comparer = $this->comparer;
+
+        $fetchCachedItems =
+            /**
+             * @psalm-return array<string,TInner>
+             */
+            static function() use (
+                $inner,
+                $innerKeySelector,
+                $comparer
+            ) {
+                $cachedInner = [];
+
+                foreach ($inner as $innerElement) {
+                    $innerKey = $innerKeySelector($innerElement);
+                    $innerHash = $comparer->hash($innerKey);
+                    $cachedInner[$innerHash] = $innerElement;
+                }
+
+                return $cachedInner;
+            };
+
+        $evaluator =
+            /**
+             * @psalm-param TKey $outerKey
+             * @psalm-return ?TInner
+             */
+            static function($outerKey) use (
+                &$cachedInner,
+                &$fetchCachedItems,
+                $comparer
+            ) {
+                if ($cachedInner === null && $fetchCachedItems !== null) {
+                    /** @var callable():array<string,TInner> $fetchCachedItems */
+                    $cachedInner = $fetchCachedItems();
+                    $fetchCachedItems = null;
+                }
+
+                $outerHash = $comparer->hash($outerKey);
+
+                return $cachedInner[$outerHash] ?? null;
+            };
 
         return new SelectIterator(
             $outer,
@@ -113,50 +150,13 @@ class LazyOuterJoin implements JoinStrategyInterface
              * @psalm-param TOuter $outerElement
              * @psalm-return TResult
              */
-            function($outerElement) use (
-                &$cachedElements,
-                $inner
+            static function($outerElement) use (
+                $outerKeySelector,
+                $resultSelector,
+                $evaluator
             ) {
-                $outerKeySelector = $this->outerKeySelector;
-                $innerKeySelector = $this->innerKeySelector;
-                $resultSelector = $this->resultSelector;
-                $comparer = $this->comparer;
-
-                /** @psalm-var LazyValue<?TInner> */
-                $innerProxy = $this->proxyFactory->createProxy(
-                    LazyValue::class,
-                    static function (?object &$wrappedObject, object $proxy, string $method, array $parameters, ?\Closure &$initializer) use (
-                        &$cachedElements,
-                        $outerElement,
-                        $inner,
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $comparer
-                    ): bool {
-                        $initializer = null;
-
-                        if ($cachedElements === null) {
-                            $cachedElements = [];
-                            foreach ($inner as $innerElement) {
-                                $innerKey = $innerKeySelector($innerElement);
-                                $innerHash = $comparer->hash($innerKey);
-                                $cachedElements[$innerHash] = $innerElement;
-                            }
-                        }
-
-                        $outerKey = $outerKeySelector($outerElement);
-                        $outerHash = $comparer->hash($outerKey);
-
-                        if (isset($cachedElements[$outerHash])) {
-                            $wrappedObject = new LazyValue($cachedElements[$outerHash]);
-                        } else {
-                            $wrappedObject = new LazyValue(null);
-                        }
-
-                        return true;
-                    }
-                );
-
+                $outerKey = $outerKeySelector($outerElement);
+                $innerProxy = new LazyValue($outerKey, $evaluator);
                 return $resultSelector($outerElement, $innerProxy);
             }
         );

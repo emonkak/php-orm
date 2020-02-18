@@ -7,7 +7,6 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin
@@ -66,26 +65,23 @@ class LazyGroupJoinTest extends TestCase
             return $user;
         };
         $comparer = LooseEqualityComparer::getInstance();
-        $proxyFactory = new LazyLoadingValueHolderFactory();
         $lazyGroupJoin = new LazyGroupJoin(
             $outerKeySelector,
             $innerKeySelector,
             $resultSelector,
-            $comparer,
-            $proxyFactory
+            $comparer
         );
 
         $this->assertSame($outerKeySelector, $lazyGroupJoin->getOuterKeySelector());
         $this->assertSame($innerKeySelector, $lazyGroupJoin->getInnerKeySelector());
         $this->assertSame($resultSelector, $lazyGroupJoin->getResultSelector());
         $this->assertSame($comparer, $lazyGroupJoin->getComparer());
-        $this->assertSame($proxyFactory, $lazyGroupJoin->getProxyFactory());
 
         $result = $lazyGroupJoin
             ->join($users, $tweets);
         $result = iterator_to_array($result, false);
         $result = array_map(function($user) {
-            $user['tweets'] = $user['tweets']->getArrayCopy();
+            $user['tweets'] = $user['tweets']->get();
             return $user;
         }, $result);
         $this->assertEquals($expectedResult, $result);

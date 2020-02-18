@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
+use Emonkak\Enumerable\EqualityComparerInterface;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Orm\Relation\JoinStrategy\LazyValue;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\SelectBuilder;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
 
 final class Relations
@@ -54,6 +55,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TOuter,?TInner):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -68,7 +71,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -109,6 +112,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TOuter,TInner[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -123,7 +128,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -169,6 +174,8 @@ final class Relations
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
                 /** @psalm-var callable(TOuter,?TThroughKey):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -184,7 +191,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -230,6 +237,8 @@ final class Relations
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
                 /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -245,7 +254,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -264,8 +273,7 @@ final class Relations
         string $outerKey,
         string $innerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        LazyLoadingValueHolderFactory $proxyFactory
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -278,16 +286,17 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $queryBuilder,
-                $fetcher,
-                $proxyFactory
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,LazyValue<TInner>):TOuter */
+                /** @psalm-var callable(TOuter,LazyValue<?TInner,TKey>):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -302,8 +311,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance(),
-                        $proxyFactory
+                        $comparer
                     )
                 );
             };
@@ -322,8 +330,7 @@ final class Relations
         string $outerKey,
         string $innerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher,
-        LazyLoadingValueHolderFactory $proxyFactory
+        FetcherInterface $fetcher
     ): callable {
         return
             /**
@@ -336,16 +343,17 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $queryBuilder,
-                $fetcher,
-                $proxyFactory
+                $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,\ArrayObject<int,TInner>):TOuter */
+                /** @psalm-var callable(TOuter,LazyCollection<int,TInner>):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new OneTo(
@@ -360,8 +368,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance(),
-                        $proxyFactory
+                        $comparer
                     )
                 );
             };
@@ -409,6 +416,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TOuter,?TInner):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new Cached(
@@ -428,7 +437,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -467,6 +476,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TOuter,?TInner):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new Preloaded(
@@ -479,7 +490,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -518,6 +529,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TOuter,TInner[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new Preloaded(
@@ -530,7 +543,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -578,6 +591,8 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKey);
                 /** @psalm-var callable(TOuter,TInner[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new ManyTo(
@@ -596,7 +611,7 @@ final class Relations
                         $outerKeySelector,
                         $innerKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };
@@ -649,6 +664,8 @@ final class Relations
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
                 /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @psalm-var EqualityComparerInterface<TKey> */
+                $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
                     $outerClass,
                     new ManyTo(
@@ -668,7 +685,7 @@ final class Relations
                         $innerKeySelector,
                         $throughKeySelector,
                         $resultSelector,
-                        LooseEqualityComparer::getInstance()
+                        $comparer
                     )
                 );
             };

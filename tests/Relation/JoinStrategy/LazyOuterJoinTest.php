@@ -8,7 +8,6 @@ use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * @covers Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin
@@ -45,21 +44,18 @@ class LazyOuterJoinTest extends TestCase
             return $talent;
         };
         $comparer = LooseEqualityComparer::getInstance();
-        $proxyFactory = new LazyLoadingValueHolderFactory();
 
         $lazyOuterJoin = new LazyOuterJoin(
             $outerKeySelector,
             $innerKeySelector,
             $resultSelector,
-            $comparer,
-            $proxyFactory
+            $comparer
         );
 
         $this->assertSame($outerKeySelector, $lazyOuterJoin->getOuterKeySelector());
         $this->assertSame($innerKeySelector, $lazyOuterJoin->getInnerKeySelector());
         $this->assertSame($resultSelector, $lazyOuterJoin->getResultSelector());
         $this->assertSame($comparer, $lazyOuterJoin->getComparer());
-        $this->assertSame($proxyFactory, $lazyOuterJoin->getProxyFactory());
 
         $result = $lazyOuterJoin
             ->join($talents, $programs);

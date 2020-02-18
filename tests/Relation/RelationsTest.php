@@ -24,7 +24,6 @@ use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\Fixtures\Spy;
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -264,16 +263,13 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
-        $proxyFactory = new LazyLoadingValueHolderFactory();
-
         $relation = Relations::lazyOneToOne(
             $relationKey,
             $table,
             $outerKey,
             $innerKey,
             $queryBuilder,
-            $fetcher,
-            $proxyFactory
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -299,7 +295,6 @@ class RelationsTest extends TestCase
                 new Model(['inner_key' => 456])
             )
         );
-        $this->assertSame($proxyFactory, $joinStrategy->getProxyFactory());
     }
 
     public function testLazyOneToMany(): void
@@ -320,16 +315,13 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
-        $proxyFactory = new LazyLoadingValueHolderFactory();
-
         $relation = Relations::lazyOneToMany(
             $relationKey,
             $table,
             $outerKey,
             $innerKey,
             $queryBuilder,
-            $fetcher,
-            $proxyFactory
+            $fetcher
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -355,7 +347,6 @@ class RelationsTest extends TestCase
                 [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
             )
         );
-        $this->assertSame($proxyFactory, $joinStrategy->getProxyFactory());
     }
 
     public function testCachedOneToOne(): void

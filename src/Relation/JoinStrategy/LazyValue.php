@@ -5,28 +5,62 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Relation\JoinStrategy;
 
 /**
- * @template T
+ * @template TValue
+ * @template TKey
  */
-class LazyValue
+class LazyValue implements \Serializable
 {
     /**
-     * @psalm-var T
+     * @psalm-var ?TValue
+     * @var mixed
      */
-    private $value;
+    private $value = null;
 
     /**
-     * @psalm-param T $value
+     * @psalm-var ?TKey
+     * @var mixed
      */
-    public function __construct($value)
+    private $key;
+
+    /**
+     * @psalm-var ?callable(TKey):TValue
+     * @var ?callable
+     */
+    private $evaluator;
+
+    /**
+     * @psalm-param TKey $key
+     * @psalm-param callable(TKey):TValue $evaluator
+     */
+    public function __construct($key, callable $evaluator)
     {
-        $this->value = $value;
+        $this->key = $key;
+        $this->evaluator = $evaluator;
     }
 
     /**
-     * @psalm-return T
+     * @psalm-return TValue
      */
     public function get()
     {
+        if ($this->evaluator !== null) {
+            /** @psalm-var TKey $this->key */
+            $this->value = ($this->evaluator)($this->key);
+            $this->key = null;
+            $this->evaluator = null;
+        }
+        /** @psalm-var TValue $this->value */
         return $this->value;
+    }
+
+    public function serialize()
+    {
+        $value = $this->get();
+        return serialize($value);
+    }
+
+    public function unserialize($data)
+    {
+        $this->value = unserialize($data);
     }
 }

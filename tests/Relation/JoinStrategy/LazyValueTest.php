@@ -14,6 +14,22 @@ class LazyValueTest extends TestCase
 {
     public function testGet(): void
     {
-        $this->assertSame(123, (new LazyValue(123))->get());
+        $key = new \stdClass();
+        $value = 'foo';
+
+        $evaluator = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+        $evaluator
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with($this->identicalTo($key))
+            ->willReturn($value);
+
+        $lazyValue = new LazyValue($key, $evaluator);
+
+        $this->assertSame($value, $lazyValue->get());
+        $this->assertSame($value, $lazyValue->get());
+        $this->assertSame($value, unserialize(serialize($lazyValue))->get());
     }
 }
