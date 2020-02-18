@@ -128,10 +128,7 @@ final class AccessorCreators
                  * @psalm-return TLhs
                  */
                 static function($lhs, $rhs) use ($key) {
-                    /** @psalm-suppress RedundantConditionGivenDocblockType */
-                    if ($rhs !== null) {
-                        $lhs->$key = $rhs;
-                    }
+                    $lhs->$key = $rhs;
                     return $lhs;
                 },
                 null,
