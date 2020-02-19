@@ -495,14 +495,24 @@ class SelectBuilder implements QueryBuilderInterface
      */
     public function paginate(FetcherInterface $fetcher, int $perPage, string $countExpr = 'COUNT(*)'): PaginatorInterface
     {
+        $pdo = $fetcher->getPdo();
+        $count = (int) $this->aggregate($pdo, $countExpr);
+        return $this->paginateWithCount($fetcher, $perPage, $count);
+    }
+
+    /**
+     * @template T
+     * @psalm-param FetcherInterface<T> $fetcher
+     * @psalm-return PaginatorInterface<T>
+     */
+    public function paginateWithCount(FetcherInterface $fetcher, int $perPage, int $count): PaginatorInterface
+    {
         $itemsFetcher = function(int $offset, int $limit) use ($fetcher): \Traversable {
             return $this
                 ->limit($limit)
                 ->offset($offset)
                 ->getResult($fetcher);
         };
-        $pdo = $fetcher->getPdo();
-        $count = (int) $this->aggregate($pdo, $countExpr);
         return new PrecountPaginator($itemsFetcher, $perPage, $count);
     }
 
