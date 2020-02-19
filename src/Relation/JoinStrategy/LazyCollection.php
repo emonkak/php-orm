@@ -7,10 +7,9 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 /**
  * @template TSource
  * @template TKey
- * @implements \IteratorAggregate<TSource>
- * @implements \ArrayAccess<array-key,TSource>
+ * @implements LazyCollectionInterface<TSource>
  */
-class LazyCollection implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializable
+class LazyCollection implements LazyCollectionInterface
 {
     /**
      * @psalm-var ?TSource[]
@@ -41,7 +40,7 @@ class LazyCollection implements \ArrayAccess, \Countable, \IteratorAggregate, \S
     }
 
     /**
-     * @psalm-return TSource[]
+     * {@inheritDoc}
      * @psalm-assert !null $this->source
      */
     public function get(): array

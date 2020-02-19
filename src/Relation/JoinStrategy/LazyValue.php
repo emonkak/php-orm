@@ -7,8 +7,9 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 /**
  * @template TValue
  * @template TKey
+ * @implements LazyValueInterface<TValue>
  */
-class LazyValue implements \Serializable
+class LazyValue implements LazyValueInterface
 {
     /**
      * @psalm-var ?TValue
