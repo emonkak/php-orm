@@ -42,14 +42,17 @@ class LazyCollectionTest extends TestCase
         $lazyCollection[0] = 'qux';
         $lazyCollection[1] = 'quux';
         $lazyCollection[2] = 'quuz';
+        $lazyCollection[] = 'gorge';
 
         $this->assertSame('qux', $lazyCollection[0]);
         $this->assertSame('quux', $lazyCollection[1]);
         $this->assertSame('quuz', $lazyCollection[2]);
+        $this->assertSame('gorge', $lazyCollection[3]);
 
         unset($lazyCollection[0]);
         unset($lazyCollection[1]);
         unset($lazyCollection[2]);
+        unset($lazyCollection[3]);
 
         $this->assertSame([], $lazyCollection->get());
         $this->assertSame([], iterator_to_array($lazyCollection));

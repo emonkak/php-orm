@@ -75,11 +75,17 @@ class LazyCollection implements LazyCollectionInterface
 
     /**
      * {@inheritDoc}
+     * @psalm-param array-key|null $offset
      */
     public function offsetSet($offset, $value)
     {
         $this->get();
-        return $this->source[$offset] = $value;
+        if ($offset !== null) {
+            $this->source[$offset] = $value;
+        } else {
+            $this->source[] = $value;
+        }
+        return $value;
     }
 
     /**
