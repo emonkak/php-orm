@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Fetcher;
 
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\RelationInterface;
@@ -21,7 +22,13 @@ class RelationFetcherTest extends TestCase
     {
         $resultClass = \stdClass::class;
 
+        $pdo = $this->createMock(PDOInterface::class);
+
         $fetcher = $this->createMock(FetcherInterface::class);
+        $fetcher
+            ->expects($this->once())
+            ->method('getPdo')
+            ->willReturn($pdo);
 
         $relation = $this->createMock(RelationInterface::class);
         $relation
@@ -33,6 +40,7 @@ class RelationFetcherTest extends TestCase
 
         $this->assertSame($fetcher, $relationFetcher->getFetcher());
         $this->assertSame($relation, $relationFetcher->getRelation());
+        $this->assertSame($pdo, $relationFetcher->getPdo());
         $this->assertSame($resultClass, $relationFetcher->getClass());
     }
 
