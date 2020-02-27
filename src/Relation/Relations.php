@@ -13,8 +13,6 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Orm\Relation\JoinStrategy\LazyValue;  // @phan-suppress-current-line PhanUnreferencedUseNormal
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
-use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
-use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\SelectBuilder;
 use Psr\SimpleCache\CacheInterface;
 
@@ -82,6 +80,7 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
+     * @psalm-param ?class-string $collationClass
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function oneToMany(
@@ -90,7 +89,8 @@ final class Relations
         string $outerKey,
         string $innerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher
+        FetcherInterface $fetcher,
+        ?string $collationClass = null
     ): callable {
         return
             /**
@@ -103,15 +103,27 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $queryBuilder,
-                $fetcher
+                $fetcher,
+                $collationClass
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 /** @psalm-var callable(TOuter):TKey */
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,TInner[]):TOuter */
+                /** @psalm-var callable(TOuter,mixed):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                if ($collationClass !== null) {
+                    $resultSelector =
+                        /**
+                         * @psalm-param TOuter $lhs
+                         * @psalm-param TInner[] $rhs
+                         * @psalm-return TOuter
+                         */
+                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
+                            return $resultSelector($lhs, new $collationClass($rhs));
+                        };
+                }
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -172,8 +184,18 @@ final class Relations
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
                 /** @psalm-var callable(TInner):TThroughKey */
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
-                /** @psalm-var callable(TOuter,?TThroughKey):TOuter */
+                /** @psalm-var callable(TOuter,mixed):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                $resultSelector =
+                    /**
+                     * @psalm-param TOuter $lhs
+                     * @psalm-param ?TInner $rhs
+                     * @psalm-return TOuter
+                     */
+                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
+                        $throughKey = $rhs !== null ? $throughKeySelector($rhs) : null;
+                        return $resultSelector($lhs, $throughKey);
+                    };
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -186,10 +208,9 @@ final class Relations
                         $queryBuilder,
                         $fetcher
                     ),
-                    new ThroughOuterJoin(
+                    new OuterJoin(
                         $outerKeySelector,
                         $innerKeySelector,
-                        $throughKeySelector,
                         $resultSelector,
                         $comparer
                     )
@@ -237,6 +258,16 @@ final class Relations
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
                 /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                $resultSelector =
+                    /**
+                     * @psalm-param TOuter $lhs
+                     * @psalm-param TInner[] $rhs
+                     * @psalm-return TOuter
+                     */
+                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
+                        $throughKeys = array_map($throughKeySelector, $rhs);
+                        return $resultSelector($lhs, $throughKeys);
+                    };
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -249,10 +280,9 @@ final class Relations
                         $queryBuilder,
                         $fetcher
                     ),
-                    new ThroughGroupJoin(
+                    new GroupJoin(
                         $outerKeySelector,
                         $innerKeySelector,
-                        $throughKeySelector,
                         $resultSelector,
                         $comparer
                     )
@@ -502,6 +532,7 @@ final class Relations
      * @template TKey of ?scalar
      * @psalm-param ?class-string<TInner> $innerClass
      * @psalm-param TInner[] $innerElements
+     * @psalm-param ?class-string $collationClass
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function preloadedOneToMany(
@@ -509,7 +540,8 @@ final class Relations
         string $outerKey,
         string $innerKey,
         ?string $innerClass,
-        array $innerElements
+        array $innerElements,
+        ?string $collationClass = null
     ): callable {
         return
             /**
@@ -521,14 +553,26 @@ final class Relations
                 $outerKey,
                 $innerKey,
                 $innerClass,
-                $innerElements
+                $innerElements,
+                $collationClass
             ): RelationInterface {
                 /** @psalm-var callable(TOuter):TKey */
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,TInner[]):TOuter */
+                /** @psalm-var callable(TOuter,mixed):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                if ($collationClass !== null) {
+                    $resultSelector =
+                        /**
+                         * @psalm-param TOuter $lhs
+                         * @psalm-param TInner[] $rhs
+                         * @psalm-return TOuter
+                         */
+                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
+                            return $resultSelector($lhs, new $collationClass($rhs));
+                        };
+                }
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -554,6 +598,7 @@ final class Relations
      * @template TInner
      * @template TKey of ?scalar
      * @psalm-param FetcherInterface<TInner> $fetcher
+     * @psalm-param ?class-string $collationClass
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
     public static function manyToMany(
@@ -565,7 +610,8 @@ final class Relations
         string $manyToOneOuterKey,
         string $manyToOneInnerKey,
         SelectBuilder $queryBuilder,
-        FetcherInterface $fetcher
+        FetcherInterface $fetcher,
+        ?string $collationClass = null
     ): callable {
         return
             /**
@@ -581,7 +627,8 @@ final class Relations
                 $manyToOneOuterKey,
                 $manyToOneInnerKey,
                 $queryBuilder,
-                $fetcher
+                $fetcher,
+                $collationClass
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
                 $pivotKey = '__pivot_' . $oneToManyInnerKey;
@@ -589,8 +636,19 @@ final class Relations
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $oneToManyOuterKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKey);
-                /** @psalm-var callable(TOuter,TInner[]):TOuter */
+                /** @psalm-var callable(TOuter,mixed):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                if ($collationClass !== null) {
+                    $resultSelector =
+                        /**
+                         * @psalm-param TOuter $lhs
+                         * @psalm-param TInner[] $rhs
+                         * @psalm-return TOuter
+                         */
+                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
+                            return $resultSelector($lhs, new $collationClass($rhs));
+                        };
+                }
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -664,6 +722,16 @@ final class Relations
                 $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
                 /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                $resultSelector =
+                    /**
+                     * @psalm-param TOuter $lhs
+                     * @psalm-param TInner[] $rhs
+                     * @psalm-return TOuter
+                     */
+                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
+                        $throughKeys = array_map($throughKeySelector, $rhs);
+                        return $resultSelector($lhs, $throughKeys);
+                    };
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
                 return new Relation(
@@ -680,10 +748,9 @@ final class Relations
                         $queryBuilder,
                         $fetcher
                     ),
-                    new ThroughGroupJoin(
+                    new GroupJoin(
                         $outerKeySelector,
                         $innerKeySelector,
-                        $throughKeySelector,
                         $resultSelector,
                         $comparer
                     )

@@ -11,8 +11,6 @@ use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
-use Emonkak\Orm\Relation\JoinStrategy\ThroughGroupJoin;
-use Emonkak\Orm\Relation\JoinStrategy\ThroughOuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\PolymorphicRelation;
@@ -75,7 +73,10 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => new Model(['inner_key' => 456])]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new Model(['inner_key' => 456])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 new Model(['inner_key' => 456])
@@ -101,13 +102,16 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        $collationClass = \ArrayObject::class;
+
         $relation = Relations::oneToMany(
             $relationKey,
             $table,
             $outerKey,
             $innerKey,
             $queryBuilder,
-            $fetcher
+            $fetcher,
+            $collationClass
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -127,7 +131,13 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new \ArrayObject([
+                    new Model(['inner_key' => 456]),
+                    new Model(['inner_key' => 789])
+                ])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
@@ -177,15 +187,17 @@ class RelationsTest extends TestCase
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
-        $this->assertInstanceOf(ThroughOuterJoin::class, $joinStrategy);
+        $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
-        $this->assertSame(789, ($joinStrategy->getThroughKeySelector())(new Model(['through_key' => 789])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => new Model(['inner_key' => 456])]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => 'foo'
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
-                new Model(['inner_key' => 456])
+                new Model(['inner_key' => 456, 'through_key' => 'foo'])
             )
         );
     }
@@ -232,15 +244,20 @@ class RelationsTest extends TestCase
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
-        $this->assertInstanceOf(ThroughGroupJoin::class, $joinStrategy);
+        $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
-        $this->assertSame(789, ($joinStrategy->getThroughKeySelector())(new Model(['through_key' => 789])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => [
+                    'foo',
+                    'bar'
+                ]
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
-                [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
+                [new Model(['inner_key' => 456, 'through_key' => 'foo']), new Model(['inner_key' => 789, 'through_key' => 'bar'])]
             )
         );
     }
@@ -289,7 +306,10 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => new Model(['inner_key' => 456])]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new Model(['inner_key' => 456])]
+            ),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 new Model(['inner_key' => 456])
@@ -341,7 +361,13 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => [
+                    new Model(['inner_key' => 456]),
+                    new Model(['inner_key' => 789])
+                ]
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
@@ -406,7 +432,10 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => new Model(['inner_key' => 456])]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new Model(['inner_key' => 456])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 new Model(['inner_key' => 456])
@@ -447,7 +476,10 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => new Model(['inner_key' => 456])]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new Model(['inner_key' => 456])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 new Model(['inner_key' => 456])
@@ -464,13 +496,15 @@ class RelationsTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
         $innerElements = [new Model([])];
+        $collationClass = \ArrayObject::class;
 
         $relation = Relations::preloadedOneToMany(
             $relationKey,
             $outerKey,
             $innerKey,
             $innerClass,
-            $innerElements
+            $innerElements,
+            $collationClass
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -488,7 +522,13 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new \ArrayObject([
+                    new Model(['inner_key' => 456]),
+                    new Model(['inner_key' => 789])
+                ])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
@@ -517,6 +557,8 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        $collationClass = \ArrayObject::class;
+
         $relation = Relations::manyToMany(
             $relationKey,
             $oneToManyTable,
@@ -526,7 +568,8 @@ class RelationsTest extends TestCase
             $manyToOneOuterKey,
             $manyToOneInnerKey,
             $queryBuilder,
-            $fetcher
+            $fetcher,
+            $collationClass
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
@@ -549,7 +592,13 @@ class RelationsTest extends TestCase
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['one_to_many_outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['__pivot_one_to_many_inner_key' => 456])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => new \ArrayObject([
+                    new Model(['inner_key' => 456]),
+                    new Model(['inner_key' => 789])
+                ])
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
                 [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
@@ -608,15 +657,20 @@ class RelationsTest extends TestCase
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
-        $this->assertInstanceOf(ThroughGroupJoin::class, $joinStrategy);
+        $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['one_to_many_outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['__pivot_one_to_many_inner_key' => 456])));
-        $this->assertSame(789, ($joinStrategy->getThroughKeySelector())(new Model(['through_key' => 789])));
         $this->assertEquals(
-            new Model(['outer_key' => 123, 'relation_key' => [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]]),
+            new Model([
+                'outer_key' => 123,
+                'relation_key' => [
+                    'foo',
+                    'bar'
+                ]
+            ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
-                [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
+                [new Model(['inner_key' => 456, 'through_key' => 'foo']), new Model(['inner_key' => 789, 'through_key' => 'bar'])]
             )
         );
     }
