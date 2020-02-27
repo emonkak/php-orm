@@ -43,7 +43,7 @@ class LazyCollection implements LazyCollectionInterface
      * {@inheritDoc}
      * @psalm-assert !null $this->source
      */
-    public function get(): array
+    public function get()
     {
         if ($this->evaluator !== null) {
             /** @psalm-var TKey $this->key */
