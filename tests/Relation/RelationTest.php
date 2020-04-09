@@ -261,31 +261,30 @@ class RelationTest extends TestCase
     public function testOneToManyIfOuterKeysIsEmpty(): void
     {
         $outerClass = Model::class;
-        $outerElements = [new Model(['job_id' => null])];
-        $outerResult = $outerElements;
+        $outerElements = [new Model(['user_id' => null])];
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
 
         $relationStrategy = new OneTo(
-            'jobs',
-            'jobs',
-            'job_id',
-            'job_id',
+            'posts',
+            'posts',
+            'user_id',
+            'user_id',
             $queryBuilder,
             $fetcher,
             []
         );
         $joinStrategy = new GroupJoin(
             function($outerElement) {
-                return $outerElement->job_id;
+                return $outerElement->user_id;
             },
             function($innerElement) {
-                return $innerElement->job_id;
+                return $innerElement->user_id;
             },
             function($outerElement, $innerElements) {
-                $outerElement->jobs = $innerElements;
+                $outerElement->posts = $innerElements;
                 return $outerElement;
             },
             LooseEqualityComparer::getInstance()
@@ -294,7 +293,9 @@ class RelationTest extends TestCase
 
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
-        $this->assertSame($outerElements, iterator_to_array($relation->associate($outerResult, $outerClass)));
+        $this->assertEquals([
+            new Model(['user_id' => null, 'posts' => []])
+        ], iterator_to_array($relation->associate($outerElements, $outerClass)));
     }
 
     public function testManyTo(): void

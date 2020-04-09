@@ -97,7 +97,7 @@ class Relation implements RelationInterface
         }
 
         if (empty($outerKeys)) {
-            return new \ArrayIterator($outerElements);
+            return $joinStrategy->join($outerElements, []);
         }
 
         $innerResult = $this->relationStrategy->getResult(array_unique($outerKeys), $joinStrategy);
