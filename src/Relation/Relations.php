@@ -380,7 +380,7 @@ final class Relations
                 $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
                 /** @psalm-var callable(TInner):TKey */
                 $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,LazyCollection<int,TInner>):TOuter */
+                /** @psalm-var callable(TOuter,LazyCollection<TInner,TKey>):TOuter */
                 $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
                 /** @psalm-var EqualityComparerInterface<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
@@ -781,6 +781,7 @@ final class Relations
                 }
                 /** @psalm-var callable(?class-string<TOuter>):string */
                 $morphKeySelector = AccessorCreators::createKeySelector($outerClass, $morphKey);
+                /** @psalm-var RelationInterface<TOuter,TOuter> */
                 return new PolymorphicRelation(
                     $outerClass,
                     $morphKeySelector,

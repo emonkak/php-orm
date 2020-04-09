@@ -40,8 +40,9 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-assert !null $this->source
+     * @psalm-return TSource[]
      */
     public function get()
     {

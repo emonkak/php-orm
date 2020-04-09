@@ -59,7 +59,7 @@ class LazyOuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable
     {
@@ -67,7 +67,7 @@ class LazyOuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable
     {
@@ -91,7 +91,9 @@ class LazyOuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-param iterable<TOuter> $outer
+     * @psalm-param iterable<TInner> $inner
+     * @psalm-return \Traversable<TResult>
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
@@ -144,6 +146,7 @@ class LazyOuterJoin implements JoinStrategyInterface
                 return $cachedInner[$outerHash] ?? null;
             };
 
+        /** @psalm-var \Traversable<TResult> */
         return new SelectIterator(
             $outer,
             /**

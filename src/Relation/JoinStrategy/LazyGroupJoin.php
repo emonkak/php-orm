@@ -29,7 +29,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     private $innerKeySelector;
 
     /**
-     * @psalm-var callable(TOuter,LazyCollection<int,TInner>):TResult $resultSelector
+     * @psalm-var callable(TOuter,LazyCollection<TInner,TKey>):TResult $resultSelector
      * @var callable
      */
     private $resultSelector;
@@ -43,7 +43,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     /**
      * @psalm-param callable(TOuter):TKey $outerKeySelector
      * @psalm-param callable(TInner):TKey $innerKeySelector
-     * @psalm-param callable(TOuter,LazyCollection<int,TInner>):TResult $resultSelector
+     * @psalm-param callable(TOuter,LazyCollection<TInner,TKey>):TResult $resultSelector
      * @psalm-param EqualityComparerInterface<TKey> $comparer
      */
     public function __construct(
@@ -59,7 +59,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable
     {
@@ -67,7 +67,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable
     {
@@ -75,7 +75,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter,LazyCollection<int,TInner>):TResult
+     * @psalm-return callable(TOuter,LazyCollection<TInner,TKey>):TResult
      */
     public function getResultSelector(): callable
     {
@@ -91,7 +91,9 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-param iterable<TOuter> $outer
+     * @psalm-param iterable<TInner> $inner
+     * @psalm-return \Traversable<TResult>
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
@@ -144,6 +146,7 @@ class LazyGroupJoin implements JoinStrategyInterface
                 return $cachedInner[$outerHash] ?? [];
             };
 
+        /** @psalm-var \Traversable<TResult> */
         return new SelectIterator(
             $outer,
             /**

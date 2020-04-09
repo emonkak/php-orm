@@ -59,7 +59,7 @@ class GroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable
     {
@@ -67,7 +67,7 @@ class GroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @psalm-return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable
     {
@@ -95,6 +95,7 @@ class GroupJoin implements JoinStrategyInterface
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
+        /** @psalm-var \Traversable<TResult> */
         return new GroupJoinIterator(
             $outer,
             $inner,
