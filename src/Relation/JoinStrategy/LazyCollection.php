@@ -86,7 +86,6 @@ class LazyCollection implements LazyCollectionInterface
         } else {
             $this->source[] = $value;
         }
-        return $value;
     }
 
     /**

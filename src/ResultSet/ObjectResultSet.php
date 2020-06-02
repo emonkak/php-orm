@@ -131,7 +131,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        /** @psalm-var TDefault $defaultValue */
+        /** @psalm-assert TDefault $defaultValue */
         return $defaultValue;
     }
 }

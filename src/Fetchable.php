@@ -18,7 +18,6 @@ trait Fetchable
      */
     public function getResult(FetcherInterface $fetcher): ResultSetInterface
     {
-        '@phan-var QueryBuilderInterface $this';
         return $fetcher->fetch($this);
     }
 
