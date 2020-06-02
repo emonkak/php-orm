@@ -11,7 +11,7 @@ use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\Preloaded
+ * @covers \Emonkak\Orm\Relation\Preloaded
  */
 class PreloadedTest extends TestCase
 {
@@ -23,7 +23,7 @@ class PreloadedTest extends TestCase
         $outerKey = 'outer_key';
         $innerKey = 'inner_key';
         $innerElements = [
-            new Model([])
+            new Model([]),
         ];
 
         $relationStrategy = new Preloaded(
@@ -47,7 +47,7 @@ class PreloadedTest extends TestCase
             new Model(['item_id' => 2]),
             new Model(['item_id' => 3]),
             new Model(['item_id' => 4]),
-            new Model(['item_id' => 5])
+            new Model(['item_id' => 5]),
         ];
 
         $relationStrategy = new Preloaded(
@@ -60,7 +60,7 @@ class PreloadedTest extends TestCase
         $expectedResult = [
             $items[0],
             $items[1],
-            $items[2]
+            $items[2],
         ];
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);

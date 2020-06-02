@@ -149,7 +149,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function updateStatement(string $prefix, string $table, array $set, ?Sql $where): Sql
     {
@@ -173,7 +173,7 @@ class DefaultGrammar extends AbstractGrammar
     }
 
     /**
-     * @param Sql[]   $select
+     * @param Sql[] $select
      * @param array<int,?scalar> $bindings
      */
     private function processSelect(array $select, array &$bindings): string
@@ -213,7 +213,6 @@ class DefaultGrammar extends AbstractGrammar
     /**
      * @param Sql[] $join
      * @param array<int,?scalar> $bindings
-     * @return string
      */
     private function processJoin(array $join, array &$bindings): string
     {
@@ -233,7 +232,6 @@ class DefaultGrammar extends AbstractGrammar
     /**
      * @param ?Sql $where
      * @param array<int,?scalar> $bindings
-     * @return string
      */
     private function processWhere(?Sql $where, array &$bindings): string
     {
@@ -395,7 +393,6 @@ class DefaultGrammar extends AbstractGrammar
     /**
      * @param ?Sql $select
      * @param array<int,?scalar> $bindings
-     * @return string
      */
     private function processInsertSelect(?Sql $select, array &$bindings): string
     {

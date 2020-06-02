@@ -55,7 +55,7 @@ class LazyValue implements LazyValueInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -64,7 +64,7 @@ class LazyValue implements LazyValueInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($data)
     {

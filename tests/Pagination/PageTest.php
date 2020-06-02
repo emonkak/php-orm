@@ -9,7 +9,7 @@ use Emonkak\Orm\Pagination\PaginatorInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Pagination\Page
+ * @covers \Emonkak\Orm\Pagination\Page
  */
 class PageTest extends TestCase
 {
@@ -52,7 +52,7 @@ class PageTest extends TestCase
         return [
             [0, 10, 0],
             [1, 10, 10],
-            [2, 10, 20]
+            [2, 10, 20],
         ];
     }
 

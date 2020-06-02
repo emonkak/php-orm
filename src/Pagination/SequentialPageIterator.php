@@ -79,7 +79,7 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -110,7 +110,7 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function next(): PageIteratorInterface
     {
@@ -130,7 +130,7 @@ class SequentialPageIterator implements \IteratorAggregate, PageIteratorInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function iterate(): EnumerableInterface
     {

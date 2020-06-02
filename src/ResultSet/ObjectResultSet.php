@@ -62,7 +62,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -75,7 +75,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function toArray(): array
     {
@@ -84,7 +84,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function first(callable $predicate = null)
     {
@@ -110,7 +110,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {

@@ -31,7 +31,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function at(int $index): PageInterface
     {
@@ -44,7 +44,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function firstPage(): PageInterface
     {
@@ -52,7 +52,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function lastPage(): PageInterface
     {

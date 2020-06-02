@@ -65,7 +65,7 @@ class Relation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getResultClass(): ?string
     {
@@ -73,7 +73,7 @@ class Relation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function associate(iterable $outerResult, ?string $outerClass): \Traversable
     {

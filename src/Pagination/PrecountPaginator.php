@@ -39,7 +39,7 @@ class PrecountPaginator extends AbstractPaginator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function at(int $index): PageInterface
     {

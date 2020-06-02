@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * @covers Emonkak\Orm\Relation\Relations
+ * @covers \Emonkak\Orm\Relation\Relations
  */
 class RelationsTest extends TestCase
 {
@@ -75,7 +75,7 @@ class RelationsTest extends TestCase
         $this->assertEquals(
             new Model([
                 'outer_key' => 123,
-                'relation_key' => new Model(['inner_key' => 456])
+                'relation_key' => new Model(['inner_key' => 456]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -135,8 +135,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => new \ArrayObject([
                     new Model(['inner_key' => 456]),
-                    new Model(['inner_key' => 789])
-                ])
+                    new Model(['inner_key' => 789]),
+                ]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -193,7 +193,7 @@ class RelationsTest extends TestCase
         $this->assertEquals(
             new Model([
                 'outer_key' => 123,
-                'relation_key' => 'foo'
+                'relation_key' => 'foo',
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -252,8 +252,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => [
                     'foo',
-                    'bar'
-                ]
+                    'bar',
+                ],
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -308,7 +308,7 @@ class RelationsTest extends TestCase
         $this->assertEquals(
             new Model([
                 'outer_key' => 123,
-                'relation_key' => new Model(['inner_key' => 456])]
+                'relation_key' => new Model(['inner_key' => 456]), ]
             ),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -365,8 +365,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => [
                     new Model(['inner_key' => 456]),
-                    new Model(['inner_key' => 789])
-                ]
+                    new Model(['inner_key' => 789]),
+                ],
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -434,7 +434,7 @@ class RelationsTest extends TestCase
         $this->assertEquals(
             new Model([
                 'outer_key' => 123,
-                'relation_key' => new Model(['inner_key' => 456])
+                'relation_key' => new Model(['inner_key' => 456]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -478,7 +478,7 @@ class RelationsTest extends TestCase
         $this->assertEquals(
             new Model([
                 'outer_key' => 123,
-                'relation_key' => new Model(['inner_key' => 456])
+                'relation_key' => new Model(['inner_key' => 456]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -526,8 +526,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => new \ArrayObject([
                     new Model(['inner_key' => 456]),
-                    new Model(['inner_key' => 789])
-                ])
+                    new Model(['inner_key' => 789]),
+                ]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -596,8 +596,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => new \ArrayObject([
                     new Model(['inner_key' => 456]),
-                    new Model(['inner_key' => 789])
-                ])
+                    new Model(['inner_key' => 789]),
+                ]),
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),
@@ -665,8 +665,8 @@ class RelationsTest extends TestCase
                 'outer_key' => 123,
                 'relation_key' => [
                     'foo',
-                    'bar'
-                ]
+                    'bar',
+                ],
             ]),
             ($joinStrategy->getResultSelector())(
                 new Model(['outer_key' => 123]),

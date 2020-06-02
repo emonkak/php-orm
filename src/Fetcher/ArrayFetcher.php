@@ -36,7 +36,7 @@ class ArrayFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getClass(): ?string
     {
@@ -44,7 +44,7 @@ class ArrayFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {

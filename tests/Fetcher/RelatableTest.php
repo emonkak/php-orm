@@ -12,7 +12,7 @@ use Emonkak\Orm\Tests\Fixtures\Spy;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetcher\Relatable
+ * @covers \Emonkak\Orm\Fetcher\Relatable
  */
 class RelatableTest extends TestCase
 {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Emonkak\Tests\Orm\Pagination;
 
-use Emonkak\Orm\Pagination\Page;
 use Emonkak\Orm\Pagination\EmptyPaginator;
+use Emonkak\Orm\Pagination\Page;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Pagination\EmptyPaginator
+ * @covers \Emonkak\Orm\Pagination\EmptyPaginator
  */
 class EmptyPaginatorTest extends TestCase
 {

@@ -8,7 +8,7 @@ use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\ResultSet\PreloadedResultSet
+ * @covers \Emonkak\Orm\ResultSet\PreloadedResultSet
  */
 class PreloadedResultSetTest extends TestCase
 {

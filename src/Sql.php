@@ -135,6 +135,7 @@ class Sql implements QueryBuilderInterface
                 } else {  // binary string
                     return "x'" . bin2hex($binding) . "'";
                 }
+                // no break
             default:
                 /** @psalm-var mixed $binding */
                 $typeOrClass = is_object($binding) ? get_class($binding) : $type;

@@ -8,7 +8,7 @@ use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Sql
+ * @covers \Emonkak\Orm\Sql
  */
 class SqlTest extends TestCase
 {
@@ -31,7 +31,7 @@ class SqlTest extends TestCase
             [
                 new Sql('c1 = ?', [123]),
                 new Sql('c2 = ?', [456]),
-                new Sql('c3 = ?', [789])
+                new Sql('c3 = ?', [789]),
             ]
         );
 
@@ -66,11 +66,11 @@ class SqlTest extends TestCase
     {
         $query = Sql::_and(
             Sql::_or(
-                new Sql('foo = ?' , [1]),
-                new Sql('bar = ?' , [2])
+                new Sql('foo = ?', [1]),
+                new Sql('bar = ?', [2])
             ),
-            new Sql('qux = ?' , [3]),
-            new Sql('baz = ?' , [4])
+            new Sql('qux = ?', [3]),
+            new Sql('baz = ?', [4])
         );
 
         $this->assertQueryIs(

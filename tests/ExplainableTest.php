@@ -11,7 +11,7 @@ use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Explainable
+ * @covers \Emonkak\Orm\Explainable
  */
 class ExplainableTest extends TestCase
 {

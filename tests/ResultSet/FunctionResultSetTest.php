@@ -10,7 +10,7 @@ use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\ResultSet\FunctionResultSet
+ * @covers \Emonkak\Orm\ResultSet\FunctionResultSet
  */
 class FunctionResultSetTest extends TestCase
 {

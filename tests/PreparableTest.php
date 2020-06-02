@@ -11,7 +11,7 @@ use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Preparable
+ * @covers \Emonkak\Orm\Preparable
  */
 class PreparableTest extends TestCase
 {

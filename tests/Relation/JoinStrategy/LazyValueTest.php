@@ -8,7 +8,7 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\LazyValue
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\LazyValue
  */
 class LazyValueTest extends TestCase
 {

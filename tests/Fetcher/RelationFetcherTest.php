@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Tests\Fetcher;
 
-use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Database\PDOInterface;
+use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\RelationInterface;
@@ -14,7 +14,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetcher\RelationFetcher
+ * @covers \Emonkak\Orm\Fetcher\RelationFetcher
  */
 class RelationFetcherTest extends TestCase
 {

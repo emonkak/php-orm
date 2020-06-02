@@ -10,7 +10,7 @@ use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Grammar\DefaultGrammar
+ * @covers \Emonkak\Orm\Grammar\DefaultGrammar
  */
 class DefaultGrammarTest extends TestCase
 {
@@ -46,16 +46,16 @@ class DefaultGrammarTest extends TestCase
     public function providerOperator()
     {
         return [
-            ['=', 'c1', [],'?', ['foo'], '(c1 = ?)', ['foo']],
-            ['!=','c1', [], '?', ['foo'], '(c1 != ?)', ['foo']],
-            ['<>','c1', [], '?', ['foo'], '(c1 <> ?)', ['foo']],
-            ['<', 'c1', [],'?', ['foo'], '(c1 < ?)', ['foo']],
-            ['<=','c1', [], '?', ['foo'], '(c1 <= ?)', ['foo']],
-            ['>', 'c1', [],'?', ['foo'], '(c1 > ?)', ['foo']],
-            ['>=','c1', [], '?', ['foo'], '(c1 >= ?)', ['foo']],
-            ['IS', 'c1', [],'NULL', [], '(c1 IS NULL)', []],
-            ['IS NOT','c1', [], 'NULL', [], '(c1 IS NOT NULL)', []],
-            ['IN','c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
+            ['=', 'c1', [], '?', ['foo'], '(c1 = ?)', ['foo']],
+            ['!=', 'c1', [], '?', ['foo'], '(c1 != ?)', ['foo']],
+            ['<>', 'c1', [], '?', ['foo'], '(c1 <> ?)', ['foo']],
+            ['<', 'c1', [], '?', ['foo'], '(c1 < ?)', ['foo']],
+            ['<=', 'c1', [], '?', ['foo'], '(c1 <= ?)', ['foo']],
+            ['>', 'c1', [], '?', ['foo'], '(c1 > ?)', ['foo']],
+            ['>=', 'c1', [], '?', ['foo'], '(c1 >= ?)', ['foo']],
+            ['IS', 'c1', [], 'NULL', [], '(c1 IS NULL)', []],
+            ['IS NOT', 'c1', [], 'NULL', [], '(c1 IS NOT NULL)', []],
+            ['IN', 'c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 IN (?, ?, ?))', ['foo', 'bar', 'baz']],
             ['NOT IN', 'c1', [], '(?, ?, ?)', ['foo', 'bar', 'baz'], '(c1 NOT IN (?, ?, ?))', ['foo', 'bar', 'baz']],
             ['LIKE', 'c1', [], '?', ['foo'], '(c1 LIKE ?)', ['foo']],
             ['NOT LIKE', 'c1', [], '?', ['foo'], '(c1 NOT LIKE ?)', ['foo']],
@@ -361,7 +361,7 @@ class DefaultGrammarTest extends TestCase
                 't1',
                 new Sql('t1.c1 = ?', [123]),
                 'DELETE FROM t1 WHERE t1.c1 = ?',
-                [123]
+                [123],
             ],
         ];
     }

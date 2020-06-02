@@ -47,7 +47,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -55,7 +55,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPaginator(): PaginatorInterface
     {
@@ -73,7 +73,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function previous(): PageInterface
     {
@@ -81,7 +81,7 @@ class Page implements \IteratorAggregate, PageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function next(): PageInterface
     {

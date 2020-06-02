@@ -240,7 +240,7 @@ final class Relations
              * @psalm-param ?class-string<TOuter> $outerClass
              * @psalm-return RelationInterface<TOuter,TOuter>
              */
-            function(?string $outerClass) use(
+            function(?string $outerClass) use (
                 $relationKey,
                 $table,
                 $outerKey,

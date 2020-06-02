@@ -91,7 +91,7 @@ class GroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {

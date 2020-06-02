@@ -17,7 +17,8 @@
     "require-dev": {
         "phpunit/phpunit": "^8.0",
         "satooshi/php-coveralls": "^2.0",
-        "vimeo/psalm": "~3.11"
+        "vimeo/psalm": "~3.11",
+        "friendsofphp/php-cs-fixer": "^2.16"
     },
     "autoload": {
         "psr-4": {

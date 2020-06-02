@@ -12,7 +12,7 @@ use Emonkak\Orm\ResultSet\ArrayResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetcher\ArrayFetcher
+ * @covers \Emonkak\Orm\Fetcher\ArrayFetcher
  */
 class ArrayFetcherTest extends TestCase
 {

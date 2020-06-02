@@ -10,7 +10,7 @@ use Emonkak\Orm\UpdateBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\UpdateBuilder
+ * @covers \Emonkak\Orm\UpdateBuilder
  */
 class UpdateBuilderTest extends TestCase
 {

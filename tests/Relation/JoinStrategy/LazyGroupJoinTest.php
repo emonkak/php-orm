@@ -9,7 +9,7 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin
  */
 class LazyGroupJoinTest extends TestCase
 {

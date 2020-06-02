@@ -9,7 +9,7 @@ use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\GroupJoin
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\GroupJoin
  */
 class GroupJoinTest extends TestCase
 {

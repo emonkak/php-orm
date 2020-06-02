@@ -9,7 +9,7 @@ use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\OuterJoin
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\OuterJoin
  */
 class OuterJoinTest extends TestCase
 {

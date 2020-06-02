@@ -9,12 +9,12 @@ use Emonkak\Orm\Grammar\AbstractGrammar;
 use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
-use Emonkak\Orm\UpdateBuilder;
 use Emonkak\Orm\Tests\Fixtures\Id;
+use Emonkak\Orm\UpdateBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Grammar\AbstractGrammar
+ * @covers \Emonkak\Orm\Grammar\AbstractGrammar
  */
 class AbstractGrammarTest extends TestCase
 {

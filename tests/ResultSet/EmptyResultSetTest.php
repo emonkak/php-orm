@@ -8,7 +8,7 @@ use Emonkak\Orm\ResultSet\EmptyResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\ResultSet\EmptyResultSet
+ * @covers \Emonkak\Orm\ResultSet\EmptyResultSet
  */
 class EmptyResultSetTest extends TestCase
 {

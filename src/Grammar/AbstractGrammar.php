@@ -35,7 +35,7 @@ abstract class AbstractGrammar implements GrammarInterface
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function lift($value): Sql
     {
@@ -53,7 +53,7 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function value($value): Sql
     {
@@ -89,23 +89,23 @@ abstract class AbstractGrammar implements GrammarInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql
     {
         switch (func_num_args()) {
-            case 1: {
+            case 1:
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 return $this->lift($arg1);
-            }
-            case 2: {
+
+            case 2:
                 /** @psalm-var string */
                 $operator = $arg1;
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg2 */
                 $rhs = $this->lift($arg2);
                 return $this->unaryOperator($operator, $rhs);
-            }
-            case 3: {
+
+            case 3:
                 /** @psalm-var string */
                 $operator = $arg2;
                 /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
@@ -113,7 +113,7 @@ abstract class AbstractGrammar implements GrammarInterface
                 /** @psalm-var scalar|scalar[]|null $arg3 */
                 $rhs = $this->value($arg3);
                 return $this->operator($operator, $lhs, $rhs);
-            }
+
             default:
                 /** @psalm-var string */
                 $operator = $arg2;

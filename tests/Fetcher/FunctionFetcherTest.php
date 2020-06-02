@@ -13,7 +13,7 @@ use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetcher\FunctionFetcher
+ * @covers \Emonkak\Orm\Fetcher\FunctionFetcher
  */
 class FunctionFetcherTest extends TestCase
 {
