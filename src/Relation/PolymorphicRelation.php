@@ -44,7 +44,7 @@ class PolymorphicRelation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getResultClass(): ?string
     {
@@ -68,7 +68,7 @@ class PolymorphicRelation implements RelationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function associate(iterable $outerResult, ?string $outerClass): \Traversable
     {

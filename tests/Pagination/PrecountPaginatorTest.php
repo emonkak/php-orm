@@ -8,7 +8,7 @@ use Emonkak\Orm\Pagination\PrecountPaginator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Pagination\PrecountPaginator
+ * @covers \Emonkak\Orm\Pagination\PrecountPaginator
  */
 class PrecountPaginatorTest extends TestCase
 {
@@ -20,7 +20,7 @@ class PrecountPaginatorTest extends TestCase
         $results = [
             array_fill(0, 10, new \stdClass()),
             array_fill(0, 10, new \stdClass()),
-            array_fill(0, 1, new \stdClass())
+            array_fill(0, 1, new \stdClass()),
         ];
 
         $itemsFetcher = $this
@@ -33,7 +33,7 @@ class PrecountPaginatorTest extends TestCase
             ->will($this->returnValueMap([
                 [0, 10, new \ArrayIterator($results[0])],
                 [10, 10, new \ArrayIterator($results[1])],
-                [20, 10, new \ArrayIterator($results[2])]
+                [20, 10, new \ArrayIterator($results[2])],
             ]));
 
         $paginator = new PrecountPaginator($itemsFetcher, $perPage, $totalItems);

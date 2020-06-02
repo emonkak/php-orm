@@ -19,7 +19,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     use EnumerableExtensions;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -36,7 +36,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function firstPage(): PageInterface
     {
@@ -44,7 +44,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function lastPage(): PageInterface
     {

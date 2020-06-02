@@ -8,7 +8,7 @@ use Emonkak\Orm\Pagination\SequentialPageIterator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Pagination\SequentialPageIterator
+ * @covers \Emonkak\Orm\Pagination\SequentialPageIterator
  */
 class SequentialPageIteratorTest extends TestCase
 {
@@ -27,7 +27,7 @@ class SequentialPageIteratorTest extends TestCase
             ->expects($this->once())
             ->method('__invoke')
             ->will($this->returnValueMap([
-                [10, 11, $items]
+                [10, 11, $items],
             ]));
 
         $iterator = SequentialPageIterator::from($index, $perPage, $itemsFetcher);
@@ -54,7 +54,7 @@ class SequentialPageIteratorTest extends TestCase
             ->will($this->returnValueMap([
                 [0, 11, range(0, 10)],
                 [11, 10, range(11, 20)],
-                [21, 10, range(21, 30)]
+                [21, 10, range(21, 30)],
             ]));
 
         $iterator = SequentialPageIterator::from($index, $perPage, $itemsFetcher);
@@ -78,7 +78,7 @@ class SequentialPageIteratorTest extends TestCase
             ->will($this->returnValueMap([
                 [0, 11, range(0, 10)],
                 [11, 10, range(11, 20)],
-                [21, 10, range(21, 30)]
+                [21, 10, range(21, 30)],
             ]));
 
         $iterator = SequentialPageIterator::from($index, $perPage, $itemsFetcher);

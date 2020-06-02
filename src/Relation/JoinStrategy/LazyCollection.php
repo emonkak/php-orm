@@ -57,7 +57,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetExists($offset)
     {
@@ -66,7 +66,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetGet($offset)
     {
@@ -75,7 +75,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @psalm-param array-key|null $offset
      */
     public function offsetSet($offset, $value)
@@ -86,11 +86,10 @@ class LazyCollection implements LazyCollectionInterface
         } else {
             $this->source[] = $value;
         }
-        return $value;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetUnset($offset)
     {
@@ -99,7 +98,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -108,7 +107,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -117,7 +116,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -126,7 +125,7 @@ class LazyCollection implements LazyCollectionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($data)
     {

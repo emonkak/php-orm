@@ -10,7 +10,7 @@ use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin
  */
 class LazyOuterJoinTest extends TestCase
 {

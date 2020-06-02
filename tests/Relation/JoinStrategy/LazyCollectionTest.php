@@ -8,7 +8,7 @@ use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\JoinStrategy\LazyCollection
+ * @covers \Emonkak\Orm\Relation\JoinStrategy\LazyCollection
  */
 class LazyCollectionTest extends TestCase
 {

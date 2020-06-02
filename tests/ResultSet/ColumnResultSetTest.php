@@ -9,7 +9,7 @@ use Emonkak\Orm\Tests\Fixtures\IterablePDOStatementInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\ResultSet\ColumnResultSet
+ * @covers \Emonkak\Orm\ResultSet\ColumnResultSet
  */
 class ColumnResultSetTest extends TestCase
 {

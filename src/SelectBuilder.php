@@ -193,9 +193,6 @@ class SelectBuilder implements QueryBuilderInterface
         return $this->offset;
     }
 
-    /**
-     * @return string
-     */
     public function getSuffix(): string
     {
         return $this->suffix;
@@ -370,7 +367,6 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param string $name
      * @param QueryBuilderInterface|Sql|string $specification
      */
     public function window(string $name, $specification = ''): self

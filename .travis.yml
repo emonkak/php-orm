@@ -15,12 +15,12 @@ install:
   - composer install
 
 script:
-  - php ./vendor/bin/phan
-  - php ./vendor/bin/psalm
   - mkdir -p build/logs
-  - php ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - ./vendor/bin/psalm --no-progress
+  - ./vendor/bin/php-cs-fixer fix -v --dry-run --stop-on-violation --using-cache=no
+  - ./vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml
 
 after_script:
-  - travis_retry php ./vendor/bin/coveralls
+  - travis_retry php ./vendor/bin/php-coveralls
 
 sudo: false

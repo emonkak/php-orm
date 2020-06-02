@@ -6,7 +6,6 @@ namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
  * @template T
@@ -68,7 +67,7 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {

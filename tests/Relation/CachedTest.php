@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * @covers Emonkak\Orm\Relation\Cached
+ * @covers \Emonkak\Orm\Relation\Cached
  */
 class CachedTest extends TestCase
 {
@@ -50,7 +50,7 @@ class CachedTest extends TestCase
         $expectedResult = [
             new Model(['id' => 1]),
             new Model(['id' => 2]),
-            new Model(['id' => 3])
+            new Model(['id' => 3]),
         ];
 
         $cacheKeySelector = function($key) { return 'model.' . $key; };
@@ -63,19 +63,19 @@ class CachedTest extends TestCase
             ->with([
                 'model.1',
                 'model.2',
-                'model.3'
+                'model.3',
             ])
             ->willReturn([
                 'model.1' => $expectedResult[0],
                 'model.2' => null,
-                'model.3' => null
+                'model.3' => null,
             ]);
         $cache
             ->expects($this->once())
             ->method('setMultiple')
             ->with([
                 'model.2' => $expectedResult[1],
-                'model.3' => $expectedResult[2]
+                'model.3' => $expectedResult[2],
             ], $cacheTtl)
             ->willReturn(true);
 
@@ -86,7 +86,7 @@ class CachedTest extends TestCase
             ->with([2, 3])
             ->willReturn([
                 $expectedResult[1],
-                $expectedResult[2]
+                $expectedResult[2],
             ]);
 
         $queryBuilder = $this->getSelectBuilder();
@@ -118,7 +118,7 @@ class CachedTest extends TestCase
         $expectedResult = [
             new Model(['id' => 1]),
             new Model(['id' => 2]),
-            new Model(['id' => 3])
+            new Model(['id' => 3]),
         ];
 
         $cacheKeySelector = function($key) { return 'model.' . $key; };
@@ -131,12 +131,12 @@ class CachedTest extends TestCase
             ->with([
                 'model.1',
                 'model.2',
-                'model.3'
+                'model.3',
             ])
             ->willReturn([
                 'model.1' => $expectedResult[0],
                 'model.2' => $expectedResult[1],
-                'model.3' => $expectedResult[2]
+                'model.3' => $expectedResult[2],
             ]);
         $cache
             ->expects($this->never())

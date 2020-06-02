@@ -16,7 +16,7 @@ use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\SelectBuilder
+ * @covers \Emonkak\Orm\SelectBuilder
  */
 class SelectBuilderTest extends TestCase
 {
@@ -527,7 +527,7 @@ class SelectBuilderTest extends TestCase
             ->groupBy('c1')
             ->having('c2', '!=', 'foo')
             ->having('c3', '<>', 'bar')
-            ->having('c4', 'IS NOT', NULL)
+            ->having('c4', 'IS NOT', null)
             ->build();
         $this->assertQueryIs(
             'SELECT * FROM t1 GROUP BY c1 HAVING (((c2 != ?) AND (c3 <> ?)) AND (c4 IS NOT NULL))',

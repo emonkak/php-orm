@@ -63,7 +63,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -76,7 +76,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function toArray(): array
     {
@@ -87,7 +87,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function first(callable $predicate = null)
     {
@@ -114,7 +114,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {
@@ -137,7 +137,7 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        /** @psalm-var TDefault $defaultValue */
+        /** @psalm-assert TDefault $defaultValue */
         return $defaultValue;
     }
 }

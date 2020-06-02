@@ -129,15 +129,16 @@ class Sql implements QueryBuilderInterface
                 return 'NULL';
             case 'string':
                 /** @psalm-var string $binding */
-                $isText = mb_check_encoding($binding, 'utf-8');  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
+                $isText = mb_check_encoding($binding, 'utf-8');
                 if ($isText) {
-                    return "'" . addslashes($binding) . "'";  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
+                    return "'" . addslashes($binding) . "'";
                 } else {  // binary string
-                    return "x'" . bin2hex($binding) . "'";  // @phan-suppress-current-line PhanTypeMismatchArgumentNullableInternal
+                    return "x'" . bin2hex($binding) . "'";
                 }
+                // no break
             default:
                 /** @psalm-var mixed $binding */
-                $typeOrClass = is_object($binding) ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
+                $typeOrClass = is_object($binding) ? get_class($binding) : $type;
                 return "'<" . $typeOrClass . ">'";
             }
         }, $this->bindings);

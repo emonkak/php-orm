@@ -10,7 +10,7 @@ use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\InsertBuilder
+ * @covers \Emonkak\Orm\InsertBuilder
  */
 class InsertBuilderTest extends TestCase
 {
@@ -35,8 +35,8 @@ class InsertBuilderTest extends TestCase
             [
                 new Sql('?', ['foo']),
                 new Sql('?', ['bar']),
-                new Sql('?', ['baz'])
-            ]
+                new Sql('?', ['baz']),
+            ],
         ], $queryBuilder->getValues());
 
         $selectQuery = $this->getSelectBuilder()

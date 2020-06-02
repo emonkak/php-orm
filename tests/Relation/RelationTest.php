@@ -19,7 +19,7 @@ use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\Relation
+ * @covers \Emonkak\Orm\Relation\Relation
  */
 class RelationTest extends TestCase
 {
@@ -58,7 +58,7 @@ class RelationTest extends TestCase
             new Model([
                 'post_id' => 4,
                 'user_id' => null,
-                'user' => null
+                'user' => null,
             ]),
         ];
 
@@ -294,7 +294,7 @@ class RelationTest extends TestCase
         $this->assertSame($relationStrategy, $relation->getRelationStrategy());
         $this->assertSame($joinStrategy, $relation->getJoinStrategy());
         $this->assertEquals([
-            new Model(['user_id' => null, 'posts' => []])
+            new Model(['user_id' => null, 'posts' => []]),
         ], iterator_to_array($relation->associate($outerElements, $outerClass)));
     }
 

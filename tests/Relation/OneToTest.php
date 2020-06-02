@@ -14,7 +14,7 @@ use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\OneTo
+ * @covers \Emonkak\Orm\Relation\OneTo
  */
 class OneToTest extends TestCase
 {

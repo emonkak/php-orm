@@ -8,7 +8,7 @@ use Emonkak\Orm\Pagination\AbstractPaginator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Pagination\AbstractPaginator
+ * @covers \Emonkak\Orm\Pagination\AbstractPaginator
  */
 class AbstractPaginatorTest extends TestCase
 {
@@ -52,7 +52,7 @@ class AbstractPaginatorTest extends TestCase
             ->will($this->returnValueMap([
                 [0, $pages[0]],
                 [1, $pages[1]],
-                [2, $pages[2]]
+                [2, $pages[2]],
             ]));
 
         $this->assertEquals([['foo' => 123], ['bar' => 456], ['baz' => 789]], iterator_to_array($paginator));
@@ -91,7 +91,7 @@ class AbstractPaginatorTest extends TestCase
             [1, 10, true],
             [9, 10, true],
             [10, 10, false],
-            [11, 10, false]
+            [11, 10, false],
         ];
     }
 

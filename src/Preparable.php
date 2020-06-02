@@ -34,9 +34,7 @@ trait Preparable
             default:
                 /** @psalm-var mixed $binding */
                 $typeOrClass = is_object($binding) ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
-                throw new \UnexpectedValueException(
-                    "The value should be a bindable type. but got '$typeOrClass'."
-                );
+                throw new \UnexpectedValueException("The value should be a bindable type. but got '$typeOrClass'.");
             }
         }
 

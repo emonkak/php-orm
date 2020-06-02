@@ -34,7 +34,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIterator(): \Traversable
     {
@@ -44,7 +44,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function toArray(): array
     {
@@ -53,7 +53,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function first(callable $predicate = null)
     {
@@ -77,7 +77,7 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function firstOrDefault(callable $predicate = null, $defaultValue = null)
     {

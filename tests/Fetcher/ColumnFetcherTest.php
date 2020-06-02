@@ -12,7 +12,7 @@ use Emonkak\Orm\ResultSet\ColumnResultSet;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetcher\ColumnFetcher
+ * @covers \Emonkak\Orm\Fetcher\ColumnFetcher
  */
 class ColumnFetcherTest extends TestCase
 {

@@ -73,7 +73,7 @@ class Preloaded implements RelationStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {

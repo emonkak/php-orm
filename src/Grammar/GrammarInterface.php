@@ -58,13 +58,13 @@ interface GrammarInterface
     public function identifier(string $string): string;
 
     /**
-     * @param Sql[]  $select
-     * @param Sql[]  $from
-     * @param Sql[]  $join
-     * @param Sql[]  $groupBy
-     * @param Sql[]  $window
-     * @param Sql[]  $orderBy
-     * @param Sql[]  $union
+     * @param Sql[] $select
+     * @param Sql[] $from
+     * @param Sql[] $join
+     * @param Sql[] $groupBy
+     * @param Sql[] $window
+     * @param Sql[] $orderBy
+     * @param Sql[] $union
      */
     public function selectStatement(string $prefix, array $select, array $from, array $join, ?Sql $where, array $groupBy, ?Sql $having, array $window, array $orderBy, ?int $limit, ?int $offset, string $suffix, array $union): Sql;
 

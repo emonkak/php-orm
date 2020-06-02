@@ -41,7 +41,7 @@ class ColumnFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getClass(): ?string
     {
@@ -49,7 +49,7 @@ class ColumnFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {

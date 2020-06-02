@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Enumerable\EqualityComparerInterface;  // @phan-suppress-current-line PhanUnreferencedUseNormal
+use Emonkak\Enumerable\EqualityComparerInterface;
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
-use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;  // @phan-suppress-current-line PhanUnreferencedUseNormal
-use Emonkak\Orm\Relation\JoinStrategy\LazyValue;  // @phan-suppress-current-line PhanUnreferencedUseNormal
+use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\SelectBuilder;
 use Psr\SimpleCache\CacheInterface;
@@ -240,7 +240,7 @@ final class Relations
              * @psalm-param ?class-string<TOuter> $outerClass
              * @psalm-return RelationInterface<TOuter,TOuter>
              */
-            function(?string $outerClass) use(
+            function(?string $outerClass) use (
                 $relationKey,
                 $table,
                 $outerKey,

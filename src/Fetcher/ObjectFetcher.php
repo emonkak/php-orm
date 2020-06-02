@@ -53,7 +53,7 @@ class ObjectFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getClass(): ?string
     {
@@ -69,7 +69,7 @@ class ObjectFetcher implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {

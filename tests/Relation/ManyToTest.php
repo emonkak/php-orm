@@ -14,7 +14,7 @@ use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\ManyTo
+ * @covers \Emonkak\Orm\Relation\ManyTo
  */
 class ManyToTest extends TestCase
 {

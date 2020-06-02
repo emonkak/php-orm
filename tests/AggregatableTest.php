@@ -9,7 +9,7 @@ use Emonkak\Orm\Aggregatable;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Aggregatable
+ * @covers \Emonkak\Orm\Aggregatable
  */
 class AggregatableTest extends TestCase
 {

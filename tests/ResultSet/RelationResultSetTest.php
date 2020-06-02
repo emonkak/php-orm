@@ -10,7 +10,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\ResultSet\RelationResultSet
+ * @covers \Emonkak\Orm\ResultSet\RelationResultSet
  */
 class RelationResultSetTest extends TestCase
 {

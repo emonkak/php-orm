@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Fetcher;
 
-use Emonkak\Orm\Relation\RelationInterface;  // @phan-suppress-current-line PhanUnreferencedUseNormal
+use Emonkak\Orm\Relation\RelationInterface;
 
 /**
  * @template TOuter
@@ -23,7 +23,6 @@ trait Relatable
      */
     public function with(callable $relationFactory): RelationFetcher
     {
-        '@phan-var FetcherInterface $this';
         $class = $this->getClass();
         $relation = $relationFactory($class);
         return new RelationFetcher($this, $relation);
@@ -36,7 +35,6 @@ trait Relatable
      */
     public function withRelation(RelationInterface $relation): RelationFetcher
     {
-        '@phan-var FetcherInterface $this';
         return new RelationFetcher($this, $relation);
     }
 }

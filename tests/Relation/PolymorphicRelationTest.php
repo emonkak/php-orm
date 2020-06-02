@@ -9,7 +9,7 @@ use Emonkak\Orm\Relation\RelationInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Relation\PolymorphicRelation
+ * @covers \Emonkak\Orm\Relation\PolymorphicRelation
  */
 class PolymorphicRelationTest extends TestCase
 {

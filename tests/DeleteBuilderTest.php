@@ -9,7 +9,7 @@ use Emonkak\Orm\Grammar\GrammarInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\DeleteBuilder
+ * @covers \Emonkak\Orm\DeleteBuilder
  */
 class DeleteBuilderTest extends TestCase
 {

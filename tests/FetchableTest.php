@@ -12,7 +12,7 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Emonkak\Orm\Fetchable
+ * @covers \Emonkak\Orm\Fetchable
  */
 class FetchableTest extends TestCase
 {
