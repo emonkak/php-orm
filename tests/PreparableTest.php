@@ -50,6 +50,28 @@ class PreparableTest extends TestCase
         $this->assertSame($stmt, $preparable->prepare($pdo));
     }
 
+    public function testPrepareThrowsRuntimeException(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        $query = new Sql('SELECT 1', []);
+
+        $preparable = $this->getMockForTrait(Preparable::class);
+        $preparable
+            ->expects($this->once())
+            ->method('build')
+            ->willReturn($query);
+
+        $pdo = $this->createMock(PDOInterface::class);
+        $pdo
+            ->expects($this->once())
+            ->method('prepare')
+            ->with($query->getSql())
+            ->willReturn(false);
+
+        $preparable->prepare($pdo);
+    }
+
     public function testPrepareThrowsUnexpectedValueException(): void
     {
         $this->expectException(\UnexpectedValueException::class);

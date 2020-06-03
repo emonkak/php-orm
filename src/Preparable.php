@@ -12,8 +12,13 @@ trait Preparable
     public function prepare(PDOInterface $pdo): PDOStatementInterface
     {
         $query = $this->build();
+        $sql = $query->getSql();
 
-        $stmt = $pdo->prepare($query->getSql());
+        $stmt = $pdo->prepare($sql);
+
+        if ($stmt === false) {
+            throw new \RuntimeException('Failed to prepare statement: ' . $sql);
+        }
 
         foreach ($query->getBindings() as $index => $binding) {
             $type = gettype($binding);
