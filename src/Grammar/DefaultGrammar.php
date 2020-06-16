@@ -129,9 +129,8 @@ class DefaultGrammar extends AbstractGrammar
              . $this->processOrderBy($orderBy, $bindings)
              . $this->processLimit($limit, $bindings)
              . $this->processOffset($offset, $bindings)
-             . ($suffix !== '' ? ' ' . $suffix : '');
-
-        $sql .= $this->processUnion($union, $bindings);
+             . ($suffix !== '' ? ' ' . $suffix : '')
+             . $this->processUnion($union, $bindings);
 
         return new Sql($sql, $bindings);
     }
