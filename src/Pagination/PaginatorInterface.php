@@ -13,23 +13,23 @@ use Emonkak\Enumerable\EnumerableInterface;
 interface PaginatorInterface extends EnumerableInterface
 {
     /**
-     * @psalm-return PageInterface<T>
+     * @psalm-return PaginatablePageInterface<T>
      */
-    public function at(int $index): PageInterface;
+    public function at(int $index): PaginatablePageInterface;
 
     public function getPerPage(): int;
 
     public function has(int $index): bool;
 
     /**
-     * @psalm-return PageInterface<T>
+     * @psalm-return PaginatablePageInterface<T>
      */
-    public function firstPage(): PageInterface;
+    public function firstPage(): PaginatablePageInterface;
 
     /**
-     * @psalm-return PageInterface<T>
+     * @psalm-return PaginatablePageInterface<T>
      */
-    public function lastPage(): PageInterface;
+    public function lastPage(): PaginatablePageInterface;
 
     public function getTotalItems(): int;
 

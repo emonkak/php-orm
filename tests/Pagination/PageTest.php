@@ -16,25 +16,8 @@ class PageTest extends TestCase
     public function testConstructor(): void
     {
         $items = new \EmptyIterator();
-        $index = 1;
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-
-        $page = new Page($items, $index, $paginator);
-
-        $this->assertSame($items, $page->getIterator());
-        $this->assertSame($index, $page->getIndex());
-        $this->assertSame($paginator, $page->getPaginator());
-    }
-
-    /**
-     * @dataProvider prividerGetOffset
-     */
-    public function testGetOffset($index, $perPage, $expectedOffset): void
-    {
-        $items = new \EmptyIterator();
-        $totalPages = 10;
         $perPage = 10;
+        $index = 1;
 
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
@@ -44,16 +27,10 @@ class PageTest extends TestCase
 
         $page = new Page($items, $index, $paginator);
 
-        $this->assertSame($expectedOffset, $page->getOffset());
-    }
-
-    public function prividerGetOffset()
-    {
-        return [
-            [0, 10, 0],
-            [1, 10, 10],
-            [2, 10, 20],
-        ];
+        $this->assertSame($items, $page->getIterator());
+        $this->assertSame($perPage, $page->getPerPage());
+        $this->assertSame($index, $page->getIndex());
+        $this->assertSame($paginator, $page->getPaginator());
     }
 
     public function testNext(): void
@@ -61,14 +38,12 @@ class PageTest extends TestCase
         $items = new \EmptyIterator();
         $index = 1;
 
-        $nextPage = $this->createMock(MockedPage::class);
-
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
             ->with($index + 1)
-            ->willReturn($nextPage);
+            ->willReturn($nextPage = new Page(new \EmptyIterator(), $index + 1, $paginator));
 
         $page = new Page($items, $index, $paginator);
 
@@ -80,14 +55,12 @@ class PageTest extends TestCase
         $items = new \EmptyIterator();
         $index = 1;
 
-        $previousPage = $this->createMock(MockedPage::class);
-
         $paginator = $this->createMock(PaginatorInterface::class);
         $paginator
             ->expects($this->once())
             ->method('at')
             ->with($index - 1)
-            ->willReturn($previousPage);
+            ->willReturn($previousPage = new Page(new \EmptyIterator(), $index - 1, $paginator));
 
         $page = new Page($items, $index, $paginator);
 
@@ -126,39 +99,5 @@ class PageTest extends TestCase
         $page = new Page($items, $index, $paginator);
 
         $this->assertTrue($page->hasNext());
-    }
-
-    public function testIsFirst(): void
-    {
-        $items = new \EmptyIterator();
-        $index = 0;
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-        $paginator
-            ->expects($this->once())
-            ->method('has')
-            ->with($index - 1)
-            ->willReturn(false);
-
-        $page = new Page($items, $index, $paginator);
-
-        $this->assertTrue($page->isFirst());
-    }
-
-    public function testIsLast(): void
-    {
-        $items = new \EmptyIterator();
-        $index = 1;
-
-        $paginator = $this->createMock(PaginatorInterface::class);
-        $paginator
-            ->expects($this->once())
-            ->method('has')
-            ->with($index + 1)
-            ->willReturn(false);
-
-        $page = new Page($items, $index, $paginator);
-
-        $this->assertTrue($page->isLast());
     }
 }

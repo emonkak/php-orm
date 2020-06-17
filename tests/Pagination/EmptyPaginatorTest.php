@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Emonkak\Tests\Orm\Pagination;
 
 use Emonkak\Orm\Pagination\EmptyPaginator;
-use Emonkak\Orm\Pagination\Page;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +15,6 @@ class EmptyPaginatorTest extends TestCase
     public function testAt(): void
     {
         $result = (new EmptyPaginator(10))->at(0);
-        $this->assertInstanceOf(Page::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 
@@ -28,14 +26,12 @@ class EmptyPaginatorTest extends TestCase
     public function testFirstPage(): void
     {
         $result = (new EmptyPaginator(10))->firstPage();
-        $this->assertInstanceOf(Page::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 
     public function testLastPage(): void
     {
         $result = (new EmptyPaginator(10))->lastPage();
-        $this->assertInstanceOf(Page::class, $result);
         $this->assertEmpty(iterator_to_array($result));
     }
 

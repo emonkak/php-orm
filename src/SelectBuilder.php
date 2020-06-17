@@ -7,10 +7,9 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
-use Emonkak\Orm\Pagination\PageIteratorInterface;
 use Emonkak\Orm\Pagination\PaginatorInterface;
 use Emonkak\Orm\Pagination\PrecountPaginator;
-use Emonkak\Orm\Pagination\SequentialPageIterator;
+use Emonkak\Orm\Pagination\SequentialPage;
 
 /**
  * Provides the query building of SELECT statement.
@@ -509,15 +508,15 @@ class SelectBuilder implements QueryBuilderInterface
                 ->offset($offset)
                 ->getResult($fetcher);
         };
-        return new PrecountPaginator($itemsFetcher, $perPage, $count);
+        return new PrecountPaginator($perPage, $count, $itemsFetcher);
     }
 
     /**
      * @template T
      * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-return PageIteratorInterface<T>
+     * @psalm-return SequentialPage<T>
      */
-    public function paginateFrom(FetcherInterface $fetcher, int $index, int $perPage): PageIteratorInterface
+    public function paginateFrom(FetcherInterface $fetcher, int $initialIndex, int $perPage): SequentialPage
     {
         $itemsFetcher = function(int $offset, int $limit) use ($fetcher): array {
             return $this
@@ -526,7 +525,7 @@ class SelectBuilder implements QueryBuilderInterface
                 ->getResult($fetcher)
                 ->toArray();
         };
-        return SequentialPageIterator::from($index, $perPage, $itemsFetcher);
+        return SequentialPage::from($initialIndex, $perPage, $itemsFetcher);
     }
 
     private function withoutSorting(): self

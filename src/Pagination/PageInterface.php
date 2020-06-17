@@ -12,24 +12,31 @@ use Emonkak\Enumerable\EnumerableInterface;
  */
 interface PageInterface extends EnumerableInterface
 {
-    /**
-     * @psalm-return PaginatorInterface<T>
-     */
-    public function getPaginator(): PaginatorInterface;
+    public function getPerPage(): int;
 
     public function getIndex(): int;
 
     public function getOffset(): int;
 
     /**
-     * @psalm-return PageInterface<T>
+     * @psalm-return self<T>
      */
-    public function previous(): PageInterface;
+    public function next(): self;
 
     /**
-     * @psalm-return PageInterface<T>
+     * @psalm-return self<T>
      */
-    public function next(): PageInterface;
+    public function previous(): self;
+
+    /**
+     * @psalm-return iterable<self<T>>
+     */
+    public function forward(): iterable;
+
+    /**
+     * @psalm-return iterable<self<T>>
+     */
+    public function backward(): iterable;
 
     public function hasPrevious(): bool;
 
