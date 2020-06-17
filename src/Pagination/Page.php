@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Pagination;
 
-use Emonkak\Enumerable\EnumerableExtensions;
-
 /**
  * @template T
- * @implements \IteratorAggregate<T>
- * @implements PageInterface<T>
+ * @extends AbstractPage<T>
+ * @implements PaginatablePageInterface<T>
  */
-class Page implements \IteratorAggregate, PageInterface
+class Page extends AbstractPage implements PaginatablePageInterface
 {
-    /**
-     * @use EnumerableExtensions<T>
-     */
-    use EnumerableExtensions;
-
     /**
      * @psalm-var \Traversable<T>
      * @var \Traversable
@@ -62,22 +55,14 @@ class Page implements \IteratorAggregate, PageInterface
         return $this->paginator;
     }
 
+    public function getPerPage(): int
+    {
+        return $this->paginator->getPerPage();
+    }
+
     public function getIndex(): int
     {
         return $this->index;
-    }
-
-    public function getOffset(): int
-    {
-        return $this->index * $this->paginator->getPerPage();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function previous(): PageInterface
-    {
-        return $this->paginator->at($this->index - 1);
     }
 
     /**
@@ -88,9 +73,12 @@ class Page implements \IteratorAggregate, PageInterface
         return $this->paginator->at($this->index + 1);
     }
 
-    public function hasPrevious(): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function previous(): PageInterface
     {
-        return $this->paginator->has($this->index - 1);
+        return $this->paginator->at($this->index - 1);
     }
 
     public function hasNext(): bool
@@ -98,13 +86,8 @@ class Page implements \IteratorAggregate, PageInterface
         return $this->paginator->has($this->index + 1);
     }
 
-    public function isFirst(): bool
+    public function hasPrevious(): bool
     {
-        return !$this->hasPrevious();
-    }
-
-    public function isLast(): bool
-    {
-        return !$this->hasNext();
+        return $this->paginator->has($this->index - 1);
     }
 }

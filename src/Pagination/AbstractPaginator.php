@@ -38,7 +38,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     /**
      * {@inheritdoc}
      */
-    public function firstPage(): PageInterface
+    public function firstPage(): PaginatablePageInterface
     {
         return $this->at(0);
     }
@@ -46,7 +46,7 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
     /**
      * {@inheritdoc}
      */
-    public function lastPage(): PageInterface
+    public function lastPage(): PaginatablePageInterface
     {
         $totalPages = $this->getTotalPages();
         return $this->at($totalPages > 0 ? $totalPages - 1 : 0);

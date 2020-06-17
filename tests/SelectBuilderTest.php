@@ -9,7 +9,6 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Pagination\PrecountPaginator;
-use Emonkak\Orm\Pagination\SequentialPageIterator;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
@@ -856,14 +855,12 @@ class SelectBuilderTest extends TestCase
                 return new PreloadedResultSet($result);
             }));
 
-        $sequentialPageIterator = $this->getSelectBuilder()
+        $sequentialPage = $this->getSelectBuilder()
             ->from('t1')
             ->orderBy('t1.id')
             ->paginateFrom($fetcher, $index, $perPage);
 
-        $this->assertInstanceOf(SequentialPageIterator::class, $sequentialPageIterator);
-
-        $this->assertEquals($expectedResult, iterator_to_array($sequentialPageIterator));
-        $this->assertTrue($sequentialPageIterator->hasNext());
+        $this->assertEquals($expectedResult, iterator_to_array($sequentialPage));
+        $this->assertTrue($sequentialPage->hasNext());
     }
 }

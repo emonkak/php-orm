@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\AbstractPaginator;
+use Emonkak\Orm\Pagination\Page;
+use Emonkak\Orm\Pagination\PaginatablePageInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,25 +16,6 @@ class AbstractPaginatorTest extends TestCase
 {
     public function testGetIterator(): void
     {
-        $pages = [
-            $this->createMock(MockedPage::class),
-            $this->createMock(MockedPage::class),
-            $this->createMock(MockedPage::class),
-        ];
-
-        $pages[0]
-            ->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator([['foo' => 123]]));
-        $pages[1]
-            ->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator([['bar' => 456]]));
-        $pages[2]
-            ->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator([['baz' => 789]]));
-
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,
             [],
@@ -42,6 +25,13 @@ class AbstractPaginatorTest extends TestCase
             true,
             ['getTotalPages']
         );
+
+        $pages = [
+            new Page(new \ArrayIterator([['foo' => 123]]), 0, $paginator),
+            new Page(new \ArrayIterator([['bar' => 456]]), 1, $paginator),
+            new Page(new \ArrayIterator([['baz' => 789]]), 2, $paginator),
+        ];
+
         $paginator
             ->expects($this->once())
             ->method('getTotalPages')
@@ -80,7 +70,7 @@ class AbstractPaginatorTest extends TestCase
         $this->assertSame($expectedResult, $paginator->has($index));
     }
 
-    public function providerHas()
+    public function providerHas(): array
     {
         return [
             [0, 0, false],
@@ -97,7 +87,7 @@ class AbstractPaginatorTest extends TestCase
 
     public function testFirst(): void
     {
-        $page = $this->createMock(MockedPage::class);
+        $page = $this->createMock(PaginatablePageInterface::class);
 
         $paginator = $this->getMockForAbstractClass(AbstractPaginator::class);
         $paginator
@@ -111,7 +101,7 @@ class AbstractPaginatorTest extends TestCase
 
     public function testLast(): void
     {
-        $page = $this->createMock(MockedPage::class);
+        $page = $this->createMock(PaginatablePageInterface::class);
 
         $paginator = $this->getMockForAbstractClass(
             AbstractPaginator::class,
@@ -161,7 +151,7 @@ class AbstractPaginatorTest extends TestCase
         $this->assertSame($expected, $paginator->getTotalPages());
     }
 
-    public function providerGetNumPages()
+    public function providerGetNumPages(): array
     {
         return [
             [0, 10, 0],

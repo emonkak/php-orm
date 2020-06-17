@@ -33,7 +33,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function at(int $index): PageInterface
+    public function at(int $index): PaginatablePageInterface
     {
         return new Page(new \EmptyIterator(), $index, $this);
     }
@@ -46,7 +46,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function firstPage(): PageInterface
+    public function firstPage(): PaginatablePageInterface
     {
         return $this->at(0);
     }
@@ -54,7 +54,7 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function lastPage(): PageInterface
+    public function lastPage(): PaginatablePageInterface
     {
         return $this->at(0);
     }

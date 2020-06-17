@@ -36,7 +36,7 @@ class PrecountPaginatorTest extends TestCase
                 [20, 10, new \ArrayIterator($results[2])],
             ]));
 
-        $paginator = new PrecountPaginator($itemsFetcher, $perPage, $totalItems);
+        $paginator = new PrecountPaginator($perPage, $totalItems, $itemsFetcher);
 
         $this->assertSame($results[0], iterator_to_array($paginator->firstPage()));
         $this->assertSame($results[2], iterator_to_array($paginator->lastPage()));
