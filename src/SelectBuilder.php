@@ -7,6 +7,7 @@ namespace Emonkak\Orm;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
+use Emonkak\Orm\Pagination\PageInterface;
 use Emonkak\Orm\Pagination\PaginatorInterface;
 use Emonkak\Orm\Pagination\PrecountPaginator;
 use Emonkak\Orm\Pagination\SequentialPage;
@@ -514,9 +515,9 @@ class SelectBuilder implements QueryBuilderInterface
     /**
      * @template T
      * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-return SequentialPage<T>
+     * @psalm-return PageInterface<T>
      */
-    public function paginateFrom(FetcherInterface $fetcher, int $initialIndex, int $perPage): SequentialPage
+    public function paginateFrom(FetcherInterface $fetcher, int $initialIndex, int $perPage): PageInterface
     {
         $itemsFetcher = function(int $offset, int $limit) use ($fetcher): array {
             return $this
