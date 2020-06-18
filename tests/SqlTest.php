@@ -64,8 +64,8 @@ class SqlTest extends TestCase
 
     public function testAnd(): void
     {
-        $query = Sql::_and(
-            Sql::_or(
+        $query = Sql::and(
+            Sql::or(
                 new Sql('foo = ?', [1]),
                 new Sql('bar = ?', [2])
             ),

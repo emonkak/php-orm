@@ -83,7 +83,7 @@ class DeleteBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::and($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -97,7 +97,7 @@ class DeleteBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::or($this->where, $condition) : $condition;
         return $cloned;
     }
 

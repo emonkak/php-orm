@@ -76,7 +76,7 @@ class Sql implements QueryBuilderInterface
         return new Sql($sql, $values);
     }
 
-    public static function _and(Sql $lhs, Sql ...$rest): self
+    public static function and(Sql $lhs, Sql ...$rest): self
     {
         $tmpSql = $lhs->sql;
         $tmpBindings = [$lhs->bindings];
@@ -91,7 +91,7 @@ class Sql implements QueryBuilderInterface
         return new Sql($tmpSql, $bindings);
     }
 
-    public static function _or(Sql $lhs, Sql ...$rest): self
+    public static function or(Sql $lhs, Sql ...$rest): self
     {
         $tmpSql = $lhs->sql;
         $tmpBindings = [$lhs->bindings];

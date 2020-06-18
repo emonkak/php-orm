@@ -275,7 +275,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? Sql::_and($this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::and($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -289,7 +289,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->where = $this->where ? Sql::_or($this->where, $condition) : $condition;
+        $cloned->where = $this->where ? Sql::or($this->where, $condition) : $condition;
         return $cloned;
     }
 
@@ -348,7 +348,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->having = $this->having ? Sql::_and($this->having, $condition) : $condition;
+        $cloned->having = $this->having ? Sql::and($this->having, $condition) : $condition;
         return $cloned;
     }
 
@@ -362,7 +362,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
-        $cloned->having = $this->having ? Sql::_or($this->having, $condition) : $condition;
+        $cloned->having = $this->having ? Sql::or($this->having, $condition) : $condition;
         return $cloned;
     }
 
