@@ -10,7 +10,7 @@ use Emonkak\Orm\ResultSet\FunctionResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @template T of object
+ * @template T
  * @implements FetcherInterface<T>
  */
 class FunctionFetcher implements FetcherInterface
@@ -26,8 +26,8 @@ class FunctionFetcher implements FetcherInterface
     private $pdo;
 
     /**
-     * @psalm-var class-string<T>
-     * @var callable
+     * @psalm-var ?class-string<T>
+     * @var ?string
      */
     private $class;
 
@@ -59,10 +59,10 @@ class FunctionFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-param class-string<T> $class
+     * @psalm-param ?class-string<T> $class
      * @psalm-param callable(array<string,mixed>):T $instantiator
      */
-    public function __construct(PDOInterface $pdo, string $class, callable $instantiator)
+    public function __construct(PDOInterface $pdo, ?string $class, callable $instantiator)
     {
         $this->pdo = $pdo;
         $this->class = $class;
@@ -96,6 +96,6 @@ class FunctionFetcher implements FetcherInterface
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $stmt = $queryBuilder->prepare($this->pdo);
-        return new FunctionResultSet($stmt, $this->class, $this->instantiator);
+        return new FunctionResultSet($stmt, $this->instantiator);
     }
 }

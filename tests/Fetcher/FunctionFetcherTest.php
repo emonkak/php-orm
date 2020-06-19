@@ -61,7 +61,6 @@ class FunctionFetcherTest extends TestCase
         $result = $fetcher->fetch($queryBuilder);
 
         $this->assertInstanceOf(FunctionResultSet::class, $result);
-        $this->assertEquals($class, $result->getClass());
         $this->assertEquals($instantiator, $result->getInstantiator());
     }
 }

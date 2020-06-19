@@ -24,34 +24,18 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     private $stmt;
 
     /**
-     * @psalm-var ?class-string<T>
-     * @var ?class-string
-     */
-    private $class;
-
-    /**
      * @psalm-var callable(array<string,mixed>):T
      * @var callable
      */
     private $instantiator;
 
     /**
-     * @psalm-param ?class-string<T> $class
      * @psalm-param callable(array<string,mixed>):T $instantiator
      */
-    public function __construct(PDOStatementInterface $stmt, ?string $class, callable $instantiator)
+    public function __construct(PDOStatementInterface $stmt, callable $instantiator)
     {
         $this->stmt = $stmt;
-        $this->class = $class;
         $this->instantiator = $instantiator;
-    }
-
-    /**
-     * @psalm-return ?class-string<T>
-     */
-    public function getClass(): ?string
-    {
-        return $this->class;
     }
 
     /**
