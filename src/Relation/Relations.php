@@ -21,7 +21,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
@@ -78,7 +78,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param ?class-string $collationClass
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -149,7 +149,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -221,7 +221,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -293,7 +293,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
@@ -350,7 +350,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
      */
@@ -407,7 +407,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param callable(TKey):string $cacheKeySelector
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -476,7 +476,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param ?class-string<TInner> $innerClass
      * @psalm-param TInner[] $innerElements
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -529,7 +529,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param ?class-string<TInner> $innerClass
      * @psalm-param TInner[] $innerElements
      * @psalm-param ?class-string $collationClass
@@ -596,7 +596,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-param ?class-string $collationClass
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
@@ -678,7 +678,7 @@ final class Relations
     /**
      * @template TOuter
      * @template TInner
-     * @template TKey of ?scalar
+     * @template TKey
      * @template TThroughKey
      * @psalm-param FetcherInterface<TInner> $fetcher
      * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>

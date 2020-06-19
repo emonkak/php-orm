@@ -95,33 +95,27 @@ abstract class AbstractGrammar implements GrammarInterface
     {
         switch (func_num_args()) {
             case 1:
-                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 return $this->lift($arg1);
 
             case 2:
                 /** @psalm-var string */
                 $operator = $arg1;
-                /** @psalm-var QueryBuilderInterface|Sql|string $arg2 */
+                /** @psalm-var mixed $arg2 */
                 $rhs = $this->lift($arg2);
                 return $this->unaryOperator($operator, $rhs);
 
             case 3:
                 /** @psalm-var string */
                 $operator = $arg2;
-                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
-                /** @psalm-var scalar|scalar[]|null $arg3 */
                 $rhs = $this->value($arg3);
                 return $this->operator($operator, $lhs, $rhs);
 
             default:
                 /** @psalm-var string */
                 $operator = $arg2;
-                /** @psalm-var QueryBuilderInterface|Sql|string $arg1 */
                 $lhs = $this->lift($arg1);
-                /** @psalm-var scalar|scalar[]|null $arg3 */
                 $start = $this->value($arg3);
-                /** @psalm-var scalar|scalar[]|null $arg4 */
                 $end = $this->value($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);
         }
