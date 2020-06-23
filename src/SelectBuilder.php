@@ -475,7 +475,7 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @return ?scalar
+     * @return mixed
      */
     public function aggregate(PDOInterface $pdo, string $expr)
     {

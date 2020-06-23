@@ -10,7 +10,7 @@ use Emonkak\Orm\ResultSet\ColumnResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @implements FetcherInterface<?scalar>
+ * @implements FetcherInterface<mixed>
  */
 class ColumnFetcher implements FetcherInterface
 {

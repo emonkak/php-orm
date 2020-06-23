@@ -34,7 +34,7 @@ trait Aggregatable
     }
 
     /**
-     * @return ?scalar
+     * @return mixed
      */
     abstract public function aggregate(PDOInterface $pdo, string $expr);
 }
