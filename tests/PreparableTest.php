@@ -21,6 +21,12 @@ class PreparableTest extends TestCase
             'SELECT * FROM t1 WHERE c1 = ? AND c2 = ? AND c3 = ?',
             ['foo', 123, true, null]
         );
+        $expectedBindValues = [
+            [1, 'foo', \PDO::PARAM_STR],
+            [2, 123, \PDO::PARAM_INT],
+            [3, true, \PDO::PARAM_BOOL],
+            [4, null, \PDO::PARAM_NULL],
+        ];
 
         $preparable = $this->getMockForTrait(Preparable::class);
         $preparable
@@ -32,13 +38,10 @@ class PreparableTest extends TestCase
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 'foo', \PDO::PARAM_STR],
-                [2, 123, \PDO::PARAM_INT],
-                [3, true, \PDO::PARAM_BOOL],
-                [4, null, \PDO::PARAM_NULL]
-            )
-            ->willReturn(true);
+            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
+                $this->assertSame(array_shift($expectedBindValues), $args);
+                return true;
+            });
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -105,6 +108,12 @@ class PreparableTest extends TestCase
             'SELECT * FROM t1 WHERE c1 = ? AND c2 = ? AND c3 = ?',
             ['foo', 123, true, null]
         );
+        $expectedBindValues = [
+            [1, 'foo', \PDO::PARAM_STR],
+            [2, 123, \PDO::PARAM_INT],
+            [3, true, \PDO::PARAM_BOOL],
+            [4, null, \PDO::PARAM_NULL],
+        ];
 
         $preparable = $this->getMockForTrait(Preparable::class);
         $preparable
@@ -116,13 +125,10 @@ class PreparableTest extends TestCase
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 'foo', \PDO::PARAM_STR],
-                [2, 123, \PDO::PARAM_INT],
-                [3, true, \PDO::PARAM_BOOL],
-                [4, null, \PDO::PARAM_NULL]
-            )
-            ->willReturn(true);
+            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
+                $this->assertSame(array_shift($expectedBindValues), $args);
+                return true;
+            });
         $stmt
             ->expects($this->once())
             ->method('execute')

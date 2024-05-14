@@ -63,17 +63,20 @@ class ManyToTest extends TestCase
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = $this->createMock(ResultSetInterface::class);
+        $expectedBindValues = [
+            [1, 1, \PDO::PARAM_INT],
+            [2, 2, \PDO::PARAM_INT],
+            [3, 3, \PDO::PARAM_INT],
+        ];
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 2, \PDO::PARAM_INT],
-                [3, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
+                $this->assertSame(array_shift($expectedBindValues), $args);
+                return true;
+            });
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo

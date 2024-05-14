@@ -16,15 +16,9 @@ class AbstractPaginatorTest extends TestCase
 {
     public function testGetIterator(): void
     {
-        $paginator = $this->getMockForAbstractClass(
-            AbstractPaginator::class,
-            [],
-            '',
-            true,
-            true,
-            true,
-            ['getTotalPages']
-        );
+        $paginator = $this->getMockBuilder(AbstractPaginator::class)
+            ->onlyMethods(['at', 'getPerPage', 'getTotalItems'])
+            ->getMock();
 
         $pages = [
             new Page(new \ArrayIterator([['foo' => 123]]), 0, $paginator),
@@ -34,16 +28,20 @@ class AbstractPaginatorTest extends TestCase
 
         $paginator
             ->expects($this->once())
-            ->method('getTotalPages')
-            ->willReturn(3);
+            ->method('getTotalItems')
+            ->willReturn(30);
+        $paginator
+            ->expects($this->once())
+            ->method('getPerPage')
+            ->willReturn(10);
         $paginator
             ->expects($this->exactly(3))
             ->method('at')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [0, $pages[0]],
                 [1, $pages[1]],
                 [2, $pages[2]],
-            ]));
+            ]);
 
         $this->assertEquals([['foo' => 123], ['bar' => 456], ['baz' => 789]], iterator_to_array($paginator));
     }
@@ -51,37 +49,35 @@ class AbstractPaginatorTest extends TestCase
     /**
      * @dataProvider providerHas
      */
-    public function testHas($index, $totalPages, $expectedResult): void
+    public function testHas(int $index, int $totalItems, int $perPage, bool $expectedResult): void
     {
-        $paginator = $this->getMockForAbstractClass(
-            AbstractPaginator::class,
-            [],
-            '',
-            true,
-            true,
-            true,
-            ['getTotalPages']
-        );
+        $paginator = $this->getMockBuilder(AbstractPaginator::class)
+            ->onlyMethods(['at', 'getPerPage', 'getTotalItems'])
+            ->getMock();
         $paginator
             ->expects($this->once())
-            ->method('getTotalPages')
-            ->willReturn($totalPages);
+            ->method('getTotalItems')
+            ->willReturn($totalItems);
+        $paginator
+            ->expects($this->once())
+            ->method('getPerPage')
+            ->willReturn($perPage);
 
         $this->assertSame($expectedResult, $paginator->has($index));
     }
 
-    public function providerHas(): array
+    public static function providerHas(): array
     {
         return [
-            [0, 0, false],
-            [0, 1, true],
-            [1, 1, false],
-            [2, 1, false],
-            [0, 10, true],
-            [1, 10, true],
-            [9, 10, true],
-            [10, 10, false],
-            [11, 10, false],
+            [0, 0, 10, false],
+            [0, 10, 10, true],
+            [1, 10, 10, false],
+            [2, 10, 10, false],
+            [0, 100, 10, true],
+            [1, 100, 10, true],
+            [9, 100, 10, true],
+            [10, 100, 10, false],
+            [11, 100, 10, false],
         ];
     }
 
@@ -89,7 +85,9 @@ class AbstractPaginatorTest extends TestCase
     {
         $page = $this->createMock(PaginatablePageInterface::class);
 
-        $paginator = $this->getMockForAbstractClass(AbstractPaginator::class);
+        $paginator = $this->getMockBuilder(AbstractPaginator::class)
+            ->onlyMethods(['at', 'getPerPage', 'getTotalItems'])
+            ->getMock();
         $paginator
             ->expects($this->once())
             ->method('at')
@@ -103,18 +101,16 @@ class AbstractPaginatorTest extends TestCase
     {
         $page = $this->createMock(PaginatablePageInterface::class);
 
-        $paginator = $this->getMockForAbstractClass(
-            AbstractPaginator::class,
-            [],
-            '',
-            false,
-            false,
-            false,
-            ['getTotalPages']
-        );
+        $paginator = $this->getMockBuilder(AbstractPaginator::class)
+            ->onlyMethods(['at', 'getPerPage', 'getTotalItems'])
+            ->getMock();
         $paginator
             ->expects($this->once())
-            ->method('getTotalPages')
+            ->method('getTotalItems')
+            ->willReturn(100);
+        $paginator
+            ->expects($this->once())
+            ->method('getPerPage')
             ->willReturn(10);
         $paginator
             ->expects($this->once())
@@ -128,17 +124,11 @@ class AbstractPaginatorTest extends TestCase
     /**
      * @dataProvider providerGetNumPages
      */
-    public function testGetNumPages($totalItems, $perPage, $expected): void
+    public function testGetNumPages(int $totalItems, int $perPage, int $expectedTotalPages): void
     {
-        $paginator = $this->getMockForAbstractClass(
-            AbstractPaginator::class,
-            [],
-            '',
-            true,
-            true,
-            true,
-            ['getTotalItems']
-        );
+        $paginator = $this->getMockBuilder(AbstractPaginator::class)
+            ->onlyMethods(['at', 'getPerPage', 'getTotalItems'])
+            ->getMock();
         $paginator
             ->expects($this->once())
             ->method('getTotalItems')
@@ -148,10 +138,10 @@ class AbstractPaginatorTest extends TestCase
             ->method('getPerPage')
             ->willReturn($perPage);
 
-        $this->assertSame($expected, $paginator->getTotalPages());
+        $this->assertSame($expectedTotalPages, $paginator->getTotalPages());
     }
 
-    public function providerGetNumPages(): array
+    public static function providerGetNumPages(): array
     {
         return [
             [0, 10, 0],

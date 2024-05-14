@@ -8,6 +8,10 @@ class Entity
 {
     private $foo;
 
+    public $__foo;
+
+    public $__pivot_foo;
+
     public function getFoo()
     {
         return $this->foo;

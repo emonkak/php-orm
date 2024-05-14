@@ -59,7 +59,7 @@ class LazyCollection implements LazyCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         $source = $this->get();
         return isset($source[$offset]);
@@ -68,7 +68,7 @@ class LazyCollection implements LazyCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         $source = $this->get();
         return $source[$offset];
@@ -78,7 +78,7 @@ class LazyCollection implements LazyCollectionInterface
      * {@inheritdoc}
      * @psalm-param array-key|null $offset
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, $value): void
     {
         $this->get();
         if ($offset !== null) {
@@ -91,7 +91,7 @@ class LazyCollection implements LazyCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $this->get();
         unset($this->source[$offset]);
@@ -109,7 +109,7 @@ class LazyCollection implements LazyCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         $source = $this->get();
         return count($source);

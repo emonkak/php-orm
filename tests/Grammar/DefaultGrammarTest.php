@@ -29,7 +29,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerOperator
      */
-    public function testOperator($operator, $lhsSql, array $lhsBindings, $rhsSql, array $rhsBindings, $expectedSql, array $expectedBindings): void
+    public function testOperator(string $operator, string $lhsSql, array $lhsBindings, string $rhsSql, array $rhsBindings, string $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $rhs = new Sql($rhsSql, $rhsBindings);
@@ -43,7 +43,7 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function providerOperator()
+    public static function providerOperator(): array
     {
         return [
             ['=', 'c1', [], '?', ['foo'], '(c1 = ?)', ['foo']],
@@ -74,7 +74,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerUnaryOperator
      */
-    public function testUnaryOperator($operator, $lhsSql, array $lhsBindings, $expectedSql, array $expectedBindings): void
+    public function testUnaryOperator(string $operator, string $lhsSql, array $lhsBindings, string $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
 
@@ -87,7 +87,7 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function providerUnaryOperator()
+    public static function providerUnaryOperator(): array
     {
         return [
             ['NOT', 'c1', [], '(NOT c1)', []],
@@ -112,7 +112,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerBetweenOperator
      */
-    public function testBetweenOperator($operator, $lhsSql, array $lhsBindings, $startSql, array $startBindings, $endSql, array $endBindings, $expectedSql, array $expectedBindings): void
+    public function testBetweenOperator(string $operator, string $lhsSql, array $lhsBindings, string $startSql, array $startBindings, string $endSql, array $endBindings, string $expectedSql, array $expectedBindings): void
     {
         $lhs = new Sql($lhsSql, $lhsBindings);
         $start = new Sql($startSql, $startBindings);
@@ -127,7 +127,7 @@ class DefaultGrammarTest extends TestCase
         );
     }
 
-    public function providerBetweenOperator()
+    public static function providerBetweenOperator(): array
     {
         return [
             ['BETWEEN', 'c1', [], '?', [123], '?', [456], '(c1 BETWEEN ? AND ?)', [123, 456]],
@@ -220,7 +220,7 @@ class DefaultGrammarTest extends TestCase
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    public function providerCompileSelect()
+    public static function providerCompileSelect(): array
     {
         return [
             [
@@ -280,14 +280,14 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileInsert
      */
-    public function testCompileInsert($prefix, $table, array $columns, array $values, Sql $select = null, $expectedSql, array $expectedBindings): void
+    public function testCompileInsert(string $prefix, string $table, array $columns, array $values, ?Sql $select, string $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->insertStatement($prefix, $table, $columns, $values, $select);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    public function providerCompileInsert()
+    public static function providerCompileInsert(): array
     {
         return [
             [
@@ -314,14 +314,14 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileUpdate
      */
-    public function testCompileUpdate($prefix, $table, array $update, Sql $where = null, $expectedSql, array $expectedBindings): void
+    public function testCompileUpdate(string $prefix, string $table, array $update, ?Sql $where, string $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->updateStatement($prefix, $table, $update, $where);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    public function providerCompileUpdate()
+    public static function providerCompileUpdate(): array
     {
         return [
             [
@@ -346,14 +346,14 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileDelete
      */
-    public function testCompileDelete($prefix, $from, Sql $where = null, $expectedSql, array $expectedBindings): void
+    public function testCompileDelete(string $prefix, string $from, Sql $where = null, $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->deleteStatement($prefix, $from, $where);
         $this->assertEquals($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    public function providerCompileDelete()
+    public static function providerCompileDelete(): array
     {
         return [
             [

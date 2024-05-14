@@ -16,6 +16,8 @@ class FunctionResultSetTest extends TestCase
 {
     private $stmt;
 
+    private $instantiator;
+
     private $result;
 
     public function setUp(): void

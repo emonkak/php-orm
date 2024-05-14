@@ -8,10 +8,9 @@ use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @template T
- * @implements \IteratorAggregate<T>
  * @implements PageInterface<T>
  */
-abstract class AbstractPage implements \IteratorAggregate, PageInterface
+abstract class AbstractPage implements PageInterface
 {
     /**
      * @use EnumerableExtensions<T>

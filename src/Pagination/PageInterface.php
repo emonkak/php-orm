@@ -9,8 +9,9 @@ use Emonkak\Enumerable\EnumerableInterface;
 /**
  * @template T
  * @extends EnumerableInterface<T>
+ * @extends \IteratorAggregate<T>
  */
-interface PageInterface extends EnumerableInterface
+interface PageInterface extends \IteratorAggregate, EnumerableInterface
 {
     public function getPerPage(): int;
 

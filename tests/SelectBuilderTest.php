@@ -761,6 +761,10 @@ class SelectBuilderTest extends TestCase
         $totalItems = 21;
 
         $expectedResult = array_fill(0, 10, new \stdClass());
+        $expectedBindValues = [
+            [1, $perPage, \PDO::PARAM_INT],
+            [2, 0, \PDO::PARAM_INT]
+        ];
 
         $stmt1 = $this->createMock(PDOStatementInterface::class);
         $stmt1
@@ -776,24 +780,25 @@ class SelectBuilderTest extends TestCase
         $stmt2
             ->expects($this->exactly(2))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, $perPage, \PDO::PARAM_INT],
-                [2, 0, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
+                $this->assertSame(array_shift($expectedBindValues), $args);
+                return true;
+            });
+
+        $expectedQueries = [
+            ['SELECT COUNT(*) FROM t1', []],
+            ['SELECT * FROM t1 ORDER BY t1.id LIMIT ? OFFSET ?', []],
+        ];
+        $expectedStmts = [$stmt1, $stmt2];
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
-            ->expects($this->exactly(2))
+            ->expects($matcher = $this->exactly(2))
             ->method('prepare')
-            ->withConsecutive(
-                ['SELECT COUNT(*) FROM t1'],
-                ['SELECT * FROM t1 ORDER BY t1.id LIMIT ? OFFSET ?']
-            )
-            ->will($this->onConsecutiveCalls(
-                $stmt1,
-                $stmt2
-            ));
+            ->willReturnCallback(function(...$args) use (&$expectedQueries, &$expectedStmts) {
+                $this->assertSame(array_shift($expectedQueries), $args);
+                return array_shift($expectedStmts);
+            });
 
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
@@ -803,10 +808,10 @@ class SelectBuilderTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+            ->willReturnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($expectedResult);
-            }));
+            });
 
         $paginator = $this->getSelectBuilder()
             ->from('t1')
@@ -828,16 +833,19 @@ class SelectBuilderTest extends TestCase
 
         $result = array_fill(0, 11, new \stdClass());
         $expectedResult = array_slice($result, 0, $perPage);
+        $expectedBindValues = [
+            [1, 11, \PDO::PARAM_INT],
+            [2, 10, \PDO::PARAM_INT],
+        ];
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 11, \PDO::PARAM_INT],
-                [2, 10, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
+                $this->assertSame(array_shift($expectedBindValues), $args);
+                return true;
+            });
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -850,10 +858,10 @@ class SelectBuilderTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $result) {
+            ->willReturnCallback(function($queryBuilder) use ($pdo, $result) {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($result);
-            }));
+            });
 
         $sequentialPage = $this->getSelectBuilder()
             ->from('t1')

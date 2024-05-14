@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Pagination;
 
 use Emonkak\Orm\Pagination\PrecountPaginator;
+use Emonkak\Orm\Tests\Fixtures\Spy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,18 +24,15 @@ class PrecountPaginatorTest extends TestCase
             array_fill(0, 1, new \stdClass()),
         ];
 
-        $itemsFetcher = $this
-            ->getMockBuilder(\stdClass::class)
-            ->setMethods(['__invoke'])
-            ->getMock();
+        $itemsFetcher = $this->createMock(Spy::class);
         $itemsFetcher
             ->expects($this->any())
             ->method('__invoke')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [0, 10, new \ArrayIterator($results[0])],
                 [10, 10, new \ArrayIterator($results[1])],
                 [20, 10, new \ArrayIterator($results[2])],
-            ]));
+            ]);
 
         $paginator = new PrecountPaginator($perPage, $totalItems, $itemsFetcher);
 

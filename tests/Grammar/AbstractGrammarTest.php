@@ -6,6 +6,8 @@ namespace Emonkak\Orm\Tests;
 
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\Grammar\AbstractGrammar;
+use Emonkak\Orm\Grammar\DefaultGrammar;
+use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\InsertBuilder;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
@@ -22,7 +24,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetSelect(): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'getSelectBuilder',
+            ]))
+            ->getMock();
         $queryBuilder = $grammar->getSelectBuilder();
 
         $this->assertInstanceOf(SelectBuilder::class, $queryBuilder);
@@ -31,7 +37,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetInsert(): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'getInsertBuilder',
+            ]))
+            ->getMock();
         $queryBuilder = $grammar->getInsertBuilder();
 
         $this->assertInstanceOf(InsertBuilder::class, $queryBuilder);
@@ -40,7 +50,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetUpdate(): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'getUpdateBuilder',
+            ]))
+            ->getMock();
         $queryBuilder = $grammar->getUpdateBuilder();
 
         $this->assertInstanceOf(UpdateBuilder::class, $queryBuilder);
@@ -49,7 +63,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetDelete(): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'getDeleteBuilder',
+            ]))
+            ->getMock();
         $queryBuilder = $grammar->getDeleteBuilder();
 
         $this->assertInstanceOf(DeleteBuilder::class, $queryBuilder);
@@ -59,35 +77,43 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerLift
      */
-    public function testLift($value, $expectedSql, array $expectedBindings): void
+    public function testLift(mixed $value, $expectedSql, array $expectedBindings): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'lift',
+            ]))
+            ->getMock();
         $query = $grammar->lift($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerLift()
+    public static function providerLift(): array
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [(new SelectBuilder(new DefaultGrammar()))->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             ['foo', 'foo', []],
         ];
     }
 
     /**
-     * @dataProvider providerExprThrowsUnexpectedValueException
+     * @dataProvider providerLiftThrowsUnexpectedValueException
      */
-    public function testExprThrowsUnexpectedValueException($value): void
+    public function testLiftThrowsUnexpectedValueException(mixed $value): void
     {
         $this->expectException(\UnexpectedValueException::class);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'lift',
+            ]))
+            ->getMock();
         $grammar->lift($value);
     }
 
-    public function providerExprThrowsUnexpectedValueException()
+    public static function providerLiftThrowsUnexpectedValueException(): array
     {
         return [
             [123],
@@ -103,19 +129,23 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerValue
      */
-    public function testValue($value, $expectedSql, array $expectedBindings): void
+    public function testValue(mixed $value, string $expectedSql, array $expectedBindings): void
     {
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'value',
+            ]))
+            ->getMock();
         $query = $grammar->value($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
 
-    public function providerValue()
+    public static function providerValue(): array
     {
         return [
             [new Sql('?', ['foo']), '?', ['foo']],
-            [$this->getSelectBuilder()->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
+            [(new SelectBuilder(new DefaultGrammar()))->from('t1')->where('c1', '=', 'foo'), '(SELECT * FROM t1 WHERE (c1 = ?))', ['foo']],
             [new Id(123), '?', ['123']],
             ['foo', '?', ['foo']],
             [123, '?', [123]],
@@ -130,15 +160,21 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerValueThrowsUnexpectedValueException
      */
-    public function testValueThrowsUnexpectedValueException($value): void
+    public function testValueThrowsUnexpectedValueException(mixed $value): void
     {
         $this->expectException(\UnexpectedValueException::class);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'condition',
+                'lift',
+                'value',
+            ]))
+            ->getMock();
         $grammar->value($value);
     }
 
-    public function providerValueThrowsUnexpectedValueException()
+    public static function providerValueThrowsUnexpectedValueException(): array
     {
         return [
             [new \stdClass()],
@@ -150,7 +186,13 @@ class AbstractGrammarTest extends TestCase
         $expr = 'SELECT 1';
         $expectedQuery = new Sql('SELECT 1');
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'condition',
+                'lift',
+                'value',
+            ]))
+            ->getMock();
 
         $this->assertEquals($expectedQuery, $grammar->condition($expr));
     }
@@ -162,7 +204,13 @@ class AbstractGrammarTest extends TestCase
         $lhs = new Sql($lhsExpr);
         $expectedQuery = new Sql('EXISTS (SELECT 1)');
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'condition',
+                'lift',
+                'value',
+            ]))
+            ->getMock();
         $grammar
             ->expects($this->any())
             ->method('unaryOperator')
@@ -181,7 +229,13 @@ class AbstractGrammarTest extends TestCase
         $rhs = new Sql('?', [$rhsExpr]);
         $expectedQuery = new Sql('c1 = ?', [123]);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'condition',
+                'lift',
+                'value',
+            ]))
+            ->getMock();
         $grammar
             ->expects($this->any())
             ->method('operator')
@@ -202,7 +256,13 @@ class AbstractGrammarTest extends TestCase
         $end = new Sql('?', [$endExpr]);
         $expectedQuery = new Sql('c1 BETWEEN ? AND ?', [123, 456]);
 
-        $grammar = $this->getMockForAbstractClass(AbstractGrammar::class);
+        $grammar = $this->getMockBuilder(AbstractGrammar::class)
+            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+                'condition',
+                'lift',
+                'value',
+            ]))
+            ->getMock();
         $grammar
             ->expects($this->any())
             ->method('betweenOperator')

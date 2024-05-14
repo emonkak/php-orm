@@ -21,7 +21,7 @@ class RelatableTest extends TestCase
         $class = \stdClass::class;
 
         $relatable = $this->getMockBuilder(RelatableMock::class)
-            ->setMethodsExcept(['with'])
+            ->onlyMethods(['getClass', 'getPdo', 'fetch'])
             ->getMock();
         $relatable
             ->expects($this->once())
@@ -51,7 +51,7 @@ class RelatableTest extends TestCase
         $relation = $this->createMock(RelationInterface::class);
 
         $relatable = $this->getMockBuilder(RelatableMock::class)
-            ->setMethodsExcept(['withRelation'])
+            ->onlyMethods(['getClass', 'getPdo', 'fetch'])
             ->getMock();
 
         $relationFetcher = $relatable->withRelation($relation);
