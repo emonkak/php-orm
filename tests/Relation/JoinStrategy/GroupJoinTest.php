@@ -38,12 +38,14 @@ class GroupJoinTest extends TestCase
             $talents[4] + ['programs' => [$programs[5]]],
         ];
 
-        $outerKeySelector = function($talent) { return $talent['talent_id']; };
-        $innerKeySelector = function($program) { return $program['talent_id']; };
-        $resultSelector = function($talent, $programs) {
+        // Test whether IDs of different types can be joined.
+        $outerKeySelector = function(array $talent): int { return $talent['talent_id']; };
+        $innerKeySelector = function(array $program): string { return $program['talent_id']; };
+        $resultSelector = function(array $talent, array $programs): array {
             $talent['programs'] = $programs;
             return $talent;
         };
+        /** @var LooseEqualityComparer<mixed> */
         $comparer = LooseEqualityComparer::getInstance();
         $groupJoin = new GroupJoin(
             $outerKeySelector,

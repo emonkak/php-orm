@@ -23,23 +23,22 @@ trait Preparable
         foreach ($query->getBindings() as $index => $binding) {
             $type = gettype($binding);
             switch ($type) {
-            case 'boolean':
-                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_BOOL);
-                break;
-            case 'integer':
-                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_INT);
-                break;
-            case 'double':
-            case 'string':
-                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_STR);
-                break;
-            case 'NULL':
-                $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
-                break;
-            default:
-                /** @psalm-var mixed $binding */
-                $typeOrClass = is_object($binding) ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
-                throw new \UnexpectedValueException("The value should be a bindable type. but got '$typeOrClass'.");
+                case 'boolean':
+                    $stmt->bindValue($index + 1, $binding, \PDO::PARAM_BOOL);
+                    break;
+                case 'integer':
+                    $stmt->bindValue($index + 1, $binding, \PDO::PARAM_INT);
+                    break;
+                case 'double':
+                case 'string':
+                    $stmt->bindValue($index + 1, $binding, \PDO::PARAM_STR);
+                    break;
+                case 'NULL':
+                    $stmt->bindValue($index + 1, $binding, \PDO::PARAM_NULL);
+                    break;
+                default:
+                    $typeOrClass = is_object($binding) ? get_class($binding) : $type;  // @phan-suppress-current-line PhanTypeMismatchArgumentInternal
+                    throw new \UnexpectedValueException("The value should be a bindable type. but got '$typeOrClass'.");
             }
         }
 

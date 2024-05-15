@@ -20,24 +20,24 @@ interface PageInterface extends \IteratorAggregate, EnumerableInterface
     public function getOffset(): int;
 
     /**
-     * @psalm-return self<T>
+     * @return self<T>
      */
     public function next(): self;
 
     /**
-     * @psalm-return self<T>
+     * @return self<T>
      */
     public function previous(): self;
 
     /**
-     * @psalm-return iterable<self<T>>
+     * @return \Traversable<self<T>>
      */
-    public function forward(): iterable;
+    public function forward(): \Traversable;
 
     /**
-     * @psalm-return iterable<self<T>>
+     * @return \Traversable<self<T>>
      */
-    public function backward(): iterable;
+    public function backward(): \Traversable;
 
     public function hasPrevious(): bool;
 

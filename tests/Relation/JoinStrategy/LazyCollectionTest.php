@@ -13,52 +13,63 @@ use PHPUnit\Framework\TestCase;
  */
 class LazyCollectionTest extends TestCase
 {
+    /**
+     * @psalm-suppress DocblockTypeContradiction
+     */
     public function testGet(): void
     {
         $key = new \stdClass();
         $source = ['foo', 'bar', 'baz'];
 
-        $evaluator = $this->createMock(Spy::class);
-        $evaluator
+        $spy = $this->createMock(Spy::class);
+        $spy
             ->expects($this->once())
             ->method('__invoke')
             ->with($this->identicalTo($key))
             ->willReturn($source);
 
-        $lazyCollection = new LazyCollection($key, $evaluator);
+        /** @var LazyCollection<string,\stdClass> */
+        $collection = new LazyCollection(
+            $key,
+            /**
+             * @return string[]
+             */
+            function(\stdClass $key) use ($spy): array {
+                return $spy->__invoke($key);
+            });
 
-        $this->assertSame($source, $lazyCollection->get());
-        $this->assertSame($source, iterator_to_array($lazyCollection));
-        $this->assertSame($source, unserialize(serialize($lazyCollection))->get());
-        $this->assertCount(count($source), $lazyCollection);
-        $this->assertTrue(isset($lazyCollection[0]));
-        $this->assertTrue(isset($lazyCollection[1]));
-        $this->assertTrue(isset($lazyCollection[2]));
-        $this->assertSame($source[0], $lazyCollection[0]);
-        $this->assertSame($source[1], $lazyCollection[1]);
-        $this->assertSame($source[2], $lazyCollection[2]);
+        $this->assertSame($source, $collection->get());
+        $this->assertSame($source, iterator_to_array($collection));
+        $this->assertSame($source, unserialize(serialize($collection))->get());
+        $this->assertCount(count($source), $collection);
+        $this->assertTrue(isset($collection[0]));
+        $this->assertTrue(isset($collection[1]));
+        $this->assertTrue(isset($collection[2]));
+        $this->assertSame('foo', $collection[0]);
+        $this->assertSame('bar', $collection[1]);
+        $this->assertSame('baz', $collection[2]);
 
-        $lazyCollection[0] = 'qux';
-        $lazyCollection[1] = 'quux';
-        $lazyCollection[2] = 'quuz';
-        $lazyCollection[] = 'gorge';
+        $collection[0] = 'qux';
+        $collection[1] = 'quux';
+        $collection[2] = 'quuz';
+        $collection[] = 'gorge';
 
-        $this->assertSame('qux', $lazyCollection[0]);
-        $this->assertSame('quux', $lazyCollection[1]);
-        $this->assertSame('quuz', $lazyCollection[2]);
-        $this->assertSame('gorge', $lazyCollection[3]);
+        $this->assertSame('qux', $collection[0]);
+        $this->assertSame('quux', $collection[1]);
+        $this->assertSame('quuz', $collection[2]);
+        $this->assertSame('gorge', $collection[3]);
 
-        unset($lazyCollection[0]);
-        unset($lazyCollection[1]);
-        unset($lazyCollection[2]);
-        unset($lazyCollection[3]);
+        unset($collection[0]);
+        unset($collection[1]);
+        unset($collection[2]);
+        unset($collection[3]);
 
-        $this->assertSame([], $lazyCollection->get());
-        $this->assertSame([], iterator_to_array($lazyCollection));
-        $this->assertSame([], unserialize(serialize($lazyCollection))->get());
-        $this->assertCount(0, $lazyCollection);
-        $this->assertFalse(isset($lazyCollection[0]));
-        $this->assertFalse(isset($lazyCollection[1]));
-        $this->assertFalse(isset($lazyCollection[2]));
+        $this->assertSame([], $collection->get());
+        $this->assertSame([], iterator_to_array($collection));
+        $this->assertSame([], unserialize(serialize($collection))->get());
+        $this->assertCount(0, $collection);
+        $this->assertFalse(isset($collection[0]));
+        $this->assertFalse(isset($collection[1]));
+        $this->assertFalse(isset($collection[2]));
     }
 }

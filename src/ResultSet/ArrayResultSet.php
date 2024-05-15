@@ -1,5 +1,7 @@
 <?php
 
+// NOTE: Do not enable "strict_types" to enable implicit type coercions.
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
@@ -7,30 +9,23 @@ use Emonkak\Enumerable\EnumerableExtensions;
 use Emonkak\Enumerable\Exception\NoSuchElementException;
 
 /**
- * @template T of array
- * @implements \IteratorAggregate<T>
- * @implements ResultSetInterface<T>
+ * @implements \IteratorAggregate<array<string,mixed>>
+ * @implements ResultSetInterface<array<string,mixed>>
  */
 class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
 {
     /**
-     * @use EnumerableExtensions<T>
+     * @use EnumerableExtensions<array<string,mixed>>
      */
     use EnumerableExtensions;
 
-    /**
-     * @var PDOStatementInterface
-     */
-    private $stmt;
+    private PDOStatementInterface $stmt;
 
     public function __construct(PDOStatementInterface $stmt)
     {
         $this->stmt = $stmt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         $this->stmt->execute();
@@ -38,23 +33,17 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         return $this->stmt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function first(callable $predicate = null)
+    public function first(?callable $predicate = null): mixed
     {
         $this->stmt->execute();
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
@@ -71,14 +60,11 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
         throw new NoSuchElementException('Sequence contains no elements');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    public function firstOrDefault(?callable $predicate = null, mixed $defaultValue = null): mixed
     {
         $this->stmt->execute();
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
@@ -92,7 +78,6 @@ class ArrayResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        /** @psalm-assert TDefault $defaultValue */
         return $defaultValue;
     }
 }

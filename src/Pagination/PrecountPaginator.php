@@ -10,24 +10,17 @@ namespace Emonkak\Orm\Pagination;
  */
 class PrecountPaginator extends AbstractPaginator
 {
-    /**
-     * @var int
-     */
-    private $perPage;
+    private int $perPage;
+
+    private int $totalItems;
 
     /**
-     * @var int
-     */
-    private $totalItems;
-
-    /**
-     * @psalm-var callable(int,int):\Traversable<T>
-     * @var callable(int,int):\Traversable
+     * @var callable(int,int):\Traversable<T>
      */
     private $itemsFetcher;
 
     /**
-     * @psalm-param callable(int,int):\Traversable<T> $itemsFetcher
+     * @param callable(int,int):\Traversable<T> $itemsFetcher
      */
     public function __construct(int $perPage, int $totalItems, callable $itemsFetcher)
     {
@@ -36,9 +29,6 @@ class PrecountPaginator extends AbstractPaginator
         $this->itemsFetcher = $itemsFetcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function at(int $index): PaginatablePageInterface
     {
         if ($index >= 0 && $index < $this->getTotalPages()) {

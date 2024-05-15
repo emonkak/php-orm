@@ -13,8 +13,8 @@ trait Fetchable
 {
     /**
      * @template TResult
-     * @psalm-param FetcherInterface<TResult> $fetcher
-     * @psalm-return ResultSetInterface<TResult>
+     * @param FetcherInterface<TResult> $fetcher
+     * @return ResultSetInterface<TResult>
      */
     public function getResult(FetcherInterface $fetcher): ResultSetInterface
     {

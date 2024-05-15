@@ -13,116 +13,117 @@ use PHPUnit\Framework\TestCase;
  */
 class ColumnResultSetTest extends TestCase
 {
-    private $stmt;
-
-    private $result;
-
-    public function setUp(): void
-    {
-        $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
-        $this->result = new ColumnResultSet($this->stmt, 1);
-    }
-
     public function testGetIterator(): void
     {
-        $expected = [['foo' => 123], ['foo' => 345]];
+        $expectedResult = [['foo' => 123], ['foo' => 345]];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new \ArrayIterator($expected));
+            ->willReturn(new \ArrayIterator($expectedResult));
+        $result = new ColumnResultSet($stmt, 1);
 
-        $this->assertSame($expected, iterator_to_array($this->result));
+        $this->assertSame($expectedResult, iterator_to_array($result));
     }
 
     public function testToColumn(): void
     {
-        $expected = [['foo' => 123], ['foo' => 345]];
+        $expectedResult = [['foo' => 123], ['foo' => 345]];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetchAll')
             ->with(\PDO::FETCH_COLUMN, 1)
-            ->willReturn($expected);
+            ->willReturn($expectedResult);
+        $result = new ColumnResultSet($stmt, 1);
 
-        $this->assertSame($expected, $this->result->toArray());
+        $this->assertSame($expectedResult, $result->toArray());
     }
 
     public function testFirst(): void
     {
-        $expected = ['foo' => 123, 'bar' => 345];
+        $expectedResult = ['foo' => 123, 'bar' => 345];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('fetch')
             ->with(\PDO::FETCH_COLUMN, 1)
-            ->willReturn($expected);
+            ->willReturn($expectedResult);
+        $result = new ColumnResultSet($stmt, 1);
 
-        $this->assertSame($expected, $this->result->first());
-        $this->assertSame($expected, $this->result->firstOrDefault());
+        $this->assertSame($expectedResult, $result->first());
+        $this->assertSame($expectedResult, $result->firstOrDefault());
     }
 
     public function testFirstThrowsRuntimeException(): void
     {
         $this->expectException(\RuntimeException::class);
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetch')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(false);
+        $result = new ColumnResultSet($stmt, 1);
 
-        $this->result->first();
+        $result->first();
     }
 
     public function testFirstOrDefaultReturnsDefaultValue(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetch')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(false);
+        $result = new ColumnResultSet($stmt, 1);
 
-        $this->assertNull($this->result->firstOrDefault());
+        $this->assertNull($result->firstOrDefault());
     }
 
     public function testFirstWithPredicate(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('setFetchMode')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -131,29 +132,31 @@ class ColumnResultSetTest extends TestCase
                 ['foo' => 3],
                 ['foo' => 4],
             ]));
+        $result = new ColumnResultSet($stmt, 1);
 
-        $predicate = function($value) {
+        $predicate = function(array $value): bool {
             return $value['foo'] % 2 === 0;
         };
 
-        $this->assertEquals(['foo' => 2], $this->result->first($predicate));
-        $this->assertEquals(['foo' => 2], $this->result->firstOrDefault($predicate));
+        $this->assertEquals(['foo' => 2], $result->first($predicate));
+        $this->assertEquals(['foo' => 2], $result->firstOrDefault($predicate));
     }
 
     public function testFirstWithPredicateThrowsRuntimeException(): void
     {
         $this->expectException(\RuntimeException::class);
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -162,26 +165,28 @@ class ColumnResultSetTest extends TestCase
                 ['foo' => 3],
                 ['foo' => 4],
             ]));
+        $result = new ColumnResultSet($stmt, 1);
 
-        $predicate = function($value) {
+        $predicate = function(mixed $value): bool {
             return false;
         };
 
-        $this->result->first($predicate);
+        $result->first($predicate);
     }
 
     public function testFirstOrDefaultWithPredicateReturnsDefaultValue(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_COLUMN, 1)
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -190,11 +195,12 @@ class ColumnResultSetTest extends TestCase
                 ['foo' => 3],
                 ['foo' => 4],
             ]));
+        $result = new ColumnResultSet($stmt, 1);
 
-        $predicate = function($value) {
+        $predicate = function(mixed $value): bool {
             return false;
         };
 
-        $this->assertNull($this->result->firstOrDefault($predicate));
+        $this->assertNull($result->firstOrDefault($predicate));
     }
 }

@@ -17,7 +17,9 @@ class ExplainableTest extends TestCase
 {
     public function testExplain(): void
     {
-        $explainable = $this->getMockForTrait(Explainable::class);
+        $explainable = $this->getMockBuilder(ExplainableMock::class)
+            ->onlyMethods(['build'])
+            ->getMock();
         $explainable
             ->expects($this->once())
             ->method('build')
@@ -44,4 +46,9 @@ class ExplainableTest extends TestCase
 
         $this->assertEquals($explainResult, $explainable->explain($pdo));
     }
+}
+
+abstract class ExplainableMock
+{
+    use Explainable;
 }

@@ -32,7 +32,9 @@ class UpdateBuilderTest extends TestCase
         $this->assertSame('UPDATE', $queryBuilder->getPrefix());
         $this->assertSame('t1', $queryBuilder->getTable());
         $this->assertEquals(['c1' => new Sql('?', [123])], $queryBuilder->getSet());
-        $this->assertQueryIs('(c2 = ?)', [456], $queryBuilder->getWhere());
+        $where = $queryBuilder->getWhere();
+        $this->assertNotNull($where);
+        $this->assertQueryIs('(c2 = ?)', [456], $where);
     }
 
     public function testPrefix(): void

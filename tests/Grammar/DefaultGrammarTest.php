@@ -18,6 +18,7 @@ class DefaultGrammarTest extends TestCase
 
     /**
      * @var DefaultGrammar
+     * @psalm-suppress PropertyNotSetInConstructor
      */
     private $grammar;
 
@@ -346,7 +347,7 @@ class DefaultGrammarTest extends TestCase
     /**
      * @dataProvider providerCompileDelete
      */
-    public function testCompileDelete(string $prefix, string $from, Sql $where = null, $expectedSql, array $expectedBindings): void
+    public function testCompileDelete(string $prefix, string $from, ?Sql $where, string $expectedSql, array $expectedBindings): void
     {
         $query = $this->grammar->deleteStatement($prefix, $from, $where);
         $this->assertEquals($expectedSql, $query->getSql());

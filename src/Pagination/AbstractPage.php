@@ -22,10 +22,7 @@ abstract class AbstractPage implements PageInterface
         return $this->getIndex() * $this->getPerPage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function forward(): iterable
+    public function forward(): \Traversable
     {
         $page = $this;
 
@@ -38,10 +35,7 @@ abstract class AbstractPage implements PageInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function backward(): iterable
+    public function backward(): \Traversable
     {
         $page = $this;
 

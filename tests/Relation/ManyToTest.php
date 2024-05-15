@@ -7,6 +7,7 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -22,39 +23,39 @@ class ManyToTest extends TestCase
 
     public function testConstructor(): void
     {
-        $relationKey = 'relation_key';
-        $oneToManyTable = 'one_to_many_table';
-        $oneToManyOuterKey = 'one_to_many_outer_key';
-        $oneToManyInnerKey = 'one_to_many_inner_key';
-        $manyToOneTable = 'many_to_one_table';
-        $manyToOneOuterKey = 'many_to_one_outer_key';
-        $manyToOneInnerKey = 'many_to_one_inner_key';
-        $pivotKey = 'pivot_key';
+        $relationKeyName = 'relation_key';
+        $oneToManyTableName = 'one_to_many_table';
+        $oneToManyOuterKeyName = 'one_to_many_outer_key';
+        $oneToManyInnerKeyName = 'one_to_many_inner_key';
+        $manyToOneTableName = 'many_to_one_table';
+        $manyToOneOuterKeyName = 'many_to_one_outer_key';
+        $manyToOneInnerKeyName = 'many_to_one_inner_key';
+        $pivotKeyName = 'pivot_key';
 
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
 
         $relation = new ManyTo(
-            $relationKey,
-            $oneToManyTable,
-            $oneToManyOuterKey,
-            $oneToManyInnerKey,
-            $manyToOneTable,
-            $manyToOneOuterKey,
-            $manyToOneInnerKey,
-            $pivotKey,
+            $relationKeyName,
+            $oneToManyTableName,
+            $oneToManyOuterKeyName,
+            $oneToManyInnerKeyName,
+            $manyToOneTableName,
+            $manyToOneOuterKeyName,
+            $manyToOneInnerKeyName,
+            $pivotKeyName,
             $queryBuilder,
             $fetcher
         );
 
-        $this->assertSame($relationKey, $relation->getRelationKey());
-        $this->assertSame($oneToManyTable, $relation->getOneToManyTable());
-        $this->assertSame($oneToManyOuterKey, $relation->getOneToManyOuterKey());
-        $this->assertSame($oneToManyInnerKey, $relation->getOneToManyInnerKey());
-        $this->assertSame($manyToOneTable, $relation->getManyToOneTable());
-        $this->assertSame($manyToOneOuterKey, $relation->getManyToOneOuterKey());
-        $this->assertSame($manyToOneInnerKey, $relation->getManyToOneInnerKey());
-        $this->assertSame($pivotKey, $relation->getPivotKey());
+        $this->assertSame($relationKeyName, $relation->getRelationKeyName());
+        $this->assertSame($oneToManyTableName, $relation->getOneToManyTableName());
+        $this->assertSame($oneToManyOuterKeyName, $relation->getOneToManyOuterKeyName());
+        $this->assertSame($oneToManyInnerKeyName, $relation->getOneToManyInnerKeyName());
+        $this->assertSame($manyToOneTableName, $relation->getManyToOneTableName());
+        $this->assertSame($manyToOneOuterKeyName, $relation->getManyToOneOuterKeyName());
+        $this->assertSame($manyToOneInnerKeyName, $relation->getManyToOneInnerKeyName());
+        $this->assertSame($pivotKeyName, $relation->getPivotKey());
         $this->assertSame($queryBuilder, $relation->getQueryBuilder());
         $this->assertSame($fetcher, $relation->getFetcher());
     }
@@ -63,20 +64,16 @@ class ManyToTest extends TestCase
     {
         $outerKeys = [1, 2, 3];
         $expectedResult = $this->createMock(ResultSetInterface::class);
-        $expectedBindValues = [
-            [1, 1, \PDO::PARAM_INT],
-            [2, 2, \PDO::PARAM_INT],
-            [3, 3, \PDO::PARAM_INT],
-        ];
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
-            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
-                $this->assertSame(array_shift($expectedBindValues), $args);
-                return true;
-            });
+            ->willReturnMap([
+                [1, 1, \PDO::PARAM_INT, true],
+                [2, 2, \PDO::PARAM_INT, true],
+                [3, 3, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -91,10 +88,10 @@ class ManyToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $expectedResult) {
                 $queryBuilder->prepare($pdo);
                 return $expectedResult;
-            }));
+            });
 
         $relation = new ManyTo(
             'friends',
@@ -106,8 +103,7 @@ class ManyToTest extends TestCase
             'user_id',
             '__pivot_key',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);

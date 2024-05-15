@@ -1,5 +1,7 @@
 <?php
 
+// NOTE: Do not enable "strict_types" to enable implicit type coercions.
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
@@ -18,19 +20,15 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
      */
     use EnumerableExtensions;
 
-    /**
-     * @var PDOStatementInterface
-     */
-    private $stmt;
+    private PDOStatementInterface $stmt;
 
     /**
-     * @psalm-var callable(array<string,mixed>):T
-     * @var callable
+     * @var callable(array<string,mixed>):T
      */
     private $instantiator;
 
     /**
-     * @psalm-param callable(array<string,mixed>):T $instantiator
+     * @param callable(array<string,mixed>):T $instantiator
      */
     public function __construct(PDOStatementInterface $stmt, callable $instantiator)
     {
@@ -39,16 +37,13 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return callable(array<string,mixed>):T
+     * @return callable(array<string,mixed>):T
      */
     public function getInstantiator(): callable
     {
         return $this->instantiator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         $this->stmt->execute();
@@ -59,9 +54,6 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         $this->stmt->execute();
@@ -70,16 +62,13 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         return array_map($instantiator, $rows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function first(callable $predicate = null)
+    public function first(?callable $predicate = null): mixed
     {
         $this->stmt->execute();
 
         $instantiator = $this->instantiator;
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $row) {
                 $instance = $instantiator($row);
@@ -97,16 +86,13 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
         throw new NoSuchElementException('Sequence contains no elements');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    public function firstOrDefault(?callable $predicate = null, mixed $defaultValue = null): mixed
     {
         $this->stmt->execute();
 
         $instantiator = $this->instantiator;
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
             foreach ($this->stmt as $row) {
                 $instance = $instantiator($row);
@@ -121,7 +107,6 @@ class FunctionResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        /** @psalm-assert TDefault $defaultValue */
         return $defaultValue;
     }
 }

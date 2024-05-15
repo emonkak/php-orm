@@ -13,19 +13,19 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 interface JoinStrategyInterface
 {
     /**
-     * @psalm-return callable(TOuter):TKey
+     * @return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable;
 
     /**
-     * @psalm-return callable(TInner):TKey
+     * @return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable;
 
     /**
-     * @psalm-param iterable<TOuter> $outer
-     * @psalm-param iterable<TInner> $inner
-     * @psalm-return \Traversable<TResult>
+     * @param iterable<TOuter> $outer
+     * @param iterable<TInner> $inner
+     * @return \Traversable<TResult>
      */
     public function join(iterable $outer, iterable $inner): \Traversable;
 }

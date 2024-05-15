@@ -17,34 +17,30 @@ use Emonkak\Enumerable\Iterator\SelectIterator;
 class LazyGroupJoin implements JoinStrategyInterface
 {
     /**
-     * @psalm-var callable(TOuter):TKey
-     * @var callable
+     * @var callable(TOuter):TKey
      */
     private $outerKeySelector;
 
     /**
-     * @psalm-var callable(TInner):TKey
-     * @var callable
+     * @var callable(TInner):TKey
      */
     private $innerKeySelector;
 
     /**
-     * @psalm-var callable(TOuter,LazyCollection<TInner,TKey>):TResult $resultSelector
-     * @var callable
+     * @var callable(TOuter,LazyCollection<TInner,TKey>):TResult
      */
     private $resultSelector;
 
     /**
-     * @psalm-var EqualityComparerInterface<TKey>
-     * @var EqualityComparerInterface
+     * @var EqualityComparerInterface<TKey>
      */
-    private $comparer;
+    private EqualityComparerInterface $comparer;
 
     /**
-     * @psalm-param callable(TOuter):TKey $outerKeySelector
-     * @psalm-param callable(TInner):TKey $innerKeySelector
-     * @psalm-param callable(TOuter,LazyCollection<TInner,TKey>):TResult $resultSelector
-     * @psalm-param EqualityComparerInterface<TKey> $comparer
+     * @param callable(TOuter):TKey $outerKeySelector
+     * @param callable(TInner):TKey $innerKeySelector
+     * @param callable(TOuter,LazyCollection<TInner,TKey>):TResult $resultSelector
+     * @param EqualityComparerInterface<TKey> $comparer
      */
     public function __construct(
         callable $outerKeySelector,
@@ -59,7 +55,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter):TKey
+     * @return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable
     {
@@ -67,7 +63,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TInner):TKey
+     * @return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable
     {
@@ -75,7 +71,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter,LazyCollection<TInner,TKey>):TResult
+     * @return callable(TOuter,LazyCollection<TInner,TKey>):TResult
      */
     public function getResultSelector(): callable
     {
@@ -83,7 +79,7 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return EqualityComparerInterface<TKey>
+     * @return EqualityComparerInterface<TKey>
      */
     public function getComparer(): EqualityComparerInterface
     {
@@ -91,13 +87,13 @@ class LazyGroupJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-param iterable<TOuter> $outer
-     * @psalm-param iterable<TInner> $inner
-     * @psalm-return \Traversable<TResult>
+     * @param iterable<TOuter> $outer
+     * @param iterable<TInner> $inner
+     * @return \Traversable<TResult>
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
-        /** @psalm-var ?TInner[] */
+        /** @var ?TInner[] */
         $cachedInner = null;
 
         $innerKeySelector = $this->innerKeySelector;
@@ -107,13 +103,13 @@ class LazyGroupJoin implements JoinStrategyInterface
 
         $fetchCachedItems =
             /**
-             * @psalm-return array<string,TInner[]>
+             * @return array<string,TInner[]>
              */
             static function() use (
                 $inner,
                 $innerKeySelector,
                 $comparer
-            ) {
+            ): array {
                 $cachedInner = [];
 
                 foreach ($inner as $innerElement) {
@@ -127,14 +123,14 @@ class LazyGroupJoin implements JoinStrategyInterface
 
         $evaluator =
             /**
-             * @psalm-param TKey $outerKey
-             * @psalm-return TInner[]
+             * @param TKey $outerKey
+             * @return TInner[]
              */
-            static function($outerKey) use (
+            static function(mixed $outerKey) use (
                 &$cachedInner,
                 &$fetchCachedItems,
                 $comparer
-            ) {
+            ): mixed {
                 if ($cachedInner === null) {
                     /** @var callable():array<string,TInner[]> $fetchCachedItems */
                     $cachedInner = $fetchCachedItems();
@@ -146,18 +142,17 @@ class LazyGroupJoin implements JoinStrategyInterface
                 return $cachedInner[$outerHash] ?? [];
             };
 
-        /** @psalm-var \Traversable<TResult> */
         return new SelectIterator(
             $outer,
             /**
-             * @psalm-param TOuter $outerElement
-             * @psalm-return TResult
+             * @param TOuter $outerElement
+             * @return TResult
              */
-            static function($outerElement) use (
+            static function(mixed $outerElement) use (
                 $outerKeySelector,
                 $resultSelector,
                 $evaluator
-            ) {
+            ): mixed {
                 $outerKey = $outerKeySelector($outerElement);
                 $innerProxy = new LazyCollection($outerKey, $evaluator);
                 return $resultSelector($outerElement, $innerProxy);

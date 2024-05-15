@@ -9,18 +9,19 @@ final class AccessorCreators
     /**
      * @template T
      * @template TKey
-     * @psalm-param ?class-string<T> $class
-     * @psalm-return callable(T):TKey
+     * @param ?class-string<T> $class
+     * @return callable(T):TKey
      */
     public static function createKeySelector(?string $class, string $key): callable
     {
         if ($class !== null) {
+            /** @var callable(T):TKey */
             return \Closure::bind(
                 /**
-                 * @psalm-param T $obj
-                 * @psalm-return TKey
+                 * @param T $obj
+                 * @return TKey
                  */
-                static function($obj) use ($key) {
+                static function(mixed $obj) use ($key): mixed {
                     return $obj->$key;
                 },
                 null,
@@ -29,10 +30,10 @@ final class AccessorCreators
         } else {
             return
                 /**
-                 * @psalm-param T $array
-                 * @psalm-return TKey
+                 * @param T $array
+                 * @return TKey
                  */
-                static function($array) use ($key) {
+                static function(mixed $array) use ($key): mixed {
                     return $array[$key];
                 };
         }
@@ -41,18 +42,19 @@ final class AccessorCreators
     /**
      * @template T
      * @template TKey
-     * @psalm-param ?class-string<T> $class
-     * @psalm-return callable(T):TKey
+     * @param ?class-string<T> $class
+     * @return callable(T):TKey
      */
     public static function createPivotKeySelector(?string $class, string $key): callable
     {
         if ($class !== null) {
+            /** @var callable(T):TKey */
             return \Closure::bind(
                 /**
-                 * @psalm-param T $obj
-                 * @psalm-return TKey
+                 * @param T $obj
+                 * @return TKey
                  */
-                static function($obj) use ($key) {
+                static function(mixed $obj) use ($key): mixed {
                     $pivot = $obj->$key;
                     unset($obj->$key);
                     return $pivot;
@@ -63,10 +65,10 @@ final class AccessorCreators
         } else {
             return
                 /**
-                 * @psalm-param T $array
-                 * @psalm-return TKey
+                 * @param T $array
+                 * @return TKey
                  */
-                static function(&$array) use ($key) {
+                static function(mixed &$array) use ($key): mixed {
                     $pivot = $array[$key];
                     unset($array[$key]);
                     return $pivot;
@@ -76,18 +78,19 @@ final class AccessorCreators
 
     /**
      * @template T
-     * @psalm-param ?class-string<T> $class
-     * @psalm-return callable(T):T
+     * @param ?class-string<T> $class
+     * @return callable(T):T
      */
     public static function createKeyEraser(?string $class, string $key): callable
     {
         if ($class !== null) {
+            /** @var callable(T):T */
             return \Closure::bind(
                 /**
-                 * @psalm-param T $obj
-                 * @psalm-return T
+                 * @param T $obj
+                 * @return T
                  */
-                static function($obj) use ($key) {
+                static function(mixed $obj) use ($key): mixed {
                     unset($obj->$key);
                     return $obj;
                 },
@@ -97,10 +100,10 @@ final class AccessorCreators
         } else {
             return
                 /**
-                 * @psalm-param T $array
-                 * @psalm-return T
+                 * @param T $array
+                 * @return T
                  */
-                static function($array) use ($key) {
+                static function(mixed $array) use ($key): mixed {
                     unset($array[$key]);
                     return $array;
                 };
@@ -110,20 +113,20 @@ final class AccessorCreators
     /**
      * @template TLhs
      * @template TRhs
-     * @psalm-param ?class-string<TLhs> $class
-     * @psalm-param string $key
-     * @psalm-return callable(TLhs,TRhs):TLhs
+     * @param ?class-string<TLhs> $class
+     * @return callable(TLhs,TRhs):TLhs
      */
-    public static function createKeyAssignee(?string $class, string $key): callable
+    public static function createKeyAssignor(?string $class, string $key): callable
     {
         if ($class !== null) {
+            /** @var callable(TLhs,TRhs):TLhs */
             return \Closure::bind(
                 /**
-                 * @psalm-param TLhs $lhs
-                 * @psalm-param TRhs $rhs
-                 * @psalm-return TLhs
+                 * @param TLhs $lhs
+                 * @param TRhs $rhs
+                 * @return TLhs
                  */
-                static function($lhs, $rhs) use ($key) {
+                static function(mixed $lhs, mixed $rhs) use ($key): mixed {
                     $lhs->$key = $rhs;
                     return $lhs;
                 },
@@ -133,15 +136,15 @@ final class AccessorCreators
         } else {
             return
                 /**
-                 * @psalm-param TLhs $lhs
-                 * @psalm-param TRhs $rhs
-                 * @psalm-return TLhs
+                 * @param TLhs $lhs
+                 * @param TRhs $rhs
+                 * @return TLhs
                  */
-                static function($lhs, $rhs) use ($key) {
-                    /** @psalm-suppress RedundantConditionGivenDocblockType */
+                static function(mixed $lhs, mixed $rhs) use ($key): mixed {
                     if ($rhs !== null) {
                         $lhs[$key] = $rhs;
                     }
+                    /** @var TLhs $lhs */
                     return $lhs;
                 };
         }

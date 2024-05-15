@@ -10,7 +10,7 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 interface LazyValueInterface
 {
     /**
-     * @psalm-return TValue
+     * @return TValue
      */
-    public function get();
+    public function get(): mixed;
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Emonkak\Orm\Relation;
 
-use Emonkak\Enumerable\EqualityComparerInterface;
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
@@ -22,56 +21,56 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function oneToOne(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
                 $queryBuilder,
                 $fetcher
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,?TInner):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,?TInner):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new OuterJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var OuterJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new OuterJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -79,70 +78,72 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param ?class-string $collationClass
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @param ?class-string $collationClass
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function oneToMany(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
         ?string $collationClass = null
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
                 $queryBuilder,
                 $fetcher,
                 $collationClass
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,mixed):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,iterable<TInner>):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 if ($collationClass !== null) {
                     $resultSelector =
                         /**
-                         * @psalm-param TOuter $lhs
-                         * @psalm-param TInner[] $rhs
-                         * @psalm-return TOuter
+                         * @param TOuter $lhs
+                         * @param TInner[] $rhs
+                         * @return TOuter
                          */
-                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
-                            return $resultSelector($lhs, new $collationClass($rhs));
+                        function(mixed $lhs, mixed $rhs) use ($collationClass, $resultSelector): mixed {
+                            /** @var iterable<TInner> */
+                            $rhs = new $collationClass($rhs);
+                            return $resultSelector($lhs, $rhs);
                         };
                 }
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new GroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var GroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new GroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -150,71 +151,70 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @template TThroughKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function throughOneToOne(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
-        string $throughKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
+        string $throughKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
-                $throughKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
+                $throughKeyName,
                 $queryBuilder,
                 $fetcher
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TInner):TThroughKey */
-                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
-                /** @psalm-var callable(TOuter,mixed):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TInner):TKey */
+                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKeyName);
+                /** @var callable(TOuter,?TKey):TOuter */
+                $relationKeyAssignor = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 $resultSelector =
                     /**
-                     * @psalm-param TOuter $lhs
-                     * @psalm-param ?TInner $rhs
-                     * @psalm-return TOuter
+                     * @param TOuter $lhs
+                     * @param ?TInner $rhs
+                     * @return TOuter
                      */
-                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
-                        $throughKey = $rhs !== null ? $throughKeySelector($rhs) : null;
-                        return $resultSelector($lhs, $throughKey);
+                    function(mixed $lhs, mixed $rhs) use ($relationKeyAssignor, $throughKeySelector): mixed {
+                        $throughKeyName = $rhs !== null ? $throughKeySelector($rhs) : null;
+                        return $relationKeyAssignor($lhs, $throughKeyName);
                     };
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new OuterJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var OuterJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new OuterJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -222,71 +222,70 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @template TThroughKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function throughOneToMany(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
-        string $throughKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
+        string $throughKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
-                $throughKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
+                $throughKeyName,
                 $queryBuilder,
                 $fetcher
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TInner):TThroughKey */
-                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
-                /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TInner):TKey */
+                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKeyName);
+                /** @var callable(TOuter,TKey[]):TOuter */
+                $relationKeyAssignor = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 $resultSelector =
                     /**
-                     * @psalm-param TOuter $lhs
-                     * @psalm-param TInner[] $rhs
-                     * @psalm-return TOuter
+                     * @param TOuter $lhs
+                     * @param TInner[] $rhs
+                     * @return TOuter
                      */
-                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
+                    function(mixed $lhs, mixed $rhs) use ($relationKeyAssignor, $throughKeySelector): mixed {
                         $throughKeys = array_map($throughKeySelector, $rhs);
-                        return $resultSelector($lhs, $throughKeys);
+                        return $relationKeyAssignor($lhs, $throughKeys);
                     };
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new GroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var GroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new GroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -294,56 +293,56 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function lazyOneToOne(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
                 $queryBuilder,
                 $fetcher
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,LazyValue<?TInner,TKey>):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,LazyValue<?TInner,mixed>):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new LazyOuterJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var LazyOuterJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new LazyOuterJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -351,56 +350,56 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function lazyOneToMany(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
                 $queryBuilder,
                 $fetcher
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,LazyCollection<TInner,TKey>):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,LazyCollection<TInner,TKey>):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new OneTo(
-                        $relationKey,
-                        $table,
-                        $outerKey,
-                        $innerKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new LazyGroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var OneTo<TInner,TKey> */
+                $relationStrategy = new OneTo(
+                    $relationKeyName,
+                    $tableName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var LazyGroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new LazyGroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -408,15 +407,15 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param callable(TKey):string $cacheKeySelector
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @param callable(TKey):string $cacheKeySelector
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function cachedOneToOne(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
         CacheInterface $cache,
@@ -425,51 +424,51 @@ final class Relations
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $table,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $tableName,
+                $outerKeyName,
+                $innerKeyName,
                 $queryBuilder,
                 $fetcher,
                 $cache,
                 $cacheKeySelector,
                 $cacheTtl
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,?TInner):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,?TInner):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new Cached(
-                        new OneTo(
-                            $relationKey,
-                            $table,
-                            $outerKey,
-                            $innerKey,
-                            $queryBuilder,
-                            $fetcher
-                        ),
-                        $cache,
-                        $cacheKeySelector,
-                        $cacheTtl
+                /** @var Cached<TInner,TKey> */
+                $relationStrategy = new Cached(
+                    new OneTo(
+                        $relationKeyName,
+                        $tableName,
+                        $outerKeyName,
+                        $innerKeyName,
+                        $queryBuilder,
+                        $fetcher
                     ),
-                    new OuterJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                    $cache,
+                    $cacheKeySelector,
+                    $cacheTtl
                 );
+                /** @var OuterJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new OuterJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -477,52 +476,52 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param ?class-string<TInner> $innerClass
-     * @psalm-param TInner[] $innerElements
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param ?class-string<TInner> $innerClass
+     * @param TInner[] $innerElements
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function preloadedOneToOne(
-        string $relationKey,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $outerKeyName,
+        string $innerKeyName,
         ?string $innerClass,
         array $innerElements
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $outerKeyName,
+                $innerKeyName,
                 $innerClass,
                 $innerElements
-            ): RelationInterface {
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,?TInner):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
-                /** @psalm-var EqualityComparerInterface<TKey> */
+            ): Relation {
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,?TInner):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new Preloaded(
-                        $relationKey,
-                        $outerKey,
-                        $innerKey,
-                        $innerElements
-                    ),
-                    new OuterJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var Preloaded<TInner,TKey> */
+                $relationStrategy = new Preloaded(
+                    $relationKeyName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $innerElements
                 );
+                /** @var OuterJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new OuterJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -530,66 +529,68 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param ?class-string<TInner> $innerClass
-     * @psalm-param TInner[] $innerElements
-     * @psalm-param ?class-string $collationClass
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param ?class-string<TInner> $innerClass
+     * @param TInner[] $innerElements
+     * @param ?class-string $collationClass
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function preloadedOneToMany(
-        string $relationKey,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $outerKeyName,
+        string $innerKeyName,
         ?string $innerClass,
         array $innerElements,
         ?string $collationClass = null
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return RelationInterface<TOuter,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $outerKey,
-                $innerKey,
+                $relationKeyName,
+                $outerKeyName,
+                $innerKeyName,
                 $innerClass,
                 $innerElements,
                 $collationClass
             ): RelationInterface {
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKey);
-                /** @psalm-var callable(TOuter,mixed):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $outerKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createKeySelector($innerClass, $innerKeyName);
+                /** @var callable(TOuter,iterable<TInner>):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 if ($collationClass !== null) {
                     $resultSelector =
                         /**
-                         * @psalm-param TOuter $lhs
-                         * @psalm-param TInner[] $rhs
-                         * @psalm-return TOuter
+                         * @param TOuter $lhs
+                         * @param TInner[] $rhs
+                         * @return TOuter
                          */
-                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
-                            return $resultSelector($lhs, new $collationClass($rhs));
+                        function(mixed $lhs, mixed $rhs) use ($collationClass, $resultSelector): mixed {
+                            /** @var \Traversable<TInner> */
+                            $rhs = new $collationClass($rhs);
+                            return $resultSelector($lhs, $rhs);
                         };
                 }
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new Preloaded(
-                        $relationKey,
-                        $outerKey,
-                        $innerKey,
-                        $innerElements
-                    ),
-                    new GroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var Preloaded<TInner,TKey> */
+                $relationStrategy = new Preloaded(
+                    $relationKeyName,
+                    $outerKeyName,
+                    $innerKeyName,
+                    $innerElements
                 );
+                /** @var GroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new GroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -597,81 +598,83 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-param ?class-string $collationClass
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @param ?class-string $collationClass
+     * @return callable(?class-string):Relation<TOuter,TInner,TKey,TOuter>
      */
     public static function manyToMany(
-        string $relationKey,
-        string $oneToManyTable,
-        string $oneToManyOuterKey,
-        string $oneToManyInnerKey,
-        string $manyToOneTable,
-        string $manyToOneOuterKey,
-        string $manyToOneInnerKey,
+        string $relationKeyName,
+        string $oneToManyTableName,
+        string $oneToManyOuterKeyName,
+        string $oneToManyInnerKeyName,
+        string $manyToOneTableName,
+        string $manyToOneOuterKeyName,
+        string $manyToOneInnerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher,
         ?string $collationClass = null
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return Relation<TOuter,TInner,TKey,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $oneToManyTable,
-                $oneToManyOuterKey,
-                $oneToManyInnerKey,
-                $manyToOneTable,
-                $manyToOneOuterKey,
-                $manyToOneInnerKey,
+                $relationKeyName,
+                $oneToManyTableName,
+                $oneToManyOuterKeyName,
+                $oneToManyInnerKeyName,
+                $manyToOneTableName,
+                $manyToOneOuterKeyName,
+                $manyToOneInnerKeyName,
                 $queryBuilder,
                 $fetcher,
                 $collationClass
-            ): RelationInterface {
+            ): Relation {
                 $innerClass = $fetcher->getClass();
-                $pivotKey = '__pivot_' . $oneToManyInnerKey;
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $oneToManyOuterKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKey);
-                /** @psalm-var callable(TOuter,mixed):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                $pivotKeyName = '__pivot_' . $oneToManyInnerKeyName;
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $oneToManyOuterKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKeyName);
+                /** @var callable(TOuter,iterable<TInner>):TOuter */
+                $resultSelector = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 if ($collationClass !== null) {
                     $resultSelector =
                         /**
-                         * @psalm-param TOuter $lhs
-                         * @psalm-param TInner[] $rhs
-                         * @psalm-return TOuter
+                         * @param TOuter $lhs
+                         * @param TInner[] $rhs
+                         * @return TOuter
                          */
-                        function($lhs, $rhs) use ($collationClass, $resultSelector) {
-                            return $resultSelector($lhs, new $collationClass($rhs));
+                        function(mixed $lhs, mixed $rhs) use ($collationClass, $resultSelector): mixed {
+                            /** @var iterable<TInner> */
+                            $rhs = new $collationClass($rhs);
+                            return $resultSelector($lhs, $rhs);
                         };
                 }
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new ManyTo(
-                        $relationKey,
-                        $oneToManyTable,
-                        $oneToManyOuterKey,
-                        $oneToManyInnerKey,
-                        $manyToOneTable,
-                        $manyToOneOuterKey,
-                        $manyToOneInnerKey,
-                        $pivotKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new GroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var Preloaded<TInner,TKey> */
+                $relationStrategy = new ManyTo(
+                    $relationKeyName,
+                    $oneToManyTableName,
+                    $oneToManyOuterKeyName,
+                    $oneToManyInnerKeyName,
+                    $manyToOneTableName,
+                    $manyToOneOuterKeyName,
+                    $manyToOneInnerKeyName,
+                    $pivotKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var GroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new GroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
@@ -679,109 +682,108 @@ final class Relations
      * @template TOuter
      * @template TInner
      * @template TKey
-     * @template TThroughKey
-     * @psalm-param FetcherInterface<TInner> $fetcher
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param FetcherInterface<TInner> $fetcher
+     * @return callable(?class-string):RelationInterface<TOuter,TOuter>
      */
     public static function throughManyToMany(
-        string $relationKey,
-        string $oneToManyTable,
-        string $oneToManyOuterKey,
-        string $oneToManyInnerKey,
-        string $manyToOneTable,
-        string $manyToOneOuterKey,
-        string $manyToOneInnerKey,
-        string $throughKey,
+        string $relationKeyName,
+        string $oneToManyTableName,
+        string $oneToManyOuterKeyName,
+        string $oneToManyInnerKeyName,
+        string $manyToOneTableName,
+        string $manyToOneOuterKeyName,
+        string $manyToOneInnerKeyName,
+        string $throughKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ): callable {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return RelationInterface<TOuter,TOuter>
              */
             function(?string $outerClass) use (
-                $relationKey,
-                $oneToManyTable,
-                $oneToManyOuterKey,
-                $oneToManyInnerKey,
-                $manyToOneTable,
-                $manyToOneOuterKey,
-                $manyToOneInnerKey,
-                $throughKey,
+                $relationKeyName,
+                $oneToManyTableName,
+                $oneToManyOuterKeyName,
+                $oneToManyInnerKeyName,
+                $manyToOneTableName,
+                $manyToOneOuterKeyName,
+                $manyToOneInnerKeyName,
+                $throughKeyName,
                 $queryBuilder,
                 $fetcher
             ): RelationInterface {
                 $innerClass = $fetcher->getClass();
-                $pivotKey = '__pivot_' . $oneToManyInnerKey;
-                /** @psalm-var callable(TOuter):TKey */
-                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $oneToManyOuterKey);
-                /** @psalm-var callable(TInner):TKey */
-                $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKey);
-                /** @psalm-var callable(TInner):TThroughKey */
-                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKey);
-                /** @psalm-var callable(TOuter,TThroughKey[]):TOuter */
-                $resultSelector = AccessorCreators::createKeyAssignee($outerClass, $relationKey);
+                $pivotKeyName = '__pivot_' . $oneToManyInnerKeyName;
+                /** @var callable(TOuter):TKey */
+                $outerKeySelector = AccessorCreators::createKeySelector($outerClass, $oneToManyOuterKeyName);
+                /** @var callable(TInner):TKey */
+                $innerKeySelector = AccessorCreators::createPivotKeySelector($innerClass, $pivotKeyName);
+                /** @var callable(TInner):mixed */
+                $throughKeySelector = AccessorCreators::createKeySelector($innerClass, $throughKeyName);
+                /** @var callable(TOuter,mixed[]):TOuter */
+                $throughKeysAssignor = AccessorCreators::createKeyAssignor($outerClass, $relationKeyName);
                 $resultSelector =
                     /**
-                     * @psalm-param TOuter $lhs
-                     * @psalm-param TInner[] $rhs
-                     * @psalm-return TOuter
+                     * @param TOuter $lhs
+                     * @param TInner[] $rhs
+                     * @return TOuter
                      */
-                    function($lhs, $rhs) use ($resultSelector, $throughKeySelector) {
+                    function(mixed $lhs, mixed $rhs) use ($throughKeysAssignor, $throughKeySelector): mixed {
                         $throughKeys = array_map($throughKeySelector, $rhs);
-                        return $resultSelector($lhs, $throughKeys);
+                        return $throughKeysAssignor($lhs, $throughKeys);
                     };
-                /** @psalm-var EqualityComparerInterface<TKey> */
+                /** @var LooseEqualityComparer<TKey> */
                 $comparer = LooseEqualityComparer::getInstance();
-                return new Relation(
-                    $outerClass,
-                    new ManyTo(
-                        $relationKey,
-                        $oneToManyTable,
-                        $oneToManyOuterKey,
-                        $oneToManyInnerKey,
-                        $manyToOneTable,
-                        $manyToOneOuterKey,
-                        $manyToOneInnerKey,
-                        $pivotKey,
-                        $queryBuilder,
-                        $fetcher
-                    ),
-                    new GroupJoin(
-                        $outerKeySelector,
-                        $innerKeySelector,
-                        $resultSelector,
-                        $comparer
-                    )
+                /** @var ManyTo<TInner,TKey> */
+                $relationStrategy = new ManyTo(
+                    $relationKeyName,
+                    $oneToManyTableName,
+                    $oneToManyOuterKeyName,
+                    $oneToManyInnerKeyName,
+                    $manyToOneTableName,
+                    $manyToOneOuterKeyName,
+                    $manyToOneInnerKeyName,
+                    $pivotKeyName,
+                    $queryBuilder,
+                    $fetcher
                 );
+                /** @var GroupJoin<TOuter,TInner,TKey,TOuter> */
+                $joinStrategy = new GroupJoin(
+                    $outerKeySelector,
+                    $innerKeySelector,
+                    $resultSelector,
+                    $comparer
+                );
+                return new Relation($outerClass, $relationStrategy, $joinStrategy);
             };
     }
 
     /**
      * @template TOuter
-     * @psalm-param array<string,callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>> $relationFactories
-     * @psalm-return callable(?class-string<TOuter>):RelationInterface<TOuter,TOuter>
+     * @param array<string,callable(?class-string):RelationInterface<TOuter,TOuter>> $relationFactories
+     * @return callable(?class-string):PolymorphicRelation<TOuter>
      */
-    public static function polymorphic(string $morphKey, array $relationFactories): callable
+    public static function polymorphic(string $morphKeyName, array $relationFactories): callable
     {
         return
             /**
-             * @psalm-param ?class-string<TOuter> $outerClass
-             * @psalm-return RelationInterface<TOuter,TOuter>
+             * @param ?class-string $outerClass
+             * @return RelationInterface<TOuter,TOuter>
              */
             function(?string $outerClass) use (
-                $morphKey,
+                $morphKeyName,
                 $relationFactories
             ): RelationInterface {
-                /** @psalm-var array<string,RelationInterface<TOuter,TOuter>> */
+                /** @var array<string,RelationInterface<TOuter,TOuter>> */
                 $relations = [];
                 foreach ($relationFactories as $morphType => $relationFactory) {
                     $relations[$morphType] = $relationFactory($outerClass);
                 }
-                /** @psalm-var callable(?class-string<TOuter>):string */
-                $morphKeySelector = AccessorCreators::createKeySelector($outerClass, $morphKey);
-                /** @psalm-var RelationInterface<TOuter,TOuter> */
+                /** @var callable(TOuter):string */
+                $morphKeySelector = AccessorCreators::createKeySelector($outerClass, $morphKeyName);
+                /** @var PolymorphicRelation<TOuter> */
                 return new PolymorphicRelation(
                     $outerClass,
                     $morphKeySelector,

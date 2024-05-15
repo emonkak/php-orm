@@ -19,23 +19,23 @@ class PreloadedTest extends TestCase
 
     public function testConstructor(): void
     {
-        $relationKey = 'relation_key';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
         $innerElements = [
             new Model([]),
         ];
 
         $relationStrategy = new Preloaded(
-            $relationKey,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $outerKeyName,
+            $innerKeyName,
             $innerElements
         );
 
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($innerElements, $relationStrategy->getInnerElements());
     }
 
@@ -67,7 +67,7 @@ class PreloadedTest extends TestCase
         $joinStrategy
             ->expects($this->once())
             ->method('getInnerKeySelector')
-            ->willReturn(function($model) {
+            ->willReturn(function(Model $model): int {
                 return $model->item_id;
             });
 

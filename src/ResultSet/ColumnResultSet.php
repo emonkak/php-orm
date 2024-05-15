@@ -1,5 +1,7 @@
 <?php
 
+// NOTE: Do not enable "strict_types" to enable implicit type coercions.
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
@@ -17,15 +19,9 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
      */
     use EnumerableExtensions;
 
-    /**
-     * @var PDOStatementInterface
-     */
-    private $stmt;
+    private PDOStatementInterface $stmt;
 
-    /**
-     * @var int
-     */
-    private $columnNumber;
+    private int $columnNumber;
 
     public function __construct(PDOStatementInterface $stmt, int $columnNumber)
     {
@@ -33,9 +29,6 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
         $this->columnNumber = $columnNumber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         $this->stmt->execute();
@@ -43,23 +36,17 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
         return $this->stmt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_COLUMN, $this->columnNumber);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function first(callable $predicate = null)
+    public function first(?callable $predicate = null): mixed
     {
         $this->stmt->execute();
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_COLUMN, $this->columnNumber);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
@@ -76,14 +63,11 @@ class ColumnResultSet implements \IteratorAggregate, ResultSetInterface
         throw new NoSuchElementException('Sequence contains no elements');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    public function firstOrDefault(?callable $predicate = null, mixed $defaultValue = null): mixed
     {
         $this->stmt->execute();
 
-        if ($predicate) {
+        if ($predicate !== null) {
             $this->stmt->setFetchMode(\PDO::FETCH_COLUMN, $this->columnNumber);
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {

@@ -33,8 +33,5 @@ trait Aggregatable
         return (int) $this->aggregate($pdo, "SUM($expr)");
     }
 
-    /**
-     * @return mixed
-     */
-    abstract public function aggregate(PDOInterface $pdo, string $expr);
+    abstract public function aggregate(PDOInterface $pdo, string $expr): mixed;
 }

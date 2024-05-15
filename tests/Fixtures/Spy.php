@@ -6,5 +6,5 @@ namespace Emonkak\Orm\Tests\Fixtures;
 
 interface Spy
 {
-    public function __invoke();
+    public function __invoke(mixed ...$args): mixed;
 }

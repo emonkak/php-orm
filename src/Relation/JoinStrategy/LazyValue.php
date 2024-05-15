@@ -12,61 +12,52 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 class LazyValue implements LazyValueInterface
 {
     /**
-     * @psalm-var ?TValue
-     * @var mixed
+     * @var ?TValue
      */
-    private $value = null;
+    private mixed $value = null;
 
     /**
-     * @psalm-var ?TKey
-     * @var mixed
+     * @var ?TKey
      */
-    private $key;
+    private mixed $key;
 
     /**
-     * @psalm-var ?callable(TKey):TValue
-     * @var ?callable
+     * @var ?callable(TKey):TValue
      */
     private $evaluator;
 
     /**
-     * @psalm-param TKey $key
-     * @psalm-param callable(TKey):TValue $evaluator
+     * @param TKey $key
+     * @param callable(TKey):TValue $evaluator
      */
-    public function __construct($key, callable $evaluator)
+    public function __construct(mixed $key, callable $evaluator)
     {
         $this->key = $key;
         $this->evaluator = $evaluator;
     }
 
     /**
-     * @psalm-return TValue
+     * @return TValue
      */
-    public function get()
+    public function get(): mixed
     {
         if ($this->evaluator !== null) {
-            /** @psalm-var TKey $this->key */
+            /** @var TKey $this->key */
             $this->value = ($this->evaluator)($this->key);
             $this->key = null;
             $this->evaluator = null;
         }
-        /** @psalm-var TValue $this->value */
+        /** @var TValue $this->value */
         return $this->value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function serialize(): string
     {
         $value = $this->get();
         return serialize($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($data)
+    public function unserialize(string $data): void
     {
         $this->value = unserialize($data);
     }

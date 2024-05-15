@@ -24,10 +24,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetSelect(): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'getSelectBuilder',
-            ]))
+            ])))
             ->getMock();
         $queryBuilder = $grammar->getSelectBuilder();
 
@@ -37,10 +38,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetInsert(): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'getInsertBuilder',
-            ]))
+            ])))
             ->getMock();
         $queryBuilder = $grammar->getInsertBuilder();
 
@@ -50,10 +52,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetUpdate(): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'getUpdateBuilder',
-            ]))
+            ])))
             ->getMock();
         $queryBuilder = $grammar->getUpdateBuilder();
 
@@ -63,10 +66,11 @@ class AbstractGrammarTest extends TestCase
 
     public function testGetDelete(): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'getDeleteBuilder',
-            ]))
+            ])))
             ->getMock();
         $queryBuilder = $grammar->getDeleteBuilder();
 
@@ -77,12 +81,13 @@ class AbstractGrammarTest extends TestCase
     /**
      * @dataProvider providerLift
      */
-    public function testLift(mixed $value, $expectedSql, array $expectedBindings): void
+    public function testLift(mixed $value, string $expectedSql, array $expectedBindings): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'lift',
-            ]))
+            ])))
             ->getMock();
         $query = $grammar->lift($value);
 
@@ -105,10 +110,11 @@ class AbstractGrammarTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'lift',
-            ]))
+            ])))
             ->getMock();
         $grammar->lift($value);
     }
@@ -131,10 +137,11 @@ class AbstractGrammarTest extends TestCase
      */
     public function testValue(mixed $value, string $expectedSql, array $expectedBindings): void
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'value',
-            ]))
+            ])))
             ->getMock();
         $query = $grammar->value($value);
 
@@ -164,12 +171,13 @@ class AbstractGrammarTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
                 'lift',
                 'value',
-            ]))
+            ])))
             ->getMock();
         $grammar->value($value);
     }
@@ -186,12 +194,13 @@ class AbstractGrammarTest extends TestCase
         $expr = 'SELECT 1';
         $expectedQuery = new Sql('SELECT 1');
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(/** @var non-empty-string[] */ array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
                 'lift',
                 'value',
-            ]))
+            ])))
             ->getMock();
 
         $this->assertEquals($expectedQuery, $grammar->condition($expr));
@@ -204,12 +213,13 @@ class AbstractGrammarTest extends TestCase
         $lhs = new Sql($lhsExpr);
         $expectedQuery = new Sql('EXISTS (SELECT 1)');
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
                 'lift',
                 'value',
-            ]))
+            ])))
             ->getMock();
         $grammar
             ->expects($this->any())
@@ -229,12 +239,13 @@ class AbstractGrammarTest extends TestCase
         $rhs = new Sql('?', [$rhsExpr]);
         $expectedQuery = new Sql('c1 = ?', [123]);
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
                 'lift',
                 'value',
-            ]))
+            ])))
             ->getMock();
         $grammar
             ->expects($this->any())
@@ -256,12 +267,13 @@ class AbstractGrammarTest extends TestCase
         $end = new Sql('?', [$endExpr]);
         $expectedQuery = new Sql('c1 BETWEEN ? AND ?', [123, 456]);
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
-            ->onlyMethods(array_diff(get_class_methods(GrammarInterface::class), [
+            ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
                 'lift',
                 'value',
-            ]))
+            ])))
             ->getMock();
         $grammar
             ->expects($this->any())

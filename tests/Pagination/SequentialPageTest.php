@@ -28,6 +28,7 @@ class SequentialPageTest extends TestCase
                 [10, 11, $items],
             ]);
 
+        /** @var callable(int, int):int[] $itemsFetcher */
         $page = SequentialPage::from($initialIndex, $perPage, $itemsFetcher);
 
         $this->assertSame($perPage, $page->getPerPage());
@@ -57,6 +58,7 @@ class SequentialPageTest extends TestCase
                 [0, 10, range(0, 9)],
             ]);
 
+        /** @var callable(int, int):int[] $itemsFetcher */
         $page = SequentialPage::from($initialIndex, $perPage, $itemsFetcher);
         $this->assertSame(range(20, 29), iterator_to_array($page));
         $this->assertSame($initialIndex, $page->getIndex());
@@ -105,6 +107,7 @@ class SequentialPageTest extends TestCase
                 [21, 10, range(21, 29)],
             ]);
 
+        /** @var callable(int, int):int[] $itemsFetcher */
         $page = SequentialPage::from($initialIndex, $perPage, $itemsFetcher);
         $this->assertSame(range(0, 9), iterator_to_array($page));
         $this->assertSame($initialIndex, $page->getIndex());

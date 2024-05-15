@@ -34,6 +34,7 @@ class PrecountPaginatorTest extends TestCase
                 [20, 10, new \ArrayIterator($results[2])],
             ]);
 
+        /** @var callable(int, int):\Traversable<int,\stdClass> $itemsFetcher */
         $paginator = new PrecountPaginator($perPage, $totalItems, $itemsFetcher);
 
         $this->assertSame($results[0], iterator_to_array($paginator->firstPage()));

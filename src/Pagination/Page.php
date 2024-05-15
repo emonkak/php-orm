@@ -12,25 +12,20 @@ namespace Emonkak\Orm\Pagination;
 class Page extends AbstractPage implements PaginatablePageInterface
 {
     /**
-     * @psalm-var \Traversable<T>
-     * @var \Traversable
+     * @var \Traversable<T>
      */
-    private $items;
+    private \Traversable $items;
+
+    private int $index;
 
     /**
-     * @var int
+     * @var PaginatorInterface<T>
      */
-    private $index;
+    private PaginatorInterface $paginator;
 
     /**
-     * @psalm-var PaginatorInterface<T>
-     * @var PaginatorInterface
-     */
-    private $paginator;
-
-    /**
-     * @psalm-param \Traversable<T> $items
-     * @psalm-param PaginatorInterface<T> $paginator
+     * @param \Traversable<T> $items
+     * @param PaginatorInterface<T> $paginator
      */
     public function __construct(\Traversable $items, int $index, PaginatorInterface $paginator)
     {
@@ -39,17 +34,11 @@ class Page extends AbstractPage implements PaginatablePageInterface
         $this->paginator = $paginator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return $this->items;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPaginator(): PaginatorInterface
     {
         return $this->paginator;
@@ -65,17 +54,11 @@ class Page extends AbstractPage implements PaginatablePageInterface
         return $this->index;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): PageInterface
     {
         return $this->paginator->at($this->index + 1);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function previous(): PageInterface
     {
         return $this->paginator->at($this->index - 1);

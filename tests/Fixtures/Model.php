@@ -6,29 +6,38 @@ namespace Emonkak\Orm\Tests\Fixtures;
 
 class Model
 {
-    private $props = [];
+    /**
+     * @var array<string,mixed>
+     */
+    private array $props = [];
 
+    /**
+     * @param array<string,mixed> $props
+     */
     public function __construct(array $props)
     {
         $this->props = $props;
     }
 
-    public function __get($key)
+    public function __get(mixed $key): mixed
     {
         return $this->props[$key];
     }
 
-    public function __set($key, $value)
+    public function __set(mixed $key, mixed $value): void
     {
         $this->props[$key] = $value;
     }
 
-    public function __unset($key)
+    public function __unset(mixed $key): void
     {
         unset($this->props[$key]);
     }
 
-    public function toArray()
+    /**
+     * @return array<string,mixed>
+     */
+    public function toArray(): array
     {
         return $this->props;
     }

@@ -15,117 +15,89 @@ use Emonkak\Orm\SelectBuilder;
  */
 class ManyTo implements RelationStrategyInterface
 {
-    /**
-     * @var string
-     */
-    private $relationKey;
+    private string $relationKeyName;
+
+    private string $oneToManyTableName;
+
+    private string $oneToManyOuterKeyName;
+
+    private string $oneToManyInnerKeyName;
+
+    private string $manyToOneTableName;
+
+    private string $manyToOneOuterKeyName;
+
+    private string $manyToOneInnerKeyName;
+
+    private string $pivotKey;
+
+    private SelectBuilder $queryBuilder;
 
     /**
-     * @var string
+     * @var FetcherInterface<TInner>
      */
-    private $oneToManyTable;
+    private FetcherInterface $fetcher;
 
     /**
-     * @var string
-     */
-    private $oneToManyOuterKey;
-
-    /**
-     * @var string
-     */
-    private $oneToManyInnerKey;
-
-    /**
-     * @var string
-     */
-    private $manyToOneTable;
-
-    /**
-     * @var string
-     */
-    private $manyToOneOuterKey;
-
-    /**
-     * @var string
-     */
-    private $manyToOneInnerKey;
-
-    /**
-     * @var string
-     */
-    private $pivotKey;
-
-    /**
-     * @var SelectBuilder
-     */
-    private $queryBuilder;
-
-    /**
-     * @psalm-var FetcherInterface<TInner>
-     * @var FetcherInterface
-     */
-    private $fetcher;
-
-    /**
-     * @psalm-param FetcherInterface<TInner> $fetcher
+     * @param FetcherInterface<TInner> $fetcher
      */
     public function __construct(
-        string $relationKey,
-        string $oneToManyTable,
-        string $oneToManyOuterKey,
-        string $oneToManyInnerKey,
-        string $manyToOneTable,
-        string $manyToOneOuterKey,
-        string $manyToOneInnerKey,
+        string $relationKeyName,
+        string $oneToManyTableName,
+        string $oneToManyOuterKeyName,
+        string $oneToManyInnerKeyName,
+        string $manyToOneTableName,
+        string $manyToOneOuterKeyName,
+        string $manyToOneInnerKeyName,
         string $pivotKey,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ) {
-        $this->relationKey = $relationKey;
-        $this->oneToManyTable = $oneToManyTable;
-        $this->oneToManyOuterKey = $oneToManyOuterKey;
-        $this->oneToManyInnerKey = $oneToManyInnerKey;
-        $this->manyToOneTable = $manyToOneTable;
-        $this->manyToOneOuterKey = $manyToOneOuterKey;
-        $this->manyToOneInnerKey = $manyToOneInnerKey;
+        $this->relationKeyName = $relationKeyName;
+        $this->oneToManyTableName = $oneToManyTableName;
+        $this->oneToManyOuterKeyName = $oneToManyOuterKeyName;
+        $this->oneToManyInnerKeyName = $oneToManyInnerKeyName;
+        $this->manyToOneTableName = $manyToOneTableName;
+        $this->manyToOneOuterKeyName = $manyToOneOuterKeyName;
+        $this->manyToOneInnerKeyName = $manyToOneInnerKeyName;
         $this->pivotKey = $pivotKey;
         $this->queryBuilder = $queryBuilder;
         $this->fetcher = $fetcher;
     }
 
-    public function getRelationKey(): string
+    public function getRelationKeyName(): string
     {
-        return $this->relationKey;
+        return $this->relationKeyName;
     }
 
-    public function getOneToManyTable(): string
+    public function getOneToManyTableName(): string
     {
-        return $this->oneToManyTable;
+        return $this->oneToManyTableName;
     }
 
-    public function getOneToManyOuterKey(): string
+    public function getOneToManyOuterKeyName(): string
     {
-        return $this->oneToManyOuterKey;
+        return $this->oneToManyOuterKeyName;
     }
 
-    public function getOneToManyInnerKey(): string
+    public function getOneToManyInnerKeyName(): string
     {
-        return $this->oneToManyInnerKey;
+        return $this->oneToManyInnerKeyName;
     }
 
-    public function getManyToOneTable(): string
+    public function getManyToOneTableName(): string
     {
-        return $this->manyToOneTable;
+        return $this->manyToOneTableName;
     }
 
-    public function getManyToOneOuterKey(): string
+    public function getManyToOneOuterKeyName(): string
     {
-        return $this->manyToOneOuterKey;
+        return $this->manyToOneOuterKeyName;
     }
 
-    public function getManyToOneInnerKey(): string
+    public function getManyToOneInnerKeyName(): string
     {
-        return $this->manyToOneInnerKey;
+        return $this->manyToOneInnerKeyName;
     }
 
     public function getPivotKey(): string
@@ -139,16 +111,13 @@ class ManyTo implements RelationStrategyInterface
     }
 
     /**
-     * @psalm-return FetcherInterface<TInner>
+     * @return FetcherInterface<TInner>
      */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $queryBuilder = $this->queryBuilder;
@@ -156,34 +125,34 @@ class ManyTo implements RelationStrategyInterface
 
         if (count($queryBuilder->getSelectBuilder()) === 0) {
             $queryBuilder = $queryBuilder
-                ->select($grammar->identifier($this->manyToOneTable) . '.*');
+                ->select($grammar->identifier($this->manyToOneTableName) . '.*');
         }
 
         $queryBuilder = $queryBuilder
             ->select(
-                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
+                $grammar->identifier($this->oneToManyTableName) . '.' . $grammar->identifier($this->oneToManyInnerKeyName),
                 $grammar->identifier($this->getPivotKey())
             );
 
         if (count($queryBuilder->getFrom()) === 0) {
-            $queryBuilder = $queryBuilder->from($grammar->identifier($this->manyToOneTable));
+            $queryBuilder = $queryBuilder->from($grammar->identifier($this->manyToOneTableName));
         }
 
         return $queryBuilder
             ->outerJoin(
-                $grammar->identifier($this->oneToManyTable),
+                $grammar->identifier($this->oneToManyTableName),
                 sprintf(
                     '%s.%s = %s.%s',
-                    $grammar->identifier($this->manyToOneTable),
-                    $grammar->identifier($this->manyToOneInnerKey),
-                    $grammar->identifier($this->oneToManyTable),
-                    $grammar->identifier($this->manyToOneOuterKey)
+                    $grammar->identifier($this->manyToOneTableName),
+                    $grammar->identifier($this->manyToOneInnerKeyName),
+                    $grammar->identifier($this->oneToManyTableName),
+                    $grammar->identifier($this->manyToOneOuterKeyName)
                 ),
                 null,
                 0
             )
             ->where(
-                $grammar->identifier($this->oneToManyTable) . '.' . $grammar->identifier($this->oneToManyInnerKey),
+                $grammar->identifier($this->oneToManyTableName) . '.' . $grammar->identifier($this->oneToManyInnerKeyName),
                 'IN',
                 $outerKeys
             )

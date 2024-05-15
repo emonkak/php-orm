@@ -10,20 +10,16 @@ use Emonkak\Orm\ResultSet\ArrayResultSet;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
 /**
- * @template T of array
- * @implements FetcherInterface<T>
+ * @implements FetcherInterface<array<string,mixed>>
  */
 class ArrayFetcher implements FetcherInterface
 {
     /**
-     * @use Relatable<T>
+     * @use Relatable<array<string,mixed>>
      */
     use Relatable;
 
-    /**
-     * @var PDOInterface
-     */
-    private $pdo;
+    private PDOInterface $pdo;
 
     public function __construct(PDOInterface $pdo)
     {
@@ -35,17 +31,11 @@ class ArrayFetcher implements FetcherInterface
         return $this->pdo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $stmt = $queryBuilder->prepare($this->pdo);

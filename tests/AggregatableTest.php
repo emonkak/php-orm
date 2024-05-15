@@ -17,7 +17,9 @@ class AggregatableTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
 
-        $aggregatable = $this->getMockForTrait(Aggregatable::class);
+        $aggregatable = $this->getMockBuilder(AggregatableMock::class)
+            ->onlyMethods(['aggregate'])
+            ->getMock();
         $aggregatable
             ->expects($this->once())
             ->method('aggregate')
@@ -31,7 +33,9 @@ class AggregatableTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
 
-        $aggregatable = $this->getMockForTrait(Aggregatable::class);
+        $aggregatable = $this->getMockBuilder(AggregatableMock::class)
+            ->onlyMethods(['aggregate'])
+            ->getMock();
         $aggregatable
             ->expects($this->once())
             ->method('aggregate')
@@ -45,7 +49,9 @@ class AggregatableTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
 
-        $aggregatable = $this->getMockForTrait(Aggregatable::class);
+        $aggregatable = $this->getMockBuilder(AggregatableMock::class)
+            ->onlyMethods(['aggregate'])
+            ->getMock();
         $aggregatable
             ->expects($this->once())
             ->method('aggregate')
@@ -59,7 +65,9 @@ class AggregatableTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
 
-        $aggregatable = $this->getMockForTrait(Aggregatable::class);
+        $aggregatable = $this->getMockBuilder(AggregatableMock::class)
+            ->onlyMethods(['aggregate'])
+            ->getMock();
         $aggregatable
             ->expects($this->once())
             ->method('aggregate')
@@ -73,7 +81,9 @@ class AggregatableTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
 
-        $aggregatable = $this->getMockForTrait(Aggregatable::class);
+        $aggregatable = $this->getMockBuilder(AggregatableMock::class)
+            ->onlyMethods(['aggregate'])
+            ->getMock();
         $aggregatable
             ->expects($this->once())
             ->method('aggregate')
@@ -82,4 +92,9 @@ class AggregatableTest extends TestCase
 
         $this->assertSame(123, $aggregatable->sum($pdo, 'c1'));
     }
+}
+
+abstract class AggregatableMock
+{
+    use Aggregatable;
 }

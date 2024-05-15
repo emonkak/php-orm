@@ -9,7 +9,9 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Pagination\PrecountPaginator;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +30,7 @@ class SelectBuilderTest extends TestCase
         $this->assertSame($grammar, $queryBuilder->getGrammar());
     }
 
-    public function testGetAccesors(): void
+    public function testAccesors(): void
     {
         $unionBuilder = $this->getSelectBuilder()->select('c1')->from('t1');
 
@@ -45,15 +47,19 @@ class SelectBuilderTest extends TestCase
             ->limit(34)
             ->suffix('FOR UPDATE')
             ->unionWith($unionBuilder);
+        $where = $queryBuilder->getWhere();
+        $having = $queryBuilder->getHaving();
 
         $this->assertSame('SELECT', $queryBuilder->getPrefix());
         $this->assertEquals([new Sql('c1')], $queryBuilder->getSelectBuilder());
         $this->assertEquals([new Sql('t1')], $queryBuilder->getFrom());
         $this->assertEquals([new Sql('JOIN t2 ON t1.id = t2.id', [])], $queryBuilder->getJoin());
-        $this->assertQueryIs('(t1.c1 = ?)', [123], $queryBuilder->getWhere());
+        $this->assertNotNull($where);
+        $this->assertQueryIs('(t1.c1 = ?)', [123], $where);
         $this->assertEquals([new Sql('t1.c1')], $queryBuilder->getGroupBy());
         $this->assertEquals([new Sql('t1.c2')], $queryBuilder->getOrderBy());
-        $this->assertQueryIs('(t1.c2 = ?)', [456], $queryBuilder->getHaving()->build());
+        $this->assertNotNull($having);
+        $this->assertQueryIs('(t1.c2 = ?)', [456], $having->build());
         $this->assertEquals([new Sql('w AS (PARTITION BY c1)', [])], $queryBuilder->getWindow());
         $this->assertSame(12, $queryBuilder->getOffset());
         $this->assertSame(34, $queryBuilder->getLimit());
@@ -761,10 +767,6 @@ class SelectBuilderTest extends TestCase
         $totalItems = 21;
 
         $expectedResult = array_fill(0, 10, new \stdClass());
-        $expectedBindValues = [
-            [1, $perPage, \PDO::PARAM_INT],
-            [2, 0, \PDO::PARAM_INT]
-        ];
 
         $stmt1 = $this->createMock(PDOStatementInterface::class);
         $stmt1
@@ -780,25 +782,19 @@ class SelectBuilderTest extends TestCase
         $stmt2
             ->expects($this->exactly(2))
             ->method('bindValue')
-            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
-                $this->assertSame(array_shift($expectedBindValues), $args);
-                return true;
-            });
-
-        $expectedQueries = [
-            ['SELECT COUNT(*) FROM t1', []],
-            ['SELECT * FROM t1 ORDER BY t1.id LIMIT ? OFFSET ?', []],
-        ];
-        $expectedStmts = [$stmt1, $stmt2];
+            ->willReturnMap([
+                [1, $perPage, \PDO::PARAM_INT, true],
+                [2, 0, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
             ->expects($matcher = $this->exactly(2))
             ->method('prepare')
-            ->willReturnCallback(function(...$args) use (&$expectedQueries, &$expectedStmts) {
-                $this->assertSame(array_shift($expectedQueries), $args);
-                return array_shift($expectedStmts);
-            });
+            ->willReturnMap([
+                ['SELECT COUNT(*) FROM t1', [], $stmt1],
+                ['SELECT * FROM t1 ORDER BY t1.id LIMIT ? OFFSET ?', [], $stmt2],
+            ]);
 
         $fetcher = $this->createMock(FetcherInterface::class);
         $fetcher
@@ -808,7 +804,7 @@ class SelectBuilderTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->willReturnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $expectedResult): ResultSetInterface {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($expectedResult);
             });
@@ -833,19 +829,15 @@ class SelectBuilderTest extends TestCase
 
         $result = array_fill(0, 11, new \stdClass());
         $expectedResult = array_slice($result, 0, $perPage);
-        $expectedBindValues = [
-            [1, 11, \PDO::PARAM_INT],
-            [2, 10, \PDO::PARAM_INT],
-        ];
 
         $stmt = $this->createMock(PDOStatementInterface::class);
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
-            ->willReturnCallback(function(...$args) use (&$expectedBindValues) {
-                $this->assertSame(array_shift($expectedBindValues), $args);
-                return true;
-            });
+            ->willReturnMap([
+                [1, 11, \PDO::PARAM_INT, true],
+                [2, 10, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -858,7 +850,7 @@ class SelectBuilderTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->willReturnCallback(function($queryBuilder) use ($pdo, $result) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $result) {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($result);
             });

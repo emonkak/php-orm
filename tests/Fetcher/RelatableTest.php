@@ -8,7 +8,6 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Fetcher\Relatable;
 use Emonkak\Orm\Fetcher\RelationFetcher;
 use Emonkak\Orm\Relation\RelationInterface;
-use Emonkak\Orm\Tests\Fixtures\Spy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,39 +29,40 @@ class RelatableTest extends TestCase
 
         $relation = $this->createMock(RelationInterface::class);
 
-        $relationFactory = $this->createMock(Spy::class);
-        $relationFactory
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($this->identicalTo($class))
-            ->willReturn($relation);
+        $fetcher = $relatable->with(function() use ($relation) {
+            return $relation;
+        });
 
-        $relationFetcher = $relatable->with($relationFactory);
-
-        $this->assertInstanceOf(RelationFetcher::class, $relationFetcher);
-        $this->assertSame($relatable, $relationFetcher->getFetcher());
-        $this->assertSame($relation, $relationFetcher->getRelation());
+        $this->assertInstanceOf(RelationFetcher::class, $fetcher);
+        $this->assertSame($relatable, $fetcher->getFetcher());
+        $this->assertSame($relation, $fetcher->getRelation());
     }
 
     public function testWithRelation(): void
     {
         $class = \stdClass::class;
-
         $relation = $this->createMock(RelationInterface::class);
 
         $relatable = $this->getMockBuilder(RelatableMock::class)
             ->onlyMethods(['getClass', 'getPdo', 'fetch'])
             ->getMock();
 
-        $relationFetcher = $relatable->withRelation($relation);
+        $fetcher = $relatable->withRelation($relation);
 
-        $this->assertInstanceOf(RelationFetcher::class, $relationFetcher);
-        $this->assertSame($relatable, $relationFetcher->getFetcher());
-        $this->assertSame($relation, $relationFetcher->getRelation());
+        $this->assertInstanceOf(RelationFetcher::class, $fetcher);
+        $this->assertSame($relatable, $fetcher->getFetcher());
+        $this->assertSame($relation, $fetcher->getRelation());
     }
 }
 
+/**
+ * @template T
+ * @implements FetcherInterface<T>
+ */
 abstract class RelatableMock implements FetcherInterface
 {
+    /**
+     * @use Relatable<T>
+     */
     use Relatable;
 }

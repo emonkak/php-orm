@@ -10,38 +10,29 @@ namespace Emonkak\Orm\Pagination;
  */
 class SequentialPage extends AbstractPage
 {
-    /**
-     * @var int
-     */
-    private $index;
+    private int $index;
+
+    private int $perPage;
 
     /**
-     * @var int
-     */
-    private $perPage;
-
-    /**
-     * @psalm-var callable(int,int):T[]
-     * @var callable
+     * @var callable(int,int):T[]
      */
     private $itemsFetcher;
 
     /**
-     * @psalm-var T[]
-     * @var mixed[]
+     * @var T[]
      */
-    private $items;
+    private array $items;
 
     /**
-     * @psalm-var T[]
-     * @var mixed[]
+     * @var T[]
      */
-    private $tailItems;
+    private array $tailItems;
 
     /**
      * @template TStatic
-     * @psalm-param callable(int,int):TStatic[] $itemsFetcher
-     * @psalm-return self<TStatic>
+     * @param callable(int,int):TStatic[] $itemsFetcher
+     * @return self<TStatic>
      */
     public static function from(int $initialIndex, int $perPage, callable $itemsFetcher): self
     {
@@ -51,9 +42,9 @@ class SequentialPage extends AbstractPage
     }
 
     /**
-     * @psalm-param T[] $items
-     * @psalm-param T[] $tailItems
-     * @psalm-param callable(int,int):T[] $itemsFetcher
+     * @param T[] $items
+     * @param T[] $tailItems
+     * @param callable(int,int):T[] $itemsFetcher
      */
     private function __construct(array $items, array $tailItems, int $index, int $perPage, callable $itemsFetcher)
     {
@@ -64,16 +55,13 @@ class SequentialPage extends AbstractPage
         $this->itemsFetcher = $itemsFetcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->items);
     }
 
     /**
-     * @psalm-return iterable<T>
+     * @return iterable<T>
      */
     public function getSource(): iterable
     {
@@ -91,16 +79,13 @@ class SequentialPage extends AbstractPage
     }
 
     /**
-     * @psalm-return T[]
+     * @return T[]
      */
     public function getItems(): array
     {
         return $this->items;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): PageInterface
     {
         $index = $this->index + 1;
@@ -114,9 +99,6 @@ class SequentialPage extends AbstractPage
         return new self($items, $tailItems, $index, $this->perPage, $this->itemsFetcher);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function previous(): PageInterface
     {
         $index = $this->index - 1;

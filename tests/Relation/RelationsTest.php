@@ -8,8 +8,10 @@ use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\Grammar\GrammarInterface;
 use Emonkak\Orm\Relation\Cached;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
@@ -34,10 +36,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -47,11 +49,12 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::oneToOne(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher
         )($outerClass);
@@ -62,10 +65,10 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -89,10 +92,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -104,11 +107,12 @@ class RelationsTest extends TestCase
 
         $collationClass = \ArrayObject::class;
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::oneToMany(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher,
             $collationClass
@@ -120,10 +124,10 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -150,10 +154,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
         $throughKey = 'through_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
@@ -164,11 +168,12 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::throughOneToOne(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $throughKey,
             $queryBuilder,
             $fetcher
@@ -180,10 +185,10 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -207,10 +212,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
         $throughKey = 'through_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
@@ -221,11 +226,12 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::throughOneToMany(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $throughKey,
             $queryBuilder,
             $fetcher
@@ -237,10 +243,10 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -267,10 +273,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -280,11 +286,12 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::lazyOneToOne(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher
         )($outerClass);
@@ -295,26 +302,24 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
         $this->assertInstanceOf(LazyOuterJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
-        $this->assertEquals(
-            new Model([
-                'outer_key' => 123,
-                'relation_key' => new Model(['inner_key' => 456]), ]
-            ),
-            ($joinStrategy->getResultSelector())(
-                new Model(['outer_key' => 123]),
-                new Model(['inner_key' => 456])
-            )
-        );
+
+        $outer = new Model(['outer_key' => 123]);
+        /** @var LazyValue<Model|null,int> */
+        $inner = new LazyValue(456, function(int $key): Model { return new Model(['inner_key' => $key]); });
+        $result = ($joinStrategy->getResultSelector())($outer, $inner);
+
+        $this->assertSame(123, $result->outer_key);
+        $this->assertEquals(new Model(['inner_key' => 456]), $result->relation_key->get());
     }
 
     public function testLazyOneToMany(): void
@@ -322,10 +327,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -335,11 +340,12 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::lazyOneToMany(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher
         )($outerClass);
@@ -350,29 +356,32 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(OneTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
         $this->assertInstanceOf(LazyGroupJoin::class, $joinStrategy);
         $this->assertSame(123, ($joinStrategy->getOuterKeySelector())(new Model(['outer_key' => 123])));
         $this->assertSame(456, ($joinStrategy->getInnerKeySelector())(new Model(['inner_key' => 456])));
-        $this->assertEquals(
-            new Model([
-                'outer_key' => 123,
-                'relation_key' => [
-                    new Model(['inner_key' => 456]),
-                    new Model(['inner_key' => 789]),
-                ],
-            ]),
-            ($joinStrategy->getResultSelector())(
-                new Model(['outer_key' => 123]),
-                [new Model(['inner_key' => 456]), new Model(['inner_key' => 789])]
-            )
-        );
+
+        $outer = new Model(['outer_key' => 123]);
+        /** @var LazyCollection<Model,int> */
+        $inner = new LazyCollection(123, function(int $key): array {
+            return [
+                new Model(['outer_key' => $key, 'inner_key' => 456]),
+                new Model(['outer_key' => $key, 'inner_key' => 789]),
+            ];
+        });
+        $result = ($joinStrategy->getResultSelector())($outer, $inner);
+
+        $this->assertSame(123, $result->outer_key);
+        $this->assertEquals([
+            new Model(['outer_key' => 123, 'inner_key' => 456]),
+            new Model(['outer_key' => 123, 'inner_key' => 789]),
+        ], $result->relation_key->get());
     }
 
     public function testCachedOneToOne(): void
@@ -380,10 +389,10 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
-        $table = 'table';
+        $relationKeyName = 'relation_key';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
+        $tableName = 'table';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -394,14 +403,15 @@ class RelationsTest extends TestCase
             ->willReturn($innerClass);
 
         $cache = $this->createMock(CacheInterface::class);
-        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
+        $cacheKeySelector = function(int $key): string { return 'prefix.' . $key; };
         $cacheTtl = 3600;
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::cachedOneToOne(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher,
             $cache,
@@ -409,7 +419,6 @@ class RelationsTest extends TestCase
             $cacheTtl
         )($outerClass);
         $relationStrategy = $relation->getRelationStrategy();
-        $innerRelationStrategy = $relationStrategy->getRelationStrategy();
         $joinStrategy = $relation->getJoinStrategy();
 
         $this->assertInstanceOf(Relation::class, $relation);
@@ -420,11 +429,12 @@ class RelationsTest extends TestCase
         $this->assertSame($cacheKeySelector, $relationStrategy->getCacheKeySelector());
         $this->assertSame($cacheTtl, $relationStrategy->getCacheTtl());
 
+        $innerRelationStrategy = $relationStrategy->getRelationStrategy();
         $this->assertInstanceOf(OneTo::class, $innerRelationStrategy);
-        $this->assertSame($relationKey, $innerRelationStrategy->getRelationKey());
-        $this->assertSame($table, $innerRelationStrategy->getTable());
-        $this->assertSame($outerKey, $innerRelationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $innerRelationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $innerRelationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $innerRelationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $innerRelationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $innerRelationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $innerRelationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $innerRelationStrategy->getFetcher());
 
@@ -448,15 +458,16 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
         $innerElements = [new Model([])];
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::preloadedOneToOne(
-            $relationKey,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $outerKeyName,
+            $innerKeyName,
             $innerClass,
             $innerElements
         )($outerClass);
@@ -467,9 +478,9 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(Preloaded::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($innerElements, $relationStrategy->getInnerElements());
 
         $this->assertInstanceOf(OuterJoin::class, $joinStrategy);
@@ -492,16 +503,17 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
         $innerElements = [new Model([])];
         $collationClass = \ArrayObject::class;
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::preloadedOneToMany(
-            $relationKey,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $outerKeyName,
+            $innerKeyName,
             $innerClass,
             $innerElements,
             $collationClass
@@ -513,9 +525,9 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(Preloaded::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($innerElements, $relationStrategy->getInnerElements());
 
         $this->assertInstanceOf(GroupJoin::class, $joinStrategy);
@@ -541,13 +553,13 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $oneToManyTable = 'one_to_many_table';
-        $oneToManyOuterKey = 'one_to_many_outer_key';
-        $oneToManyInnerKey = 'one_to_many_inner_key';
-        $manyToOneTable = 'many_to_one_table';
-        $manyToOneOuterKey = 'many_to_one_outer_key';
-        $manyToOneInnerKey = 'many_to_one_inner_key';
+        $relationKeyName = 'relation_key';
+        $oneToManyTableName = 'one_to_many_table';
+        $oneToManyOuterKeyName = 'one_to_many_outer_key';
+        $oneToManyInnerKeyName = 'one_to_many_inner_key';
+        $manyToOneTableName = 'many_to_one_table';
+        $manyToOneOuterKeyName = 'many_to_one_outer_key';
+        $manyToOneInnerKeyName = 'many_to_one_inner_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -559,14 +571,15 @@ class RelationsTest extends TestCase
 
         $collationClass = \ArrayObject::class;
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::manyToMany(
-            $relationKey,
-            $oneToManyTable,
-            $oneToManyOuterKey,
-            $oneToManyInnerKey,
-            $manyToOneTable,
-            $manyToOneOuterKey,
-            $manyToOneInnerKey,
+            $relationKeyName,
+            $oneToManyTableName,
+            $oneToManyOuterKeyName,
+            $oneToManyInnerKeyName,
+            $manyToOneTableName,
+            $manyToOneOuterKeyName,
+            $manyToOneInnerKeyName,
             $queryBuilder,
             $fetcher,
             $collationClass
@@ -578,13 +591,13 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(ManyTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($oneToManyTable, $relationStrategy->getOneToManyTable());
-        $this->assertSame($oneToManyOuterKey, $relationStrategy->getOneToManyOuterKey());
-        $this->assertSame($oneToManyInnerKey, $relationStrategy->getOneToManyInnerKey());
-        $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
-        $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
-        $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($oneToManyTableName, $relationStrategy->getOneToManyTableName());
+        $this->assertSame($oneToManyOuterKeyName, $relationStrategy->getOneToManyOuterKeyName());
+        $this->assertSame($oneToManyInnerKeyName, $relationStrategy->getOneToManyInnerKeyName());
+        $this->assertSame($manyToOneTableName, $relationStrategy->getManyToOneTableName());
+        $this->assertSame($manyToOneOuterKeyName, $relationStrategy->getManyToOneOuterKeyName());
+        $this->assertSame($manyToOneInnerKeyName, $relationStrategy->getManyToOneInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -611,14 +624,14 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
         $innerClass = Model::class;
 
-        $relationKey = 'relation_key';
-        $oneToManyTable = 'one_to_many_table';
-        $oneToManyOuterKey = 'one_to_many_outer_key';
-        $oneToManyInnerKey = 'one_to_many_inner_key';
-        $manyToOneTable = 'many_to_one_table';
-        $manyToOneOuterKey = 'many_to_one_outer_key';
-        $manyToOneInnerKey = 'many_to_one_inner_key';
-        $throughKey = 'through_key';
+        $relationKeyName = 'relation_key';
+        $oneToManyTableName = 'one_to_many_table';
+        $oneToManyOuterKeyName = 'one_to_many_outer_key';
+        $oneToManyInnerKeyName = 'one_to_many_inner_key';
+        $manyToOneTableName = 'many_to_one_table';
+        $manyToOneOuterKeyName = 'many_to_one_outer_key';
+        $manyToOneInnerKeyName = 'many_to_one_inner_key';
+        $throughKeyName = 'through_key';
 
         $grammar = $this->createMock(GrammarInterface::class);
         $queryBuilder = new SelectBuilder($grammar);
@@ -628,15 +641,16 @@ class RelationsTest extends TestCase
             ->method('getClass')
             ->willReturn($innerClass);
 
+        /** @var Relation<Model,Model,int,Model> */
         $relation = Relations::throughManyToMany(
-            $relationKey,
-            $oneToManyTable,
-            $oneToManyOuterKey,
-            $oneToManyInnerKey,
-            $manyToOneTable,
-            $manyToOneOuterKey,
-            $manyToOneInnerKey,
-            $throughKey,
+            $relationKeyName,
+            $oneToManyTableName,
+            $oneToManyOuterKeyName,
+            $oneToManyInnerKeyName,
+            $manyToOneTableName,
+            $manyToOneOuterKeyName,
+            $manyToOneInnerKeyName,
+            $throughKeyName,
             $queryBuilder,
             $fetcher
         )($outerClass);
@@ -647,13 +661,13 @@ class RelationsTest extends TestCase
         $this->assertSame($outerClass, $relation->getResultClass());
 
         $this->assertInstanceOf(ManyTo::class, $relationStrategy);
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($oneToManyTable, $relationStrategy->getOneToManyTable());
-        $this->assertSame($oneToManyOuterKey, $relationStrategy->getOneToManyOuterKey());
-        $this->assertSame($oneToManyInnerKey, $relationStrategy->getOneToManyInnerKey());
-        $this->assertSame($manyToOneTable, $relationStrategy->getManyToOneTable());
-        $this->assertSame($manyToOneOuterKey, $relationStrategy->getManyToOneOuterKey());
-        $this->assertSame($manyToOneInnerKey, $relationStrategy->getManyToOneInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($oneToManyTableName, $relationStrategy->getOneToManyTableName());
+        $this->assertSame($oneToManyOuterKeyName, $relationStrategy->getOneToManyOuterKeyName());
+        $this->assertSame($oneToManyInnerKeyName, $relationStrategy->getOneToManyInnerKeyName());
+        $this->assertSame($manyToOneTableName, $relationStrategy->getManyToOneTableName());
+        $this->assertSame($manyToOneOuterKeyName, $relationStrategy->getManyToOneOuterKeyName());
+        $this->assertSame($manyToOneInnerKeyName, $relationStrategy->getManyToOneInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
 
@@ -680,32 +694,29 @@ class RelationsTest extends TestCase
         $outerClass = Model::class;
 
         $morphKey = 'morph_key';
-        $morphRelations = [
+        $relations = [
             'first' => $this->createMock(RelationInterface::class),
             'second' => $this->createMock(RelationInterface::class),
         ];
-
-        $morphRelationFactories = [
+        $relationFactories = [
             'first' => $this->createMock(Spy::class),
             'second' => $this->createMock(Spy::class),
         ];
 
-        foreach ($morphRelationFactories as $key => $morphRelationFactory) {
-            $morphRelationFactory
+        foreach ($relationFactories as $key => $relationFactory) {
+            $relationFactory
                 ->expects($this->once())
                 ->method('__invoke')
                 ->with($this->identicalTo($outerClass))
-                ->willReturn($morphRelations[$key]);
+                ->willReturn($relations[$key]);
         }
 
-        $relation = Relations::polymorphic(
-            $morphKey,
-            $morphRelationFactories
-        )($outerClass);
+        /** @var array<string,callable(?class-string):RelationInterface<Model,Model>> $relationFactories */
+        $relation = Relations::polymorphic($morphKey, $relationFactories)($outerClass);
 
         $this->assertInstanceOf(PolymorphicRelation::class, $relation);
         $this->assertSame($outerClass, $relation->getResultClass());
         $this->assertSame(123, ($relation->getMorphKeySelector())(new Model(['morph_key' => 123])));
-        $this->assertSame($morphRelations, $relation->getRelations());
+        $this->assertSame($relations, $relation->getRelations());
     }
 }

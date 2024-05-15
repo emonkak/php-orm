@@ -23,20 +23,18 @@ class RelationFetcher implements FetcherInterface
     use Relatable;
 
     /**
-     * @psalm-var FetcherInterface<TOuter>
-     * @var FetcherInterface
+     * @var FetcherInterface<TOuter>
      */
-    private $fetcher;
+    private FetcherInterface $fetcher;
 
     /**
-     * @psalm-var RelationInterface<TOuter,TResult>
-     * @var RelationInterface
+     * @var RelationInterface<TOuter,TResult>
      */
-    private $relation;
+    private RelationInterface $relation;
 
     /**
-     * @psalm-param FetcherInterface<TOuter> $fetcher
-     * @psalm-param RelationInterface<TOuter,TResult> $relation
+     * @param FetcherInterface<TOuter> $fetcher
+     * @param RelationInterface<TOuter,TResult> $relation
      */
     public function __construct(FetcherInterface $fetcher, RelationInterface $relation)
     {
@@ -45,7 +43,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-return FetcherInterface<TOuter>
+     * @return FetcherInterface<TOuter>
      */
     public function getFetcher(): FetcherInterface
     {
@@ -53,7 +51,7 @@ class RelationFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-return RelationInterface<TOuter,TResult>
+     * @return RelationInterface<TOuter,TResult>
      */
     public function getRelation(): RelationInterface
     {
@@ -65,17 +63,11 @@ class RelationFetcher implements FetcherInterface
         return $this->fetcher->getPdo();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): ?string
     {
         return $this->relation->getResultClass();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $result = $this->fetcher->fetch($queryBuilder);
