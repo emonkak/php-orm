@@ -38,10 +38,11 @@ jobs:
       - name: Run PHP CS Fixer
         run: ./vendor/bin/php-cs-fixer fix --dry-run --using-cache=no --stop-on-violation --show-progress=none --verbose
       - name: Run tests
-        run: ./vendor/bin/phpunit --coverage-clover ./build/logs/clover.xml
+        run: ./vendor/bin/phpunit --coverage-clover ./coverage/clover.xml
       - name: Upload coverage results
-        run: ./vendor/bin/php-coveralls --verbose
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_PARALLEL: 'true'
-          COVERALLS_FLAG_NAME: php-${{ matrix.php-version }}
+        continue-on-error: true
+        uses: coverallsapp/github-action@v2
+        with:
+          file: ./coverage/clover.xml
+          flag-name: php-${{ matrix.php-version }}
+          parallel: true
