@@ -1,6 +1,7 @@
 <?php
 
 // NOTE: Do not enable "strict_types" to enable implicit type coercions.
+declare(strict_types=0);
 
 namespace Emonkak\Orm\ResultSet;
 
