@@ -7,6 +7,7 @@ namespace Emonkak\Orm\Tests\Relation;
 use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
@@ -22,27 +23,27 @@ class OneToTest extends TestCase
 
     public function testConstructor(): void
     {
-        $relationKey = 'relation_key';
-        $table = 'table';
-        $outerKey = 'outer_key';
-        $innerKey = 'inner_key';
+        $relationKeyName = 'relation_key';
+        $tableName = 'table';
+        $outerKeyName = 'outer_key';
+        $innerKeyName = 'inner_key';
 
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
 
         $relationStrategy = new OneTo(
-            $relationKey,
-            $table,
-            $outerKey,
-            $innerKey,
+            $relationKeyName,
+            $tableName,
+            $outerKeyName,
+            $innerKeyName,
             $queryBuilder,
             $fetcher
         );
 
-        $this->assertSame($relationKey, $relationStrategy->getRelationKey());
-        $this->assertSame($table, $relationStrategy->getTable());
-        $this->assertSame($outerKey, $relationStrategy->getOuterKey());
-        $this->assertSame($innerKey, $relationStrategy->getInnerKey());
+        $this->assertSame($relationKeyName, $relationStrategy->getRelationKeyName());
+        $this->assertSame($tableName, $relationStrategy->getTableName());
+        $this->assertSame($outerKeyName, $relationStrategy->getOuterKeyName());
+        $this->assertSame($innerKeyName, $relationStrategy->getInnerKeyName());
         $this->assertSame($queryBuilder, $relationStrategy->getQueryBuilder());
         $this->assertSame($fetcher, $relationStrategy->getFetcher());
     }
@@ -56,12 +57,11 @@ class OneToTest extends TestCase
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 2, \PDO::PARAM_INT],
-                [3, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 1, \PDO::PARAM_INT, true],
+                [2, 2, \PDO::PARAM_INT, true],
+                [3, 3, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -76,10 +76,10 @@ class OneToTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $expectedResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $expectedResult) {
                 $queryBuilder->prepare($pdo);
                 return $expectedResult;
-            }));
+            });
 
         $relationStrategy = new OneTo(
             'revisions',
@@ -87,8 +87,7 @@ class OneToTest extends TestCase
             'revision_id',
             'revision_id',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
 
         $joinStrategy = $this->createMock(JoinStrategyInterface::class);

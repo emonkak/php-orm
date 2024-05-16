@@ -17,34 +17,30 @@ use Emonkak\Enumerable\Iterator\OuterJoinIterator;
 class OuterJoin implements JoinStrategyInterface
 {
     /**
-     * @psalm-var callable(TOuter):TKey
-     * @var callable
+     * @var callable(TOuter):TKey
      */
     private $outerKeySelector;
 
     /**
-     * @psalm-var callable(TInner):TKey
-     * @var callable
+     * @var callable(TInner):TKey
      */
     private $innerKeySelector;
 
     /**
-     * @psalm-var callable(TOuter,?TInner):TResult $resultSelector
-     * @var callable
+     * @var callable(TOuter,?TInner):TResult
      */
     private $resultSelector;
 
     /**
-     * @psalm-var EqualityComparerInterface<TKey>
-     * @var EqualityComparerInterface
+     * @var EqualityComparerInterface<TKey>
      */
-    private $comparer;
+    private EqualityComparerInterface $comparer;
 
     /**
-     * @psalm-param callable(TOuter):TKey $outerKeySelector
-     * @psalm-param callable(TInner):TKey $innerKeySelector
-     * @psalm-param callable(TOuter,?TInner):TResult $resultSelector
-     * @psalm-param EqualityComparerInterface<TKey> $comparer
+     * @param callable(TOuter):TKey $outerKeySelector
+     * @param callable(TInner):TKey $innerKeySelector
+     * @param callable(TOuter,?TInner):TResult $resultSelector
+     * @param EqualityComparerInterface<TKey> $comparer
      */
     public function __construct(
         callable $outerKeySelector,
@@ -59,7 +55,7 @@ class OuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter):TKey
+     * @return callable(TOuter):TKey
      */
     public function getOuterKeySelector(): callable
     {
@@ -67,7 +63,7 @@ class OuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TInner):TKey
+     * @return callable(TInner):TKey
      */
     public function getInnerKeySelector(): callable
     {
@@ -75,7 +71,7 @@ class OuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TOuter,?TInner):TResult
+     * @return callable(TOuter,?TInner):TResult
      */
     public function getResultSelector(): callable
     {
@@ -83,7 +79,7 @@ class OuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-return EqualityComparerInterface<TKey>
+     * @return EqualityComparerInterface<TKey>
      */
     public function getComparer(): EqualityComparerInterface
     {
@@ -91,13 +87,12 @@ class OuterJoin implements JoinStrategyInterface
     }
 
     /**
-     * @psalm-param iterable<TOuter> $outer
-     * @psalm-param iterable<TInner> $inner
-     * @psalm-return \Traversable<TResult>
+     * @param iterable<TOuter> $outer
+     * @param iterable<TInner> $inner
+     * @return \Traversable<TResult>
      */
     public function join(iterable $outer, iterable $inner): \Traversable
     {
-        /** @psalm-var \Traversable<TResult> */
         return new OuterJoinIterator(
             $outer,
             $inner,

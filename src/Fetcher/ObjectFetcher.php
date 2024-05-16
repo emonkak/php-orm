@@ -20,27 +20,23 @@ class ObjectFetcher implements FetcherInterface
      */
     use Relatable;
 
-    /**
-     * @var PDOInterface
-     */
-    private $pdo;
+    private PDOInterface $pdo;
 
     /**
-     * @psalm-var class-string<T>
      * @var class-string<T>
      */
-    private $class;
+    private string $class;
 
     /**
-     * @var ?array<int,mixed>
+     * @var mixed[]|null
      */
-    private $constructorArguments;
+    private ?array $constructorArguments;
 
     /**
-     * @psalm-param class-string<T> $class
-     * @psalm-param ?array<int,mixed> $constructorArguments
+     * @param class-string<T> $class
+     * @param ?mixed[] $constructorArguments
      */
-    public function __construct(PDOInterface $pdo, string $class, array $constructorArguments = null)
+    public function __construct(PDOInterface $pdo, string $class, ?array $constructorArguments = null)
     {
         $this->class = $class;
         $this->constructorArguments = $constructorArguments;
@@ -52,9 +48,6 @@ class ObjectFetcher implements FetcherInterface
         return $this->pdo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): ?string
     {
         return $this->class;
@@ -68,9 +61,6 @@ class ObjectFetcher implements FetcherInterface
         return $this->constructorArguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $stmt = $queryBuilder->prepare($this->pdo);

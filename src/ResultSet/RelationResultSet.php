@@ -21,27 +21,24 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     use EnumerableExtensions;
 
     /**
-     * @psalm-var ResultSetInterface<T>
-     * @var ResultSetInterface
+     * @var ResultSetInterface<T>
      */
-    private $outerResult;
+    private ResultSetInterface $outerResult;
 
     /**
-     * @psalm-var ?class-string<T>
      * @var ?class-string
      */
-    private $outerClass;
+    private ?string $outerClass;
 
     /**
-     * @psalm-var RelationInterface<T,TResult>
-     * @var RelationInterface
+     * @var RelationInterface<T,TResult>
      */
-    private $relation;
+    private RelationInterface $relation;
 
     /**
-     * @psalm-param ResultSetInterface<T> $outerResult
-     * @psalm-param ?class-string<T> $outerClass
-     * @psalm-param RelationInterface<T,TResult> $relation
+     * @param ResultSetInterface<T> $outerResult
+     * @param ?class-string $outerClass
+     * @param RelationInterface<T,TResult> $relation
      */
     public function __construct(ResultSetInterface $outerResult, ?string $outerClass, RelationInterface $relation)
     {
@@ -51,7 +48,7 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return ResultSetInterface<T>
+     * @return ResultSetInterface<T>
      */
     public function getOuterResult(): ResultSetInterface
     {
@@ -59,16 +56,13 @@ class RelationResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return ?class-string<T>
+     * @return ?class-string
      */
     public function getOuterClass(): ?string
     {
         return $this->outerClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return $this->relation->associate($this->outerResult, $this->outerClass);

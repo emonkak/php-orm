@@ -14,15 +14,9 @@ use Emonkak\Orm\ResultSet\ResultSetInterface;
  */
 class ColumnFetcher implements FetcherInterface
 {
-    /**
-     * @var PDOInterface
-     */
-    private $pdo;
+    private PDOInterface $pdo;
 
-    /**
-     * @var int
-     */
-    private $columnNumber;
+    private int $columnNumber;
 
     public function __construct(PDOInterface $pdo, int $columnNumber = 0)
     {
@@ -40,17 +34,11 @@ class ColumnFetcher implements FetcherInterface
         return $this->columnNumber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $stmt = $queryBuilder->prepare($this->pdo);

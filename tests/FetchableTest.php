@@ -23,7 +23,7 @@ class FetchableTest extends TestCase
         $pdo = $this->createMock(PDOInterface::class);
 
         $fetchable = $this->getMockBuilder(FetchableMock::class)
-            ->setMethodsExcept(['getResult'])
+            ->onlyMethods(['build', 'prepare'])
             ->getMock();
 
         $fetcher = $this->createMock(FetcherInterface::class);

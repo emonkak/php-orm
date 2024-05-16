@@ -22,82 +22,73 @@ class SelectBuilder implements QueryBuilderInterface
     use Fetchable;
     use Preparable;
 
-    /**
-     * @var GrammarInterface
-     */
-    private $grammar;
+    private GrammarInterface $grammar;
 
-    /**
-     * @var string
-     */
-    private $prefix = 'SELECT';
+    private string $prefix = 'SELECT';
 
     /**
      * @var Sql[]
      */
-    private $select = [];
+    private array $select = [];
 
     /**
      * @var Sql[]
      */
-    private $from = [];
+    private array $from = [];
 
     /**
      * @var Sql[]
      */
-    private $join = [];
+    private array $join = [];
 
     /**
      * @var ?Sql
      */
-    private $where;
+    private ?Sql $where = null;
 
     /**
      * @var Sql[]
      */
-    private $groupBy = [];
+    private array $groupBy = [];
 
     /**
      * @var ?Sql
      */
-    private $having;
+    private ?Sql $having = null;
 
     /**
      * @var Sql[]
      */
-    private $window = [];
+    private array $window = [];
 
     /**
      * @var Sql[]
      */
-    private $orderBy = [];
+    private array $orderBy = [];
 
     /**
      * @var ?int
      */
-    private $offset;
+    private ?int $offset = null;
 
     /**
      * @var ?int
      */
-    private $limit;
+    private ?int $limit = null;
 
-    /**
-     * @var string
-     */
-    private $suffix = '';
+    private string $suffix = '';
 
     /**
      * @var Sql[]
      */
-    private $union = [];
+    private array $union = [];
 
     /**
      * @var ?self
      */
-    private $parent;
+    private ?self $parent = null;
 
-    public function __construct(GrammarInterface $grammar, SelectBuilder $parent = null)
+    public function __construct(GrammarInterface $grammar, ?SelectBuilder $parent = null)
     {
         $this->grammar = $grammar;
         $this->parent = $parent;
@@ -213,12 +204,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $expr
-     */
-    public function select($expr, ?string $alias = null): self
+    public function select(mixed $expr, ?string $alias = null): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -228,13 +216,13 @@ class SelectBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param (QueryBuilderInterface|Sql|string)[] $exprs
+     * @param mixed[] $exprs
      */
     public function withSelect(array $exprs): self
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = $this->grammar->lift($expr);
+            $expr = $this->grammar->lvalue($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -245,12 +233,9 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $table
-     */
-    public function from($table, ?string $alias = null, int $position = -1): self
+    public function from(mixed $table, ?string $alias = null, int $position = -1): self
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->lvalue($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -265,13 +250,7 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function where(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -279,13 +258,7 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function orWhere(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -293,18 +266,14 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $table
-     * @param QueryBuilderInterface|Sql|string|null $condition
-     */
-    public function join($table, $condition = null, string $alias = null, int $position = -1, string $type = 'JOIN'): self
+    public function join(mixed $table, mixed $condition = null, ?string $alias = null, int $position = -1, string $type = 'JOIN'): self
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->lvalue($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         if ($condition !== null) {
-            $condition = $this->grammar->lift($condition);
+            $condition = $this->grammar->lvalue($condition);
         }
         $joinedTable = $this->grammar->join($table, $condition, $type);
         $join = $this->join;
@@ -318,33 +287,20 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $table
-     * @param QueryBuilderInterface|Sql|string|null $condition
-     */
-    public function outerJoin($table, $condition = null, string $alias = null, int $position = -1): self
+    public function outerJoin(mixed $table, mixed $condition = null, ?string $alias = null, int $position = -1): self
     {
         return $this->join($table, $condition, $alias, $position, 'LEFT OUTER JOIN');
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $expr
-     */
-    public function groupBy($expr): self
+    public function groupBy(mixed $expr): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function having($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function having(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -352,13 +308,7 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function orHaving($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function orHaving(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -366,23 +316,17 @@ class SelectBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $specification
-     */
-    public function window(string $name, $specification = ''): self
+    public function window(string $name, mixed $specification = ''): self
     {
-        $specification = $this->grammar->lift($specification);
+        $specification = $this->grammar->lvalue($specification);
         $cloned = clone $this;
         $cloned->window[] = $this->grammar->window($name, $specification);
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $expr
-     */
-    public function orderBy($expr, ?string $ordering = null): self
+    public function orderBy(mixed $expr, ?string $ordering = null): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -429,21 +373,15 @@ class SelectBuilder implements QueryBuilderInterface
         return $this->union('UNION ALL');
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $query
-     */
-    public function unionWith($query, string $type = 'UNION'): self
+    public function unionWith(mixed $query, string $type = 'UNION'): self
     {
-        $query = $this->grammar->lift($query);
+        $query = $this->grammar->lvalue($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;
     }
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $query
-     */
-    public function unionAllWith($query): self
+    public function unionAllWith(mixed $query): self
     {
         return $this->unionWith($query, 'UNION ALL');
     }
@@ -474,20 +412,17 @@ class SelectBuilder implements QueryBuilderInterface
         return count($sqls) > 1 ? Sql::join(' ', array_reverse($sqls)) : $sqls[0];
     }
 
-    /**
-     * @return mixed
-     */
-    public function aggregate(PDOInterface $pdo, string $expr)
+    public function aggregate(PDOInterface $pdo, string $expr): mixed
     {
-        $stmt = $this->withSelect([$expr])->withoutSorting()->prepare($pdo);
+        $stmt = $this->withSelect([$expr])->withoutOrdering()->prepare($pdo);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     /**
      * @template T
-     * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-return PaginatorInterface<T>
+     * @param FetcherInterface<T> $fetcher
+     * @return PaginatorInterface<T>
      */
     public function paginate(FetcherInterface $fetcher, int $perPage, string $countExpr = 'COUNT(*)'): PaginatorInterface
     {
@@ -498,8 +433,8 @@ class SelectBuilder implements QueryBuilderInterface
 
     /**
      * @template T
-     * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-return PaginatorInterface<T>
+     * @param FetcherInterface<T> $fetcher
+     * @return PaginatorInterface<T>
      */
     public function paginateWithCount(FetcherInterface $fetcher, int $perPage, int $count): PaginatorInterface
     {
@@ -514,8 +449,8 @@ class SelectBuilder implements QueryBuilderInterface
 
     /**
      * @template T
-     * @psalm-param FetcherInterface<T> $fetcher
-     * @psalm-return PageInterface<T>
+     * @param FetcherInterface<T> $fetcher
+     * @return PageInterface<T>
      */
     public function paginateFrom(FetcherInterface $fetcher, int $initialIndex, int $perPage): PageInterface
     {
@@ -529,7 +464,7 @@ class SelectBuilder implements QueryBuilderInterface
         return SequentialPage::from($initialIndex, $perPage, $itemsFetcher);
     }
 
-    private function withoutSorting(): self
+    private function withoutOrdering(): self
     {
         $cloned = clone $this;
         $cloned->orderBy = [];

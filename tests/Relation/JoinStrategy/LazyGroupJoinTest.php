@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Enumerable\LooseEqualityComparer;
+use Emonkak\Orm\Relation\JoinStrategy\LazyCollection;
 use Emonkak\Orm\Relation\JoinStrategy\LazyGroupJoin;
 use PHPUnit\Framework\TestCase;
 
@@ -58,12 +59,13 @@ class LazyGroupJoinTest extends TestCase
             ],
         ];
 
-        $outerKeySelector = function($user) { return $user['user_id']; };
-        $innerKeySelector = function($user) { return $user['user_id']; };
-        $resultSelector = function($user, $tweets) {
+        $outerKeySelector = function(array $user): int { return $user['user_id']; };
+        $innerKeySelector = function(array $user): int { return $user['user_id']; };
+        $resultSelector = function(array $user, LazyCollection $tweets): array {
             $user['tweets'] = $tweets;
             return $user;
         };
+        /** @var LooseEqualityComparer<mixed> */
         $comparer = LooseEqualityComparer::getInstance();
         $lazyGroupJoin = new LazyGroupJoin(
             $outerKeySelector,

@@ -1,5 +1,7 @@
 <?php
 
+// NOTE: Do not enable "strict_types" to enable implicit type coercions.
+
 namespace Emonkak\Orm\ResultSet;
 
 use Emonkak\Database\PDOStatementInterface;
@@ -18,27 +20,23 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
      */
     use EnumerableExtensions;
 
-    /**
-     * @var PDOStatementInterface
-     */
-    private $stmt;
+    private PDOStatementInterface $stmt;
 
     /**
-     * @psalm-var class-string<T>
-     * @var class-string
+     * @var class-string<T>
      */
-    private $class;
+    private string $class;
 
     /**
-     * @var ?mixed[]
+     * @var mixed[]|null
      */
-    private $constructorArguments;
+    private ?array $constructorArguments;
 
     /**
-     * @psalm-param class-string<T> $class
-     * @psalm-param ?mixed[] $constructorArguments
+     * @param class-string<T> $class
+     * @param mixed[]|null $constructorArguments
      */
-    public function __construct(PDOStatementInterface $stmt, string $class, array $constructorArguments = null)
+    public function __construct(PDOStatementInterface $stmt, string $class, ?array $constructorArguments = null)
     {
         $this->stmt = $stmt;
         $this->class = $class;
@@ -46,7 +44,7 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return class-string<T>
+     * @return class-string<T>
      */
     public function getClass(): string
     {
@@ -54,52 +52,43 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * @psalm-return ?mixed[]
+     * @return mixed[]|null
      */
     public function getConstructorArguments(): ?array
     {
         return $this->constructorArguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
-        // Uses a generator to avoid the enabling of 'strict_types' directive.
         $this->stmt->execute();
         $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
+
+        // Iterate the statement within this function to avoid 'strict_types' directive.
         foreach ($this->stmt as $element) {
             yield $element;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(): array
     {
         $this->stmt->execute();
         return $this->stmt->fetchAll(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function first(callable $predicate = null)
+    public function first(?callable $predicate = null): mixed
     {
         $this->stmt->execute();
 
         $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
 
-        if ($predicate) {
+        if ($predicate !== null) {
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
                     return $element;
                 }
             }
         } else {
-            /** @psalm-var T|false */
             $element = $this->stmt->fetch();
             if ($element !== false) {
                 return $element;
@@ -109,16 +98,13 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
         throw new NoSuchElementException('Sequence contains no elements');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function firstOrDefault(callable $predicate = null, $defaultValue = null)
+    public function firstOrDefault(?callable $predicate = null, mixed $defaultValue = null): mixed
     {
         $this->stmt->execute();
 
         $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $this->class, $this->constructorArguments);
 
-        if ($predicate) {
+        if ($predicate !== null) {
             foreach ($this->stmt as $element) {
                 if ($predicate($element)) {
                     return $element;
@@ -131,7 +117,6 @@ class ObjectResultSet implements \IteratorAggregate, ResultSetInterface
             }
         }
 
-        /** @psalm-assert TDefault $defaultValue */
         return $defaultValue;
     }
 }

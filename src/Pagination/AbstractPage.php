@@ -8,10 +8,9 @@ use Emonkak\Enumerable\EnumerableExtensions;
 
 /**
  * @template T
- * @implements \IteratorAggregate<T>
  * @implements PageInterface<T>
  */
-abstract class AbstractPage implements \IteratorAggregate, PageInterface
+abstract class AbstractPage implements PageInterface
 {
     /**
      * @use EnumerableExtensions<T>
@@ -23,10 +22,7 @@ abstract class AbstractPage implements \IteratorAggregate, PageInterface
         return $this->getIndex() * $this->getPerPage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function forward(): iterable
+    public function forward(): \Traversable
     {
         $page = $this;
 
@@ -39,10 +35,7 @@ abstract class AbstractPage implements \IteratorAggregate, PageInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function backward(): iterable
+    public function backward(): \Traversable
     {
         $page = $this;
 

@@ -36,12 +36,13 @@ class OuterJoinTest extends TestCase
             $talents[4] + ['program' => $programs[3]],
         ];
 
-        $outerKeySelector = function($talent) { return $talent['talent_id']; };
-        $innerKeySelector = function($program) { return $program['talent_id']; };
-        $resultSelector = function($talent, $program) {
+        $outerKeySelector = function(array $talent): int { return $talent['talent_id']; };
+        $innerKeySelector = function(array $program): string { return $program['talent_id']; };
+        $resultSelector = function(array $talent, ?array $program): array {
             $talent['program'] = $program;
             return $talent;
         };
+        /** @var LooseEqualityComparer<mixed> */
         $comparer = LooseEqualityComparer::getInstance();
         $outerJoin = new OuterJoin(
             $outerKeySelector,

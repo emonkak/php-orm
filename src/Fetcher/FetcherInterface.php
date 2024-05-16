@@ -16,12 +16,12 @@ interface FetcherInterface
     public function getPdo(): PDOInterface;
 
     /**
-     * @psalm-return ?class-string<T>
+     * @return ?class-string
      */
     public function getClass(): ?string;
 
     /**
-     * @psalm-return ResultSetInterface<T>
+     * @return ResultSetInterface<T>
      */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface;
 }

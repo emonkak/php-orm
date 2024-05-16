@@ -18,9 +18,6 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
      */
     use EnumerableExtensions;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         for ($i = 0, $l = $this->getTotalPages(); $i < $l; $i++) {
@@ -35,17 +32,11 @@ abstract class AbstractPaginator implements \IteratorAggregate, PaginatorInterfa
         return 0 <= $index && $index < $this->getTotalPages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function firstPage(): PaginatablePageInterface
     {
         return $this->at(0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lastPage(): PaginatablePageInterface
     {
         $totalPages = $this->getTotalPages();

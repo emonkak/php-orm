@@ -16,7 +16,7 @@ class PolymorphicRelationTest extends TestCase
     public function testConstructor(): void
     {
         $resultClass = \stdClass::class;
-        $morphKeySelector = function($object) {
+        $morphKeySelector = function(\stdClass $object): string {
             return $object->morph_key;
         };
         $relations = [
@@ -41,7 +41,7 @@ class PolymorphicRelationTest extends TestCase
             ['comment_id' => 1, 'commentable_id' => 1, 'commentable_type' => 'posts', 'body' => 'foo'],
             ['comment_id' => 2, 'commentable_id' => 2, 'commentable_type' => 'videos', 'body' => 'bar'],
             ['comment_id' => 3, 'commentable_id' => 3, 'commentable_type' => 'posts', 'body' => 'baz'],
-            ['comment_id' => 4, 'commentable_id' => null, 'commentable_type' => null, 'body' => 'qux'],
+            ['comment_id' => 4, 'commentable_id' => null, 'commentable_type' => 'none', 'body' => 'qux'],
         ];
         $posts = [
             ['post_id' => 1, 'content' => 'foo'],
@@ -87,7 +87,7 @@ class PolymorphicRelationTest extends TestCase
             [
                 'comment_id' => 4,
                 'commentable_id' => null,
-                'commentable_type' => null,
+                'commentable_type' => 'none',
                 'body' => 'qux',
             ],
         ];
@@ -96,26 +96,26 @@ class PolymorphicRelationTest extends TestCase
         $hasPost
             ->expects($this->once())
             ->method('associate')
-            ->will($this->returnCallback(function($result) use ($posts) {
+            ->willReturnCallback(function(array $result) use ($posts): \ArrayIterator {
                 return new \ArrayIterator([
-                     $result[0] + ['commentable' => $posts[0]],
-                     $result[1] + ['commentable' => $posts[2]],
+                    $result[0] + ['commentable' => $posts[0]],
+                    $result[1] + ['commentable' => $posts[2]],
                 ]);
-            }));
+            });
 
         $hasVideo = $this->createMock(RelationInterface::class);
         $hasVideo
             ->expects($this->once())
             ->method('associate')
-            ->will($this->returnCallback(function($result) use ($videos) {
+            ->willReturnCallback(function(array $result) use ($videos): \ArrayIterator {
                 return new \ArrayIterator([
-                     $result[0] + ['commentable' => $videos[1]],
+                    $result[0] + ['commentable' => $videos[1]],
                 ]);
-            }));
+            });
 
         $relation = new PolymorphicRelation(
             null,
-            function($row) {
+            function(array $row): string {
                 return $row['commentable_type'];
             },
             [

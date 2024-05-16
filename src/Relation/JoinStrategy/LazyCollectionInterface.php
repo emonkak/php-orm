@@ -10,6 +10,6 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
  * @extends \ArrayAccess<array-key,TSource>
  * @extends LazyValueInterface<TSource[]>
  */
-interface LazyCollectionInterface extends \ArrayAccess, \Countable, \IteratorAggregate, \Serializable, LazyValueInterface
+interface LazyCollectionInterface extends \ArrayAccess, \Countable, \IteratorAggregate, LazyValueInterface
 {
 }

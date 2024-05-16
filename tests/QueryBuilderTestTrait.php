@@ -13,28 +13,31 @@ use Emonkak\Orm\UpdateBuilder;
 
 trait QueryBuilderTestTrait
 {
-    protected function assertQueryIs($expectedSql, array $expectedBindings, Sql $query)
+    /**
+     * @param mixed[] $expectedBindings
+     */
+    protected function assertQueryIs(string $expectedSql, array $expectedBindings, Sql $query): void
     {
         $this->assertSame($expectedSql, $query->getSql());
         $this->assertEquals($expectedBindings, $query->getBindings());
     }
 
-    protected function getSelectBuilder()
+    protected function getSelectBuilder(): SelectBuilder
     {
         return new SelectBuilder(new DefaultGrammar());
     }
 
-    protected function getInsertBuilder()
+    protected function getInsertBuilder(): InsertBuilder
     {
         return new InsertBuilder(new DefaultGrammar());
     }
 
-    protected function getUpdateBuilder()
+    protected function getUpdateBuilder(): UpdateBuilder
     {
         return new UpdateBuilder(new DefaultGrammar());
     }
 
-    protected function getDeleteBuilder()
+    protected function getDeleteBuilder(): DeleteBuilder
     {
         return new DeleteBuilder(new DefaultGrammar());
     }

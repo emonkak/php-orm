@@ -14,42 +14,38 @@ use PHPUnit\Framework\TestCase;
  */
 class RelationResultSetTest extends TestCase
 {
-    private $outerResult;
-
-    private $relation;
-
-    private $result;
-
-    public function setUp(): void
-    {
-        $this->outerResult = $this->createMock(ResultSetInterface::class);
-        $this->relation = $this->createMock(RelationInterface::class);
-        $this->result = new RelationResultSet($this->outerResult, \stdClass::class, $this->relation);
-    }
-
     public function testGetOuterResult(): void
     {
-        $this->assertSame($this->outerResult, $this->result->getOuterResult());
+        $outerResult = $this->createMock(ResultSetInterface::class);
+        $relation = $this->createMock(RelationInterface::class);
+        $result = new RelationResultSet($outerResult, \stdClass::class, $relation);
+        $this->assertSame($outerResult, $result->getOuterResult());
     }
 
     public function testGetOuterClass(): void
     {
-        $this->assertSame(\stdClass::class, $this->result->getOuterClass());
+        $outerResult = $this->createMock(ResultSetInterface::class);
+        $relation = $this->createMock(RelationInterface::class);
+        $result = new RelationResultSet($outerResult, \stdClass::class, $relation);
+        $this->assertSame(\stdClass::class, $result->getOuterClass());
     }
 
     public function testGetIterator(): void
     {
-        $expected = new \ArrayIterator([
+        $expectedResult = new \ArrayIterator([
             ['foo' => 123],
             ['foo' => 456],
         ]);
 
-        $this->relation
+        $outerResult = $this->createMock(ResultSetInterface::class);
+        $relation = $this->createMock(RelationInterface::class);
+        $relation
             ->expects($this->once())
             ->method('associate')
-            ->with($this->identicalTo($this->outerResult))
-            ->willReturn($expected);
+            ->with($this->identicalTo($outerResult))
+            ->willReturn($expectedResult);
+        $result = new RelationResultSet($outerResult, \stdClass::class, $relation);
 
-        $this->assertSame($expected, $this->result->getIterator());
+        $this->assertSame($expectedResult, $result->getIterator());
     }
 }

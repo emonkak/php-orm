@@ -21,14 +21,10 @@ class CachedTest extends TestCase
 
     public function testConstructor(): void
     {
-        $outerKeySelector = function() {};
-        $innerKeySelector = function() {};
-        $resultSelector = function() {};
-
         $innerRelationStrategy = $this->createMock(RelationStrategyInterface::class);
 
         $cache = $this->createMock(CacheInterface::class);
-        $cacheKeySelector = function($key) { return 'prefix.' . $key; };
+        $cacheKeySelector = function(int $id): string { return 'prefix.' . $id; };
         $cacheTtl = 3600;
 
         $relationStrategy = new Cached(
@@ -53,7 +49,7 @@ class CachedTest extends TestCase
             new Model(['id' => 3]),
         ];
 
-        $cacheKeySelector = function($key) { return 'model.' . $key; };
+        $cacheKeySelector = function(int $id): string { return 'model.' . $id; };
         $cacheTtl = 3600;
 
         $cache = $this->createMock(CacheInterface::class);
@@ -103,7 +99,7 @@ class CachedTest extends TestCase
             ->expects($this->once())
             ->method('getInnerKeySelector')
             ->with()
-            ->willReturn(function($model) {
+            ->willReturn(function(Model $model): int {
                 return $model->id;
             });
 
@@ -121,7 +117,7 @@ class CachedTest extends TestCase
             new Model(['id' => 3]),
         ];
 
-        $cacheKeySelector = function($key) { return 'model.' . $key; };
+        $cacheKeySelector = function(int $id): string { return 'model.' . $id; };
         $cacheTtl = 3600;
 
         $cache = $this->createMock(CacheInterface::class);

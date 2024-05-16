@@ -15,7 +15,7 @@ namespace Emonkak\Orm\Pagination;
 interface PaginatablePageInterface extends PageInterface
 {
     /**
-     * @psalm-return PaginatorInterface<T>
+     * @return PaginatorInterface<T>
      */
     public function getPaginator(): PaginatorInterface;
 }

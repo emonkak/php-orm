@@ -6,7 +6,6 @@ namespace Emonkak\Orm\Grammar;
 
 use Emonkak\Orm\DeleteBuilder;
 use Emonkak\Orm\InsertBuilder;
-use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\SelectBuilder;
 use Emonkak\Orm\Sql;
 use Emonkak\Orm\UpdateBuilder;
@@ -21,23 +20,11 @@ interface GrammarInterface
 
     public function getDeleteBuilder(): DeleteBuilder;
 
-    /**
-     * @param QueryBuilderInterface|Sql|string $value
-     */
-    public function lift($value): Sql;
+    public function lvalue(mixed $value): Sql;
 
-    /**
-     * @param mixed $value
-     */
-    public function value($value): Sql;
+    public function rvalue(mixed $value): Sql;
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql;
+    public function condition(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): Sql;
 
     public function operator(string $operator, Sql $lhs, Sql $rhs): Sql;
 
@@ -49,7 +36,7 @@ interface GrammarInterface
 
     public function window(string $name, Sql $specification): Sql;
 
-    public function ordering(Sql $expr, string $ordering): sql;
+    public function ordering(Sql $expr, string $ordering): Sql;
 
     public function union(Sql $query, string $type): Sql;
 
@@ -72,7 +59,7 @@ interface GrammarInterface
      * @param string[] $columns
      * @param Sql[][] $values
      */
-    public function insertStatement(string $prefix, string $table, array $columns, array $values, ?Sql $select): Sql;
+    public function insertStatement(string $prefix, string $into, array $columns, array $values, ?Sql $select): Sql;
 
     /**
      * @param Sql[] $set

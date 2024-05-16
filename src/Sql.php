@@ -10,19 +10,13 @@ class Sql implements QueryBuilderInterface
     use Fetchable;
     use Preparable;
 
-    /**
-     * @var string
-     */
-    private $sql;
+    private string $sql;
 
     /**
-     * @var array<int,?scalar>
+     * @var array<int,mixed>
      */
-    private $bindings;
+    private array $bindings;
 
-    /**
-     * @suppress PhanTypeExpectedObjectPropAccess
-     */
     public static function format(string $format, Sql ...$sqls): self
     {
         $tmpSqls = [];
@@ -58,16 +52,13 @@ class Sql implements QueryBuilderInterface
         return new Sql($sql, $bindings);
     }
 
-    /**
-     * @param ?scalar $value
-     */
-    public static function value($value): self
+    public static function value(mixed $value): self
     {
         return new Sql('?', [$value]);
     }
 
     /**
-     * @param array<int,?scalar> $values
+     * @param array<int,mixed> $values
      */
     public static function values(array $values): self
     {
@@ -107,7 +98,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param array<int,?scalar> $bindings
+     * @param array<int,mixed> $bindings
      */
     public function __construct(string $sql, array $bindings = [])
     {
@@ -118,28 +109,29 @@ class Sql implements QueryBuilderInterface
     public function __toString(): string
     {
         $format = str_replace(['%', '?'], ['%%', '%s'], $this->sql);
-        $args = array_map(function($binding) {
+        $args = array_map(function(mixed $binding): mixed {
             switch ($type = gettype($binding)) {
-            case 'integer':
-            case 'double':
-                return $binding;
-            case 'boolean':
-                return $binding ? 1 : 0;
-            case 'NULL':
-                return 'NULL';
-            case 'string':
-                /** @psalm-var string $binding */
-                $isText = mb_check_encoding($binding, 'utf-8');
-                if ($isText) {
-                    return "'" . addslashes($binding) . "'";
-                } else {  // binary string
-                    return "x'" . bin2hex($binding) . "'";
-                }
-                // no break
-            default:
-                /** @psalm-var mixed $binding */
-                $typeOrClass = is_object($binding) ? get_class($binding) : $type;
-                return "'<" . $typeOrClass . ">'";
+                case 'integer':
+                case 'double':
+                    /** @var float|int $binding */
+                    return $binding;
+                case 'boolean':
+                    /** @var bool $binding */
+                    return $binding ? 1 : 0;
+                case 'NULL':
+                    return 'NULL';
+                case 'string':
+                    /** @var string $binding */
+                    $isText = mb_check_encoding($binding, 'utf-8');
+                    if ($isText) {
+                        return "'" . addslashes($binding) . "'";
+                    } else {  // binary string
+                        return "x'" . bin2hex($binding) . "'";
+                    }
+                    // no break
+                default:
+                    $typeOrClass = is_object($binding) ? get_class($binding) : $type;
+                    return "'<" . $typeOrClass . ">'";
             }
         }, $this->bindings);
         return vsprintf($format, $args);
@@ -151,7 +143,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @return array<int,?scalar>
+     * @return array<int,mixed>
      */
     public function getBindings(): array
     {
@@ -159,7 +151,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param array<int,?scalar> $bindings
+     * @param array<int,mixed> $bindings
      */
     public function append(string $sql, array $bindings = [], string $separator = ' '): self
     {
@@ -181,7 +173,7 @@ class Sql implements QueryBuilderInterface
     }
 
     /**
-     * @param array<int,?scalar> $bindings
+     * @param array<int,mixed> $bindings
      */
     public function prepend(string $sql, array $bindings = [], string $separator = ' '): self
     {

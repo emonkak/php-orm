@@ -6,14 +6,18 @@ namespace Emonkak\Orm\Tests\Fixtures;
 
 class Entity
 {
-    private $foo;
+    private mixed $foo = null;
 
-    public function getFoo()
+    public mixed $__foo = null;
+
+    public mixed $__pivot_foo = null;
+
+    public function getFoo(): mixed
     {
         return $this->foo;
     }
 
-    public function setFoo($foo)
+    public function setFoo(mixed $foo): void
     {
         $this->foo = $foo;
     }

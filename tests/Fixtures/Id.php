@@ -6,14 +6,14 @@ namespace Emonkak\Orm\Tests\Fixtures;
 
 class Id implements \JsonSerializable
 {
-    private $id;
+    private int $id;
 
-    public function __construct($id)
+    public function __construct(int $id)
     {
         $this->id = $id;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->id;
     }

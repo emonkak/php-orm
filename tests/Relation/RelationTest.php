@@ -8,12 +8,14 @@ use Emonkak\Database\PDOInterface;
 use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Fetcher\FetcherInterface;
+use Emonkak\Orm\QueryBuilderInterface;
 use Emonkak\Orm\Relation\JoinStrategy\GroupJoin;
 use Emonkak\Orm\Relation\JoinStrategy\OuterJoin;
 use Emonkak\Orm\Relation\ManyTo;
 use Emonkak\Orm\Relation\OneTo;
 use Emonkak\Orm\Relation\Relation;
 use Emonkak\Orm\ResultSet\PreloadedResultSet;
+use Emonkak\Orm\ResultSet\ResultSetInterface;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use Emonkak\Orm\Tests\QueryBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +30,7 @@ class RelationTest extends TestCase
     public function testOneToOne(): void
     {
         $outerClass = Model::class;
+        // Test whether IDs of different types can be joined.
         $outerResult = [
             new Model(['post_id' => 1, 'user_id' => 1]),
             new Model(['post_id' => 2, 'user_id' => 1]),
@@ -66,11 +69,10 @@ class RelationTest extends TestCase
         $stmt
             ->expects($this->exactly(2))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 1, \PDO::PARAM_INT, true],
+                [2, 3, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -85,32 +87,35 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $innerResult): ResultSetInterface {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($innerResult);
-            }));
+            });
 
+        /** @var LooseEqualityComparer<mixed> */
+        $comparer = LooseEqualityComparer::getInstance();
+        /** @var OneTo<Model,mixed> */
         $relationStrategy = new OneTo(
             'user',
             'users',
             'user_id',
             'user_id',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
+        /** @var OuterJoin<Model,Model,mixed,Model> */
         $joinStrategy = new OuterJoin(
-            function($outerElement) {
-                return $outerElement->user_id;
+            function(Model $outer): mixed {
+                return $outer->user_id;
             },
-            function($innerElement) {
-                return $innerElement->user_id;
+            function(Model $inner): mixed {
+                return $inner->user_id;
             },
-            function($outerElement, $innerElement) {
-                $outerElement->user = $innerElement;
-                return $outerElement;
+            function(Model $outer, ?Model $inner): Model {
+                $outer->user = $inner;
+                return $outer;
             },
-            LooseEqualityComparer::getInstance()
+            $comparer
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -163,12 +168,11 @@ class RelationTest extends TestCase
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 2, \PDO::PARAM_INT],
-                [3, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 1, \PDO::PARAM_INT, true],
+                [2, 2, \PDO::PARAM_INT, true],
+                [3, 3, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -183,32 +187,35 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $innerResult): ResultSetInterface {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($innerResult);
-            }));
+            });
 
+        /** @var LooseEqualityComparer<mixed> */
+        $comparer = LooseEqualityComparer::getInstance();
+        /** @var OneTo<Model,mixed> */
         $relationStrategy = new OneTo(
             'posts',
             'posts',
             'user_id',
             'user_id',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
+        /** @var GroupJoin<Model,Model,mixed,Model> */
         $joinStrategy = new GroupJoin(
-            function($outerElement) {
-                return $outerElement->user_id;
+            function(Model $outer): mixed {
+                return $outer->user_id;
             },
-            function($innerElement) {
-                return $innerElement->user_id;
+            function(Model $inner): mixed {
+                return $inner->user_id;
             },
-            function($outerElement, $innerElements) {
-                $outerElement->posts = $innerElements;
-                return $outerElement;
+            function(Model $outer, array $inner): Model {
+                $outer->posts = $inner;
+                return $outer;
             },
-            LooseEqualityComparer::getInstance()
+            $comparer
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -227,27 +234,30 @@ class RelationTest extends TestCase
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
 
+        /** @var LooseEqualityComparer<mixed> */
+        $comparer = LooseEqualityComparer::getInstance();
+        /** @var OneTo<Model,mixed> */
         $relationStrategy = new OneTo(
             'posts',
             'posts',
             'user_id',
             'user_id',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
+        /** @var GroupJoin<Model,Model,mixed,Model> */
         $joinStrategy = new GroupJoin(
-            function($outerElement) {
-                return $outerElement->user_id;
+            function(Model $outer): mixed {
+                return $outer->user_id;
             },
-            function($innerElement) {
-                return $innerElement->user_id;
+            function(Model $inner): mixed {
+                return $inner->user_id;
             },
-            function($outerElement, $innerElements) {
-                $outerElement->posts = $innerElements;
-                return $outerElement;
+            function(Model $outer, array $inner): Model {
+                $outer->posts = $inner;
+                return $outer;
             },
-            LooseEqualityComparer::getInstance()
+            $comparer
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -267,27 +277,30 @@ class RelationTest extends TestCase
         $queryBuilder = $this->getSelectBuilder();
         $fetcher = $this->createMock(FetcherInterface::class);
 
+        /** @var LooseEqualityComparer<mixed> */
+        $comparer = LooseEqualityComparer::getInstance();
+        /** @var OneTo<Model,mixed> */
         $relationStrategy = new OneTo(
             'posts',
             'posts',
             'user_id',
             'user_id',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
+        /** @var GroupJoin<Model,Model,mixed,Model> */
         $joinStrategy = new GroupJoin(
-            function($outerElement) {
-                return $outerElement->user_id;
+            function(Model $outer): mixed {
+                return $outer->user_id;
             },
-            function($innerElement) {
-                return $innerElement->user_id;
+            function(Model $inner): mixed {
+                return $inner->user_id;
             },
-            function($outerElement, $innerElements) {
-                $outerElement->posts = $innerElements;
-                return $outerElement;
+            function(Model $outer, array $inner): Model {
+                $outer->posts = $inner;
+                return $outer;
             },
-            LooseEqualityComparer::getInstance()
+            $comparer
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 
@@ -338,12 +351,11 @@ class RelationTest extends TestCase
         $stmt
             ->expects($this->exactly(3))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 1, \PDO::PARAM_INT],
-                [2, 2, \PDO::PARAM_INT],
-                [3, 3, \PDO::PARAM_INT]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 1, \PDO::PARAM_INT, true],
+                [2, 2, \PDO::PARAM_INT, true],
+                [3, 3, \PDO::PARAM_INT, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -358,11 +370,14 @@ class RelationTest extends TestCase
         $fetcher
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnCallback(function($queryBuilder) use ($pdo, $innerResult) {
+            ->willReturnCallback(function(QueryBuilderInterface $queryBuilder) use ($pdo, $innerResult): ResultSetInterface {
                 $queryBuilder->prepare($pdo);
                 return new PreloadedResultSet($innerResult);
-            }));
+            });
 
+        /** @var LooseEqualityComparer<mixed> */
+        $comparer = LooseEqualityComparer::getInstance();
+        /** @var ManyTo<Model,mixed> */
         $relationStrategy = new ManyTo(
             'friends',
             'friendships',
@@ -373,21 +388,21 @@ class RelationTest extends TestCase
             'user_id',
             '__pivot_key',
             $queryBuilder,
-            $fetcher,
-            []
+            $fetcher
         );
+        /** @var OuterJoin<Model,Model,mixed,Model> */
         $joinStrategy = new GroupJoin(
-            function($outerElement) {
-                return $outerElement->user_id;
+            function(Model $outer): mixed {
+                return $outer->user_id;
             },
-            function($innerElement) {
-                return $innerElement->__pivot_key;
+            function(Model $inner): mixed {
+                return $inner->__pivot_key;
             },
-            function($outerElement, $innerElements) {
-                $outerElement->friends = $innerElements;
-                return $outerElement;
+            function(Model $outer, array $inner): Model {
+                $outer->friends = $inner;
+                return $outer;
             },
-            LooseEqualityComparer::getInstance()
+            $comparer
         );
         $relation = new Relation($outerClass, $relationStrategy, $joinStrategy);
 

@@ -16,27 +16,24 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
 class Relation implements RelationInterface
 {
     /**
-     * @psalm-var ?class-string<TResult>
      * @var ?class-string
      */
-    private $resultClass;
+    private ?string $resultClass;
 
     /**
-     * @psalm-var RelationStrategyInterface<TInner,TKey>
-     * @var RelationStrategyInterface
+     * @var RelationStrategyInterface<TInner,TKey>
      */
-    private $relationStrategy;
+    private RelationStrategyInterface $relationStrategy;
 
     /**
-     * @psalm-var JoinStrategyInterface<TOuter,TInner,TKey,TResult>
-     * @var JoinStrategyInterface
+     * @var JoinStrategyInterface<TOuter,TInner,TKey,TResult>
      */
-    private $joinStrategy;
+    private JoinStrategyInterface $joinStrategy;
 
     /**
-     * @psalm-param ?class-string<TResult> $resultClass
-     * @psalm-param RelationStrategyInterface<TInner,TKey> $relationStrategy
-     * @psalm-param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
+     * @param ?class-string $resultClass
+     * @param RelationStrategyInterface<TInner,TKey> $relationStrategy
+     * @param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
      */
     public function __construct(
         ?string $resultClass,
@@ -49,7 +46,7 @@ class Relation implements RelationInterface
     }
 
     /**
-     * @psalm-return RelationStrategyInterface<TInner,TKey>
+     * @return RelationStrategyInterface<TInner,TKey>
      */
     public function getRelationStrategy(): RelationStrategyInterface
     {
@@ -57,24 +54,18 @@ class Relation implements RelationInterface
     }
 
     /**
-     * @psalm-return JoinStrategyInterface<TOuter,TInner,TKey,TResult>
+     * @return JoinStrategyInterface<TOuter,TInner,TKey,TResult>
      */
     public function getJoinStrategy(): JoinStrategyInterface
     {
         return $this->joinStrategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResultClass(): ?string
     {
         return $this->resultClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function associate(iterable $outerResult, ?string $outerClass): \Traversable
     {
         $joinStrategy = $this->joinStrategy;
@@ -86,7 +77,6 @@ class Relation implements RelationInterface
         foreach ($outerResult as $outerElement) {
             $outerElements[] = $outerElement;
             $outerKey = $outerKeySelector($outerElement);
-            /** @psalm-suppress RedundantConditionGivenDocblockType */
             if ($outerKey !== null) {
                 $outerKeys[] = $outerKey;
             }

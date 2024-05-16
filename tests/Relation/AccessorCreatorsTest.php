@@ -39,10 +39,11 @@ class AccessorCreatorsTest extends TestCase
         $this->assertFalse(isset($entity->_foo));
     }
 
-    public function testToObjectKeyAssignee(): void
+    public function testToObjectKeyAssignor(): void
     {
         $entity = new Entity();
-        $keyAssignee = AccessorCreators::createKeyAssignee(Entity::class, 'foo');
+        /** @var callable(Entity,int):Entity */
+        $keyAssignee = AccessorCreators::createKeyAssignor(Entity::class, 'foo');
         $keyAssignee($entity, 123);
         $this->assertSame(123, $entity->getFoo());
     }
@@ -68,10 +69,11 @@ class AccessorCreatorsTest extends TestCase
         $this->assertEquals([], $eraser($array));
     }
 
-    public function testToArrayKeyAssignee(): void
+    public function testToArrayKeyAssignor(): void
     {
         $array = [];
-        $keyAssignee = AccessorCreators::createKeyAssignee(null, 'foo');
+        /** @var callable(array<mixed,mixed>,int):Entity $keyAssignee */
+        $keyAssignee = AccessorCreators::createKeyAssignor(null, 'foo');
         $this->assertEquals(['foo' => 123], $keyAssignee($array, 123));
     }
 }

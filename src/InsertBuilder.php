@@ -14,35 +14,26 @@ class InsertBuilder implements QueryBuilderInterface
     use Explainable;
     use Preparable;
 
-    /**
-     * @var GrammarInterface
-     */
-    private $grammar;
+    private GrammarInterface $grammar;
 
-    /**
-     * @var string
-     */
-    private $prefix = 'INSERT';
+    private string $prefix = 'INSERT';
 
-    /**
-     * @var ?string
-     */
-    private $into;
+    private ?string $into = null;
 
     /**
      * @var string[]
      */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var Sql[][]
      */
-    private $values = [];
+    private array $values = [];
 
     /**
      * @var ?Sql
      */
-    private $select;
+    private ?Sql $select = null;
 
     public function __construct(GrammarInterface $grammar)
     {
@@ -112,7 +103,7 @@ class InsertBuilder implements QueryBuilderInterface
         foreach ($values as $row) {
             $innerValues = [];
             foreach ($row as $value) {
-                $innerValues[] = $this->grammar->value($value);
+                $innerValues[] = $this->grammar->rvalue($value);
             }
             $cloned->values[] = $innerValues;
         }
@@ -125,7 +116,7 @@ class InsertBuilder implements QueryBuilderInterface
     public function select($query): self
     {
         $cloned = clone $this;
-        $cloned->select = $this->grammar->lift($query);
+        $cloned->select = $this->grammar->lvalue($query);
         return $cloned;
     }
 
@@ -133,7 +124,7 @@ class InsertBuilder implements QueryBuilderInterface
     {
         return $this->grammar->insertStatement(
             $this->prefix,
-            $this->into ?: '',
+            $this->into ?? '',
             $this->columns,
             $this->values,
             $this->select

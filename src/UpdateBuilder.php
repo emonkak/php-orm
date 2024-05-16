@@ -14,30 +14,21 @@ class UpdateBuilder implements QueryBuilderInterface
     use Explainable;
     use Preparable;
 
-    /**
-     * @var GrammarInterface
-     */
-    private $grammar;
+    private GrammarInterface $grammar;
 
-    /**
-     * @var string
-     */
-    private $prefix = 'UPDATE';
+    private string $prefix = 'UPDATE';
 
-    /**
-     * @var string
-     */
-    private $table = '';
+    private string $table = '';
 
     /**
      * @var Sql[]
      */
-    private $set = [];
+    private array $set = [];
 
     /**
      * @var ?Sql
      */
-    private $where;
+    private ?Sql $where = null;
 
     public function __construct(GrammarInterface $grammar)
     {
@@ -86,13 +77,10 @@ class UpdateBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $expr
-     */
-    public function set(string $column, $expr): self
+    public function set(string $column, mixed $expr): self
     {
         $cloned = clone $this;
-        $cloned->set[$column] = $this->grammar->value($expr);
+        $cloned->set[$column] = $this->grammar->rvalue($expr);
         return $cloned;
     }
 
@@ -102,17 +90,11 @@ class UpdateBuilder implements QueryBuilderInterface
     public function withSet(array $set): self
     {
         $cloned = clone $this;
-        $cloned->set = array_map([$this->grammar, 'value'], $set);
+        $cloned->set = array_map([$this->grammar, 'rvalue'], $set);
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function where($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function where(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;
@@ -120,13 +102,7 @@ class UpdateBuilder implements QueryBuilderInterface
         return $cloned;
     }
 
-    /**
-     * @param mixed $arg1
-     * @param mixed $arg2
-     * @param mixed $arg3
-     * @param mixed $arg4
-     */
-    public function orWhere($arg1, $arg2 = null, $arg3 = null, $arg4 = null): self
+    public function orWhere(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): self
     {
         $condition = $this->grammar->condition(...func_get_args());
         $cloned = clone $this;

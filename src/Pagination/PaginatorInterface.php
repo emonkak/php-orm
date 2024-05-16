@@ -13,7 +13,7 @@ use Emonkak\Enumerable\EnumerableInterface;
 interface PaginatorInterface extends EnumerableInterface
 {
     /**
-     * @psalm-return PaginatablePageInterface<T>
+     * @return PaginatablePageInterface<T>
      */
     public function at(int $index): PaginatablePageInterface;
 
@@ -22,12 +22,12 @@ interface PaginatorInterface extends EnumerableInterface
     public function has(int $index): bool;
 
     /**
-     * @psalm-return PaginatablePageInterface<T>
+     * @return PaginatablePageInterface<T>
      */
     public function firstPage(): PaginatablePageInterface;
 
     /**
-     * @psalm-return PaginatablePageInterface<T>
+     * @return PaginatablePageInterface<T>
      */
     public function lastPage(): PaginatablePageInterface;
 

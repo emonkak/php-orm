@@ -29,7 +29,9 @@ class DeleteBuilderTest extends TestCase
             ->where('c1', '=', 123);
         $this->assertSame('DELETE', $queryBuilder->getPrefix());
         $this->assertSame('t1', $queryBuilder->getFrom());
-        $this->assertQueryIs('(c1 = ?)', [123], $queryBuilder->getWhere());
+        $where = $queryBuilder->getWhere();
+        $this->assertNotNull($where);
+        $this->assertQueryIs('(c1 = ?)', [123], $where);
     }
 
     public function testPrefix(): void

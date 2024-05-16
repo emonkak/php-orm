@@ -33,11 +33,7 @@ abstract class AbstractGrammar implements GrammarInterface
         return new DeleteBuilder($this);
     }
 
-    /**
-     * @psalm-suppress RedundantConditionGivenDocblockType
-     * {@inheritdoc}
-     */
-    public function lift($value): Sql
+    public function lvalue(mixed $value): Sql
     {
         if ($value instanceof Sql) {
             return $value;
@@ -49,13 +45,10 @@ abstract class AbstractGrammar implements GrammarInterface
             return new Sql($value);
         }
         $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as a query, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as a left valiue, got '$type'.");
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function value($value): Sql
+    public function rvalue(mixed $value): Sql
     {
         if ($value === null) {
             return new Sql('NULL');
@@ -76,7 +69,7 @@ abstract class AbstractGrammar implements GrammarInterface
             $tmpSqls = [];
             $tmpBindings = [];
             foreach ($value as $v) {
-                $liftedValue = $this->value($v);
+                $liftedValue = $this->rvalue($v);
                 $tmpSqls[] = $liftedValue->getSql();
                 $tmpBindings[] = $liftedValue->getBindings();
             }
@@ -85,38 +78,34 @@ abstract class AbstractGrammar implements GrammarInterface
             return new Sql($sql, $bindings);
         }
         $type = is_object($value) ? get_class($value) : gettype($value);
-        throw new \UnexpectedValueException("The value can not be lifted as a value, got '$type'.");
+        throw new \UnexpectedValueException("The value can not be lifted as a right value, got '$type'.");
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function condition($arg1, $arg2 = null, $arg3 = null, $arg4 = null): Sql
+    public function condition(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): Sql
     {
         switch (func_num_args()) {
             case 1:
-                return $this->lift($arg1);
+                return $this->lvalue($arg1);
 
             case 2:
-                /** @psalm-var string */
+                /** @var string */
                 $operator = $arg1;
-                /** @psalm-var mixed $arg2 */
-                $rhs = $this->lift($arg2);
+                $rhs = $this->lvalue($arg2);
                 return $this->unaryOperator($operator, $rhs);
 
             case 3:
-                /** @psalm-var string */
+                /** @var string */
                 $operator = $arg2;
-                $lhs = $this->lift($arg1);
-                $rhs = $this->value($arg3);
+                $lhs = $this->lvalue($arg1);
+                $rhs = $this->rvalue($arg3);
                 return $this->operator($operator, $lhs, $rhs);
 
             default:
-                /** @psalm-var string */
+                /** @var string */
                 $operator = $arg2;
-                $lhs = $this->lift($arg1);
-                $start = $this->value($arg3);
-                $end = $this->value($arg4);
+                $lhs = $this->lvalue($arg1);
+                $start = $this->rvalue($arg3);
+                $end = $this->rvalue($arg4);
                 return $this->betweenOperator($operator, $lhs, $start, $end);
         }
     }

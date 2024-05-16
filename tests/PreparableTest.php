@@ -22,7 +22,9 @@ class PreparableTest extends TestCase
             ['foo', 123, true, null]
         );
 
-        $preparable = $this->getMockForTrait(Preparable::class);
+        $preparable = $this->getMockBuilder(PreparableMock::class)
+            ->onlyMethods(['build'])
+            ->getMock();
         $preparable
             ->expects($this->once())
             ->method('build')
@@ -32,13 +34,12 @@ class PreparableTest extends TestCase
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 'foo', \PDO::PARAM_STR],
-                [2, 123, \PDO::PARAM_INT],
-                [3, true, \PDO::PARAM_BOOL],
-                [4, null, \PDO::PARAM_NULL]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 'foo', \PDO::PARAM_STR, true],
+                [2, 123, \PDO::PARAM_INT, true],
+                [3, true, \PDO::PARAM_BOOL, true],
+                [4, null, \PDO::PARAM_NULL, true],
+            ]);
 
         $pdo = $this->createMock(PDOInterface::class);
         $pdo
@@ -56,7 +57,9 @@ class PreparableTest extends TestCase
 
         $query = new Sql('SELECT 1', []);
 
-        $preparable = $this->getMockForTrait(Preparable::class);
+        $preparable = $this->getMockBuilder(PreparableMock::class)
+            ->onlyMethods(['build'])
+            ->getMock();
         $preparable
             ->expects($this->once())
             ->method('build')
@@ -81,7 +84,9 @@ class PreparableTest extends TestCase
             [new \stdClass()]
         );
 
-        $preparable = $this->getMockForTrait(Preparable::class);
+        $preparable = $this->getMockBuilder(PreparableMock::class)
+            ->onlyMethods(['build'])
+            ->getMock();
         $preparable
             ->expects($this->once())
             ->method('build')
@@ -106,7 +111,9 @@ class PreparableTest extends TestCase
             ['foo', 123, true, null]
         );
 
-        $preparable = $this->getMockForTrait(Preparable::class);
+        $preparable = $this->getMockBuilder(PreparableMock::class)
+            ->onlyMethods(['build'])
+            ->getMock();
         $preparable
             ->expects($this->once())
             ->method('build')
@@ -116,13 +123,12 @@ class PreparableTest extends TestCase
         $stmt
             ->expects($this->exactly(4))
             ->method('bindValue')
-            ->withConsecutive(
-                [1, 'foo', \PDO::PARAM_STR],
-                [2, 123, \PDO::PARAM_INT],
-                [3, true, \PDO::PARAM_BOOL],
-                [4, null, \PDO::PARAM_NULL]
-            )
-            ->willReturn(true);
+            ->willReturnMap([
+                [1, 'foo', \PDO::PARAM_STR, true],
+                [2, 123, \PDO::PARAM_INT, true],
+                [3, true, \PDO::PARAM_BOOL, true],
+                [4, null, \PDO::PARAM_NULL, true],
+            ]);
         $stmt
             ->expects($this->once())
             ->method('execute')
@@ -137,4 +143,9 @@ class PreparableTest extends TestCase
 
         $this->assertSame(true, $preparable->execute($pdo));
     }
+}
+
+abstract class PreparableMock
+{
+    use Preparable;
 }

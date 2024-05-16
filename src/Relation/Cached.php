@@ -15,29 +15,22 @@ use Psr\SimpleCache\CacheInterface;
 class Cached implements RelationStrategyInterface
 {
     /**
-     * @psalm-var RelationStrategyInterface<TInner,TKey>
-     * @var RelationStrategyInterface
+     * @var RelationStrategyInterface<TInner,TKey>
      */
-    private $relationStrategy;
+    private RelationStrategyInterface $relationStrategy;
+
+    private CacheInterface $cache;
 
     /**
-     * @var CacheInterface
-     */
-    private $cache;
-
-    /**
-     * @psalm-var callable(TKey):string
+     * @var callable(TKey):string
      */
     private $cacheKeySelector;
 
-    /**
-     * @var ?int
-     */
-    private $cacheTtl;
+    private ?int $cacheTtl;
 
     /**
-     * @psalm-param RelationStrategyInterface<TInner,TKey> $relationStrategy
-     * @psalm-param callable(TKey):string $cacheKeySelector
+     * @param RelationStrategyInterface<TInner,TKey> $relationStrategy
+     * @param callable(TKey):string $cacheKeySelector
      */
     public function __construct(
         RelationStrategyInterface $relationStrategy,
@@ -52,7 +45,7 @@ class Cached implements RelationStrategyInterface
     }
 
     /**
-     * @psalm-return RelationStrategyInterface<TInner,TKey>
+     * @return RelationStrategyInterface<TInner,TKey>
      */
     public function getRelationStrategy(): RelationStrategyInterface
     {
@@ -65,7 +58,7 @@ class Cached implements RelationStrategyInterface
     }
 
     /**
-     * @psalm-return callable(TKey):string
+     * @return callable(TKey):string
      */
     public function getCacheKeySelector(): callable
     {
@@ -77,9 +70,6 @@ class Cached implements RelationStrategyInterface
         return $this->cacheTtl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $outerKeysByCacheKey = [];

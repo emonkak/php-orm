@@ -11,16 +11,16 @@ namespace Emonkak\Orm\Relation;
 interface RelationInterface
 {
     /**
-     * @psalm-return ?class-string<TResult>
+     * @return ?class-string
      */
     public function getResultClass(): ?string;
 
     /**
      * Associates between the outer result and the relation result.
      *
-     * @psalm-param iterable<TOuter> $outerResult
-     * @psalm-param ?class-string<TOuter> $outerClass
-     * @psalm-return \Traversable<TResult>
+     * @param iterable<TOuter> $outerResult
+     * @param ?class-string $outerClass
+     * @return \Traversable<TResult>
      */
     public function associate(iterable $outerResult, ?string $outerClass): \Traversable;
 }

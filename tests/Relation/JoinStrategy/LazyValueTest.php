@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
+use Emonkak\Orm\Tests\Fixtures\Spy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,16 +18,16 @@ class LazyValueTest extends TestCase
         $key = new \stdClass();
         $value = 'foo';
 
-        $evaluator = $this->getMockBuilder(\stdClass::class)
-            ->setMethods(['__invoke'])
-            ->getMock();
-        $evaluator
+        $spy = $this->createMock(Spy::class);
+        $spy
             ->expects($this->once())
             ->method('__invoke')
             ->with($this->identicalTo($key))
             ->willReturn($value);
 
-        $lazyValue = new LazyValue($key, $evaluator);
+        $lazyValue = new LazyValue($key, function(\stdClass $key) use ($spy): string {
+            return $spy->__invoke($key);
+        });
 
         $this->assertSame($value, $lazyValue->get());
         $this->assertSame($value, $lazyValue->get());

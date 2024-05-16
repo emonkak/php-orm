@@ -19,30 +19,23 @@ class PreloadedResultSet implements \IteratorAggregate, ResultSetInterface
     use EnumerableExtensions;
 
     /**
-     * @psalm-var T[]
-     * @var mixed[]
+     * @var T[]
      */
-    private $elements;
+    private array $elements;
 
     /**
-     * @psalm-param T[] $elements
+     * @param T[] $elements
      */
     public function __construct(array $elements)
     {
         $this->elements = $elements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->elements);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSource(): iterable
     {
         return $this->elements;

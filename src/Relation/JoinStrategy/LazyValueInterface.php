@@ -7,10 +7,10 @@ namespace Emonkak\Orm\Relation\JoinStrategy;
 /**
  * @template TValue
  */
-interface LazyValueInterface extends \Serializable
+interface LazyValueInterface
 {
     /**
-     * @psalm-return TValue
+     * @return TValue
      */
-    public function get();
+    public function get(): mixed;
 }

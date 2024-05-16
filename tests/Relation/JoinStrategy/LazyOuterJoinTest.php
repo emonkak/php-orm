@@ -6,6 +6,7 @@ namespace Emonkak\Orm\Tests\Relation;
 
 use Emonkak\Enumerable\LooseEqualityComparer;
 use Emonkak\Orm\Relation\JoinStrategy\LazyOuterJoin;
+use Emonkak\Orm\Relation\JoinStrategy\LazyValue;
 use Emonkak\Orm\Tests\Fixtures\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -37,12 +38,14 @@ class LazyOuterJoinTest extends TestCase
             new Model($talents[4]->toArray() + ['program' => $programs[3]]),
         ];
 
-        $outerKeySelector = function($talent) { return $talent->talent_id; };
-        $innerKeySelector = function($program) { return $program->talent_id; };
-        $resultSelector = function($talent, $program) {
+        // Test whether IDs of different types can be joined.
+        $outerKeySelector = function(Model $talent): int { return $talent->talent_id; };
+        $innerKeySelector = function(Model $program): string { return $program->talent_id; };
+        $resultSelector = function(Model $talent, LazyValue $program): Model {
             $talent->program = $program;
             return $talent;
         };
+        /** @var LooseEqualityComparer<mixed> */
         $comparer = LooseEqualityComparer::getInstance();
 
         $lazyOuterJoin = new LazyOuterJoin(
@@ -60,7 +63,7 @@ class LazyOuterJoinTest extends TestCase
         $result = $lazyOuterJoin
             ->join($talents, $programs);
         $result = iterator_to_array($result, false);
-        $result = array_map(function($talent) {
+        $result = array_map(function(Model $talent): Model {
             $talent->program = $talent->program->get();
             return $talent;
         }, $result);

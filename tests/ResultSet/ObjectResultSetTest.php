@@ -13,141 +13,148 @@ use PHPUnit\Framework\TestCase;
  */
 class ObjectResultSetTest extends TestCase
 {
-    private $stmt;
-
-    private $result;
-
-    public function setUp(): void
-    {
-        $this->stmt = $this->createMock(IterablePDOStatementInterface::class);
-        $this->result = new ObjectResultSet($this->stmt, \stdClass::class, ['foo']);
-    }
-
     public function testGetClass(): void
     {
-        $this->assertSame(\stdClass::class, $this->result->getClass());
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
+
+        $this->assertSame(\stdClass::class, $result->getClass());
     }
 
     public function testGetConstructorArguments(): void
     {
-        $this->assertSame(['foo'], $this->result->getConstructorArguments());
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
+
+        $this->assertSame(['foo'], $result->getConstructorArguments());
     }
 
     public function testGetIterator(): void
     {
-        $expected = [(object) ['foo' => 123], (object) ['foo' => 345]];
+        $expectedResult = [(object) ['foo' => 123], (object) ['foo' => 345]];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new \ArrayIterator($expected));
+            ->willReturn(new \ArrayIterator($expectedResult));
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $this->assertSame($expected, iterator_to_array($this->result));
+        $this->assertSame($expectedResult, iterator_to_array($result));
     }
 
     public function testToArray(): void
     {
-        $expected = [(object) ['foo' => 123], (object) ['foo' => 345]];
+        $expectedResult = [(object) ['foo' => 123], (object) ['foo' => 345]];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetchAll')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
-            ->willReturn($expected);
+            ->willReturn($expectedResult);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $this->assertSame($expected, $this->result->toArray());
+        $this->assertSame($expectedResult, $result->toArray());
     }
 
     public function testFirst(): void
     {
-        $expected = ['foo' => 123, 'bar' => 345];
+        $expectedResult = ['foo' => 123, 'bar' => 345];
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('fetch')
             ->with()
-            ->willReturn($expected);
+            ->willReturn($expectedResult);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $this->assertSame($expected, $this->result->first());
-        $this->assertSame($expected, $this->result->firstOrDefault());
+        $this->assertSame($expectedResult, $result->first());
+        $this->assertSame($expectedResult, $result->firstOrDefault());
     }
 
     public function testFirstThrowsRuntimeException(): void
     {
         $this->expectException(\RuntimeException::class);
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetch')
             ->with()
             ->willReturn(false);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $this->result->first();
+        $result->first();
     }
 
     public function testFirstOrDefaultReturnsDefaultValue(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('fetch')
             ->with()
             ->willReturn(false);
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $this->assertNull($this->result->firstOrDefault());
+        $this->assertNull($result->firstOrDefault());
     }
 
     public function testFirstWithPredicate(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->exactly(2))
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->exactly(2))
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -156,29 +163,31 @@ class ObjectResultSetTest extends TestCase
                 (object) ['foo' => 3],
                 (object) ['foo' => 4],
             ]));
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $predicate = function($value) {
+        $predicate = function(\stdClass $value): bool {
             return $value->foo % 2 === 0;
         };
 
-        $this->assertEquals((object) ['foo' => 2], $this->result->first($predicate));
-        $this->assertEquals((object) ['foo' => 2], $this->result->firstOrDefault($predicate));
+        $this->assertEquals((object) ['foo' => 2], $result->first($predicate));
+        $this->assertEquals((object) ['foo' => 2], $result->firstOrDefault($predicate));
     }
 
     public function testFirstWithPredicateThrowsRuntimeException(): void
     {
         $this->expectException(\RuntimeException::class);
 
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -187,26 +196,28 @@ class ObjectResultSetTest extends TestCase
                 (object) ['foo' => 3],
                 (object) ['foo' => 4],
             ]));
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $predicate = function($value) {
+        $predicate = function(\stdClass $value): bool {
             return false;
         };
 
-        $this->result->first($predicate);
+        $result->first($predicate);
     }
 
     public function testFirstOrDefaultWithPredicateReturnsDefaultValue(): void
     {
-        $this->stmt
+        $stmt = $this->createMock(IterablePDOStatementInterface::class);
+        $stmt
             ->expects($this->once())
             ->method('execute')
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('setFetchMode')
             ->with(\PDO::FETCH_CLASS, \stdClass::class, ['foo'])
             ->willReturn(true);
-        $this->stmt
+        $stmt
             ->expects($this->once())
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([
@@ -215,11 +226,12 @@ class ObjectResultSetTest extends TestCase
                 (object) ['foo' => 3],
                 (object) ['foo' => 4],
             ]));
+        $result = new ObjectResultSet($stmt, \stdClass::class, ['foo']);
 
-        $predicate = function($value) {
+        $predicate = function(\stdClass $value): bool {
             return false;
         };
 
-        $this->assertNull($this->result->firstOrDefault($predicate));
+        $this->assertNull($result->firstOrDefault($predicate));
     }
 }

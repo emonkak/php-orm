@@ -21,7 +21,7 @@ class FunctionFetcherTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $class = Model::class;
-        $instantiator = function($props) { return new Model($props); };
+        $instantiator = function(array $props): Model { return new Model($props); };
 
         $fetcher = new FunctionFetcher($pdo, $class, $instantiator);
 
@@ -45,7 +45,7 @@ class FunctionFetcherTest extends TestCase
     {
         $pdo = $this->createMock(PDOInterface::class);
         $class = Model::class;
-        $instantiator = function($props) { return new Model($props); };
+        $instantiator = function(array $props): Model { return new Model($props); };
 
         $stmt = $this->createMock(PDOStatementInterface::class);
 

@@ -14,11 +14,16 @@ use PHPUnit\Framework\TestCase;
 class AbstractPageTest extends TestCase
 {
     /**
-     * @dataProvider prividerGetOffset
+     * @dataProvider providerGetOffset
      */
-    public function testGetOffset($index, $perPage, $expectedOffset): void
+    public function testGetOffset(int $index, int $perPage, int $expectedOffset): void
     {
-        $page = $this->getMockForAbstractClass(AbstractPage::class);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $page = $this->getMockBuilder(AbstractPage::class)
+            ->onlyMethods(array_values(array_diff(get_class_methods(PageInterface::class), [
+                'getOffset',
+            ])))
+            ->getMock();
         $page
             ->expects($this->once())
             ->method('getIndex')
@@ -31,7 +36,7 @@ class AbstractPageTest extends TestCase
         $this->assertSame($expectedOffset, $page->getOffset());
     }
 
-    public function prividerGetOffset(): array
+    public static function providerGetOffset(): array
     {
         return [
             [0, 10, 0],
@@ -42,7 +47,12 @@ class AbstractPageTest extends TestCase
 
     public function testForward(): void
     {
-        $firstPage = $this->getMockForAbstractClass(AbstractPage::class);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $firstPage = $this->getMockBuilder(AbstractPage::class)
+            ->onlyMethods(array_values(array_diff(get_class_methods(PageInterface::class), [
+                'forward',
+            ])))
+            ->getMock();
         $secondPage = $this->createMock(PageInterface::class);
         $thirdPage = $this->createMock(PageInterface::class);
 
@@ -77,7 +87,12 @@ class AbstractPageTest extends TestCase
 
     public function testBackward(): void
     {
-        $firstPage = $this->getMockForAbstractClass(AbstractPage::class);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $firstPage = $this->getMockBuilder(AbstractPage::class)
+            ->onlyMethods(array_values(array_diff(get_class_methods(PageInterface::class), [
+                'backward',
+            ])))
+            ->getMock();
         $secondPage = $this->createMock(PageInterface::class);
         $thirdPage = $this->createMock(PageInterface::class);
 
@@ -112,7 +127,12 @@ class AbstractPageTest extends TestCase
 
     public function testIsFirst(): void
     {
-        $page = $this->getMockForAbstractClass(AbstractPage::class);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $page = $this->getMockBuilder(AbstractPage::class)
+            ->onlyMethods(array_values(array_diff(get_class_methods(PageInterface::class), [
+                'isFirst',
+            ])))
+            ->getMock();
         $page
             ->expects($this->exactly(2))
             ->method('hasPrevious')
@@ -124,7 +144,12 @@ class AbstractPageTest extends TestCase
 
     public function testIsLast(): void
     {
-        $page = $this->getMockForAbstractClass(AbstractPage::class);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $page = $this->getMockBuilder(AbstractPage::class)
+            ->onlyMethods(array_values(array_diff(get_class_methods(PageInterface::class), [
+                'isLast',
+            ])))
+            ->getMock();
         $page
             ->expects($this->exactly(2))
             ->method('hasNext')

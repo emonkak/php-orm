@@ -13,68 +13,55 @@ use Emonkak\Orm\Relation\JoinStrategy\JoinStrategyInterface;
  */
 class Preloaded implements RelationStrategyInterface
 {
-    /**
-     * @var string
-     */
-    private $relationKey;
+    private string $relationKeyName;
+
+    private string $outerKeyName;
+
+    private string $innerKeyName;
 
     /**
-     * @var string
+     * @var TInner[]
      */
-    private $outerKey;
+    private array $innerElements;
 
     /**
-     * @var string
-     */
-    private $innerKey;
-
-    /**
-     * @psalm-var TInner[]
-     * @var mixed[]
-     */
-    private $innerElements;
-
-    /**
-     * @psalm-param TInner[] $innerElements
+     * @param TInner[] $innerElements
      */
     public function __construct(
-        string $relationKey,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $outerKeyName,
+        string $innerKeyName,
         array $innerElements
     ) {
-        $this->relationKey = $relationKey;
-        $this->outerKey = $outerKey;
-        $this->innerKey = $innerKey;
+        $this->relationKeyName = $relationKeyName;
+        $this->outerKeyName = $outerKeyName;
+        $this->innerKeyName = $innerKeyName;
         $this->innerElements = $innerElements;
     }
 
-    public function getRelationKey(): string
+    public function getRelationKeyName(): string
     {
-        return $this->relationKey;
+        return $this->relationKeyName;
     }
 
-    public function getOuterKey(): string
+    public function getOuterKeyName(): string
     {
-        return $this->outerKey;
+        return $this->outerKeyName;
     }
 
-    public function getInnerKey(): string
+    public function getInnerKeyName(): string
     {
-        return $this->innerKey;
+        return $this->innerKeyName;
     }
 
     /**
-     * @psalm-return TInner[]
+     * @return TInner[]
      */
     public function getInnerElements(): array
     {
         return $this->innerElements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $innerKeySelector = $joinStrategy->getInnerKeySelector();
@@ -83,8 +70,8 @@ class Preloaded implements RelationStrategyInterface
         $filteredElements = [];
 
         foreach ($this->innerElements as $innerElement) {
-            $innerKey = $innerKeySelector($innerElement);
-            if (isset($reversedOuterKeys[$innerKey])) {
+            $innerKeyName = $innerKeySelector($innerElement);
+            if (isset($reversedOuterKeys[$innerKeyName])) {
                 $filteredElements[] = $innerElement;
             }
         }

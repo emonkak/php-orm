@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    strategy:
+      matrix:
+        include:
+          - php-version: '8.1'
+          - php-version: '8.2'
+          - php-version: '8.3'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo 'dir=$(composer config cache-files-dir)' >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Install dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+      - name: Run Psalm
+        run: ./vendor/bin/psalm --no-cache --no-progress
+      - name: Run PHP CS Fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --using-cache=no --stop-on-violation --show-progress=none --verbose
+      - name: Run tests
+        run: ./vendor/bin/phpunit --coverage-clover ./coverage/clover.xml
+      - name: Upload coverage results
+        continue-on-error: true
+        uses: coverallsapp/github-action@v2
+        with:
+          file: ./coverage/clover.xml
+          flag-name: php-${{ matrix.php-version }}
+          parallel: true

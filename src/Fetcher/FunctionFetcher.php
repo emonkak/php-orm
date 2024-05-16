@@ -20,34 +20,30 @@ class FunctionFetcher implements FetcherInterface
      */
     use Relatable;
 
-    /**
-     * @var PDOInterface
-     */
-    private $pdo;
+    private PDOInterface $pdo;
 
     /**
-     * @psalm-var ?class-string<T>
-     * @var ?string
+     * @var ?class-string
      */
-    private $class;
+    private ?string $class;
 
     /**
-     * @psalm-var callable(array<string,mixed>):T
-     * @var callable
+     * @var callable(array<string,mixed>):T
      */
     private $instantiator;
 
     /**
      * @template TStatic of object
-     * @psalm-param class-string<TStatic> $class
-     * @psalm-return self<TStatic>
+     * @param class-string<TStatic> $class
+     * @return self<TStatic>
      */
     public static function ofConstructor(PDOInterface $pdo, string $class): self
     {
+        /** @var callable(array<string,mixed>):TStatic */
         $instantiator = \Closure::bind(
             /**
-             * @psalm-param array<string,mixed> $props
-             * @psalm-return TStatic
+             * @param array<string,mixed> $props
+             * @return TStatic
              */
             function(array $props) use ($class) {
                 return new $class($props);
@@ -59,8 +55,8 @@ class FunctionFetcher implements FetcherInterface
     }
 
     /**
-     * @psalm-param ?class-string<T> $class
-     * @psalm-param callable(array<string,mixed>):T $instantiator
+     * @param ?class-string $class
+     * @param callable(array<string,mixed>):T $instantiator
      */
     public function __construct(PDOInterface $pdo, ?string $class, callable $instantiator)
     {
@@ -74,25 +70,19 @@ class FunctionFetcher implements FetcherInterface
         return $this->pdo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): ?string
     {
         return $this->class;
     }
 
     /**
-     * @psalm-return callable(array<string,mixed>):T
+     * @return callable(array<string,mixed>):T
      */
     public function getInstantiator(): callable
     {
         return $this->instantiator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fetch(QueryBuilderInterface $queryBuilder): ResultSetInterface
     {
         $stmt = $queryBuilder->prepare($this->pdo);

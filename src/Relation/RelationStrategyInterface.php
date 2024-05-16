@@ -15,9 +15,9 @@ interface RelationStrategyInterface
     /**
      * @template TOuter
      * @template TResult
-     * @psalm-param TKey[] $outerKeys
-     * @psalm-param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
-     * @psalm-return iterable<TInner>
+     * @param TKey[] $outerKeys
+     * @param JoinStrategyInterface<TOuter,TInner,TKey,TResult> $joinStrategy
+     * @return iterable<TInner>
      */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable;
 }

@@ -12,17 +12,18 @@ use Emonkak\Orm\Relation\RelationInterface;
 trait Relatable
 {
     /**
-     * @psalm-return ?class-string<TOuter>
+     * @return ?class-string
      */
     abstract public function getClass(): ?string;
 
     /**
      * @template TResult
-     * @psalm-param callable(?class-string<TOuter>):RelationInterface<TOuter,TResult> $relationFactory
-     * @psalm-return RelationFetcher<TOuter,TResult>
+     * @param callable(?class-string):RelationInterface<TOuter,TResult> $relationFactory
+     * @return RelationFetcher<TOuter,TResult>
      */
     public function with(callable $relationFactory): RelationFetcher
     {
+        /** @var FetcherInterface<TOuter> $this */
         $class = $this->getClass();
         $relation = $relationFactory($class);
         return new RelationFetcher($this, $relation);
@@ -30,11 +31,12 @@ trait Relatable
 
     /**
      * @template TResult
-     * @psalm-param RelationInterface<TOuter,TResult> $relation
-     * @psalm-return RelationFetcher<TOuter,TResult>
+     * @param RelationInterface<TOuter,TResult> $relation
+     * @return RelationFetcher<TOuter,TResult>
      */
     public function withRelation(RelationInterface $relation): RelationFetcher
     {
+        /** @var FetcherInterface<TOuter> $this */
         return new RelationFetcher($this, $relation);
     }
 }

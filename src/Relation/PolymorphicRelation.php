@@ -12,29 +12,27 @@ use Emonkak\Enumerable\Iterator\ConcatIterator;
  */
 class PolymorphicRelation implements RelationInterface
 {
-    const SORT_KEY = '__sort';
+    public const SORT_KEY = '__sort';
 
     /**
-     * @psalm-var ?class-string<TOuter>
      * @var ?class-string
      */
-    private $resultClass;
+    private ?string $resultClass;
 
     /**
-     * @psalm-var callable(TOuter):string
+     * @var callable(TOuter):string
      */
     private $morphKeySelector;
 
     /**
-     * @psalm-var array<string,RelationInterface<TOuter,TOuter>>
-     * @var array<string,RelationInterface>
+     * @var array<string,RelationInterface<TOuter,TOuter>>
      */
-    private $relations;
+    private array $relations;
 
     /**
-     * @psalm-param ?class-string<TOuter> $resultClass
-     * @psalm-param callable(TOuter):string $morphKeySelector
-     * @psalm-param array<string,RelationInterface<TOuter,TOuter>> $relations
+     * @param ?class-string $resultClass
+     * @param callable(TOuter):string $morphKeySelector
+     * @param array<string,RelationInterface<TOuter,TOuter>> $relations
      */
     public function __construct(?string $resultClass, callable $morphKeySelector, array $relations)
     {
@@ -43,16 +41,13 @@ class PolymorphicRelation implements RelationInterface
         $this->relations = $relations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResultClass(): ?string
     {
         return $this->resultClass;
     }
 
     /**
-     * @psalm-return callable(TOuter):string
+     * @return callable(TOuter):string
      */
     public function getMorphKeySelector(): callable
     {
@@ -60,26 +55,23 @@ class PolymorphicRelation implements RelationInterface
     }
 
     /**
-     * @psalm-return array<string,RelationInterface<TOuter,TOuter>> $relations
+     * @return array<string,RelationInterface<TOuter,TOuter>> $relations
      */
     public function getRelations(): array
     {
         return $this->relations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function associate(iterable $outerResult, ?string $outerClass): \Traversable
     {
         $morphKeySelector = $this->morphKeySelector;
-        /** @psalm-var callable(TOuter,int):TOuter */
-        $sortKeyAssignee = AccessorCreators::createKeyAssignee($outerClass, self::SORT_KEY);
+        /** @var callable(TOuter,int):TOuter */
+        $sortKeyAssignor = AccessorCreators::createKeyAssignor($outerClass, self::SORT_KEY);
         $outerElementsByMorphKey = [];
 
         foreach ($outerResult as $index => $outerElement) {
             $morphKey = $morphKeySelector($outerElement);
-            $outerElement = $sortKeyAssignee($outerElement, $index);
+            $outerElement = $sortKeyAssignor($outerElement, $index);
             $outerElementsByMorphKey[$morphKey][] = $outerElement;
         }
 
@@ -94,9 +86,9 @@ class PolymorphicRelation implements RelationInterface
             }
         }
 
-        /** @psalm-var callable(TOuter):int */
+        /** @var callable(TOuter):int */
         $sortKeySelector = AccessorCreators::createKeySelector($outerClass, self::SORT_KEY);
-        /** @psalm-var callable(TOuter):TOuter */
+        /** @var callable(TOuter,array-key):TOuter */
         $sortKeyEraser = AccessorCreators::createKeyEraser($outerClass, self::SORT_KEY);
 
         return (new ConcatIterator($outerResults))

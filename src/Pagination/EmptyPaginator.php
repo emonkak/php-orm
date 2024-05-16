@@ -17,22 +17,13 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
      */
     use EnumerableExtensions;
 
-    /**
-     * @var int
-     */
-    private $perPage;
+    private int $perPage;
 
-    /**
-     * @psalm-param int $perPage
-     */
     public function __construct(int $perPage)
     {
         $this->perPage = $perPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function at(int $index): PaginatablePageInterface
     {
         return new Page(new \EmptyIterator(), $index, $this);
@@ -43,17 +34,11 @@ class EmptyPaginator extends \EmptyIterator implements PaginatorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function firstPage(): PaginatablePageInterface
     {
         return $this->at(0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lastPage(): PaginatablePageInterface
     {
         return $this->at(0);

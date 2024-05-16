@@ -15,74 +15,58 @@ use Emonkak\Orm\SelectBuilder;
  */
 class OneTo implements RelationStrategyInterface
 {
-    /**
-     * @var string
-     */
-    private $relationKey;
+    private string $relationKeyName;
+
+    private string $tableName;
+
+    private string $outerKeyName;
+
+    private string $innerKeyName;
+
+    private SelectBuilder $queryBuilder;
 
     /**
-     * @var string
+     * @var FetcherInterface<TInner>
      */
-    private $table;
+    private FetcherInterface $fetcher;
 
     /**
-     * @var string
-     */
-    private $outerKey;
-
-    /**
-     * @var string
-     */
-    private $innerKey;
-
-    /**
-     * @var SelectBuilder
-     */
-    private $queryBuilder;
-
-    /**
-     * @psalm-var FetcherInterface<TInner>
-     * @var FetcherInterface
-     */
-    private $fetcher;
-
-    /**
-     * @psalm-param FetcherInterface<TInner> $fetcher
+     * @param FetcherInterface<TInner> $fetcher
      */
     public function __construct(
-        string $relationKey,
-        string $table,
-        string $outerKey,
-        string $innerKey,
+        string $relationKeyName,
+        string $tableName,
+        string $outerKeyName,
+        string $innerKeyName,
         SelectBuilder $queryBuilder,
         FetcherInterface $fetcher
     ) {
-        $this->relationKey = $relationKey;
-        $this->table = $table;
-        $this->outerKey = $outerKey;
-        $this->innerKey = $innerKey;
+        $this->relationKeyName = $relationKeyName;
+        $this->tableName = $tableName;
+        $this->outerKeyName = $outerKeyName;
+        $this->innerKeyName = $innerKeyName;
         $this->queryBuilder = $queryBuilder;
         $this->fetcher = $fetcher;
     }
 
-    public function getRelationKey(): string
+    public function getRelationKeyName(): string
     {
-        return $this->relationKey;
+        return $this->relationKeyName;
     }
 
-    public function getTable(): string
+    public function getTableName(): string
     {
-        return $this->table;
+        return $this->tableName;
     }
 
-    public function getOuterKey(): string
+    public function getOuterKeyName(): string
     {
-        return $this->outerKey;
+        return $this->outerKeyName;
     }
 
-    public function getInnerKey(): string
+    public function getInnerKeyName(): string
     {
-        return $this->innerKey;
+        return $this->innerKeyName;
     }
 
     public function getQueryBuilder(): SelectBuilder
@@ -91,28 +75,25 @@ class OneTo implements RelationStrategyInterface
     }
 
     /**
-     * @psalm-return FetcherInterface<TInner>
+     * @return FetcherInterface<TInner>
      */
     public function getFetcher(): FetcherInterface
     {
         return $this->fetcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResult(array $outerKeys, JoinStrategyInterface $joinStrategy): iterable
     {
         $queryBuilder = $this->queryBuilder;
         $grammar = $queryBuilder->getGrammar();
 
         if (count($queryBuilder->getFrom()) === 0) {
-            $queryBuilder = $queryBuilder->from($grammar->identifier($this->table));
+            $queryBuilder = $queryBuilder->from($grammar->identifier($this->tableName));
         }
 
         return $queryBuilder
             ->where(
-                $grammar->identifier($this->table) . '.' . $grammar->identifier($this->innerKey),
+                $grammar->identifier($this->tableName) . '.' . $grammar->identifier($this->innerKeyName),
                 'IN',
                 $outerKeys
             )
