@@ -22,15 +22,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout the repository
         uses: actions/checkout@v4
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo 'dir=$(composer config cache-files-dir)' >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
       - name: Install dependencies
         run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
       - name: Run Psalm
@@ -46,3 +37,12 @@ jobs:
           file: ./coverage/clover.xml
           flag-name: php-${{ matrix.php-version }}
           parallel: true
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finish Coveralls parallel build
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true

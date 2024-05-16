@@ -33,4 +33,12 @@ class LazyValueTest extends TestCase
         $this->assertSame($value, $lazyValue->get());
         $this->assertSame($value, unserialize(serialize($lazyValue))->get());
     }
+
+    public function testSerialize(): void
+    {
+        $value = new LazyValue('foo', function(): int {
+            return 123;
+        });
+        $this->assertSame(123, unserialize(serialize($value))->get());
+    }
 }
