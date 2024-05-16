@@ -20,9 +20,9 @@ interface GrammarInterface
 
     public function getDeleteBuilder(): DeleteBuilder;
 
-    public function lift(mixed $value): Sql;
+    public function lvalue(mixed $value): Sql;
 
-    public function value(mixed $value): Sql;
+    public function rvalue(mixed $value): Sql;
 
     public function condition(mixed $arg1, mixed $arg2 = null, mixed $arg3 = null, mixed $arg4 = null): Sql;
 

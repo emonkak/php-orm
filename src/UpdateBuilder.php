@@ -80,7 +80,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function set(string $column, mixed $expr): self
     {
         $cloned = clone $this;
-        $cloned->set[$column] = $this->grammar->value($expr);
+        $cloned->set[$column] = $this->grammar->rvalue($expr);
         return $cloned;
     }
 
@@ -90,7 +90,7 @@ class UpdateBuilder implements QueryBuilderInterface
     public function withSet(array $set): self
     {
         $cloned = clone $this;
-        $cloned->set = array_map([$this->grammar, 'value'], $set);
+        $cloned->set = array_map([$this->grammar, 'rvalue'], $set);
         return $cloned;
     }
 

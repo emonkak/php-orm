@@ -206,7 +206,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function select(mixed $expr, ?string $alias = null): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         if ($alias !== null) {
             $expr = $this->grammar->alias($expr, $alias);
         }
@@ -222,7 +222,7 @@ class SelectBuilder implements QueryBuilderInterface
     {
         $select = [];
         foreach ($exprs as $key => $expr) {
-            $expr = $this->grammar->lift($expr);
+            $expr = $this->grammar->lvalue($expr);
             if (is_string($key)) {
                 $expr = $this->grammar->alias($expr, $key);
             }
@@ -235,7 +235,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function from(mixed $table, ?string $alias = null, int $position = -1): self
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->lvalue($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
@@ -268,12 +268,12 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function join(mixed $table, mixed $condition = null, ?string $alias = null, int $position = -1, string $type = 'JOIN'): self
     {
-        $table = $this->grammar->lift($table);
+        $table = $this->grammar->lvalue($table);
         if ($alias !== null) {
             $table = $this->grammar->alias($table, $alias);
         }
         if ($condition !== null) {
-            $condition = $this->grammar->lift($condition);
+            $condition = $this->grammar->lvalue($condition);
         }
         $joinedTable = $this->grammar->join($table, $condition, $type);
         $join = $this->join;
@@ -294,7 +294,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function groupBy(mixed $expr): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         $cloned = clone $this;
         $cloned->groupBy[] = $expr;
         return $cloned;
@@ -318,7 +318,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function window(string $name, mixed $specification = ''): self
     {
-        $specification = $this->grammar->lift($specification);
+        $specification = $this->grammar->lvalue($specification);
         $cloned = clone $this;
         $cloned->window[] = $this->grammar->window($name, $specification);
         return $cloned;
@@ -326,7 +326,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function orderBy(mixed $expr, ?string $ordering = null): self
     {
-        $expr = $this->grammar->lift($expr);
+        $expr = $this->grammar->lvalue($expr);
         if ($ordering !== null) {
             $expr = $this->grammar->ordering($expr, $ordering);
         }
@@ -375,7 +375,7 @@ class SelectBuilder implements QueryBuilderInterface
 
     public function unionWith(mixed $query, string $type = 'UNION'): self
     {
-        $query = $this->grammar->lift($query);
+        $query = $this->grammar->lvalue($query);
         $cloned = clone $this;
         $cloned->union[] = $this->grammar->union($query, $type);
         return $cloned;

@@ -86,10 +86,10 @@ class AbstractGrammarTest extends TestCase
         /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
-                'lift',
+                'lvalue',
             ])))
             ->getMock();
-        $query = $grammar->lift($value);
+        $query = $grammar->lvalue($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
@@ -113,10 +113,10 @@ class AbstractGrammarTest extends TestCase
         /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
-                'lift',
+                'lvalue',
             ])))
             ->getMock();
-        $grammar->lift($value);
+        $grammar->lvalue($value);
     }
 
     public static function providerLiftThrowsUnexpectedValueException(): array
@@ -140,10 +140,10 @@ class AbstractGrammarTest extends TestCase
         /** @psalm-suppress ArgumentTypeCoercion */
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
-                'value',
+                'rvalue',
             ])))
             ->getMock();
-        $query = $grammar->value($value);
+        $query = $grammar->rvalue($value);
 
         $this->assertQueryIs($expectedSql, $expectedBindings, $query);
     }
@@ -175,11 +175,11 @@ class AbstractGrammarTest extends TestCase
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
-                'lift',
-                'value',
+                'lvalue',
+                'rvalue',
             ])))
             ->getMock();
-        $grammar->value($value);
+        $grammar->rvalue($value);
     }
 
     public static function providerValueThrowsUnexpectedValueException(): array
@@ -198,8 +198,8 @@ class AbstractGrammarTest extends TestCase
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(/** @var non-empty-string[] */ array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
-                'lift',
-                'value',
+                'lvalue',
+                'rvalue',
             ])))
             ->getMock();
 
@@ -217,8 +217,8 @@ class AbstractGrammarTest extends TestCase
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
-                'lift',
-                'value',
+                'lvalue',
+                'rvalue',
             ])))
             ->getMock();
         $grammar
@@ -243,8 +243,8 @@ class AbstractGrammarTest extends TestCase
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
-                'lift',
-                'value',
+                'lvalue',
+                'rvalue',
             ])))
             ->getMock();
         $grammar
@@ -271,8 +271,8 @@ class AbstractGrammarTest extends TestCase
         $grammar = $this->getMockBuilder(AbstractGrammar::class)
             ->onlyMethods(array_values(array_diff(get_class_methods(GrammarInterface::class), [
                 'condition',
-                'lift',
-                'value',
+                'lvalue',
+                'rvalue',
             ])))
             ->getMock();
         $grammar
