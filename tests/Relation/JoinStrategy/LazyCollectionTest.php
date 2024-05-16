@@ -72,4 +72,12 @@ class LazyCollectionTest extends TestCase
         $this->assertFalse(isset($collection[1]));
         $this->assertFalse(isset($collection[2]));
     }
+
+    public function testSerialize(): void
+    {
+        $xs = new LazyCollection('foo', function(): array {
+            return [1, 2, 3];
+        });
+        $this->assertSame([1, 2, 3], unserialize(serialize($xs))->get());
+    }
 }

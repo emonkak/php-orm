@@ -92,14 +92,13 @@ class LazyCollection implements LazyCollectionInterface
         return count($source);
     }
 
-    public function serialize(): string
+    public function __serialize(): array
     {
-        $source = $this->get();
-        return serialize($source);
+        return ['source' => $this->get()];
     }
 
-    public function unserialize(string $data): void
+    public function __unserialize(array $data): void
     {
-        $this->source = unserialize($data);
+        $this->source = $data['source'];
     }
 }

@@ -51,14 +51,13 @@ class LazyValue implements LazyValueInterface
         return $this->value;
     }
 
-    public function serialize(): string
+    public function __serialize(): array
     {
-        $value = $this->get();
-        return serialize($value);
+        return ['value' => $this->get()];
     }
 
-    public function unserialize(string $data): void
+    public function __unserialize(array $data): void
     {
-        $this->value = unserialize($data);
+        $this->value = $data['value'];
     }
 }
