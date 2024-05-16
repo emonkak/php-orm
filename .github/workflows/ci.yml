@@ -46,3 +46,12 @@ jobs:
           file: ./coverage/clover.xml
           flag-name: php-${{ matrix.php-version }}
           parallel: true
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finish Coveralls parallel build
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
