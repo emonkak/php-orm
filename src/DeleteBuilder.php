@@ -7,7 +7,7 @@ namespace Emonkak\Orm;
 use Emonkak\Orm\Grammar\GrammarInterface;
 
 /**
- * Provides the query building of DELETE statement.
+ * A query builder for DELETE statement.
  */
 class DeleteBuilder implements QueryBuilderInterface
 {

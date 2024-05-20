@@ -7,7 +7,7 @@ namespace Emonkak\Orm;
 use Emonkak\Orm\Grammar\GrammarInterface;
 
 /**
- * Provides the query building of UPDATE statement.
+ * A query builder for UPDATE statement.
  */
 class UpdateBuilder implements QueryBuilderInterface
 {

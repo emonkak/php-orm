@@ -13,7 +13,7 @@ use Emonkak\Orm\Pagination\PrecountPaginator;
 use Emonkak\Orm\Pagination\SequentialPage;
 
 /**
- * Provides the query building of SELECT statement.
+ * A query builder for SELECT statement.
  */
 class SelectBuilder implements QueryBuilderInterface
 {

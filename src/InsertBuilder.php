@@ -7,7 +7,7 @@ namespace Emonkak\Orm;
 use Emonkak\Orm\Grammar\GrammarInterface;
 
 /**
- * Provides the query building of INSERT statement.
+ * A query builder for INSERT statement.
  */
 class InsertBuilder implements QueryBuilderInterface
 {
