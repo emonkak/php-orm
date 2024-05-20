@@ -8,6 +8,7 @@ use Emonkak\Orm\Relation\RelationInterface;
 
 /**
  * @template TOuter
+ * @psalm-require-implements FetcherInterface
  */
 trait Relatable
 {

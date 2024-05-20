@@ -9,6 +9,9 @@ use Emonkak\Database\PDOStatementInterface;
 use Emonkak\Orm\Fetcher\FetcherInterface;
 use Emonkak\Orm\ResultSet\ResultSetInterface;
 
+/**
+ * @psalm-require-implements QueryBuilderInterface
+ */
 trait Fetchable
 {
     /**
